@@ -141,6 +141,6 @@ stdenv.mkDerivation rec {
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ ];
     mainProgram = "backlog";
-    platforms = lib.platforms.all;
+    platforms = [ "x86_64-linux" ];
   };
 }

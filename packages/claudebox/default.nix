@@ -29,6 +29,10 @@ in
 pkgs.runCommand "claudebox"
   {
     buildInputs = [ pkgs.makeWrapper ];
+    meta = with pkgs.lib; {
+      description = "Sandboxed environment for Claude Code";
+      platforms = platforms.linux;
+    };
   }
   ''
     mkdir -p $out/bin $out/share/claudebox $out/libexec/claudebox
