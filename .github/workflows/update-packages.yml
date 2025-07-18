@@ -1,0 +1,143 @@
+name: Update packages
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Space-separated list of packages to update (leave empty for all)'
+        required: false
+        default: ''
+
+jobs:
+  get-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: cachix/install-nix-action@v24
+        with:
+          extra_nix_config: |
+            accept-flake-config = true
+            experimental-features = nix-command flakes
+      
+      - id: set-matrix
+        run: |
+          if [ -n "${{ github.event.inputs.packages }}" ]; then
+            # Manual run with specific packages
+            packages='${{ github.event.inputs.packages }}'
+            matrix=$(echo $packages | jq -R -s -c 'split(" ") | map(select(length > 0))')
+          else
+            # Use update-packages tool to get the list (it already filters non-updatable packages)
+            packages=$(nix run .#update-packages -- --list-only)
+            matrix=$(echo "$packages" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          fi
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "Matrix: $matrix"
+
+  update:
+    needs: get-packages
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.get-packages.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - uses: cachix/install-nix-action@v24
+        with:
+          extra_nix_config: |
+            accept-flake-config = true
+            experimental-features = nix-command flakes
+      
+      - name: Set up git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Update package
+        id: update
+        run: |
+          echo "Updating ${{ matrix.package }}..."
+          
+          # Capture the current version
+          current_version=$(nix eval .#${{ matrix.package }}.version --raw 2>/dev/null || echo "unknown")
+          echo "Current version: $current_version"
+          
+          # Run the update
+          if output=$(nix run .#update-packages -- ${{ matrix.package }} 2>&1); then
+            echo "$output"
+            
+            # Check if there were actual changes
+            if git diff --quiet; then
+              echo "No changes detected"
+              echo "updated=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            
+            # Get the new version
+            new_version=$(nix eval .#${{ matrix.package }}.version --raw 2>/dev/null || echo "unknown")
+            echo "New version: $new_version"
+            
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "current_version=$current_version" >> $GITHUB_OUTPUT
+            echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          else
+            echo "Update failed"
+            echo "$output"
+            echo "updated=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+      
+      - name: Create or update PR
+        if: steps.update.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          package="${{ matrix.package }}"
+          current_version="${{ steps.update.outputs.current_version }}"
+          new_version="${{ steps.update.outputs.new_version }}"
+          branch="update/${package}"
+          
+          # Create a new branch
+          git checkout -b "$branch"
+          
+          # Stage all changes
+          git add .
+          
+          # Commit
+          commit_message="${package}: ${current_version} -> ${new_version}"
+          git commit -m "$commit_message"
+          
+          # Check if PR branch already exists on remote
+          if git ls-remote --heads origin "$branch" | grep -q "$branch"; then
+            echo "Branch exists, force pushing..."
+            git push --force origin "$branch"
+          else
+            echo "Creating new branch..."
+            git push origin "$branch"
+          fi
+          
+          # Check if bot PR already exists for this branch
+          pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number // empty')
+          
+          if [ -n "$pr_number" ]; then
+            echo "Updating existing bot PR #$pr_number"
+            gh pr edit "$pr_number" \
+              --title "$commit_message" \
+              --body "Automated update of ${package} from ${current_version} to ${new_version}."
+          else
+            echo "Creating new PR"
+            gh pr create \
+              --title "$commit_message" \
+              --body "Automated update of ${package} from ${current_version} to ${new_version}." \
+              --base main \
+              --head "$branch"
+          fi
