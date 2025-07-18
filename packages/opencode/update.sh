@@ -26,11 +26,12 @@ echo "Current version: $current_version"
 
 # Check if update is needed
 if [ "$latest_version" = "$current_version" ]; then
-  echo "Package is already up to date!"
-  exit 0
+  echo "Version is already up to date at $current_version"
+  echo "Checking if all platform hashes are correct..."
+  # Continue to verify/update hashes even if version matches
+else
+  echo "Update available: $current_version -> $latest_version"
 fi
-
-echo "Update available: $current_version -> $latest_version"
 
 # Calculate hashes for all platforms
 echo "Calculating hashes for all platforms..."
@@ -53,7 +54,18 @@ declare -A platforms=(
 for nix_system in "${!platforms[@]}"; do
   download_name="${platforms[$nix_system]}"
   echo "  Calculating hash for $nix_system..."
-  new_hash=$(nix hash file --sri <(curl -sL "https://github.com/sst/opencode/releases/download/v${latest_version}/opencode-${download_name}.zip"))
+  # Use nix-build with fetchzip to get the correct hash
+  url="https://github.com/sst/opencode/releases/download/v${latest_version}/opencode-${download_name}.zip"
+
+  # Calculate hash with timeout and error handling
+  hash_output=$(timeout 60 nix-build -E "with import <nixpkgs> {}; fetchzip { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
+  new_hash=$(echo "$hash_output" | grep "got:" | awk '{print $2}')
+
+  if [ -z "$new_hash" ]; then
+    echo "    ERROR: Failed to calculate hash for $nix_system"
+    echo "    Output: $hash_output"
+    continue
+  fi
 
   # Update the specific hash for this platform
   # Find the line number for this platform's hash
@@ -66,12 +78,27 @@ for nix_system in "${!platforms[@]}"; do
   fi
 done
 
-# Move updated file back
-mv "$tmp_file" "$package_file"
+# Check if any changes were made
+if ! diff -q "$tmp_file" "$package_file" >/dev/null 2>&1; then
+  # Move updated file back
+  mv "$tmp_file" "$package_file"
 
-echo "Updated to version $latest_version"
-echo "Building package to verify..."
-nix build "$script_dir/../.."#packages.x86_64-linux.opencode
+  if [ "$latest_version" != "$current_version" ]; then
+    echo "Updated to version $latest_version"
+  else
+    echo "Updated platform hashes for version $current_version"
+  fi
 
-echo "Update completed successfully!"
-echo "opencode has been updated from $current_version to $latest_version"
+  echo "Building package to verify..."
+  nix build "$script_dir/../.."#packages.x86_64-linux.opencode
+
+  echo "Update completed successfully!"
+  if [ "$latest_version" != "$current_version" ]; then
+    echo "opencode has been updated from $current_version to $latest_version"
+  else
+    echo "Platform hashes have been updated for opencode $current_version"
+  fi
+else
+  echo "No changes needed - all hashes are already correct"
+  rm -f "$tmp_file"
+fi
