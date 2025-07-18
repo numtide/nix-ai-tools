@@ -6,6 +6,7 @@ pkgs.writeShellApplication {
     git
     jq
     curl
+    nodejs_20  # Includes npm, needed for some package update scripts
   ];
   text = ''
     set -euo pipefail
@@ -16,20 +17,45 @@ pkgs.writeShellApplication {
 
     # Check for --list-only flag first
     if [ "$#" -eq 1 ] && [ "$1" = "--list-only" ]; then
-        # Output packages as JSON array
-        nix eval --json --impure .#packages.x86_64-linux --apply 'builtins.attrNames' | jq -c 'map(select(. | test("^(update-packages|default|formatter)$") | not))'
+        # Output packages with package.nix as JSON array
+        packages_array=()
+        for package_file in packages/*/package.nix; do
+            if [ -f "$package_file" ]; then
+                pkg=$(basename "$(dirname "$package_file")")
+                packages_array+=("\"$pkg\"")
+            fi
+        done
+        # Convert to JSON array format
+        echo "[$(IFS=,; echo "''${packages_array[*]}")]"
         exit 0
     fi
 
     # Check if specific packages were provided
     if [ $# -gt 0 ]; then
-        # Use provided packages
-        packages=("$@")
+        # Use provided packages, but filter for those with package.nix
+        packages=()
+        for pkg in "$@"; do
+            if [ -f "packages/$pkg/package.nix" ]; then
+                packages+=("$pkg")
+            else
+                echo "Warning: Skipping $pkg (no package.nix file)"
+            fi
+        done
+        if [ ''${#packages[@]} -eq 0 ]; then
+            echo "No valid packages to update"
+            exit 0
+        fi
         echo "Updating specified packages: ''${packages[*]}"
     else
-        # Get all packages from the flake
+        # Get all packages with package.nix files
         echo "Updating all packages in the flake..."
-        mapfile -t packages < <(nix eval --json --impure .#packages.x86_64-linux --apply 'builtins.attrNames' | jq -r '.[]')
+        packages=()
+        for package_file in packages/*/package.nix; do
+            if [ -f "$package_file" ]; then
+                pkg=$(basename "$(dirname "$package_file")")
+                packages+=("$pkg")
+            fi
+        done
     fi
     echo
 
@@ -39,28 +65,57 @@ pkgs.writeShellApplication {
     already_uptodate=()
 
     for pkg in "''${packages[@]}"; do
-        echo "Checking $pkg..."
-        
-        # Skip packages that are not meant to be updated
-        case "$pkg" in
-            update-packages|default|formatter)
-                echo "  Skipping $pkg"
-                continue
-                ;;
-        esac
 
-        # Use nix-update with -u to use passthru.updateScript if available
-        if output=$(nix-update --flake --use-update-script --version=stable "$pkg" 2>&1); then
-            if echo "$output" | grep -q "Package already up to date"; then
-                already_uptodate+=("$pkg")
-                echo "  ✓ Already up to date"
+        # Get current version
+        current_version=$(nix eval --raw .#packages.x86_64-linux."$pkg".version 2>/dev/null || echo "unknown")
+        echo "Checking $pkg (current: $current_version)..."
+
+        # Check if package has a custom update script
+        # Look for the update script in the source tree
+        update_script_path="packages/$pkg/update.sh"
+        if [ -f "$update_script_path" ] && [ -x "$update_script_path" ]; then
+            echo "  Using custom update script..."
+            # Capture output to extract version info
+            if output=$("$update_script_path" 2>&1); then
+                # Try to extract version info from output
+                if echo "$output" | grep -q "Update available:"; then
+                    new_version=$(echo "$output" | grep "Update available:" | sed -E 's/.*-> ([0-9.]+).*/\1/')
+                    updated+=("$pkg: $current_version → $new_version")
+                    echo "  ✓ Updated successfully ($current_version → $new_version)"
+                elif echo "$output" | grep -q "already up to date"; then
+                    already_uptodate+=("$pkg: $current_version")
+                    echo "  ✓ Already up to date at $current_version"
+                else
+                    # Package was updated but version extraction failed
+                    new_version=$(nix eval --raw .#packages.x86_64-linux."$pkg".version 2>/dev/null || echo "unknown")
+                    if [ "$new_version" != "$current_version" ]; then
+                        updated+=("$pkg: $current_version → $new_version")
+                        echo "  ✓ Updated successfully ($current_version → $new_version)"
+                    else
+                        updated+=("$pkg: version unknown")
+                        echo "  ✓ Updated successfully"
+                    fi
+                fi
             else
-                updated+=("$pkg")
-                echo "  ✓ Updated successfully"
+                failed+=("$pkg: $current_version")
+                echo "  ✗ Failed to update (current: $current_version)"
             fi
         else
-            failed+=("$pkg")
-            echo "  ✗ Failed to update"
+            # Use nix-update for packages without custom scripts
+            if output=$(nix-update --flake --version=stable "$pkg" 2>&1); then
+                if echo "$output" | grep -q "Package already up to date"; then
+                    already_uptodate+=("$pkg: $current_version")
+                    echo "  ✓ Already up to date at $current_version"
+                else
+                    # Get new version after update
+                    new_version=$(nix eval --raw .#packages.x86_64-linux."$pkg".version 2>/dev/null || echo "unknown")
+                    updated+=("$pkg: $current_version → $new_version")
+                    echo "  ✓ Updated successfully ($current_version → $new_version)"
+                fi
+            else
+                failed+=("$pkg: $current_version")
+                echo "  ✗ Failed to update (current: $current_version)"
+            fi
         fi
         echo
     done
@@ -92,6 +147,11 @@ pkgs.writeShellApplication {
         echo "  1. Review the changes: git diff"
         echo "  2. Build updated packages: nix build .#packages.x86_64-linux.<package>"
         echo "  3. Commit the updates"
+    fi
+
+    # Exit with error code if there were any failures
+    if [ ''${#failed[@]} -gt 0 ]; then
+        exit 1
     fi
   '';
 }
