@@ -238,6 +238,10 @@ Contributions are welcome! Please:
 3. Run `nix fmt` before committing
 4. Submit a pull request
 
+## See also
+
+* https://github.com/k3d3/claude-desktop-linux-flake
+
 ## License
 
 Individual tools are licensed under their respective licenses:
