@@ -17,21 +17,25 @@ As Nix and DevOps consultants, this work is part of our strategic exploration—
 This project explores several key integration patterns between Nix and AI agents:
 
 ### 1. Reproducible AI Tool Deployment
+
 - **Declarative packaging**: All AI tools are packaged as Nix derivations, ensuring reproducible builds across different systems
 - **Version pinning**: Exact versions are locked via flake.lock for consistent behavior
 - **Cross-platform support**: Native support for Linux and macOS on both x86_64 and aarch64
 
 ### 2. Security and Sandboxing
+
 - **claudebox**: Demonstrates running AI agents in bubblewrap sandboxes with restricted filesystem access
 - **Transparency**: All AI agent actions are logged and displayed in real-time via tmux integration
 - **Controlled access**: Read-only system access with write permissions limited to project directories
 
 ### 3. Tool Composition and Routing
+
 - **claude-code-router**: Shows how to decouple AI interfaces from specific providers
 - **Alternative backends**: Route requests to different LLM providers while maintaining the same interface
 - **Extensibility**: Easy addition of new AI tools through modular package structure
 
 ### 4. Development Environment Integration
+
 - **Unified tooling**: AI agents work seamlessly within Nix development shells
 - **Format integration**: AI-generated code automatically follows project formatting rules
 - **Dependency management**: AI tools have access to all project dependencies through Nix
@@ -41,18 +45,21 @@ This project explores several key integration patterns between Nix and AI agents
 ### AI Coding Assistants
 
 #### claude-code
+
 - **Description**: Anthropic's official Claude Code CLI - an agentic coding tool
 - **Version**: 1.0.53
 - **License**: Proprietary (unfree)
 - **Usage**: `nix run .#claude-code -- --help`
 
 #### opencode
+
 - **Description**: Open-source AI coding agent built for the terminal
 - **Version**: 0.3.13
 - **License**: MIT
 - **Usage**: `nix run .#opencode -- --help`
 
 #### gemini-cli
+
 - **Description**: Google's AI agent bringing Gemini AI to your terminal
 - **Version**: 0.1.12
 - **License**: Apache 2.0
@@ -61,6 +68,7 @@ This project explores several key integration patterns between Nix and AI agents
 ### AI Collaboration Tools
 
 #### backlog-md
+
 - **Description**: Project collaboration tool for humans and AI agents in git ecosystems
 - **Version**: 1.4.1
 - **License**: Check package
@@ -69,6 +77,7 @@ This project explores several key integration patterns between Nix and AI agents
 ### Integration Examples
 
 #### claudebox
+
 - **Integration Focus**: Security and transparency for AI agent execution
 - **Key Innovation**: Combines Nix packaging with bubblewrap sandboxing and tmux for real-time monitoring
 - **Features**:
@@ -80,6 +89,7 @@ This project explores several key integration patterns between Nix and AI agents
 - **Usage**: `nix run .#claudebox`
 
 #### claude-code-router
+
 - **Integration Focus**: Provider abstraction and flexibility
 - **Key Innovation**: Decouples AI tool interfaces from specific providers
 - **Version**: 1.0.19
@@ -90,6 +100,7 @@ This project explores several key integration patterns between Nix and AI agents
 ### Development Tools
 
 #### formatter
+
 - **Description**: Enhanced treefmt wrapper with format checking
 - **Features**: Includes nixfmt, deadnix, shellcheck, shfmt, mdformat, yamlfmt, taplo
 - **Usage**: `nix run .#formatter`
@@ -164,6 +175,7 @@ nix flake check
 ### Platform Support
 
 All packages support:
+
 - `x86_64-linux`
 - `aarch64-linux`
 - `x86_64-darwin`
@@ -178,6 +190,7 @@ Most packages are based on Node.js 20, with some providing pre-built binaries. E
 This repository serves as a laboratory for exploring how Nix can enhance AI-powered development:
 
 ### Current Experiments
+
 - **Sandboxed execution**: claudebox demonstrates transparent, sandboxed AI agent execution
 - **Provider abstraction**: claude-code-router explores decoupling AI interfaces from specific providers
 - **Tool composition**: Investigating how multiple AI agents can work together in Nix environments
@@ -185,27 +198,32 @@ This repository serves as a laboratory for exploring how Nix can enhance AI-powe
 ### Future Exploration Areas
 
 #### Dynamic Development Environment Integration
+
 - **Automatic devshell reloading**: Enable AI agents to detect and reload their development shells whenever the Nix configuration changes
 - **Live environment updates**: Seamless integration of new tools and dependencies without interrupting AI agent sessions
 - **State preservation**: Maintain AI agent context across devshell reloads
 
 #### Enhanced Tool Discovery
+
 - **Nixpkgs program indexing**: Make the entire nixpkgs collection queryable by AI agents for dynamic tool discovery
 - **Smart tool suggestions**: AI agents can recommend and instantly access appropriate tools from nixpkgs based on task requirements
 - **On-demand tool loading**: Just-in-time provisioning of development tools without pre-declaring all dependencies
 
 #### Advanced Workspace Management
+
 - **Git worktree integration**: Enable AI agents to dynamically create and manage git worktrees for parallel development branches
 - **Isolated experiment spaces**: Each AI task can operate in its own worktree without affecting the main development flow
 - **Automatic context switching**: AI agents can seamlessly move between different worktrees based on task requirements
 
 #### Asynchronous Collaboration
+
 - **Online work sessions**: Support for long-running, asynchronous AI agent sessions that persist beyond terminal sessions
 - **Background task execution**: AI agents can continue working on tasks while developers focus on other activities
 - **Progress synchronization**: Real-time updates and notifications for ongoing AI agent work
 - **Session handoff**: Ability to pause, resume, and transfer AI agent sessions between different environments
 
 #### Additional Research Areas
+
 - **Deterministic AI outputs**: Using Nix's reproducibility features to create more predictable AI behaviors
 - **Context management**: Leveraging Nix's declarative nature to manage AI agent contexts and memory
 - **Multi-agent orchestration**: Coordinating multiple AI tools through Nix expressions
@@ -214,6 +232,7 @@ This repository serves as a laboratory for exploring how Nix can enhance AI-powe
 ### Research Questions
 
 #### Technical Integration
+
 - How can AI agents dynamically adapt to changing Nix environments without losing context?
 - What's the best way to expose the entire nixpkgs ecosystem to AI agents for tool discovery?
 - Can git worktrees provide effective isolation for parallel AI agent experiments?
@@ -222,6 +241,7 @@ This repository serves as a laboratory for exploring how Nix can enhance AI-powe
 - How can we balance AI agent autonomy with security and reproducibility guarantees?
 
 #### Consulting Practice Evolution
+
 - How will AI agents transform Nix and DevOps consulting engagements?
 - What new service offerings can we create by combining Nix expertise with AI capabilities?
 - How do we help clients adopt AI-enhanced DevOps practices safely and effectively?
@@ -234,17 +254,18 @@ This repository serves as a laboratory for exploring how Nix can enhance AI-powe
 Contributions are welcome! Please:
 
 1. Fork the repository
-2. Create a feature branch
-3. Run `nix fmt` before committing
-4. Submit a pull request
+1. Create a feature branch
+1. Run `nix fmt` before committing
+1. Submit a pull request
 
 ## See also
 
-* https://github.com/k3d3/claude-desktop-linux-flake
+- https://github.com/k3d3/claude-desktop-linux-flake
 
 ## License
 
 Individual tools are licensed under their respective licenses:
+
 - claude-code: Proprietary
 - opencode: MIT
 - gemini-cli: Apache 2.0

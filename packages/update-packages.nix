@@ -6,7 +6,7 @@ pkgs.writeShellApplication {
     git
     jq
     curl
-    nodejs_20  # Includes npm, needed for some package update scripts
+    nodejs_20 # Includes npm, needed for some package update scripts
   ];
   text = ''
     set -euo pipefail
