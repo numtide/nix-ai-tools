@@ -7,7 +7,7 @@
 
 buildNpmPackage rec {
   pname = "claude-code";
-  version = "1.0.53";
+  version = "1.0.58";
 
   nodejs = nodejs_20; # required for sandboxed Nix builds on Darwin
 
@@ -16,7 +16,7 @@ buildNpmPackage rec {
     hash = "sha256-opFOUa/YtJDwhkD5dN+PL74z5NqkrRCVrU2RQu6xmEc=";
   };
 
-  npmDepsHash = "sha256-e+WTydp3WIl6hZwbmv5SKM9XhcMJpYO5mTInT41/p2c=";
+  npmDepsHash = "sha256-iAckljEIJFVtlySHjS414HUFg6XVSlPr8azYqTo1py8=";
 
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
