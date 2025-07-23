@@ -9,7 +9,7 @@ other dependencies.
 
 We also patch Claude to monitor all the executed commands in a tmux side-pane.
 
-![Demo](./claudbox-demo.svg)
+![Demo](./claudebox-demo.svg)
 
 ## Usage
 
