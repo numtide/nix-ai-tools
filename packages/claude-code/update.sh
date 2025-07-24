@@ -45,7 +45,7 @@ echo "New source hash: $new_src_hash"
 
 # Update version and source hash in package.nix
 sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "$package_file"
-old_src_hash=$(grep -A1 'src = fetchzip' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
+old_src_hash=$(grep -A2 'src = fetchzip' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
 sed -i "s|$old_src_hash|$new_src_hash|" "$package_file"
 
 echo "Updated version and source hash. Now building to get new npmDepsHash..."
@@ -60,11 +60,15 @@ if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.claude-code 2>&1
   echo "Build succeeded unexpectedly with dummy hash!"
 else
   # Extract the correct hash from error output
-  if new_npm_hash=$(echo "$output" | grep -A1 "got:" | tail -1 | xargs); then
+  # Look for the pattern "got:    sha256-..." in the output
+  new_npm_hash=$(echo "$output" | grep -E "got:[[:space:]]+sha256-" | sed -E 's/.*got:[[:space:]]+(sha256-[^[:space:]]+).*/\1/' | head -1)
+  if [ -n "$new_npm_hash" ] && [ "$new_npm_hash" != "" ]; then
     echo "New npmDepsHash: $new_npm_hash"
     sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$new_npm_hash|" "$package_file"
   else
     echo "ERROR: Could not extract npmDepsHash from build output"
+    echo "Build output:"
+    echo "$output" | tail -20
     # Restore original hash
     sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$old_npm_hash|" "$package_file"
     exit 1

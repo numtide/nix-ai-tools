@@ -99,7 +99,7 @@ bwrap "${bwrap_args[@]}" bash -c "
   tmux set-option -t '$session_name' history-limit 50000
 
   # Create right pane for command viewer (exec to share process group)
-  tmux split-window -h -t '$session_name' \"exec command-viewer '$logfile'\"
+  tmux split-window -h -t '$session_name' \"command-viewer '$logfile'\"
 
   # Return focus to left pane
   tmux select-pane -t '${session_name}:0.0'
