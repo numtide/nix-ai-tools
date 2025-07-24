@@ -1,0 +1,118 @@
+name: Update Flake
+on:
+  workflow_call:
+    inputs:
+      packages:
+        description: 'Space-separated list of specific packages to update (empty for all)'
+        required: false
+        type: string
+        default: ''
+      inputs:
+        description: 'Space-separated list of specific inputs to update (empty for all)'
+        required: false
+        type: string
+        default: ''
+      pr-labels:
+        description: 'Comma-separated list of labels to add to PRs'
+        required: false
+        type: string
+        default: 'dependencies,automated'
+      auto-merge:
+        description: 'Enable auto-merge for created pull requests'
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      APP_ID:
+        description: 'GitHub App ID'
+        required: true
+      APP_PRIVATE_KEY:
+        description: 'GitHub App private key'
+        required: true
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+      has-updates: ${{ steps.build-matrix.outputs.has-updates }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+      - name: Build update matrix
+        id: build-matrix
+        env:
+          PACKAGES: "${{ inputs.packages }}"
+          INPUTS: "${{ inputs.inputs }}"
+        run: |
+          # Use the discovery script
+          .github/actions/discovery.sh
+  update:
+    needs: discover
+    if: needs.discover.outputs.has-updates == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ steps.app-token.outputs.token }}
+      - name: Set up git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Perform update
+        id: update
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # Use the update script
+          .github/actions/update.sh "${{ matrix.type }}" "${{ matrix.name }}"
+      - name: Create pull request
+        if: steps.update.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_LABELS: ${{ inputs.pr-labels }}
+          AUTO_MERGE: ${{ inputs.auto-merge }}
+        run: |
+          # The script should be available from the checkout
+          .github/actions/create-pr.sh \
+            "${{ matrix.type }}" \
+            "${{ matrix.name }}" \
+            "${{ matrix.current_version }}" \
+            "${{ steps.update.outputs.new_version }}"
+  summary:
+    needs: [discover, update]
+    runs-on: ubuntu-latest
+    if: always() && needs.discover.outputs.has-updates == 'true'
+    steps:
+      - name: Generate summary
+        run: |-
+          echo "## Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check overall status
+          if [ "${{ contains(needs.update.result, 'failure') }}" = "true" ]; then
+            echo "⚠️ Some updates failed. Check individual job logs for details." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All update jobs completed." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Configuration:" >> $GITHUB_STEP_SUMMARY
+          echo "- Auto-merge: ${{ inputs.auto-merge }}" >> $GITHUB_STEP_SUMMARY
