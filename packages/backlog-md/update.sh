@@ -34,7 +34,7 @@ echo "Update available: $current_version -> $latest_version"
 
 # Calculate new source hash
 echo "Calculating source hash for new version..."
-new_src_hash=$(nix hash file --sri <(curl -sL "https://github.com/MrLesk/Backlog.md/archive/v${latest_version}.tar.gz"))
+new_src_hash=$(nix-prefetch-url --unpack "https://github.com/MrLesk/Backlog.md/archive/v${latest_version}.tar.gz" 2>&1 | tail -1 | xargs -I {} nix hash convert --hash-algo sha256 --to sri {})
 echo "New source hash: $new_src_hash"
 
 # Create temporary file for updated content
@@ -45,7 +45,7 @@ cp "$package_file" "$tmp_file"
 sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "$tmp_file"
 
 # Update source hash
-old_src_hash=$(grep -A3 'src = fetchFromGitHub' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
+old_src_hash=$(grep -E '^\s*hash = "sha256-[^"]+";' "$package_file" | head -1 | sed -E 's/.*hash = "([^"]+)".*/\1/')
 sed -i "s|$old_src_hash|$new_src_hash|" "$tmp_file"
 
 # Move updated file back
@@ -54,7 +54,7 @@ mv "$tmp_file" "$package_file"
 echo "Updated version and source hash. Now building to get new node_modules hash..."
 
 # Build with dummy hash to get the correct one
-old_node_hash=$(grep -A5 'node_modules = fetchBunDeps' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
+old_node_hash=$(grep -E '^\s*hash = "sha256-[^"]+";' "$package_file" | tail -1 | sed -E 's/.*hash = "([^"]+)".*/\1/')
 sed -i "s|$old_node_hash|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|" "$package_file"
 
 # Try to build and capture the correct hash
@@ -63,11 +63,15 @@ if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.backlog-md 2>&1)
   echo "Build succeeded unexpectedly with dummy hash!"
 else
   # Extract the correct hash from error output
-  if new_node_hash=$(echo "$output" | grep -A1 "got:" | tail -1 | xargs); then
+  # Look for the pattern "got:    sha256-..." in the output
+  new_node_hash=$(echo "$output" | grep -E "got:[[:space:]]+sha256-" | sed -E 's/.*got:[[:space:]]+(sha256-[^[:space:]]+).*/\1/' | head -1)
+  if [ -n "$new_node_hash" ] && [ "$new_node_hash" != "" ]; then
     echo "New node_modules hash: $new_node_hash"
     sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$new_node_hash|" "$package_file"
   else
     echo "ERROR: Could not extract node_modules hash from build output"
+    echo "Build output:"
+    echo "$output" | tail -20
     # Restore original hash
     sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$old_node_hash|" "$package_file"
     exit 1
