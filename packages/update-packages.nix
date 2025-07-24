@@ -99,6 +99,10 @@ pkgs.writeShellApplication {
             else
                 failed+=("$pkg: $current_version")
                 echo "  ✗ Failed to update (current: $current_version)"
+                echo "  Error output:"
+                while IFS= read -r line; do
+                    echo "    $line"
+                done <<< "$output"
             fi
         else
             # Use nix-update for packages without custom scripts
@@ -115,6 +119,10 @@ pkgs.writeShellApplication {
             else
                 failed+=("$pkg: $current_version")
                 echo "  ✗ Failed to update (current: $current_version)"
+                echo "  Error output:"
+                while IFS= read -r line; do
+                    echo "    $line"
+                done <<< "$output"
             fi
         fi
         echo

@@ -16,11 +16,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v24
-        with:
-          extra_nix_config: |
-            accept-flake-config = true
-            experimental-features = nix-command flakes
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
       - id: set-matrix
         run: |
           if [ -n "${{ github.event.inputs.packages }}" ]; then
@@ -85,7 +82,7 @@ jobs:
             echo "Update failed"
             echo "$output"
             echo "updated=false" >> $GITHUB_OUTPUT
-            exit 0
+            exit 1
           fi
       - name: Create or update PR
         if: steps.update.outputs.updated == 'true'
