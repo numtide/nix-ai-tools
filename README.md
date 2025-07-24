@@ -40,6 +40,10 @@ This project explores several key integration patterns between Nix and AI agents
 - **Format integration**: AI-generated code automatically follows project formatting rules
 - **Dependency management**: AI tools have access to all project dependencies through Nix
 
+## Automated Updates
+
+This repository uses GitHub Actions to automatically update all packages and flake inputs daily. Updates are created as individual pull requests for easy review and testing. See `.github/workflows/update.yml` for the workflow configuration.
+
 ## Available Tools
 
 ### AI Coding Assistants

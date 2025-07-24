@@ -1,0 +1,29 @@
+name: Update Dependencies
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Specific packages to update (space-separated, empty for all)'
+        required: false
+        default: ''
+      inputs:
+        description: 'Specific flake inputs to update (space-separated, empty for all)'
+        required: false
+        default: ''
+jobs:
+  update:
+    uses: ./.github/workflows/update-flake.yml
+    with:
+      packages: ${{ github.event.inputs.packages }}
+      inputs: ${{ github.event.inputs.inputs }}
+      pr-labels: 'dependencies,automated'
+      auto-merge: true
+    secrets:
+      APP_ID: ${{ secrets.APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+    permissions:
+      contents: write
+      pull-requests: write
