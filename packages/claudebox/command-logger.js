@@ -26,7 +26,7 @@ function handleError(error, context) {
 // Helper to capture and log output from child processes
 function wrapChildProcess(child, commandNum) {
   if (!child || !child.stdout || !child.stderr) return child;
-  
+
   // Capture stdout
   child.stdout.on('data', (data) => {
     writeLogEntry({
@@ -36,7 +36,7 @@ function wrapChildProcess(child, commandNum) {
       timestamp: Date.now()
     });
   });
-  
+
   // Capture stderr
   child.stderr.on('data', (data) => {
     writeLogEntry({
@@ -46,24 +46,46 @@ function wrapChildProcess(child, commandNum) {
       timestamp: Date.now()
     });
   });
-  
-  // Store exit code but wait for close event
+
+  // Track exit status
   let exitCode = null;
-  
-  child.on('exit', (code) => {
-    exitCode = code === null ? 0 : code;
-  });
-  
-  // Log exit code only after all streams are closed
-  child.on('close', () => {
+  let exitLogged = false;
+
+  // Helper to log exit once we have the code
+  function logExit(code) {
+    if (exitLogged) return;
+    exitLogged = true;
+
+    // Normalize exit code (null means 0 in Node.js)
+    const finalCode = code === null || code === undefined ? 0 : code;
+
     writeLogEntry({
       num: commandNum,
       type: 'exit',
-      exitCode: exitCode,
+      exitCode: finalCode,
       timestamp: Date.now()
     });
+  }
+
+  // The 'exit' event provides the exit code
+  child.on('exit', (code, signal) => {
+    exitCode = code;
+    // If we already got 'close', log now
+    if (child.stdout.destroyed && child.stderr.destroyed) {
+      logExit(exitCode);
+    }
   });
-  
+
+  // The 'close' event fires when all streams are closed
+  // It also provides exit code as the first parameter
+  child.on('close', (code) => {
+    // Use the code from close if we don't have one from exit
+    if (exitCode === null && code !== null) {
+      exitCode = code;
+    }
+    logExit(exitCode);
+  });
+
   return child;
 }
 
@@ -71,7 +93,7 @@ function parseCommand(command) {
   // Extract the actual command from Claude's bash wrapper
   // Pattern: bash -c -l eval 'ACTUAL_COMMAND' < /dev/null && pwd -P >| /tmp/...
   const evalMatch = command.match(/eval\s+'([^']+)'/);
-  
+
   return {
     actualCommand: evalMatch ? evalMatch[1] : command,
     isWrapped: !!evalMatch
@@ -103,13 +125,13 @@ function writeLogEntry(entry) {
 function logCommand(command, source = '') {
   try {
     const { actualCommand, isWrapped } = parseCommand(command);
-    
+
     // Skip empty commands
     if (!actualCommand || actualCommand.trim() === '') return 0;
-    
+
     // Get unique command number
     const commandNum = ++commandCounter;
-    
+
     // Write command entry
     writeLogEntry({
       num: commandNum,
@@ -119,7 +141,7 @@ function logCommand(command, source = '') {
       source: source || undefined,
       timestamp: Date.now()
     });
-    
+
     return commandNum;
   } catch (error) {
     handleError(error, 'logCommand');
@@ -152,7 +174,7 @@ try {
   // Patch execSync
   cp.execSync = function (command, options) {
     const commandNum = logCommand(command, 'execSync');
-    
+
     let result;
     let exitCode = 0;
     try {
@@ -177,7 +199,7 @@ try {
         timestamp: Date.now()
       });
     } catch (error) {
-      const exitCode = error.status || 1;
+      exitCode = error.status || 1;
       // Log error output
       if (error.stderr) {
         writeLogEntry({
@@ -195,7 +217,7 @@ try {
       });
       throw error; // Re-throw the original error
     }
-    
+
     return result;
   };
 
@@ -203,7 +225,7 @@ try {
   cp.execFile = function (file, args, options, callback) {
     // Handle various argument patterns for execFile
     let actualArgs = [];
-    
+
     if (typeof args === 'function') {
       actualArgs = [];
     } else if (Array.isArray(args)) {
@@ -212,7 +234,7 @@ try {
       // args is actually options
       actualArgs = [];
     }
-    
+
     const fullCommand = [file, ...actualArgs].map(String).join(' ');
     const commandNum = logCommand(fullCommand, 'execFile');
     const child = originalExecFile.apply(this, arguments);
@@ -226,7 +248,7 @@ try {
 process.on('exit', (code) => {
   writeLogEntry({
     type: 'process_exit',
-    exitCode: code === null ? 0 : code,
+    exitCode: code === null || code === undefined ? 0 : code,
     timestamp: Date.now()
   });
 });
