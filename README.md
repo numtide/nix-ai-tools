@@ -1,4 +1,8 @@
-# nix-ai-tools
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/nix-ai-tools-banner--dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/nix-ai-tools-banner--white.svg">
+  <img alt="nix-ai-tools" src="docs/nix-ai-tools-banner--white.svg">
+</picture>
 
 Exploring the integration between Nix and AI coding agents. This repository serves as a testbed for packaging, sandboxing, and enhancing AI-powered development tools within the Nix ecosystem.
 
