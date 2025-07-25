@@ -44,9 +44,17 @@ pkgs.runCommand "claudebox"
     # Install command-viewer script
     cp ${./command-viewer.js} $out/libexec/claudebox/command-viewer.js
 
-    # Create wrapper for command-viewer
-    makeWrapper ${pkgs.nodejs}/bin/node $out/libexec/claudebox/command-viewer \
+    # Install wrapper script
+    cp ${./command-viewer-wrapper.sh} $out/libexec/claudebox/command-viewer-wrapper.sh
+    chmod +x $out/libexec/claudebox/command-viewer-wrapper.sh
+
+    # Create the real command-viewer executable
+    makeWrapper ${pkgs.nodejs}/bin/node $out/libexec/claudebox/command-viewer-real \
       --add-flags $out/libexec/claudebox/command-viewer.js
+
+    # Create wrapper that logs the command-viewer execution
+    makeWrapper $out/libexec/claudebox/command-viewer-wrapper.sh $out/libexec/claudebox/command-viewer \
+      --set COMMAND_VIEWER_REAL $out/libexec/claudebox/command-viewer-real
 
     # Patch shebang
     patchShebangs $out/bin/claudebox
