@@ -6,7 +6,11 @@ set -euo pipefail
 
 # Generate unique session name for this sandbox
 project_dir="$(pwd)"
-session_prefix="$(basename "$project_dir")"
+
+# Try to find git repo root, fallback to current directory
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "$project_dir")"
+
+session_prefix="$(basename "$repo_root")"
 session_id="$(printf '%04x%04x' $RANDOM $RANDOM)"
 session_name="${session_prefix}-${session_id}"
 
@@ -30,18 +34,18 @@ if [[ ! -f $claude_json ]]; then
   sleep 1
 fi
 
-# Smart filesystem sharing - full tree read-only, project read-write
-real_project_dir="$(realpath "$project_dir")"
+# Smart filesystem sharing - full tree read-only, repo/project read-write
+real_repo_root="$(realpath "$repo_root")"
 real_home="$(realpath "$HOME")"
 
-if [[ $real_project_dir == "$real_home"/* ]]; then
+if [[ $real_repo_root == "$real_home"/* ]]; then
   # Share entire top-level directory as read-only (e.g., ~/projects/*)
-  rel_path="${real_project_dir#"$real_home"/}"
+  rel_path="${real_repo_root#"$real_home"/}"
   top_dir="$(echo "$rel_path" | cut -d'/' -f1)"
   share_tree="$real_home/$top_dir"
 else
-  # Only share current project directory
-  share_tree="$real_project_dir"
+  # Only share current repo/project directory
+  share_tree="$real_repo_root"
 fi
 
 # Bubblewrap sandbox - lightweight isolation for transparency
@@ -74,12 +78,12 @@ bwrap_args=(
 )
 
 # Mount parent directory tree if working under home
-if [[ $share_tree != "$project_dir" ]]; then
+if [[ $share_tree != "$repo_root" ]]; then
   bwrap_args+=(--ro-bind "$share_tree" "$share_tree")
 fi
 
-# Current project gets full write access (YOLO mode)
-bwrap_args+=(--bind "$project_dir" "$project_dir")
+# Git repo root (or current dir) gets full write access (YOLO mode)
+bwrap_args+=(--bind "$repo_root" "$repo_root")
 
 # Define log file path
 logfile="/tmp/claudebox-commands-${session_name}.log"
@@ -89,6 +93,9 @@ bwrap_args+=(--setenv CLAUDEBOX_LOG_FILE "$logfile")
 
 # Launch tmux with Claude in left pane, commands in right
 bwrap "${bwrap_args[@]}" bash -c "
+  # Change to original working directory
+  cd '$project_dir'
+
   # Create the log file
   touch '$logfile'
 
