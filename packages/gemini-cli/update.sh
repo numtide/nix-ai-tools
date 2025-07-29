@@ -33,7 +33,7 @@ fi
 
 echo "Update available: $current_version -> $latest_version"
 
-# Download and extract the npm package
+# Download and extract the npm package to generate package-lock.json
 echo "Downloading npm package..."
 tmp_dir=$(mktemp -d)
 cd "$tmp_dir"
@@ -48,47 +48,55 @@ npm install --package-lock-only --ignore-scripts >/dev/null 2>&1
 # Copy the generated package-lock.json
 cp package-lock.json "$lock_file"
 
-# Calculate tarball hash
-echo "Calculating tarball hash..."
-cd "$tmp_dir"
-new_tarball_hash=$(nix-prefetch-url --unpack "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-${latest_version}.tgz" 2>&1 | tail -1 | xargs -I {} nix hash to-sri --type sha256 {})
-echo "New tarball hash: $new_tarball_hash"
-
 # Update version in package.nix
 sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "$package_file"
 
-# Update the tarball URL and hash
-sed -i "s|/@google/gemini-cli/-/gemini-cli-[0-9.]*\.tgz|/@google/gemini-cli/-/gemini-cli-${latest_version}.tgz|" "$package_file"
-old_tarball_hash=$(grep -B1 -A1 'url = "https://registry.npmjs.org/@google/gemini-cli' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
-sed -i "s|hash = \"$old_tarball_hash\"|hash = \"$new_tarball_hash\"|" "$package_file"
+# Step 1: Update URL and set dummy tarball hash
+echo "Getting tarball hash..."
+sed -i "s|/@google/gemini-cli/-/gemini-cli-[0-9.]\\+\\.tgz|/@google/gemini-cli/-/gemini-cli-${latest_version}.tgz|" "$package_file"
+sed -i '/fetchurl {/,/}/ s|hash = "sha256-[^"]*"|hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="|' "$package_file"
 
-# Cleanup happens automatically via trap
-
-echo "Updated version and tarball hash. Now building to get new npmDeps hash..."
-
-# Build with dummy hash to get the correct one
-old_npm_hash=$(grep -A1 'npmDeps = fetchNpmDeps' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
-sed -i "s|hash = \"$old_npm_hash\"|hash = \"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"|" "$package_file"
-
-# Try to build and capture the correct hash
-echo "Building to get correct npmDeps hash..."
+# Build to get the correct tarball hash
 if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli 2>&1); then
-  echo "Build succeeded unexpectedly with dummy hash!"
+  echo "ERROR: Build succeeded with dummy tarball hash!"
+  exit 1
 else
-  # Extract the correct hash from error output
-  if new_npm_hash=$(echo "$output" | grep -A1 "got:" | tail -1 | xargs); then
-    echo "New npmDeps hash: $new_npm_hash"
-    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$new_npm_hash|" "$package_file"
+  # Extract the correct hash
+  if tarball_hash=$(echo "$output" | grep -A2 "error: hash mismatch" | grep "got:" | head -1 | sed 's/.*got: *//' | xargs); then
+    echo "Tarball hash: $tarball_hash"
+    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$tarball_hash|" "$package_file"
   else
-    echo "ERROR: Could not extract npmDeps hash from build output"
-    # Restore original hash
-    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$old_npm_hash|" "$package_file"
+    echo "ERROR: Could not extract tarball hash from build output"
     exit 1
   fi
 fi
 
-echo "Building package to verify..."
-nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli
+# Step 2: Build with wrong npmDeps hash to get the correct one
+echo "Getting npmDeps hash..."
+# Set a dummy hash for npmDeps
+sed -i '/npmDeps = fetchNpmDeps {/,/}/ s|hash = "sha256-[^"]*"|hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="|' "$package_file"
 
-echo "Update completed successfully!"
-echo "gemini-cli has been updated from $current_version to $latest_version"
+# Build and capture the correct hash
+if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli 2>&1); then
+  echo "ERROR: Build succeeded with dummy npmDeps hash!"
+  exit 1
+else
+  # Extract the correct hash
+  if npmdeps_hash=$(echo "$output" | grep -A2 "error: hash mismatch" | grep "got:" | sed 's/.*got: *//' | xargs); then
+    echo "npmDeps hash: $npmdeps_hash"
+    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$npmdeps_hash|" "$package_file"
+  else
+    echo "ERROR: Could not extract npmDeps hash from build output"
+    exit 1
+  fi
+fi
+
+# Final verification build
+echo "Building package to verify..."
+if nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli; then
+  echo "Update completed successfully!"
+  echo "gemini-cli has been updated from $current_version to $latest_version"
+else
+  echo "ERROR: Final build failed!"
+  exit 1
+fi
