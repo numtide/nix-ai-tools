@@ -21,8 +21,8 @@ echo "Fetching latest version..."
 latest_version=$(npm view @google/gemini-cli version)
 echo "Latest version: $latest_version"
 
-# Extract current version from package.nix
-current_version=$(grep -E '^\s*version = "' "$package_file" | sed -E 's/.*version = "([^"]+)".*/\1/')
+# Extract current version using nix eval
+current_version=$(nix eval .#gemini-cli.version --raw)
 echo "Current version: $current_version"
 
 # Check if update is needed

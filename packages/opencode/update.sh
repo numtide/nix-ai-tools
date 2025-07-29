@@ -26,8 +26,8 @@ fi
 
 echo "Latest version: $latest_version"
 
-# Extract current version from package.nix
-current_version=$(grep -E '^\s*version = "' "$package_file" | sed -E 's/.*version = "([^"]+)".*/\1/')
+# Extract current version using nix eval
+current_version=$(nix eval .#opencode.version --raw)
 echo "Current version: $current_version"
 
 # Check if update is needed

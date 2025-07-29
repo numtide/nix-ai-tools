@@ -20,8 +20,8 @@ echo "Fetching latest version..."
 latest_version=$(curl -s https://api.github.com/repos/MrLesk/Backlog.md/releases/latest | jq -r '.tag_name' | sed 's/^v//')
 echo "Latest version: $latest_version"
 
-# Extract current version from package.nix
-current_version=$(grep -E '^\s*version = "' "$package_file" | head -1 | sed -E 's/.*version = "([^"]+)".*/\1/')
+# Extract current version using nix eval
+current_version=$(nix eval .#backlog-md.version --raw)
 echo "Current version: $current_version"
 
 # Check if update is needed

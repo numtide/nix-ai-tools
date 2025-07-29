@@ -7,8 +7,8 @@ cd "$(dirname "$0")"
 latest_version=$(curl -s https://registry.npmjs.org/@musistudio/claude-code-router | jq -r '.["dist-tags"].latest')
 echo "Latest version: $latest_version"
 
-# Extract current version from package.nix
-current_version=$(grep -E '^\s*version = "' package.nix | sed -E 's/.*version = "([^"]+)".*/\1/')
+# Extract current version using nix eval
+current_version=$(nix eval .#claude-code-router.version --raw)
 echo "Current version: $current_version"
 
 # Check if update is needed
