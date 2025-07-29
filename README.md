@@ -55,7 +55,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code
 
 - **Description**: Anthropic's official Claude Code CLI - an agentic coding tool
-- **Version**: 1.0.53
+- **Version**: 1.0.62
 - **License**: Proprietary (unfree)
 - **Usage**: `nix run .#claude-code -- --help`
 
@@ -69,7 +69,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### gemini-cli
 
 - **Description**: Google's AI agent bringing Gemini AI to your terminal
-- **Version**: 0.1.12
+- **Version**: 0.1.14
 - **License**: Apache 2.0
 - **Usage**: `nix run .#gemini-cli -- --help`
 
@@ -86,7 +86,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### backlog-md
 
 - **Description**: Project collaboration tool for humans and AI agents in git ecosystems
-- **Version**: 1.4.1
+- **Version**: 1.6.3
 - **License**: Check package
 - **Usage**: `nix run .#backlog-md -- --help`
 
