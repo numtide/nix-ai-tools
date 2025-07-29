@@ -55,7 +55,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code
 
 - **Description**: Anthropic's official Claude Code CLI - an agentic coding tool
-- **Version**: 1.0.53
+- **Version**: 1.0.62
 - **License**: Proprietary (unfree)
 - **Usage**: `nix run .#claude-code -- --help`
 
@@ -69,16 +69,24 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### gemini-cli
 
 - **Description**: Google's AI agent bringing Gemini AI to your terminal
-- **Version**: 0.1.12
+- **Version**: 0.1.14
 - **License**: Apache 2.0
 - **Usage**: `nix run .#gemini-cli -- --help`
+
+#### qwen-code
+
+- **Description**: Command-line AI workflow tool for Qwen3-Coder models
+- **Version**: 0.0.1-alpha.10
+- **License**: Apache 2.0
+- **Usage**: `nix run .#qwen-code -- --help`
+- **Note**: Experimental package - functionality may be limited
 
 ### AI Collaboration Tools
 
 #### backlog-md
 
 - **Description**: Project collaboration tool for humans and AI agents in git ecosystems
-- **Version**: 1.4.1
+- **Version**: 1.6.3
 - **License**: Check package
 - **Usage**: `nix run .#backlog-md -- --help`
 
@@ -130,6 +138,7 @@ Add to your system configuration:
     claude-code
     opencode
     gemini-cli
+    qwen-code
     # ... other tools
   ];
 }
@@ -146,6 +155,9 @@ nix run github:numtide/nix-ai-tools#opencode
 
 # Try Gemini CLI
 nix run github:numtide/nix-ai-tools#gemini-cli
+
+# Try Qwen Code
+nix run github:numtide/nix-ai-tools#qwen-code
 ```
 
 ## Development
@@ -165,6 +177,7 @@ nix build .#claude-code
 # Build all packages
 nix build .#packages.x86_64-linux.claude-code
 nix build .#packages.x86_64-linux.opencode
+nix build .#packages.x86_64-linux.qwen-code
 # etc...
 ```
 
