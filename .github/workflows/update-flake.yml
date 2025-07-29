@@ -82,7 +82,12 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           # Use the update script
-          .github/actions/update.sh "${{ matrix.type }}" "${{ matrix.name }}"
+          if [[ "${{ matrix.type }}" = package ]]; then
+            # Only load the devshell to update packages
+            nix develop -c .github/actions/update.sh "${{ matrix.type }}" "${{ matrix.name }}"
+          else
+            .github/actions/update.sh "${{ matrix.type }}" "${{ matrix.name }}"
+          fi
       - name: Create pull request
         if: steps.update.outputs.updated == 'true'
         env:
