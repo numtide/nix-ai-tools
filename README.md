@@ -73,6 +73,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Apache 2.0
 - **Usage**: `nix run .#gemini-cli -- --help`
 
+#### qwen-code
+
+- **Description**: Command-line AI workflow tool for Qwen3-Coder models
+- **Version**: 0.0.1-alpha.10
+- **License**: Apache 2.0
+- **Usage**: `nix run .#qwen-code -- --help`
+- **Note**: Experimental package - functionality may be limited
+
 ### AI Collaboration Tools
 
 #### backlog-md
@@ -130,6 +138,7 @@ Add to your system configuration:
     claude-code
     opencode
     gemini-cli
+    qwen-code
     # ... other tools
   ];
 }
@@ -146,6 +155,9 @@ nix run github:numtide/nix-ai-tools#opencode
 
 # Try Gemini CLI
 nix run github:numtide/nix-ai-tools#gemini-cli
+
+# Try Qwen Code
+nix run github:numtide/nix-ai-tools#qwen-code
 ```
 
 ## Development
@@ -165,6 +177,7 @@ nix build .#claude-code
 # Build all packages
 nix build .#packages.x86_64-linux.claude-code
 nix build .#packages.x86_64-linux.opencode
+nix build .#packages.x86_64-linux.qwen-code
 # etc...
 ```
 
