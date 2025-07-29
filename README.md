@@ -50,76 +50,73 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 ## Available Tools
 
-### AI Coding Assistants
+`> ./scripts/generate-package-docs.sh`
+
+<!-- BEGIN mdsh -->
+#### backlog-md
+
+- **Description**: Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem
+- **Version**: 1.6.3
+- **License**: MIT
+- **Homepage**: https://github.com/MrLesk/Backlog.md
+- **Usage**: `nix run .#backlog-md -- --help`
+
+#### claudebox
+
+- **Description**: Sandboxed environment for Claude Code
+- **Version**: unknown
+- **License**: Check package
+- **Usage**: `nix run .#claudebox -- --help`
 
 #### claude-code
 
-- **Description**: Anthropic's official Claude Code CLI - an agentic coding tool
+- **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
 - **Version**: 1.0.62
-- **License**: Proprietary (unfree)
+- **License**: unfree
+- **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run .#claude-code -- --help`
 
-#### opencode
+#### claude-code-router
 
-- **Description**: Open-source AI coding agent built for the terminal
-- **Version**: 0.3.80
+- **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
+- **Version**: 1.0.28
 - **License**: MIT
-- **Usage**: `nix run .#opencode -- --help`
+- **Homepage**: https://github.com/musistudio/claude-code-router
+- **Usage**: `nix run .#claude-code-router -- --help`
+
+#### formatter
+
+- **Description**: one CLI to format the code tree
+- **Version**: unknown
+- **License**: MIT
+- **Homepage**: https://github.com/numtide/treefmt
+- **Usage**: `nix run .#formatter -- --help`
 
 #### gemini-cli
 
-- **Description**: Google's AI agent bringing Gemini AI to your terminal
+- **Description**: AI agent that brings the power of Gemini directly into your terminal
 - **Version**: 0.1.14
-- **License**: Apache 2.0
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/google-gemini/gemini-cli
 - **Usage**: `nix run .#gemini-cli -- --help`
+
+#### opencode
+
+- **Description**: AI coding agent, built for the terminal
+- **Version**: 0.3.80
+- **License**: MIT
+- **Homepage**: https://github.com/sst/opencode
+- **Usage**: `nix run .#opencode -- --help`
 
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
 - **Version**: 0.0.1-alpha.10
-- **License**: Apache 2.0
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run .#qwen-code -- --help`
-- **Note**: Experimental package - functionality may be limited
 
-### AI Collaboration Tools
-
-#### backlog-md
-
-- **Description**: Project collaboration tool for humans and AI agents in git ecosystems
-- **Version**: 1.6.3
-- **License**: Check package
-- **Usage**: `nix run .#backlog-md -- --help`
-
-### Integration Examples
-
-#### claudebox
-
-- **Integration Focus**: Security and transparency for AI agent execution
-- **Key Innovation**: Combines Nix packaging with bubblewrap sandboxing and tmux for real-time monitoring
-- **Features**:
-  - Runs Claude Code in a bubblewrap sandbox for safety
-  - Shows all executed commands in a tmux split pane
-  - Provides read-only filesystem access with write access only to current project
-  - Command logging and viewing functionality
-- **Demonstrates**: How Nix can wrap AI tools with additional security layers
-- **Usage**: `nix run .#claudebox`
-
-#### claude-code-router
-
-- **Integration Focus**: Provider abstraction and flexibility
-- **Key Innovation**: Decouples AI tool interfaces from specific providers
-- **Version**: 1.0.19
-- **Features**: Use Claude Code without an Anthropic account by routing to other LLMs
-- **Demonstrates**: How Nix can enable swappable AI backends while maintaining consistent interfaces
-- **Usage**: `nix run .#claude-code-router -- --help`
-
-### Development Tools
-
-#### formatter
-
-- **Description**: Enhanced treefmt wrapper with format checking
-- **Features**: Includes nixfmt, deadnix, shellcheck, shfmt, mdformat, yamlfmt, taplo
-- **Usage**: `nix run .#formatter`
+<!-- END mdsh -->
 
 ## Installation
 

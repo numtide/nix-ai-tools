@@ -48,21 +48,9 @@ if [ "$type" = "package" ]; then
   new_version=$(nix eval .#packages.x86_64-linux."$name".version --raw 2>/dev/null || echo "unknown")
   echo "New version: $new_version"
 
-  # Update version in README.md
-  if [ -f "README.md" ] && [ "$new_version" != "unknown" ]; then
-    echo "Updating version in README.md..."
-    # Find the package section and update the version line
-    # This handles the format: #### package-name followed by - **Version**: X.X.X
-    # Use a more specific pattern to avoid matching wrong sections
-    awk -v pkg="$name" -v ver="$new_version" '
-      /^#### / { in_section = ($2 == pkg) }
-      in_section && /^- \*\*Version\*\*:/ {
-        print "- **Version**: " ver
-        next
-      }
-      { print }
-    ' README.md >README.md.tmp && mv README.md.tmp README.md
-  fi
+  # Run formatter to update README with mdsh
+  echo "Running formatter to update documentation..."
+  nix fmt
 
   echo "updated=true" >>"$output_var"
   echo "new_version=$new_version" >>"$output_var"

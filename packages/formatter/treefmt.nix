@@ -24,4 +24,12 @@
   settings.formatter.shellcheck.priority = 1;
   settings.formatter.shfmt.pipeline = "shell";
   settings.formatter.shfmt.priority = 2;
+
+  # Custom mdsh formatter
+  settings.formatter.mdsh = {
+    command = "${pkgs.writeShellScript "mdsh-wrapper" ''
+      ${pkgs.mdsh}/bin/mdsh -i "$@"
+    ''}";
+    includes = [ "README.md" ];
+  };
 }
