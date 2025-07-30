@@ -77,6 +77,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run .#claude-code-router -- --help`
 
+#### claude-desktop
+
+- **Description**: Claude Desktop - AI assistant from Anthropic
+- **Version**: 0.12.55
+- **License**: unfree
+- **Homepage**: https://claude.ai
+- **Usage**: `nix run .#claude-desktop -- --help`
+
 #### claudebox
 
 - **Description**: Sandboxed environment for Claude Code
