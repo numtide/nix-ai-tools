@@ -14,8 +14,8 @@ for package_dir in packages/*/; do
   fi
 done
 
-# Sort packages
-mapfile -t sorted_packages < <(printf '%s\n' "${packages[@]}" | sort)
+# Sort packages reproducibly with LC_ALL=C
+mapfile -t sorted_packages < <(printf '%s\n' "${packages[@]}" | LC_ALL=C sort)
 
 # Generate markdown for each package
 for package in "${sorted_packages[@]}"; do

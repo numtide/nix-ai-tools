@@ -84,6 +84,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Check package
 - **Usage**: `nix run .#claudebox -- --help`
 
+#### crush
+
+- **Description**: The glamourous AI coding agent for your favourite terminal
+- **Version**: 0.1.8
+- **License**: MIT
+- **Homepage**: https://github.com/charmbracelet/crush
+- **Usage**: `nix run .#crush -- --help`
+
 #### formatter
 
 - **Description**: one CLI to format the code tree
