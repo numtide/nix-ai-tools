@@ -61,17 +61,10 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run .#backlog-md -- --help`
 
-#### claudebox
-
-- **Description**: Sandboxed environment for Claude Code
-- **Version**: unknown
-- **License**: Check package
-- **Usage**: `nix run .#claudebox -- --help`
-
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
-- **Version**: 1.0.62
+- **Version**: 1.0.63
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run .#claude-code -- --help`
@@ -83,6 +76,13 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run .#claude-code-router -- --help`
+
+#### claudebox
+
+- **Description**: Sandboxed environment for Claude Code
+- **Version**: unknown
+- **License**: Check package
+- **Usage**: `nix run .#claudebox -- --help`
 
 #### formatter
 
