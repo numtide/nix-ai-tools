@@ -61,13 +61,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run .#backlog-md -- --help`
 
-#### claudebox
-
-- **Description**: Sandboxed environment for Claude Code
-- **Version**: unknown
-- **License**: Check package
-- **Usage**: `nix run .#claudebox -- --help`
-
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
@@ -83,6 +76,13 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run .#claude-code-router -- --help`
+
+#### claudebox
+
+- **Description**: Sandboxed environment for Claude Code
+- **Version**: unknown
+- **License**: Check package
+- **Usage**: `nix run .#claudebox -- --help`
 
 #### formatter
 
@@ -111,7 +111,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.1-alpha.10
+- **Version**: 0.0.1-alpha.11
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run .#qwen-code -- --help`
