@@ -111,7 +111,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
-- **Version**: 0.1.14
+- **Version**: 0.1.15
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
 - **Usage**: `nix run .#gemini-cli -- --help`
