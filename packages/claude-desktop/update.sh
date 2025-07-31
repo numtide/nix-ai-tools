@@ -40,24 +40,24 @@ echo "arm64 hash: $arm64_hash"
 # Try to extract version from the installer
 echo "Attempting to extract version..."
 temp_dir=$(mktemp -d)
-trap "rm -rf $temp_dir" EXIT
+trap 'rm -rf "$temp_dir"' EXIT
 
 # Download a small portion of the installer to check version
 if command -v 7z >/dev/null 2>&1; then
   echo "Downloading x64 installer to check version..."
   curl -L "$x64_url" -o "$temp_dir/claude-setup.exe" 2>/dev/null || true
-  
+
   if [ -f "$temp_dir/claude-setup.exe" ]; then
     # Try to extract version from the installer
     version=$(7z l "$temp_dir/claude-setup.exe" 2>/dev/null | grep -oP 'AnthropicClaude-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1) || true
-    
+
     if [ -z "$version" ]; then
       # Try alternative extraction method
-      version=$(7z x -y "$temp_dir/claude-setup.exe" -o"$temp_dir/extracted" 2>/dev/null && \
-                find "$temp_dir/extracted" -name "AnthropicClaude-*.nupkg" | \
-                grep -oP 'AnthropicClaude-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1) || true
+      version=$(7z x -y "$temp_dir/claude-setup.exe" -o"$temp_dir/extracted" 2>/dev/null &&
+        find "$temp_dir/extracted" -name "AnthropicClaude-*.nupkg" |
+        grep -oP 'AnthropicClaude-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1) || true
     fi
-    
+
     if [ -n "$version" ]; then
       echo "Detected version: $version"
       current_version=$(grep -oP 'version = "\K[^"]+' "$package_file" | head -1)
@@ -99,7 +99,7 @@ fi
 echo ""
 echo "Would you like to build the package to verify the update? (y/N)"
 read -r response
-if [[ "$response" =~ ^[Yy]$ ]]; then
+if [[ $response =~ ^[Yy]$ ]]; then
   echo "Building claude-desktop..."
   nix build "$script_dir/../.."#claude-desktop
   echo "Build completed successfully!"
