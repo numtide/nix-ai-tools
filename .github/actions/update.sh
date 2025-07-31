@@ -9,6 +9,8 @@ set -euo pipefail
 type="$1"
 name="$2"
 
+export NIX_PATH=nixpkgs=flake:nixpkgs
+
 # Outputs are written to GITHUB_OUTPUT if available
 output_var="${GITHUB_OUTPUT:-/dev/stdout}"
 
