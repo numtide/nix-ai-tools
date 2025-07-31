@@ -87,20 +87,13 @@ sed -i "/aarch64-linux = fetchurl {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$a
 echo "Hashes updated successfully!"
 echo ""
 
+echo "Building package to verify..."
+nix build .#claude-desktop
+
 # Check if version was updated
 if [ -z "${version:-}" ]; then
   echo "Note: Version number needs to be updated manually in package.nix"
   echo "Check https://github.com/aaddrick/claude-desktop-debian/releases for latest version"
 else
   echo "Version and hashes have been updated"
-fi
-
-# Offer to build the package
-echo ""
-echo "Would you like to build the package to verify the update? (y/N)"
-read -r response
-if [[ $response =~ ^[Yy]$ ]]; then
-  echo "Building claude-desktop..."
-  nix build "$script_dir/../.."#claude-desktop
-  echo "Build completed successfully!"
 fi

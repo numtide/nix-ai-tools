@@ -56,7 +56,7 @@ sed -i "s|$old_npm_hash|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|" "$
 
 # Try to build and capture the correct hash
 echo "Building to get correct npmDepsHash..."
-if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.claude-code 2>&1); then
+if output=$(nix build .#claude-code 2>&1); then
   echo "Build succeeded unexpectedly with dummy hash!"
 else
   # Extract the correct hash from error output
@@ -76,7 +76,7 @@ else
 fi
 
 echo "Building package to verify..."
-nix build "$script_dir/../.."#packages.x86_64-linux.claude-code
+nix build .#claude-code
 
 echo "Update completed successfully!"
 echo "claude-code has been updated from $current_version to $latest_version"

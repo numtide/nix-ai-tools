@@ -59,7 +59,7 @@ sed -i "s|$old_node_hash|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|" "
 
 # Try to build and capture the correct hash
 echo "Building to get correct node_modules hash..."
-if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.backlog-md 2>&1); then
+if output=$(nix build .#backlog-md 2>&1); then
   echo "Build succeeded unexpectedly with dummy hash!"
 else
   # Extract the correct hash from error output
@@ -79,7 +79,7 @@ else
 fi
 
 echo "Building package to verify..."
-nix build "$script_dir/../.."#packages.x86_64-linux.backlog-md
+nix build .#backlog-md
 
 echo "Update completed successfully!"
 echo "backlog-md has been updated from $current_version to $latest_version"

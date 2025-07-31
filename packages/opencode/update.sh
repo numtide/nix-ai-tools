@@ -97,9 +97,6 @@ if ! diff -q "$tmp_file" "$package_file" >/dev/null 2>&1; then
     echo "Updated platform hashes for version $current_version"
   fi
 
-  echo "Building package to verify..."
-  nix build "$script_dir/../.."#packages.x86_64-linux.opencode
-
   echo "Update completed successfully!"
   if [ "$latest_version" != "$current_version" ]; then
     echo "opencode has been updated from $current_version to $latest_version"
