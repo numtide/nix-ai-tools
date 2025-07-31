@@ -52,6 +52,10 @@ if [ "$type" = "package" ]; then
   echo "Running formatter to update documentation..."
   nix fmt
 
+  # Build the package to verify the update
+  echo "Building package to verify update..."
+  nix build .#"$name" --no-link
+
   echo "updated=true" >>"$output_var"
   echo "new_version=$new_version" >>"$output_var"
 

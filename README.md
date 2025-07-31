@@ -186,11 +186,8 @@ nix develop
 ```bash
 # Build a specific package
 nix build .#claude-code
-
-# Build all packages
-nix build .#packages.x86_64-linux.claude-code
-nix build .#packages.x86_64-linux.opencode
-nix build .#packages.x86_64-linux.qwen-code
+nix build .#opencode
+nix build .#qwen-code
 # etc...
 ```
 

@@ -57,7 +57,7 @@ sed -i "s|/@google/gemini-cli/-/gemini-cli-[0-9.]\\+\\.tgz|/@google/gemini-cli/-
 sed -i '/fetchurl {/,/}/ s|hash = "sha256-[^"]*"|hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="|' "$package_file"
 
 # Build to get the correct tarball hash
-if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli 2>&1); then
+if output=$(nix build .#gemini-cli 2>&1); then
   echo "ERROR: Build succeeded with dummy tarball hash!"
   exit 1
 else
@@ -77,7 +77,7 @@ echo "Getting npmDeps hash..."
 sed -i '/npmDeps = fetchNpmDeps {/,/}/ s|hash = "sha256-[^"]*"|hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="|' "$package_file"
 
 # Build and capture the correct hash
-if output=$(nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli 2>&1); then
+if output=$(nix build .#gemini-cli 2>&1); then
   echo "ERROR: Build succeeded with dummy npmDeps hash!"
   exit 1
 else
@@ -91,12 +91,8 @@ else
   fi
 fi
 
-# Final verification build
 echo "Building package to verify..."
-if nix build "$script_dir/../.."#packages.x86_64-linux.gemini-cli; then
-  echo "Update completed successfully!"
-  echo "gemini-cli has been updated from $current_version to $latest_version"
-else
-  echo "ERROR: Final build failed!"
-  exit 1
-fi
+nix build .#gemini-cli
+
+echo "Update completed successfully!"
+echo "gemini-cli has been updated from $current_version to $latest_version"

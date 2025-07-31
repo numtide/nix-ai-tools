@@ -48,7 +48,7 @@ When adding a new AI tool package:
 
 ```bash
 # Build and verify package
-nix build .#packages.x86_64-linux.<package-name>
+nix build .#<package-name>
 
 # Run package checks
 nix build .#checks.x86_64-linux.pkgs-<package-name>
