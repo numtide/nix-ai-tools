@@ -8,11 +8,11 @@
 
 stdenv.mkDerivation rec {
   pname = "qwen-code";
-  version = "0.0.1-alpha.12";
+  version = "0.0.2";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-${version}.tgz";
-    hash = "sha256-uG2NG191OuAERN+KZa1tEj+1h6vg4bMqSbuIoQI3XA8=";
+    hash = "sha256-sHuZ8R8LV8IuECUdC/AGSVDLwDaCPk+QJGCvaStwpMg=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
