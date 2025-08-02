@@ -6,13 +6,13 @@
 
 buildGoModule rec {
   pname = "crush";
-  version = "0.1.11";
+  version = "0.2.0";
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = "sha256-l6X6Hdh0NRGXG9YBYRWkcgJwJwK2II//Z9iQd8wTzcs=";
+    hash = "sha256-EXKTc5kJa+4WnJtngUPXHE5oLp0hpYlyq81PuMEdKcY=";
   };
 
   vendorHash = "sha256-aI3MSaQYUOLJxBxwCoVg13HpxK46q6ZITrw1osx5tiE=";
