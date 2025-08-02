@@ -66,6 +66,7 @@ for nix_system in "${!platforms[@]}"; do
   url="https://github.com/sst/opencode/releases/download/v${latest_version}/opencode-${download_name}.zip"
 
   # Calculate hash with timeout and error handling
+  export NIX_PATH=nixpkgs=flake:nixpkgs
   hash_output=$(timeout 60 nix-build -E "with import <nixpkgs> {}; fetchzip { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
   new_hash=$(echo "$hash_output" | grep "got:" | awk '{print $2}')
 

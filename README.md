@@ -102,7 +102,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 #### formatter
 
-- **Description**: one CLI to format the code tree
+- **Description**: One CLI to format the code tree
 - **Version**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/numtide/treefmt
@@ -119,7 +119,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
-- **Version**: 0.3.101
+- **Version**: 0.3.112
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run .#opencode -- --help`
