@@ -8,14 +8,14 @@
 }:
 
 let
-  version = "0.1.15";
+  version = "0.1.16";
   # First, create a source with package-lock.json included
   srcWithLock = runCommand "gemini-cli-src-with-lock" { } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
         url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-${version}.tgz";
-        hash = "sha256-QUpdD8FsTD8I3sitl+LYhyVACPpP3SvDqjISIynreHk=";
+        hash = "sha256-Dlr1IPkR8r1ByFawGQIZYMOq40FD6ZYR6CX3XR0kdRE=";
       }
     } -C $out --strip-components=1
     cp ${./package-lock.json} $out/package-lock.json
@@ -29,7 +29,7 @@ buildNpmPackage rec {
 
   npmDeps = fetchNpmDeps {
     inherit src;
-    hash = "sha256-qvwA5Y7siJAssSq1BU6rQPES0M2MJFy/0HqDhC3rCvI=";
+    hash = "sha256-H+G+rJZCPfc0+qNwpmbL/957kQq6xM8DwAqrbae83HY=";
   };
 
   # The package from npm is already built
