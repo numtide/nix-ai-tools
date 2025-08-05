@@ -100,14 +100,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/charmbracelet/crush
 - **Usage**: `nix run .#crush -- --help`
 
-#### formatter
-
-- **Description**: One CLI to format the code tree
-- **Version**: unknown
-- **License**: MIT
-- **Homepage**: https://github.com/numtide/treefmt
-- **Usage**: `nix run .#formatter -- --help`
-
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
