@@ -31,7 +31,7 @@ let
     sources.${stdenv.hostPlatform.system}
       or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "opencode";
   inherit version;
 
@@ -41,7 +41,13 @@ stdenv.mkDerivation rec {
     stripRoot = false;
   };
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = lib.optionals stdenv.isLinux [
+    autoPatchelfHook
+  ];
+
+  buildInputs = lib.optionals stdenv.isLinux [
+    stdenv.cc.cc.lib
+  ];
 
   dontBuild = true;
   dontStrip = true;
@@ -54,6 +60,10 @@ stdenv.mkDerivation rec {
     chmod +x $out/bin/opencode
 
     runHook postInstall
+  '';
+
+  postFixup = lib.optionalString stdenv.isLinux ''
+    patchelf --add-needed "$(patchelf --print-soname ${stdenv.cc.cc.lib}/lib/libstdc++.so)" $out/bin/opencode
   '';
 
   passthru.updateScript = ./update.sh;
