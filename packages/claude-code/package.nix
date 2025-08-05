@@ -3,6 +3,7 @@
   buildNpmPackage,
   fetchzip,
   nodejs_20,
+  makeWrapper,
 }:
 
 buildNpmPackage rec {
@@ -18,6 +19,8 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-yg4HKmEk7NiJScMl7K8cJAVIKOwmQfYFL0vuBh7Y7Q0=";
 
+  nativeBuildInputs = [ makeWrapper ];
+
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
   '';
@@ -26,8 +29,15 @@ buildNpmPackage rec {
 
   AUTHORIZED = "1";
 
-  # Note: Environment variables like DISABLE_AUTOUPDATER and DEV are handled by claudebox
-  # which wraps this package. We don't set them here to avoid duplication.
+  # Disable auto-updates and telemetry by wrapping the binary
+  postInstall = ''
+    wrapProgram $out/bin/claude \
+      --set DISABLE_AUTOUPDATER 1 \
+      --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
+      --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
+      --set DISABLE_TELEMETRY 1 \
+      --unset DEV
+  '';
 
   passthru.updateScript = ./update.sh;
 

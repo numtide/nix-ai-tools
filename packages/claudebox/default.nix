@@ -61,11 +61,6 @@ pkgs.runCommand "claudebox"
 
     # Create claude wrapper that references the original
     makeWrapper ${perSystem.self.claude-code}/bin/claude $out/libexec/claudebox/claude \
-      --unset DEV \
-      --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
-      --set DISABLE_AUTOUPDATER 1 \
-      --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
-      --set DISABLE_TELEMETRY 1 \
       --set NODE_OPTIONS "--require=${./command-logger.js}" \
       --inherit-argv0
 
