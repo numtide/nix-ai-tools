@@ -1,32 +1,42 @@
 {
   lib,
-  stdenv,
-  fetchzip,
-  nodejs_20,
-  makeWrapper,
+  buildNpmPackage,
+  fetchFromGitHub,
+  fetchNpmDeps,
 }:
 
-stdenv.mkDerivation rec {
+buildNpmPackage (finalAttrs: {
   pname = "qwen-code";
   version = "0.0.4";
 
-  src = fetchzip {
-    url = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-${version}.tgz";
-    hash = "sha256-19qnhdWrz+Y7WJ4gv7yzKU0kpngbu0tZZ2ULuMga43Q=";
+  src = fetchFromGitHub {
+    owner = "QwenLM";
+    repo = "qwen-code";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-zVbgJaufJNYxsNuX2JH3tgQeBPalzhgf43sNaifzjYI=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  npmDeps = fetchNpmDeps {
+    inherit (finalAttrs) src;
+    hash = "sha256-wQokEy8kbh81xVbuEAtK/YAKIL+u9gLT1utB5YINupE=";
+  };
+
+  buildPhase = ''
+    runHook preBuild
+
+    npm run generate
+    npm run bundle
+
+    runHook postBuild
+  '';
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/lib/node_modules/@qwen-code/qwen-code
-    cp -r * $out/lib/node_modules/@qwen-code/qwen-code/
-
-    # Create wrapper script
     mkdir -p $out/bin
-    makeWrapper ${nodejs_20}/bin/node $out/bin/qwen \
-      --add-flags "$out/lib/node_modules/@qwen-code/qwen-code/bundle/gemini.js"
+    cp -r bundle/* $out/
+    patchShebangs $out
+    ln -s $out/gemini.js $out/bin/qwen
 
     runHook postInstall
   '';
@@ -40,4 +50,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.all;
     mainProgram = "qwen";
   };
-}
+})
