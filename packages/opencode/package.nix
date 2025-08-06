@@ -6,24 +6,24 @@
 }:
 
 let
-  version = "0.3.129";
+  version = "0.3.131";
 
   sources = {
     x86_64-linux = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-linux-x64.zip";
-      sha256 = "sha256-EATgc18K13mFAoJ7om4fJCilRX0BvoUtKQF99IVyIJQ=";
+      sha256 = "sha256-gKNRcCRcsfyQvJE1JnWNhP1TNeaHiAMWjbQ9yusw59k=";
     };
     aarch64-linux = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-linux-arm64.zip";
-      sha256 = "sha256-ss/wrwf6xi4mBausTUvqMtrlR57MYuBA7cSJcgTI+3I=";
+      sha256 = "sha256-ZwWa8QN576FpzdJndUoIx+veJCf8MgVQgqF5NafFBFc=";
     };
     x86_64-darwin = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-darwin-x64.zip";
-      sha256 = "sha256-4hZSq0V6A7sIHXrHlhe7SHYgc+D/Bd0TCUzL/MpD0K0=";
+      sha256 = "sha256-j8Btf1liv5CQnvqm2znZqcB6AAp5bCqov9iItE4QPHE=";
     };
     aarch64-darwin = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-darwin-arm64.zip";
-      sha256 = "sha256-YegO1ZtQWu5zYcskzxNJcmYTk92lfDNS2sPSjRAxUVE=";
+      sha256 = "sha256-Rla1RsjTZZTrLkTlg3sHnXhb2U8MqjGLi/IIt4UuBos=";
     };
   };
 
