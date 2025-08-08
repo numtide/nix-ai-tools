@@ -53,6 +53,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 `> ./scripts/generate-package-docs.sh`
 
 <!-- BEGIN mdsh -->
+#### amp
+
+- **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
+- **Version**: 0.0.1754626568-ga6faed
+- **License**: unfree
+- **Homepage**: https://ampcode.com/
+- **Usage**: `nix run .#amp -- --help`
+
 #### backlog-md
 
 - **Description**: Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem
