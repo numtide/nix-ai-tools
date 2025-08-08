@@ -51,20 +51,20 @@ let
       outputHashMode = "recursive";
     };
 
-  version = "1.6.4";
+  version = "1.7.2";
 
   src = fetchFromGitHub {
     owner = "MrLesk";
     repo = "Backlog.md";
     rev = "v${version}";
-    hash = "sha256-ezEOJ5jlxJzQ2H+jGaBoewLIP3jAEjCNko+/EHKlFIo=";
+    hash = "sha256-kAk2y0mdrZXpz6uQ+DYhorPw8C7cPFLSEkJOo4swoWw=";
   };
 
   # Create a fixed-output derivation for dependencies
   node_modules = fetchBunDeps {
     pname = "backlog-md-bun-deps";
     inherit version src;
-    hash = "sha256-T4YC6FQ3PhW36/eFXWW2Wm5zg6+PyV4mLYgOMpu7olo=";
+    hash = "sha256-1TWhTHgFnAosobp+Rc8lB3f2+QQJNz78OaiRW7Wojks=";
   };
 in
 stdenv.mkDerivation rec {
@@ -105,6 +105,10 @@ stdenv.mkDerivation rec {
 
     # Patch shebangs in node_modules
     patchShebangs node_modules
+
+    # Patch ELF files in node_modules to fix native dependencies
+    echo "Running autoPatchelf on node_modules..."
+    autoPatchelf node_modules
 
     # Build the project to create the binary
     export HOME=$TMPDIR
