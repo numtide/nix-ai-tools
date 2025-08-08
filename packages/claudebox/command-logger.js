@@ -10,6 +10,9 @@ const originalExecFile = cp.execFile;
 // Track command numbers for ordering
 let commandCounter = 0;
 
+// Unset NODE_OPTIONS to prevent child Node processes from inheriting command logging
+delete process.env.NODE_OPTIONS;
+
 // Error handler that displays in Claude's UI
 function handleError(error, context) {
   const errorMsg = `[claudebox error in ${context}]: ${error.message || error}`;
