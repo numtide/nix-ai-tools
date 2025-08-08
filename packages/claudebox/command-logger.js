@@ -94,8 +94,13 @@ function wrapChildProcess(child, commandNum) {
 
 function parseCommand(command) {
   // Extract the actual command from Claude's bash wrapper
-  // Pattern: bash -c -l eval 'ACTUAL_COMMAND' < /dev/null && pwd -P >| /tmp/...
-  const evalMatch = command.match(/eval\s+'([^']+)'/);
+  // Pattern: bash -c -l ... eval "ACTUAL_COMMAND" < /dev/null && pwd -P >| /tmp/...
+  // We know the pattern ends with < /dev/null && pwd -P >| /tmp/
+  // So we can match everything between eval and that ending
+
+  // Match eval followed by either ' or ", capture everything until the known ending pattern
+  // This avoids complex quote parsing by using the known structure
+  const evalMatch = command.match(/eval\s+["'](.+?)["']\s*\\?<\s*\/dev\/null\s*&&\s*pwd/);
 
   return {
     actualCommand: evalMatch ? evalMatch[1] : command,
