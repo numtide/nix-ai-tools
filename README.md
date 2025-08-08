@@ -108,6 +108,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/charmbracelet/crush
 - **Usage**: `nix run .#crush -- --help`
 
+#### cursor-agent
+
+- **Description**: Cursor Agent - CLI tool for Cursor AI code editor
+- **Version**: 2025.08.08-562252e
+- **License**: unfree
+- **Homepage**: https://cursor.com/
+- **Usage**: `nix run .#cursor-agent -- --help`
+
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal

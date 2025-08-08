@@ -10,6 +10,10 @@ packages=()
 for package_dir in packages/*/; do
   if [ -f "$package_dir/package.nix" ] || [ -f "$package_dir/default.nix" ]; then
     package_name=$(basename "$package_dir")
+    # Skip the formatter package
+    if [ "$package_name" = "formatter" ]; then
+      continue
+    fi
     packages+=("$package_name")
   fi
 done
