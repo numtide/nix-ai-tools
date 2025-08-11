@@ -4,6 +4,8 @@
   <img alt="nix-ai-tools" src="docs/nix-ai-tools-banner--white.svg">
 </picture>
 
+[![Mentioned in Awesome Gemini CLI](https://awesome.re/mentioned-badge.svg)](https://github.com/Piebald-AI/awesome-gemini-cli)
+
 Exploring the integration between Nix and AI coding agents. This repository serves as a testbed for packaging, sandboxing, and enhancing AI-powered development tools within the Nix ecosystem.
 
 ## Automated Updates
