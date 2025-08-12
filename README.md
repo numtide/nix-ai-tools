@@ -88,6 +88,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/google-gemini/gemini-cli
 - **Usage**: `nix run .#gemini-cli -- --help`
 
+#### goose-cli
+
+- **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
+- **Version**: 1.3.0
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/block/goose
+- **Usage**: `nix run .#goose-cli -- --help`
+
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
