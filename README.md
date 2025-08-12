@@ -75,7 +75,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.08.08-562252e
+- **Version**: 2025.08.09-d8191f3
 - **License**: unfree
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run .#cursor-agent -- --help`

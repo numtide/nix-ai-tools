@@ -49,7 +49,15 @@ update_hash() {
   echo "New hash for $platform_key: $new_hash"
 
   # Update hash in package.nix - find the line after the platform key
-  sed -i "/${platform_key} = fetchurl {/,/hash = / s|hash = \"[^\"]*\"|hash = \"$new_hash\"|" "$package_file"
+  # Use awk to update the hash more reliably
+  awk -v key="$platform_key" -v hash="$new_hash" '
+    $0 ~ key " = fetchurl {" { found=1 }
+    found && /hash = / {
+      sub(/hash = "sha256-[^"]*"/, "hash = \"" hash "\"")
+      found=0
+    }
+    { print }
+  ' "$package_file" > "$package_file.tmp" && mv "$package_file.tmp" "$package_file"
 }
 
 # Update hashes for all platforms
