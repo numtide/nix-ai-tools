@@ -57,7 +57,7 @@ update_hash() {
       found=0
     }
     { print }
-  ' "$package_file" > "$package_file.tmp" && mv "$package_file.tmp" "$package_file"
+  ' "$package_file" >"$package_file.tmp" && mv "$package_file.tmp" "$package_file"
 }
 
 # Update hashes for all platforms
