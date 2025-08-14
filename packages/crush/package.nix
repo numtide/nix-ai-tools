@@ -26,7 +26,6 @@ buildGoModule rec {
     "-X=github.com/charmbracelet/crush/internal/version.Version=${version}"
   ];
 
-
   meta = with lib; {
     description = "The glamourous AI coding agent for your favourite terminal";
     homepage = "https://github.com/charmbracelet/crush";

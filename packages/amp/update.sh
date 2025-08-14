@@ -81,13 +81,13 @@ awk '
     in_npmDeps=0
   }
   { print }
-' "$package_file" > "$package_file.tmp" && mv "$package_file.tmp" "$package_file"
+' "$package_file" >"$package_file.tmp" && mv "$package_file.tmp" "$package_file"
 
 # Try to build and capture the correct npmDeps hash from the error message
 if ! npm_deps_output=$(nix build "$script_dir/../.."#amp 2>&1); then
   # Extract the correct hash from the error message - looking for the "got:" line
   correct_npm_hash=$(echo "$npm_deps_output" | grep -E "got:[[:space:]]*sha256-" | awk '{print $2}' | head -1)
-  
+
   if [ -n "$correct_npm_hash" ]; then
     echo "Updating npmDeps hash to: $correct_npm_hash"
     # Update the npmDeps hash specifically
@@ -98,7 +98,7 @@ if ! npm_deps_output=$(nix build "$script_dir/../.."#amp 2>&1); then
         in_npmDeps=0
       }
       { print }
-    ' "$package_file" > "$package_file.tmp" && mv "$package_file.tmp" "$package_file"
+    ' "$package_file" >"$package_file.tmp" && mv "$package_file.tmp" "$package_file"
   else
     echo "Warning: Could not extract npmDeps hash from error output"
     echo "Error output was:"

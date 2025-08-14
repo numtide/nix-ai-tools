@@ -89,6 +89,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run .#cursor-agent -- --help`
 
+#### forge
+
+- **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
+- **Version**: 0.107.0
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://github.com/antinomyhq/forge
+- **Usage**: `nix run .#forge -- --help`
+
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
