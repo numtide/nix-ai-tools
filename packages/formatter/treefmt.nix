@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  package = pkgs.treefmt2;
+  package = pkgs.treefmt;
 
   projectRootFile = "flake.lock";
 

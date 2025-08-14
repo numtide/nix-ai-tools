@@ -47,7 +47,7 @@ awk -v new_hash="$new_sri_hash" '
 # Generate package-lock.json from the new package.json
 echo "Generating package-lock.json from new version..."
 temp_dir=$(mktemp -d)
-trap "rm -rf $temp_dir" EXIT
+trap 'rm -rf "$temp_dir"' EXIT
 
 # Extract the tarball
 curl -sL "https://registry.npmjs.org/@sourcegraph/amp/-/amp-${latest_version}.tgz" | tar -xz -C "$temp_dir"
