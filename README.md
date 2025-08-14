@@ -28,7 +28,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### backlog-md
 
 - **Description**: Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem
-- **Version**: 1.8.0
+- **Version**: 1.8.2
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run .#backlog-md -- --help`
@@ -44,7 +44,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code-router
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
-- **Version**: 1.0.35
+- **Version**: 1.0.37
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run .#claude-code-router -- --help`
@@ -91,7 +91,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### goose-cli
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
-- **Version**: 1.3.0
+- **Version**: 1.3.1
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run .#goose-cli -- --help`
@@ -99,7 +99,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
-- **Version**: 0.4.24
+- **Version**: 0.4.41
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run .#opencode -- --help`
@@ -107,7 +107,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.4
+- **Version**: 0.0.6
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run .#qwen-code -- --help`
