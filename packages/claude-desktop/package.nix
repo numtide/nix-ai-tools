@@ -170,7 +170,6 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-
   meta = with lib; {
     description = "Claude Desktop - AI assistant from Anthropic";
     homepage = "https://claude.ai";

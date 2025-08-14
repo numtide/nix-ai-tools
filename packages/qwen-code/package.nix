@@ -41,7 +41,6 @@ buildNpmPackage (finalAttrs: {
     runHook postInstall
   '';
 
-
   meta = {
     description = "Command-line AI workflow tool for Qwen3-Coder models";
     homepage = "https://github.com/QwenLM/qwen-code";
