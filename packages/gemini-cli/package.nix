@@ -37,13 +37,16 @@ buildNpmPackage rec {
 
   nodejs = nodejs_20;
 
-  passthru.updateScript = ./update.sh;
+  passthru = {
+    updateScript = ./update.sh;
+  };
 
   meta = {
     description = "AI agent that brings the power of Gemini directly into your terminal";
     homepage = "https://github.com/google-gemini/gemini-cli";
     changelog = "https://github.com/google-gemini/gemini-cli/releases";
     license = lib.licenses.asl20;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with lib.maintainers; [ donteatoreo ];
     platforms = lib.platforms.all;
     mainProgram = "gemini";
