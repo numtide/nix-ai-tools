@@ -221,12 +221,6 @@ Contributions are welcome! Please:
 
 ## License
 
-Individual tools are licensed under their respective licenses:
-
-- claude-code: Proprietary
-- opencode: MIT
-- gemini-cli: Apache 2.0
-- claude-code-router: Check package
-- claudebox: Check package
+Individual tools are licensed under their respective licenses.
 
 The Nix packaging code in this repository is licensed under MIT.
