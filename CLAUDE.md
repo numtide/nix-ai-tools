@@ -21,8 +21,11 @@ nix flake check
 nix run .#claude-code -- --help
 nix run .#gemini-cli -- --help
 
-# Format code
+# Format code - always run before committing
 nix fmt
+
+# Regenerate README package documentation
+mdsh
 
 # Update packages - each package can be updated individually
 # using either its custom update script or nix-update
@@ -39,9 +42,13 @@ nix-update --flake --version=branch <package-name>
 When adding a new AI tool package:
 
 1. Create directory: `packages/<tool-name>/`
-1. Add `package.nix` using existing packages as templates (Node.js tools use `buildNpmPackage`)
+1. Add `package.nix` using existing packages as templates:
+   - Node.js tools use `buildNpmPackage`
+   - Rust tools use `rustPlatform.buildRustPackage`
+   - Pre-built binaries use `stdenv.mkDerivation` with `fetchurl`
 1. Add `default.nix` that imports the package
 1. Create `update.sh` if the package needs custom update logic
+1. **Important**: Use `git add` on new package files for Nix flakes to recognize them
 1. The package will be automatically discovered by blueprint
 
 ### Testing Individual Packages
@@ -100,3 +107,14 @@ The flake supports: x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin
 - **Modularity**: Each tool is independently packaged and versioned
 - **Automation**: Update scripts handle version bumps and hash recalculation
 - **Security**: Experimental sandboxing for AI tool execution
+
+### Common Issues and Solutions
+
+1. **Rust packages with git dependencies**: May fail during cargo vendoring if dependencies have workspace inheritance issues. Consider using pre-built binaries as a workaround.
+
+2. **Binary packages**: When packaging pre-built binaries:
+   - Use `dontUnpack = true` if the download is a single executable file
+   - Use `autoPatchelfHook` on Linux to handle dynamic library dependencies
+   - Common missing libraries: `gcc-unwrapped.lib` for libgcc_s.so.1
+
+3. **Update scripts**: Follow shellcheck recommendations - declare and assign variables separately to avoid masking return values.
