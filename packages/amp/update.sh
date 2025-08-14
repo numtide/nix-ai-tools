@@ -72,20 +72,37 @@ else
 fi
 
 echo "Calculating new npmDeps hash..."
+# First set a dummy hash to trigger the error with the correct hash
+# We need to update only the npmDeps hash, not the fetchurl hash
+awk '
+  /npmDeps = fetchNpmDeps/ { in_npmDeps=1 }
+  in_npmDeps && /hash = / {
+    sub(/hash = "sha256-[^"]*"/, "hash = \"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"")
+    in_npmDeps=0
+  }
+  { print }
+' "$package_file" > "$package_file.tmp" && mv "$package_file.tmp" "$package_file"
+
 # Try to build and capture the correct npmDeps hash from the error message
 if ! npm_deps_output=$(nix build "$script_dir/../.."#amp 2>&1); then
-  # Extract the correct hash from the error message
-  if correct_npm_hash=$(echo "$npm_deps_output" | rg "got:" | head -1 | awk '{print $2}'); then
+  # Extract the correct hash from the error message - looking for the "got:" line
+  correct_npm_hash=$(echo "$npm_deps_output" | grep -E "got:[[:space:]]*sha256-" | awk '{print $2}' | head -1)
+  
+  if [ -n "$correct_npm_hash" ]; then
     echo "Updating npmDeps hash to: $correct_npm_hash"
     # Update the npmDeps hash specifically
     awk -v new_hash="$correct_npm_hash" '
-      /npmDeps = fetchNpmDeps/ { found=1 }
-      found && /hash = / {
+      /npmDeps = fetchNpmDeps/ { in_npmDeps=1 }
+      in_npmDeps && /hash = / {
         sub(/hash = "sha256-[^"]*"/, "hash = \"" new_hash "\"")
-        found=0
+        in_npmDeps=0
       }
       { print }
-    ' "$package_file" >"$package_file.tmp" && mv "$package_file.tmp" "$package_file"
+    ' "$package_file" > "$package_file.tmp" && mv "$package_file.tmp" "$package_file"
+  else
+    echo "Warning: Could not extract npmDeps hash from error output"
+    echo "Error output was:"
+    echo "$npm_deps_output" | grep -A2 -B2 "hash mismatch" || echo "$npm_deps_output" | tail -20
   fi
 fi
 
