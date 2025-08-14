@@ -11,25 +11,33 @@ echo "Latest version: $latest_version"
 # Update version in package.nix
 sed -i "s/version = \".*\"/version = \"$latest_version\"/" package.nix
 
-# Update hashes for each platform
-platforms=(
-  "x86_64-linux:x86_64-unknown-linux-gnu"
-  "aarch64-linux:aarch64-unknown-linux-gnu"
-  "x86_64-darwin:x86_64-apple-darwin"
-  "aarch64-darwin:aarch64-apple-darwin"
-)
+# Get source hash
+echo "Getting source hash..."
+src_hash=$(nix run nixpkgs#nix-prefetch-github -- block goose --rev "v$latest_version" 2>/dev/null | jq -r .hash)
+echo "Source hash: $src_hash"
 
-for platform_spec in "${platforms[@]}"; do
-  nix_platform="${platform_spec%%:*}"
-  goose_platform="${platform_spec##*:}"
+# Update source hash
+sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$src_hash\"|g" package.nix
 
-  url="https://github.com/block/goose/releases/download/v$latest_version/goose-$goose_platform.tar.bz2"
+# Set dummy cargo hash to get the real one
+sed -i 's|cargoHash = "sha256-[^"]*"|cargoHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="|' package.nix
 
-  echo "Fetching hash for $nix_platform..."
-  hash=$(nix-prefetch-url --type sha256 "$url" 2>/dev/null | xargs -I {} nix hash convert --hash-algo sha256 {} 2>/dev/null || echo "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
-
-  # Update the hash in package.nix
-  sed -i "/$nix_platform = {/,/};/ s|hash = \".*\"|hash = \"$hash\"|" package.nix
-done
+# Build to get the correct cargo hash
+echo "Building to get cargo vendor hash..."
+if output=$(nix build ../..#goose-cli 2>&1); then
+  echo "Build succeeded with dummy hash - something is wrong!"
+  exit 1
+else
+  # Extract the correct cargo hash
+  if cargo_hash=$(echo "$output" | grep -A2 "error: hash mismatch" | grep "got:" | sed 's/.*got:[[:space:]]*//' | head -1); then
+    echo "Cargo vendor hash: $cargo_hash"
+    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$cargo_hash|" package.nix
+  else
+    echo "ERROR: Could not extract cargo hash from build output"
+    echo "Build output:"
+    echo "$output" | tail -50
+    exit 1
+  fi
+fi
 
 echo "Update complete!"
