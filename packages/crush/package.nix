@@ -26,10 +26,12 @@ buildGoModule rec {
     "-X=github.com/charmbracelet/crush/internal/version.Version=${version}"
   ];
 
-  meta = {
+
+  meta = with lib; {
     description = "The glamourous AI coding agent for your favourite terminal";
     homepage = "https://github.com/charmbracelet/crush";
     license = lib.licenses.mit;
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with lib.maintainers; [ zimbatm ];
     mainProgram = "crush";
   };

@@ -66,12 +66,15 @@ stdenv.mkDerivation {
     patchelf --add-needed "$(patchelf --print-soname ${stdenv.cc.cc.lib}/lib/libstdc++.so)" $out/bin/opencode
   '';
 
-  passthru.updateScript = ./update.sh;
+  passthru = {
+    updateScript = ./update.sh;
+  };
 
   meta = with lib; {
     description = "AI coding agent, built for the terminal";
     homepage = "https://github.com/sst/opencode";
     license = licenses.mit;
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     platforms = [
       "x86_64-linux"
       "aarch64-linux"

@@ -37,14 +37,18 @@ buildNpmPackage rec {
 
   nodejs = nodejs_20;
 
-  passthru.updateScript = ./update.sh;
+  passthru = {
+    updateScript = ./update.sh;
+  };
 
-  meta = {
+  meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";
     homepage = "https://ampcode.com/";
-    license = lib.licenses.unfree; # Need to verify the actual license
-    maintainers = with lib.maintainers; [ ];
-    platforms = lib.platforms.all;
+    changelog = "https://github.com/sourcegraph/amp/releases";
+    license = licenses.unfree;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    maintainers = with maintainers; [ ];
+    platforms = platforms.all;
     mainProgram = "amp";
   };
 }

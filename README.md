@@ -14,13 +14,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 ## Available Tools
 
-`> ./scripts/generate-package-docs.sh`
+<!-- `> ./scripts/generate-package-docs.sh` -->
 
 <!-- BEGIN mdsh -->
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
 - **Version**: 0.0.1755158498-g04711f
+- **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
 - **Usage**: `nix run .#amp -- --help`
@@ -29,6 +30,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem
 - **Version**: 1.8.2
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run .#backlog-md -- --help`
@@ -37,6 +39,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
 - **Version**: 1.0.80
+- **Source**: source
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run .#claude-code -- --help`
@@ -45,6 +48,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
 - **Version**: 1.0.37
+- **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run .#claude-code-router -- --help`
@@ -53,6 +57,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Claude Desktop - AI assistant from Anthropic
 - **Version**: 0.12.55
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://claude.ai
 - **Usage**: `nix run .#claude-desktop -- --help`
@@ -61,13 +66,16 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Sandboxed environment for Claude Code
 - **Version**: unknown
+- **Source**: source
 - **License**: Check package
+- **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
 - **Usage**: `nix run .#claudebox -- --help`
 
 #### crush
 
 - **Description**: The glamourous AI coding agent for your favourite terminal
 - **Version**: 0.6.0
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
 - **Usage**: `nix run .#crush -- --help`
@@ -76,6 +84,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
 - **Version**: 2025.08.09-d8191f3
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run .#cursor-agent -- --help`
@@ -84,6 +93,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
 - **Version**: 0.1.21
+- **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
 - **Usage**: `nix run .#gemini-cli -- --help`
@@ -92,6 +102,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
 - **Version**: 1.3.1
+- **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run .#goose-cli -- --help`
@@ -100,6 +111,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI coding agent, built for the terminal
 - **Version**: 0.4.45
+- **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run .#opencode -- --help`
@@ -108,6 +120,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
 - **Version**: 0.0.6
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run .#qwen-code -- --help`

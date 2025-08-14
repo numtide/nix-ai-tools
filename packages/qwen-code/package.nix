@@ -41,11 +41,13 @@ buildNpmPackage (finalAttrs: {
     runHook postInstall
   '';
 
+
   meta = {
     description = "Command-line AI workflow tool for Qwen3-Coder models";
     homepage = "https://github.com/QwenLM/qwen-code";
     changelog = "https://github.com/QwenLM/qwen-code/releases";
     license = lib.licenses.asl20;
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with lib.maintainers; [ zimbatm ];
     platforms = lib.platforms.all;
     mainProgram = "qwen";

@@ -72,10 +72,12 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+
   meta = with lib; {
     description = "Cursor Agent - CLI tool for Cursor AI code editor";
     homepage = "https://cursor.com/";
     license = licenses.unfree;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     platforms = [
       "x86_64-linux"

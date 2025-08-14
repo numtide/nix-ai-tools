@@ -64,10 +64,12 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+
   meta = with lib; {
     description = "CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks";
     homepage = "https://github.com/block/goose";
     license = licenses.asl20;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     platforms = [
       "x86_64-linux"

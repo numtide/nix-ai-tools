@@ -39,17 +39,22 @@ buildNpmPackage rec {
       --unset DEV
   '';
 
-  passthru.updateScript = ./update.sh;
+  passthru = {
+    updateScript = ./update.sh;
+  };
 
-  meta = {
+  meta = with lib; {
     description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";
     homepage = "https://github.com/anthropics/claude-code";
     downloadPage = "https://www.npmjs.com/package/@anthropic-ai/claude-code";
-    license = lib.licenses.unfree;
-    maintainers = with lib.maintainers; [
+    changelog = "https://github.com/anthropics/claude-code/releases";
+    license = licenses.unfree;
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    maintainers = with maintainers; [
       malo
       omarjatoi
     ];
     mainProgram = "claude";
+    platforms = platforms.all;
   };
 }

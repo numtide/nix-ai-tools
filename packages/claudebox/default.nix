@@ -31,6 +31,8 @@ pkgs.runCommand "claudebox"
     buildInputs = [ pkgs.makeWrapper ];
     meta = with pkgs.lib; {
       description = "Sandboxed environment for Claude Code";
+      homepage = "https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox";
+      sourceProvenance = with sourceTypes; [ fromSource ];
       platforms = platforms.linux;
     };
   }

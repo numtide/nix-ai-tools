@@ -170,10 +170,12 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+
   meta = with lib; {
     description = "Claude Desktop - AI assistant from Anthropic";
     homepage = "https://claude.ai";
     license = licenses.unfree;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     platforms = [
       "x86_64-linux"
