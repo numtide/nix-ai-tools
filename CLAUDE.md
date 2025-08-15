@@ -112,9 +112,10 @@ The flake supports: x86_64-linux, aarch64-linux, x86_64-darwin, aarch64-darwin
 
 1. **Rust packages with git dependencies**: May fail during cargo vendoring if dependencies have workspace inheritance issues. Consider using pre-built binaries as a workaround.
 
-2. **Binary packages**: When packaging pre-built binaries:
+1. **Binary packages**: When packaging pre-built binaries:
+
    - Use `dontUnpack = true` if the download is a single executable file
    - Use `autoPatchelfHook` on Linux to handle dynamic library dependencies
    - Common missing libraries: `gcc-unwrapped.lib` for libgcc_s.so.1
 
-3. **Update scripts**: Follow shellcheck recommendations - declare and assign variables separately to avoid masking return values.
+1. **Update scripts**: Follow shellcheck recommendations - declare and assign variables separately to avoid masking return values.
