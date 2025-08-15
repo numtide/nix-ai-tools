@@ -116,6 +116,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run .#goose-cli -- --help`
 
+#### groq-code-cli
+
+- **Description**: A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration
+- **Version**: 1.0.2-unstable-2025-08-12
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/build-with-groq/groq-code-cli
+- **Usage**: `nix run .#groq-code-cli -- --help`
+
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
