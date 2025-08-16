@@ -1,45 +1,41 @@
 {
   lib,
+  nodejs_20,
   buildNpmPackage,
-  fetchFromGitHub,
+  fetchurl,
   fetchNpmDeps,
+  runCommand,
 }:
-
-buildNpmPackage (finalAttrs: {
+let
   pname = "qwen-code";
-  version = "0.0.6";
+  version = "0.0.7";
+  srcHash = "sha256-DEaa4uEiuCIBPAjiHCOgPxvtsNXl+82wMjAnypsf+00=";
+  npmDepsHash = "sha256-PPw1HHAIPsKabYqmKz00jOrYj65OR78Y6WXRYZy/Zn8=";
 
-  src = fetchFromGitHub {
-    owner = "QwenLM";
-    repo = "qwen-code";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-s4+1hqdlJh5jOy6uZz608n5DzuBR+v/s+7D85oFwQIY=";
-  };
+  src = runCommand "gemini-cli-src-with-lock" { } ''
+    mkdir -p $out
+    tar -xzf ${
+      fetchurl {
+        url = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-${version}.tgz";
+        hash = "${srcHash}";
+      }
+    } -C $out --strip-components=1
+    cp ${./package-lock.json} $out/package-lock.json
+  '';
+in
+buildNpmPackage (finalAttrs: {
+  inherit pname version src;
 
   npmDeps = fetchNpmDeps {
     inherit (finalAttrs) src;
-    hash = "sha256-cGO66hQxgpoxphtt/BPPDIBuAG8yQseCdzUdAO2mkr4=";
+    hash = "${npmDepsHash}";
   };
 
-  buildPhase = ''
-    runHook preBuild
+  dontNpmBuild = true;
 
-    npm run generate
-    npm run bundle
+  nodejs = nodejs_20;
 
-    runHook postBuild
-  '';
-
-  installPhase = ''
-    runHook preInstall
-
-    mkdir -p $out/bin
-    cp -r bundle/* $out/
-    patchShebangs $out
-    ln -s $out/gemini.js $out/bin/qwen
-
-    runHook postInstall
-  '';
+  passthru.updateScript = ./update.sh;
 
   meta = {
     description = "Command-line AI workflow tool for Qwen3-Coder models";
@@ -47,7 +43,10 @@ buildNpmPackage (finalAttrs: {
     changelog = "https://github.com/QwenLM/qwen-code/releases";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with lib.maintainers; [ zimbatm ];
+    maintainers = with lib.maintainers; [
+      zimbatm
+      lonerOrz
+    ];
     platforms = lib.platforms.all;
     mainProgram = "qwen";
   };
