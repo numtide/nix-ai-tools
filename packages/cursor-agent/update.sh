@@ -48,9 +48,18 @@ update_hash() {
 
   echo "New hash for $platform_key: $new_hash"
 
+  # Map to Nix system format for matching in package.nix
+  local nix_system
+  case "$platform_key" in
+    "x64-linux")    nix_system="x86_64-linux" ;;
+    "arm64-linux")  nix_system="aarch64-linux" ;;
+    "x64-darwin")   nix_system="x86_64-darwin" ;;
+    "arm64-darwin") nix_system="aarch64-darwin" ;;
+  esac
+
   # Update hash in package.nix - find the line after the platform key
   # Use awk to update the hash more reliably
-  awk -v key="$platform_key" -v hash="$new_hash" '
+  awk -v key="$nix_system" -v hash="$new_hash" '
     $0 ~ key " = fetchurl {" { found=1 }
     found && /hash = / {
       sub(/hash = "sha256-[^"]*"/, "hash = \"" hash "\"")
