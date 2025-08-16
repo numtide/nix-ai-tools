@@ -7,18 +7,20 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "qwen-code";
-  version = "0.0.6";
+  version = "0.0.7";
+
+  makeCacheWritable = true;
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-s4+1hqdlJh5jOy6uZz608n5DzuBR+v/s+7D85oFwQIY=";
+    hash = "sha256-eumtANV/z3pjP/X6ljVnPLRjZtjW+fsB0cvLS7HmQOo=";
   };
 
   npmDeps = fetchNpmDeps {
     inherit (finalAttrs) src;
-    hash = "sha256-cGO66hQxgpoxphtt/BPPDIBuAG8yQseCdzUdAO2mkr4=";
+    hash = "sha256-EP2xvXC5+oJ6a3DjDY8ISf7dsLeshIAi6oisN2ZRPgg=";
   };
 
   buildPhase = ''
