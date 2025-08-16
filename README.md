@@ -8,9 +8,9 @@
 
 Exploring the integration between Nix and AI coding agents. This repository serves as a testbed for packaging, sandboxing, and enhancing AI-powered development tools within the Nix ecosystem.
 
-## Automated Updates
+## Daily Updates
 
-This repository uses GitHub Actions to automatically update all packages and flake inputs daily. Updates are created as individual pull requests for easy review and testing. See `.github/workflows/update.yml` for the workflow configuration.
+This repository uses GitHub Actions to automatically update all packages and flake inputs daily.
 
 ## Available Tools
 
@@ -182,6 +182,8 @@ nix run github:numtide/nix-ai-tools#gemini-cli
 
 # Try Qwen Code
 nix run github:numtide/nix-ai-tools#qwen-code
+
+# etc...
 ```
 
 ## Development
@@ -222,10 +224,6 @@ All packages support:
 - `aarch64-linux`
 - `x86_64-darwin`
 - `aarch64-darwin`
-
-### Dependencies
-
-Most packages are based on Node.js 20, with some providing pre-built binaries. Each package is self-contained with all required dependencies.
 
 ## Experimental Features
 
