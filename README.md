@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1755309458-gaf3343
+- **Version**: 0.0.1755388894-geb324e
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -83,7 +83,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.08.09-d8191f3
+- **Version**: 2025.08.15-dbc8d73
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
