@@ -12,26 +12,26 @@ let
 
   sources = {
     x86_64-linux = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v0.107.0/forge-x86_64-unknown-linux-gnu";
-      hash = "sha256-lwlJt2julVlLsMP+zQ9lHK7KIKMvovCCX/e+yJJ+IH8=";
+      url = "https://github.com/antinomyhq/forge/releases/download/v0.108.0/forge-x86_64-unknown-linux-gnu";
+      hash = "sha256-MIWD0ieXp1ZN8ROZCHpqPtyTMdgeRtqm1vOqL/er09g=";
     };
     aarch64-linux = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v0.107.0/forge-aarch64-unknown-linux-gnu";
-      hash = "sha256-BKhqtxhMiRnsCCkMhZG2VjsjPqn7yH6St8s75vvUMO0=";
+      url = "https://github.com/antinomyhq/forge/releases/download/v0.108.0/forge-aarch64-unknown-linux-gnu";
+      hash = "sha256-VO6lWKDoyxOEW6vknQugbOHEpfL96CUg2gY8IPZhfoA=";
     };
     x86_64-darwin = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v0.107.0/forge-x86_64-apple-darwin";
-      hash = "sha256-xL2Wnlxj4dzEkqhk7ps499aC1qCA3XivMgg0TT1DMe4=";
+      url = "https://github.com/antinomyhq/forge/releases/download/v0.108.0/forge-x86_64-apple-darwin";
+      hash = "sha256-IKgAcGfYd4nNdEkgXZWKeuYXTxyw4St57TDRj/ykmiU=";
     };
     aarch64-darwin = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v0.107.0/forge-aarch64-apple-darwin";
-      hash = "sha256-G8CSXmJHYNCMTQwkzX4xpfJbexALiTZb/2DbBnJy6pM=";
+      url = "https://github.com/antinomyhq/forge/releases/download/v0.108.0/forge-aarch64-apple-darwin";
+      hash = "sha256-ZRdBK9HqvP3dBON8It6vE0ghNMWVbnfgA9b+GbtitBc=";
     };
   };
 in
 stdenv.mkDerivation rec {
   pname = "forge";
-  version = "0.107.0";
+  version = "0.108.0";
 
   src = fetchurl sources.${system};
 

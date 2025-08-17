@@ -83,7 +83,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.08.09-d8191f3
+- **Version**: 2025.08.15-dbc8d73
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
@@ -92,7 +92,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
-- **Version**: 0.107.0
+- **Version**: 0.108.0
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge

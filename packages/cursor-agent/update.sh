@@ -51,10 +51,10 @@ update_hash() {
   # Map to Nix system format for matching in package.nix
   local nix_system
   case "$platform_key" in
-    "x64-linux")    nix_system="x86_64-linux" ;;
-    "arm64-linux")  nix_system="aarch64-linux" ;;
-    "x64-darwin")   nix_system="x86_64-darwin" ;;
-    "arm64-darwin") nix_system="aarch64-darwin" ;;
+  "x64-linux") nix_system="x86_64-linux" ;;
+  "arm64-linux") nix_system="aarch64-linux" ;;
+  "x64-darwin") nix_system="x86_64-darwin" ;;
+  "arm64-darwin") nix_system="aarch64-darwin" ;;
   esac
 
   # Update hash in package.nix - find the line after the platform key
