@@ -47,7 +47,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code-router
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
-- **Version**: 1.0.38
+- **Version**: 1.0.39
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
@@ -83,7 +83,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.08.09-d8191f3
+- **Version**: 2025.08.15-dbc8d73
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
