@@ -35,6 +35,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run .#backlog-md -- --help`
 
+#### catnip
+
+- **Description**: Developer environment that's like catnip for agentic programming
+- **Version**: 0.9.2
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/wandb/catnip
+- **Usage**: `nix run .#catnip -- --help`
+
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
