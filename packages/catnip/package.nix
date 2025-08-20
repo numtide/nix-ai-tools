@@ -60,7 +60,10 @@ stdenv.mkDerivation {
     runHook preInstall
 
     ${if stdenv.isDarwin then ''
-      install -Dm755 Catnip.app/Contents/MacOS/catnip $out/bin/catnip
+      mkdir -p $out/Applications
+      cp -r Catnip.app $out/Applications/
+      mkdir -p $out/bin
+      ln -s $out/Applications/Catnip.app/Contents/MacOS/catnip $out/bin/catnip
     '' else ''
       install -Dm755 catnip $out/bin/catnip
     ''}
