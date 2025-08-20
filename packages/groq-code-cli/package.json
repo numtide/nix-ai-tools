@@ -11,7 +11,8 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc --watch"
+		"dev": "tsc --watch",
+		"test": "ava"
 	},
 	"files": [
 		"dist"
@@ -20,9 +21,11 @@
 		"chalk": "^5.4.1",
 		"commander": "^14.0.0",
 		"groq-sdk": "^0.27.0",
+		"https-proxy-agent": "^7.0.6",
 		"ink": "^6.0.1",
 		"meow": "^11.0.0",
-		"react": "^19.1.0"
+		"react": "^19.1.0",
+		"socks-proxy-agent": "^8.0.5"
 	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^3.0.1",
@@ -46,6 +49,10 @@
 		},
 		"nodeArguments": [
 			"--loader=ts-node/esm"
+		],
+		"files": [
+			"src/**/*.test.ts",
+			"!**/*.d.ts"
 		]
 	},
 	"xo": {
