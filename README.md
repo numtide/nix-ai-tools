@@ -56,7 +56,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code-router
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
-- **Version**: 1.0.42
+- **Version**: 1.0.43
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
