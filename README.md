@@ -65,7 +65,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-desktop
 
 - **Description**: Claude Desktop - AI assistant from Anthropic
-- **Version**: 0.12.55
+- **Version**: 0.12.112
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://claude.ai
