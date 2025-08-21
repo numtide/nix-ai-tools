@@ -80,6 +80,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
 - **Usage**: `nix run .#claudebox -- --help`
 
+#### codex
+
+- **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
+- **Version**: 0.23.0
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/openai/codex
+- **Usage**: `nix run .#codex -- --help`
+
 #### crush
 
 - **Description**: The glamourous AI coding agent for your favourite terminal
