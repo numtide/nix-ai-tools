@@ -18,7 +18,7 @@ update_hash() {
 
   echo "Fetching hash for $platform..."
   # shellcheck disable=SC2016
-  url="${url_pattern//\${version}/$latest_version}"
+  url="${url_pattern//\${version/}/$latest_version}"
 
   # Use nix-prefetch-url to get the correct hash
   hash=$(nix-prefetch-url "$url" 2>/dev/null || echo "")
