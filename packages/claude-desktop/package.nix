@@ -12,16 +12,16 @@
 
 let
   pname = "claude-desktop";
-  version = "0.12.55"; # Updated based on extracted nupkg
+  version = "0.12.112"; # Updated based on extracted nupkg
 
   srcs = {
     x86_64-linux = fetchurl {
       url = "https://storage.googleapis.com/osprey-downloads-c02f6a0d-347c-492b-a752-3e0651722e97/nest-win-x64/Claude-Setup-x64.exe";
-      hash = "sha256-hmnvrNKwj2Zx2e2YpVBoEQRJC4bJLjJBFIr6NipNKTg=";
+      hash = "sha256-LrGHVMq7dXMCNwHQQ+w3o+RoDcxSuwl5rJy1hi3fjTk=";
     };
     aarch64-linux = fetchurl {
       url = "https://storage.googleapis.com/osprey-downloads-c02f6a0d-347c-492b-a752-3e0651722e97/nest-win-arm64/Claude-Setup-arm64.exe";
-      hash = "sha256-/yiq3XMtKii5ddrbGPzb2DP5JHToGenMk9wOeMqUmYQ=";
+      hash = "sha256-gqXDmA5ezmHq4T/KDIL2ii9PgiFMBnG4quYeghSfNlU=";
     };
   };
 
