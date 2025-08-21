@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
-- **Version**: 0.5.7
+- **Version**: 0.5.12
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
