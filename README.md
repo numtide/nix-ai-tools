@@ -128,7 +128,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### goose-cli
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
-- **Version**: 1.5.0
+- **Version**: 1.6.0
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
