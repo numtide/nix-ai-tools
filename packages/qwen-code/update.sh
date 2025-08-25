@@ -41,7 +41,7 @@ echo "Downloading npm package..."
 tmp_dir=$(mktemp -d)
 cd "$tmp_dir"
 npm pack "@qwen-code/qwen-code@$latest_version" >/dev/null 2>&1
-tarball_name=$(ls *.tgz)
+tarball_name=$(ls ./*.tgz)
 tar -xzf "$tarball_name"
 
 echo "Generating package-lock.json..."
