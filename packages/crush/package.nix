@@ -1,20 +1,20 @@
 {
   lib,
-  buildGo124Module,
+  buildGo125Module,
   fetchFromGitHub,
 }:
-buildGo124Module rec {
+buildGo125Module rec {
   pname = "crush";
-  version = "0.6.2";
+  version = "0.7.1";
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = "sha256-UtcAHxFydicvc6tdW2uZLf0Vq7T0vHgKqh1dykvYdwI=";
+    hash = "sha256-3wBGN3Uit1Xw8ZQ4WyR4PhA66Cfhl6YljMEbpaaJP60=";
   };
 
-  vendorHash = "sha256-vdzAVVGr7uTW/A/I8TcYW189E3960SCIqatu7Kb60hg=";
+  vendorHash = "sha256-qUcgVu6+cSFYDCsIB1pB5Vy3adWua2Rs8P9SNXJEjcA=";
 
   # Tests require config files that aren't available in the build environment
   doCheck = false;
