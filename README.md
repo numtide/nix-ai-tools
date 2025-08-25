@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### groq-code-cli
 
 - **Description**: A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration
-- **Version**: 1.0.2-unstable-2025-08-19
+- **Version**: 1.0.2-unstable-2025-08-22
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
@@ -155,7 +155,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.6
+- **Version**: 0.0.7
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
