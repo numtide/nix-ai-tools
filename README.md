@@ -47,7 +47,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
-- **Version**: 1.0.86
+- **Version**: 1.0.90
 - **Source**: source
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
@@ -155,7 +155,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.6
+- **Version**: 0.0.7
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
