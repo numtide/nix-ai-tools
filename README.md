@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1755734500-g56e2f8
+- **Version**: 0.0.1756144227-g92df3a
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -47,7 +47,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
-- **Version**: 1.0.86
+- **Version**: 1.0.90
 - **Source**: source
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
@@ -101,7 +101,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.08.15-dbc8d73
+- **Version**: 2025.08.25-896bbe1
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
@@ -110,7 +110,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
-- **Version**: 0.110.0
+- **Version**: 0.111.0
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
@@ -128,7 +128,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### goose-cli
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
-- **Version**: 1.5.0
+- **Version**: 1.6.0
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### groq-code-cli
 
 - **Description**: A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration
-- **Version**: 1.0.2-unstable-2025-08-19
+- **Version**: 1.0.2-unstable-2025-08-22
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
