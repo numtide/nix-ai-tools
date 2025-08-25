@@ -4,7 +4,6 @@
   fetchurl,
   autoPatchelfHook,
   gcc-unwrapped,
-  darwin,
 }:
 
 let
@@ -41,18 +40,9 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
 
-  buildInputs =
-    lib.optionals stdenv.isLinux [
-      gcc-unwrapped.lib
-    ]
-    ++ lib.optionals stdenv.isDarwin (
-      with darwin.apple_sdk.frameworks;
-      [
-        CoreFoundation
-        Security
-        SystemConfiguration
-      ]
-    );
+  buildInputs = lib.optionals stdenv.isLinux [
+    gcc-unwrapped.lib
+  ];
 
   sourceRoot = ".";
 
