@@ -6,24 +6,24 @@
 }:
 
 let
-  version = "0.5.12";
+  version = "0.5.27";
 
   sources = {
     x86_64-linux = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-linux-x64.zip";
-      sha256 = "sha256-SFStcODY78lpywRnQ4wb+G41ZI7NbayUuvrxYivw7XU=";
+      sha256 = "sha256-/FURMcYorbutitimin4F2pqjm/jWwz0TMIM9DM+tju8=";
     };
     aarch64-linux = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-linux-arm64.zip";
-      sha256 = "sha256-N0n8AGtj3wVASzxNgmtkhWOm29JBiZpB3zb5k2ZUpA8=";
+      sha256 = "sha256-hQBjEWuhDZKifNFvWIonE9OztvRUHxV9Bf0UAjm7gXQ=";
     };
     x86_64-darwin = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-darwin-x64.zip";
-      sha256 = "sha256-iKkIfn1sFOWxY7N3UYea1HK0kbZsxJKvCpXZVdC7b/4=";
+      sha256 = "sha256-tgniVW5laIp52VCd0HViK0naEyeRkhNg1UcXfY5fgg4=";
     };
     aarch64-darwin = {
       url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-darwin-arm64.zip";
-      sha256 = "sha256-YNGHZTdbZoaa/cxPgxEvvy931Q64iR4dO/7bIxZAlJA=";
+      sha256 = "sha256-BoEYptMNyKtDvQisBefv1GgeQXEpzkX/vptdWjlK6Cs=";
     };
   };
 
@@ -54,6 +54,7 @@ stdenv.mkDerivation {
 
   installPhase = ''
     runHook preInstall
+
 
     mkdir -p $out/bin
     cp opencode $out/bin/
