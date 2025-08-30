@@ -5,6 +5,7 @@
   fetchNpmDeps,
   nodejs_20,
   runCommand,
+  stdenv,
 }:
 
 let
@@ -34,6 +35,10 @@ buildNpmPackage rec {
 
   # The package from npm is already built
   dontNpmBuild = true;
+
+  # On aarch64-darwin, avoid running install scripts that try to build
+  # optional native deps (node-pty) with node-gyp and fail.
+  npmFlags = lib.optionals (stdenv.isAarch64 && stdenv.isDarwin) [ "--ignore-scripts" ];
 
   nodejs = nodejs_20;
 
