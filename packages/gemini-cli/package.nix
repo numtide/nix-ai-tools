@@ -5,17 +5,18 @@
   fetchNpmDeps,
   nodejs_20,
   runCommand,
+  stdenv,
 }:
 
 let
-  version = "0.1.22";
+  version = "0.2.2";
   # First, create a source with package-lock.json included
   srcWithLock = runCommand "gemini-cli-src-with-lock" { } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
         url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-${version}.tgz";
-        hash = "sha256-5i0gepSRdfkEQUa9e9xKfSkmJlqwe4aQGsp3x5v1v9g=";
+        hash = "sha256-XLoviMM/gJ383D5GSQ2gWsp8P9EhxjQLbgQDmNr9FhI=";
       }
     } -C $out --strip-components=1
     cp ${./package-lock.json} $out/package-lock.json
@@ -29,11 +30,15 @@ buildNpmPackage rec {
 
   npmDeps = fetchNpmDeps {
     inherit src;
-    hash = "sha256-JrZW6rqa/aAwOqZMV+XqdMOqVbMuXi6BRlBPO+vbQZQ=";
+    hash = "sha256-rH5ISWQMYx4hxKhNzJnoVNYc+qtdB1HrocB5bEGLBwg=";
   };
 
   # The package from npm is already built
   dontNpmBuild = true;
+
+  # On aarch64-darwin, avoid running install scripts that try to build
+  # optional native deps (node-pty) with node-gyp and fail.
+  npmFlags = lib.optionals (stdenv.isAarch64 && stdenv.isDarwin) [ "--ignore-scripts" ];
 
   nodejs = nodejs_20;
 
