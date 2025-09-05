@@ -7,11 +7,11 @@
 
 stdenv.mkDerivation rec {
   pname = "claude-code-router";
-  version = "1.0.46";
+  version = "1.0.47";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-${version}.tgz";
-    hash = "sha256-wgP+xskiZYSK4pLbeUHWrz23NeaenIT7n2S452WAAyo=";
+    hash = "sha256-N+c/fnyBXFgHlDfBXZY9yqNKROBTzENkx1aninhEIQs=";
   };
 
   nativeBuildInputs = [ nodejs_20 ];
