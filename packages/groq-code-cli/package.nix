@@ -6,16 +6,16 @@
 
 buildNpmPackage rec {
   pname = "groq-code-cli";
-  version = "1.0.2-unstable-2025-08-22";
+  version = "1.0.2-unstable-2025-09-05";
 
   src = fetchFromGitHub {
     owner = "build-with-groq";
     repo = "groq-code-cli";
-    rev = "d79a9c59f31028f81bbf3221dc7b5fe4b37a9cef";
-    hash = "sha256-ZER7Wnz9DOnVLGggpYugBFGFXC6Vbjkfi/sDaKKgJBg=";
+    rev = "a303eb4be01a53aaf3fbf319636e2b608e80aeca";
+    hash = "sha256-AyuGMMFcMQXclRbR1AJstop3QRD4lBzXI6eAAKOO3t0=";
   };
 
-  npmDepsHash = "sha256-JmVAvPAmf3QWLaZptUhKlYCk0yqmvOAYugvxVvMWuUU=";
+  npmDepsHash = "sha256-HwqHis/bLAUyzoN8xmt5xKmMSzBUInNrnKVCIE0eK5Y=";
 
   postPatch = ''
     # Update package-lock.json with the one we generated
