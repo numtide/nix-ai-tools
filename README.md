@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### groq-code-cli
 
 - **Description**: A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration
-- **Version**: 1.0.2-unstable-2025-08-22
+- **Version**: 1.0.2-unstable-2025-09-05
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
