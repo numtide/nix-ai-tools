@@ -5,13 +5,13 @@
 }:
 buildGo125Module rec {
   pname = "crush";
-  version = "0.7.5";
+  version = "0.7.6";
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = "sha256-NQHw3sascSgB1hzIpDNUQqp5R4NA9sdO30qa9I3CBew=";
+    hash = "sha256-udcAHAIR0ocYrFRJX2RTBY/8fd8TH8dCZ7rXO8L3QbE=";
   };
 
   vendorHash = "sha256-k7yfCyfeW2TW5DpVmxfNLXV08FxhpW4SQNAcDyrYKPc=";
