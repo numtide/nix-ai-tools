@@ -15,7 +15,7 @@ buildNpmPackage rec {
     hash = "sha256-AyuGMMFcMQXclRbR1AJstop3QRD4lBzXI6eAAKOO3t0=";
   };
 
-  npmDepsHash = "sha256-mcZ+L7oT/d97p7e7k2ug1Dxac8hbTBVO3JUIzFTCCsk=";
+  npmDepsHash = "sha256-VLXo9WQoA1c5oShc7pbHq5wc9JO8Mp0vYBGmrcEXIys=";
 
   postPatch = ''
     # Update package-lock.json with the one we generated
