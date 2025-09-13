@@ -143,6 +143,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
 - **Usage**: `nix run .#groq-code-cli -- --help`
 
+#### nanocoder
+
+- **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
+- **Version**: 1.10.3
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/Mote-Software/nanocoder
+- **Usage**: `nix run .#nanocoder -- --help`
+
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
