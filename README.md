@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1757880072-g1e891a
+- **Version**: 0.0.1757937702-g40ff18
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -147,7 +147,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
 - **Version**: 1.10.3
-- **Source**: bytecode
+- **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
 - **Usage**: `nix run .#nanocoder -- --help`
