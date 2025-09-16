@@ -7,24 +7,24 @@
 }:
 
 let
-  version = "0.34.0";
+  version = "0.36.0";
 
   sources = {
     x86_64-linux = {
       url = "https://github.com/openai/codex/releases/download/rust-v${version}/codex-x86_64-unknown-linux-musl.tar.gz";
-      hash = "sha256-VxXcM0lHNhVVt875Bism1s1pLdb2R4HLKEkTfrx6jlk=";
+      hash = "sha256-72kockzkx/6vUWELOnWmDPAtQtbV7yzMd8JceBYoQPQ=";
     };
     aarch64-linux = {
       url = "https://github.com/openai/codex/releases/download/rust-v${version}/codex-aarch64-unknown-linux-musl.tar.gz";
-      hash = "sha256-6J01SAzocOLYPRC29ahkEdcoWS82VE2tkUxpfBgCz8w=";
+      hash = "sha256-CrzRea9Edpkghx9XFAgEyz419V6phm6FT7RniSQfTiI=";
     };
     x86_64-darwin = {
       url = "https://github.com/openai/codex/releases/download/rust-v${version}/codex-x86_64-apple-darwin.tar.gz";
-      hash = "sha256-KywRHvQsUNUsPBhMsnxFKFQtmWWgzVtNqndUt5I5tsM=";
+      hash = "sha256-PHMVAVRNbJKzsgXAp+Xgo/tkaDJ4po/mZNvYbMUFSLM=";
     };
     aarch64-darwin = {
       url = "https://github.com/openai/codex/releases/download/rust-v${version}/codex-aarch64-apple-darwin.tar.gz";
-      hash = "sha256-IV6090p6pK/2ElUG92bAru/QpXFs7+yVHJgMevcOVYs=";
+      hash = "sha256-0NN1g3DyykSP5Gjp3QewNIeo5uyPpAocSx6lN9FnNHg=";
     };
   };
 
