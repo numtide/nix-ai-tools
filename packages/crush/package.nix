@@ -5,16 +5,16 @@
 }:
 buildGo125Module rec {
   pname = "crush";
-  version = "0.8.2";
+  version = "0.8.3";
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = "sha256-KDGxr1TfxR1WrHsgGXD0f9cXVqnnVNOt2neUqj2FVFw=";
+    hash = "sha256-NKGMI7NXnzQcECeSex5SifqhqPMYUVtPbFCeoHw7kgA=";
   };
 
-  vendorHash = "sha256-AtPHyqDKWh/HvIpyznIRl4LUqmnkEr1x0WPHAIsvhPo=";
+  vendorHash = "sha256-b5RRCN5TxiGeFR0xQJ4wVg7K67tbqqJHThPS8XlArxE=";
 
   # Tests require config files that aren't available in the build environment
   doCheck = false;
