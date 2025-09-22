@@ -4,7 +4,6 @@
   fetchurl,
   nodejs_20,
   makeWrapper,
-  nix-update-script,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
