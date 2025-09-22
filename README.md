@@ -84,7 +84,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI-powered code review CLI tool
 - **Version**: 0.3.1
-- **Source**: unknown
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run .#coderabbit-cli -- --help`
