@@ -66,6 +66,8 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru.updateScript = ./update-script.sh;
+
   meta = with lib; {
     description = "Developer environment that's like catnip for agentic programming";
     homepage = "https://github.com/wandb/catnip";
