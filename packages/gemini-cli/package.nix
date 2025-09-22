@@ -2,7 +2,6 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  nix-update-script,
   ripgrep,
   jq,
   pkg-config,
