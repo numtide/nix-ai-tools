@@ -66,13 +66,6 @@ buildNpmPackage (finalAttrs: {
     runHook postInstall
   '';
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version-regex"
-      "^v(\\d+\\.\\d+\\.\\d+)$"
-    ];
-  };
-
   meta = {
     description = "AI agent that brings the power of Gemini directly into your terminal";
     homepage = "https://github.com/google-gemini/gemini-cli";
