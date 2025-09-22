@@ -28,7 +28,9 @@ let
     };
   };
 
-  source = sources.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  source =
+    sources.${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation rec {
   pname = "coderabbit-cli";
@@ -60,7 +62,12 @@ stdenv.mkDerivation rec {
     homepage = "https://coderabbit.ai";
     license = licenses.unfree;
     maintainers = with maintainers; [ ];
-    platforms = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
     mainProgram = "coderabbit";
   };
 }
