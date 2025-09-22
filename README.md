@@ -80,6 +80,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
 - **Usage**: `nix run .#claudebox -- --help`
 
+#### coderabbit-cli
+
+- **Description**: AI-powered code review CLI tool
+- **Version**: 0.3.1
+- **Source**: unknown
+- **License**: unfree
+- **Homepage**: https://coderabbit.ai
+- **Usage**: `nix run .#coderabbit-cli -- --help`
+
 #### codex
 
 - **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
@@ -88,15 +97,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run .#codex -- --help`
-
-#### coderabbit-cli
-
-- **Description**: AI-powered code review CLI tool
-- **Version**: 0.3.1
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://www.coderabbit.ai/cli
-- **Usage**: `nix run .#coderabbit-cli -- --help`
 
 #### crush
 
@@ -119,7 +119,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
-- **Version**: 0.119.1
+- **Version**: 0.120.0
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
