@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1758499308-g0a22df
+- **Version**: 0.0.1758528096-g256db8
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -84,7 +84,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI-powered code review CLI tool
 - **Version**: 0.3.1
-- **Source**: binary
+- **Source**: unknown
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run .#coderabbit-cli -- --help`
@@ -173,7 +173,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.9
+- **Version**: 0.0.12
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
