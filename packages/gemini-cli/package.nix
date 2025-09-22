@@ -1,59 +1,79 @@
 {
   lib,
   buildNpmPackage,
-  fetchurl,
-  fetchNpmDeps,
-  nodejs_20,
-  runCommand,
-  stdenv,
+  fetchFromGitHub,
+  nix-update-script,
+  ripgrep,
+  jq,
+  pkg-config,
+  libsecret,
 }:
 
-let
-  version = "0.5.5";
-  # First, create a source with package-lock.json included
-  srcWithLock = runCommand "gemini-cli-src-with-lock" { } ''
-    mkdir -p $out
-    tar -xzf ${
-      fetchurl {
-        url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-${version}.tgz";
-        hash = "sha256-nVW1FEDplwlmFuTJ4pVmXtyQBYPxx2KhIv+4cudZwG0=";
-      }
-    } -C $out --strip-components=1
-    cp ${./package-lock.json} $out/package-lock.json
-  '';
-in
-buildNpmPackage rec {
+buildNpmPackage (finalAttrs: {
   pname = "gemini-cli";
-  inherit version;
+  version = "0.5.5";
 
-  src = srcWithLock;
-
-  npmDeps = fetchNpmDeps {
-    inherit src;
-    hash = "sha256-QU+wyCMfhMjlBv2II3GC0RvAzQci7ZzGiQfXncDF6xY=";
+  src = fetchFromGitHub {
+    owner = "google-gemini";
+    repo = "gemini-cli";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-A4O94X0TCc8lgX52+VQ1lSGREmpPIFLpu65Vwxsqso8=";
   };
 
-  # The package from npm is already built
-  dontNpmBuild = true;
+  npmDepsHash = "sha256-d33dWwrCND/5veeIQ8iz87nTxu6wd7FskrGgvwBuruk=";
 
-  # On aarch64-darwin, avoid running install scripts that try to build
-  # optional native deps (node-pty) with node-gyp and fail.
-  npmFlags = lib.optionals (stdenv.isAarch64 && stdenv.isDarwin) [ "--ignore-scripts" ];
+  nativeBuildInputs = [
+    jq
+    pkg-config
+  ];
 
-  nodejs = nodejs_20;
+  buildInputs = [
+    ripgrep
+    libsecret
+  ];
 
-  passthru = {
-    updateScript = ./update.sh;
-  };
+  preConfigure = ''
+    mkdir -p packages/generated
+    echo "export const GIT_COMMIT_INFO = { commitHash: '${finalAttrs.src.rev}' };" > packages/generated/git-commit.ts
+  '';
+
+  postPatch = ''
+    # Remove node-pty dependency from package.json
+    ${jq}/bin/jq 'del(.optionalDependencies."node-pty")' package.json > package.json.tmp && mv package.json.tmp package.json
+
+    # Remove node-pty dependency from packages/core/package.json
+    ${jq}/bin/jq 'del(.optionalDependencies."node-pty")' packages/core/package.json > packages/core/package.json.tmp && mv packages/core/package.json.tmp packages/core/package.json
+  '';
+
+  installPhase = ''
+    runHook preInstall
+    mkdir -p $out/{bin,share/gemini-cli}
+
+    cp -r node_modules $out/share/gemini-cli/
+
+    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli
+    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-core
+    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-a2a-server
+    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-test-utils
+    rm -f $out/share/gemini-cli/node_modules/gemini-cli-vscode-ide-companion
+    cp -r packages/cli $out/share/gemini-cli/node_modules/@google/gemini-cli
+    cp -r packages/core $out/share/gemini-cli/node_modules/@google/gemini-cli-core
+    cp -r packages/a2a-server $out/share/gemini-cli/node_modules/@google/gemini-cli-a2a-server
+
+    ln -s $out/share/gemini-cli/node_modules/@google/gemini-cli/dist/index.js $out/bin/gemini
+    chmod +x "$out/bin/gemini"
+
+    runHook postInstall
+  '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "AI agent that brings the power of Gemini directly into your terminal";
     homepage = "https://github.com/google-gemini/gemini-cli";
-    changelog = "https://github.com/google-gemini/gemini-cli/releases";
     license = lib.licenses.asl20;
-    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
-    maintainers = with lib.maintainers; [ donteatoreo ];
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.all;
     mainProgram = "gemini";
   };
-}
+})
