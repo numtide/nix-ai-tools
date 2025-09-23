@@ -3,7 +3,7 @@
   buildNpmPackage,
   fetchurl,
   fetchNpmDeps,
-  nodejs_20,
+  nodejs_22,
   runCommand,
 }:
 
@@ -35,7 +35,7 @@ buildNpmPackage rec {
   # The package from npm is already built
   dontNpmBuild = true;
 
-  nodejs = nodejs_20;
+  nodejs = nodejs_22;
 
   passthru = {
     updateScript = ./update.sh;
