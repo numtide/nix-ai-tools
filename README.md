@@ -155,7 +155,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### nanocoder
 
 - **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
-- **Version**: 1.11.0
+- **Version**: 1.11.1
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
