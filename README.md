@@ -84,7 +84,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI-powered code review CLI tool
 - **Version**: 0.3.2
-- **Source**: unknown
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run .#coderabbit-cli -- --help`
@@ -93,7 +93,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
 - **Version**: 0.40.0
-- **Source**: binary
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run .#codex -- --help`
