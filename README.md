@@ -92,7 +92,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### codex
 
 - **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
-- **Version**: 0.39.0
+- **Version**: 0.40.0
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
