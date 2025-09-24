@@ -1,35 +1,38 @@
 {
   lib,
-  stdenv,
+  buildNpmPackage,
   fetchurl,
-  nodejs_20,
-  makeWrapper,
+  fetchNpmDeps,
+  nodejs_22,
+  runCommand,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+buildNpmPackage (finalAttrs: {
   pname = "qwen-code";
-  version = "0.0.12";
+  version = "0.0.13";
 
   src = fetchurl {
-    url = "https://github.com/QwenLM/qwen-code/releases/download/v${finalAttrs.version}/gemini.js";
-    hash = "sha256-QzvlPP8DYK/tOinn5glTZWvjgACP1SrR6V1QgK5FrgU=";
+    url = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-${finalAttrs.version}.tgz";
+    hash = "sha256-1zR9sLJcQrYhUXzrMFocATIKOMyetOnXkKtdoN9adYE=";
   };
 
-  dontUnpack = true;
-
-  nativeBuildInputs = [ makeWrapper ];
-
-  installPhase = ''
-    runHook preInstall
-
-    mkdir -p $out/bin $out/lib/qwen-code
-    cp $src $out/lib/qwen-code/gemini.js
-
-    makeWrapper ${nodejs_20}/bin/node $out/bin/qwen \
-      --add-flags "$out/lib/qwen-code/gemini.js"
-
-    runHook postInstall
+  postPatch = ''
+    cp ${./package-lock.json} package-lock.json
   '';
+
+  npmDeps = fetchNpmDeps {
+    src = runCommand "qwen-code-src-with-lock" { } ''
+      mkdir -p $out
+      tar -xzf ${finalAttrs.src} -C $out --strip-components=1
+      cp ${./package-lock.json} $out/package-lock.json
+    '';
+    hash = "sha256-5pByxXfJyCkBScMWwENi7qFl/cPjkNr9y6IRjTU4U6o=";
+  };
+
+  npmFlags = [ "--ignore-scripts" ];
+  dontNpmBuild = true;
+
+  nodejs = nodejs_22;
 
   meta = {
     description = "Command-line AI workflow tool for Qwen3-Coder models";
