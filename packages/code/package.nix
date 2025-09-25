@@ -6,7 +6,6 @@
   rustPlatform,
   pkg-config,
   openssl,
-  versionCheckHook,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
