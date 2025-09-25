@@ -80,11 +80,20 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
 - **Usage**: `nix run .#claudebox -- --help`
 
+#### code
+
+- **Description**: Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.
+- **Version**: 0.2.162
+- **Source**: unknown
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/just-every/code/
+- **Usage**: `nix run .#code -- --help`
+
 #### coderabbit-cli
 
 - **Description**: AI-powered code review CLI tool
 - **Version**: 0.3.2
-- **Source**: binary
+- **Source**: unknown
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run .#coderabbit-cli -- --help`
@@ -93,7 +102,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
 - **Version**: 0.40.0
-- **Source**: source
+- **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run .#codex -- --help`
@@ -164,7 +173,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent, built for the terminal
-- **Version**: 0.11.2
+- **Version**: 0.11.3
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
@@ -173,7 +182,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.12
+- **Version**: 0.0.13
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
