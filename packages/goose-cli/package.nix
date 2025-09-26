@@ -9,24 +9,24 @@
 }:
 
 let
-  version = "1.8.0";
+  version = "1.9.0";
 
   sources = {
     x86_64-linux = {
       url = "https://github.com/block/goose/releases/download/v${version}/goose-x86_64-unknown-linux-gnu.tar.bz2";
-      hash = "sha256-W3cZ9A2KyTFaToKpl7piz4eSR5CRiL0dclrl3CasbFc=";
+      hash = "sha256-2a8xHdXsh19vjPUrgujTr8eAAVyJfm4XSZp2TXa8pMU=";
     };
     aarch64-linux = {
       url = "https://github.com/block/goose/releases/download/v${version}/goose-aarch64-unknown-linux-gnu.tar.bz2";
-      hash = "sha256-tPO1LPryVStxeLUeXUXRLD5AgsJvoMo5BWplgdmhoFk=";
+      hash = "sha256-H0aqu8PQVOCjofXiUBXZEEEAsT7UH6/iOTvfMl7tfMc=";
     };
     x86_64-darwin = {
       url = "https://github.com/block/goose/releases/download/v${version}/goose-x86_64-apple-darwin.tar.bz2";
-      hash = "sha256-DxSHlus2REuJ0+sYvjgc4W3Hw8KRgJKIDxuVPRVaTBQ=";
+      hash = "sha256-v4N9m8uCCVcgkK4N/QneejjJT1qcqpHruNLItbps8+w=";
     };
     aarch64-darwin = {
       url = "https://github.com/block/goose/releases/download/v${version}/goose-aarch64-apple-darwin.tar.bz2";
-      hash = "sha256-napHM5T8cxLjNoE/7/0WUWYVesSmhCYiePHq/cRSXP8=";
+      hash = "sha256-BhGfPEw97QqjMGsxb2JopnwZWSyS3X/hZk5Z6xlMYd8=";
     };
   };
 
