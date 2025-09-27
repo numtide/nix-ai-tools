@@ -83,7 +83,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### code
 
 - **Description**: Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.
-- **Version**: 0.2.167
+- **Version**: 0.2.169
 - **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
