@@ -4,7 +4,6 @@ on:
     # Run daily at 3 AM UTC (1 hour after main update workflow)
     - cron: '0 3 * * *'
   workflow_dispatch:
-
 jobs:
   # First job: Update the main package on x86_64-linux
   update-package:
@@ -22,18 +21,14 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
-
       - name: Setup Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Update OpenCode package
         id: update
         run: |
@@ -63,7 +58,6 @@ jobs:
             # Stage the changes
             git add packages/opencode/package.nix
           fi
-
       - name: Upload updated package
         if: steps.update.outputs.updated == 'true'
         uses: actions/upload-artifact@v4
@@ -71,7 +65,6 @@ jobs:
           name: opencode-x86_64-linux
           path: packages/opencode/package.nix
           retention-days: 1
-
   # Second job: Update node_modules hashes for other platforms
   update-hashes:
     needs: update-package
@@ -97,27 +90,22 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-
       - name: Download x86_64-linux update
         uses: actions/download-artifact@v4
         with:
           name: opencode-x86_64-linux
           path: packages/opencode/
-
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
             system-features = nixos-test benchmark big-parallel kvm
-
       - name: Setup Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Update node_modules hashes
         run: |
           set -euo pipefail
@@ -136,14 +124,12 @@ jobs:
 
             # The above might fail if the hash is already correct, that's ok
           done
-
       - name: Upload platform-specific update
         uses: actions/upload-artifact@v4
         with:
           name: opencode-${{ matrix.cache-key }}
           path: packages/opencode/package.nix
           retention-days: 1
-
   # Final job: Merge all updates and create PR
   create-pr:
     needs: [update-package, update-hashes]
@@ -159,24 +145,19 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: opencode-*
           path: /tmp/artifacts/
-
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
-
       - name: Setup Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Merge updates
         run: |
           # Start with x86_64-linux as base
@@ -203,12 +184,10 @@ jobs:
               fi
             fi
           done
-
       - name: Verify build
         run: |
           # Test that the package builds on current platform
           nix build .#packages.x86_64-linux.opencode --no-link
-
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v7
@@ -222,7 +201,6 @@ jobs:
           labels: |
             dependencies
             automated
-
       - name: Enable auto-merge
         if: steps.cpr.outputs.pull-request-number
         env:
