@@ -84,7 +84,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.
 - **Version**: 0.2.171
-- **Source**: unknown
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
 - **Usage**: `nix run .#code -- --help`
@@ -93,7 +93,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI-powered code review CLI tool
 - **Version**: 0.3.2
-- **Source**: unknown
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run .#coderabbit-cli -- --help`
@@ -101,11 +101,20 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### codex
 
 - **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
-- **Version**: 0.40.0
-- **Source**: unknown
+- **Version**: 0.42.0
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run .#codex -- --help`
+
+#### copilot-cli
+
+- **Description**: GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.
+- **Version**: 0.0.328
+- **Source**: bytecode
+- **License**: unfree
+- **Homepage**: https://github.com/github/copilot-cli
+- **Usage**: `nix run .#copilot-cli -- --help`
 
 #### crush
 
@@ -165,16 +174,16 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
 - **Version**: 1.11.3
-- **Source**: unknown
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
 - **Usage**: `nix run .#nanocoder -- --help`
 
 #### opencode
 
-- **Description**: AI coding agent, built for the terminal
+- **Description**: AI coding agent built for the terminal
 - **Version**: 0.12.1
-- **Source**: binary
+- **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run .#opencode -- --help`
