@@ -44,7 +44,7 @@ jobs:
           echo "current_version=$current_version" >> $GITHUB_OUTPUT
 
           # Run nix-update for the main package (including tui and node_modules for x86_64-linux)
-          nix run nixpkgs#nix-update -- \
+          nix run --inputs-from . nixpkgs#nix-update -- \
             --subpackage tui \
             --subpackage node_modules \
             --flake opencode
@@ -127,7 +127,7 @@ jobs:
             echo "Updating node_modules hash for $platform..."
 
             # Run nix-update with --version skip to only update the node_modules hash
-            nix run nixpkgs#nix-update -- \
+            nix run --inputs-from . nixpkgs#nix-update -- \
               --flake \
               --version skip \
               --subpackage tui \
@@ -169,7 +169,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: opencode-*
-          path: artifacts/
+          path: /tmp/artifacts/
 
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
@@ -180,10 +180,10 @@ jobs:
       - name: Merge updates
         run: |
           # Start with x86_64-linux as base
-          cp artifacts/opencode-x86_64-linux/package.nix packages/opencode/package.nix
+          cp /tmp/artifacts/opencode-x86_64-linux/package.nix packages/opencode/package.nix
 
           # Extract hashes from other platform updates and merge them
-          for artifact in artifacts/opencode-*/package.nix; do
+          for artifact in /tmp/artifacts/opencode-*/package.nix; do
             if [[ "$artifact" == *"darwin"* ]]; then
               # Extract Darwin hashes
               x86_64_darwin=$(grep 'x86_64-darwin = "sha256-' "$artifact" | head -1 || true)
@@ -218,12 +218,6 @@ jobs:
           title: "opencode: ${{ needs.update-package.outputs.current_version }} -> ${{ needs.update-package.outputs.new_version }}"
           body: |
             Automated update of OpenCode from ${{ needs.update-package.outputs.current_version }} to ${{ needs.update-package.outputs.new_version }}
-
-            This update includes platform-specific node_modules hashes for:
-            - x86_64-linux
-            - aarch64-linux
-            - x86_64-darwin
-            - aarch64-darwin
           branch: update-opencode-${{ needs.update-package.outputs.new_version }}
           labels: |
             dependencies
