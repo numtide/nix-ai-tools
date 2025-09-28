@@ -44,7 +44,7 @@ jobs:
           echo "current_version=$current_version" >> $GITHUB_OUTPUT
 
           # Run nix-update for the main package (including tui and node_modules for x86_64-linux)
-          nix run nixpkgs#nix-update -- \
+          nix run --inputs-from . nixpkgs#nix-update -- \
             --subpackage tui \
             --subpackage node_modules \
             --flake opencode
@@ -127,7 +127,7 @@ jobs:
             echo "Updating node_modules hash for $platform..."
 
             # Run nix-update with --version skip to only update the node_modules hash
-            nix run nixpkgs#nix-update -- \
+            nix run --inputs-from . nixpkgs#nix-update -- \
               --flake \
               --version skip \
               --subpackage tui \
