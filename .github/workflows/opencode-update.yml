@@ -45,10 +45,9 @@ jobs:
 
           # Run nix-update for the main package (including tui and node_modules for x86_64-linux)
           nix run nixpkgs#nix-update -- \
-            --flake \
-            --build-commit \
-            opencode \
-            --override-filename packages/opencode/package.nix
+            --subpackage tui \
+            --subpackage node_modules \
+            --flake opencode
 
           # Get new version
           new_version=$(nix eval .#packages.x86_64-linux.opencode.version --raw)
@@ -131,10 +130,9 @@ jobs:
             nix run nixpkgs#nix-update -- \
               --flake \
               --version skip \
-              --build-commit \
-              --system "$platform" \
-              opencode.node_modules \
-              --override-filename packages/opencode/package.nix || true
+              --subpackage tui \
+              --subpackage node_modules \
+              opencode
 
             # The above might fail if the hash is already correct, that's ok
           done
