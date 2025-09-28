@@ -5,7 +5,6 @@
   buildGoModule,
   bun,
   fetchFromGitHub,
-  makeBinaryWrapper,
   models-dev,
   nix-update-script,
   testers,

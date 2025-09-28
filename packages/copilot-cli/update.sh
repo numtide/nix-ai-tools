@@ -21,7 +21,7 @@ sed_inplace() {
 registry_url="https://registry.npmjs.org/@github%2Fcopilot"
 version=$(curl -s "$registry_url" | jq -r '."dist-tags".latest')
 
-if [[ -z "$version" || "$version" == "null" ]]; then
+if [[ -z $version || $version == "null" ]]; then
   echo "ERROR: unable to determine latest version" >&2
   exit 1
 fi
