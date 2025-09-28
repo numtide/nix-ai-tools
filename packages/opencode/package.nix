@@ -1,87 +1,191 @@
 {
   lib,
   stdenv,
-  fetchzip,
-  autoPatchelfHook,
+  stdenvNoCC,
+  buildGoModule,
+  bun,
+  fetchFromGitHub,
+  makeBinaryWrapper,
+  models-dev,
+  nix-update-script,
+  testers,
+  writableTmpDirAsHomeHook,
 }:
 
 let
-  version = "0.12.1";
-
-  sources = {
-    x86_64-linux = {
-      url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-linux-x64.zip";
-      sha256 = "sha256-ayduwTOHBeL1/zUQc5vATvj0fwcUbavfbWFpIPBcCFM=";
-    };
-    aarch64-linux = {
-      url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-linux-arm64.zip";
-      sha256 = "sha256-Gm0okLbTDlUmJdrs7DtFyn8XwMJGV1bJcjpE4g9X1As=";
-    };
-    x86_64-darwin = {
-      url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-darwin-x64.zip";
-      sha256 = "sha256-INKEqsCDIFux/wgPAADfkgUiuvsuxMbEYEADOIYhuX4=";
-    };
-    aarch64-darwin = {
-      url = "https://github.com/sst/opencode/releases/download/v${version}/opencode-darwin-arm64.zip";
-      sha256 = "sha256-/BfAF7xBoTptERRckSuu9IntPh7aS5DuxKyMxx5WeSk=";
-    };
+  bun-target = {
+    "aarch64-darwin" = "bun-darwin-arm64";
+    "aarch64-linux" = "bun-linux-arm64";
+    "x86_64-darwin" = "bun-darwin-x64";
+    "x86_64-linux" = "bun-linux-x64";
   };
-
-  source =
-    sources.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 in
-stdenv.mkDerivation {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  inherit version;
-
-  src = fetchzip {
-    url = source.url;
-    sha256 = source.sha256;
-    stripRoot = false;
+  version = "0.12.0";
+  src = fetchFromGitHub {
+    owner = "sst";
+    repo = "opencode";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-rDYuJdJVRT1jvNZNoZdiySMmkSxUsEmsDJfWbEv6mO4=";
   };
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [
-    autoPatchelfHook
+  tui = buildGoModule {
+    pname = "opencode-tui";
+    inherit (finalAttrs) version src;
+
+    modRoot = "packages/tui";
+
+    vendorHash = "sha256-H+TybeyyHTbhvTye0PCDcsWkcN8M34EJ2ddxyXEJkZI=";
+
+    subPackages = [ "cmd/opencode" ];
+
+    env.CGO_ENABLED = 0;
+
+    ldflags = [
+      "-s"
+      "-X=main.Version=${finalAttrs.version}"
+    ];
+
+    installPhase = ''
+      runHook preInstall
+
+      install -Dm755 $GOPATH/bin/opencode $out/bin/tui
+
+      runHook postInstall
+    '';
+  };
+
+  node_modules = stdenvNoCC.mkDerivation {
+    pname = "opencode-node_modules";
+    inherit (finalAttrs) version src;
+
+    impureEnvVars = lib.fetchers.proxyImpureEnvVars ++ [
+      "GIT_PROXY_COMMAND"
+      "SOCKS_SERVER"
+    ];
+
+    nativeBuildInputs = [
+      bun
+      writableTmpDirAsHomeHook
+    ];
+
+    dontConfigure = true;
+
+    buildPhase = ''
+      runHook preBuild
+
+       export BUN_INSTALL_CACHE_DIR=$(mktemp -d)
+
+       # Disable post-install scripts to avoid shebang issues
+       bun install \
+         --filter=opencode \
+         --force \
+         --ignore-scripts \
+         --no-progress
+         # Remove `--frozen-lockfile` and `--production` — they erroneously report the lockfile needs updating even though `bun install` does not change it.
+         # Related to  https://github.com/oven-sh/bun/issues/19088
+         # --frozen-lockfile \
+         # --production
+
+      runHook postBuild
+    '';
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out/node_modules
+      cp -R ./node_modules $out
+
+      runHook postInstall
+    '';
+
+    # Required else we get errors that our fixed-output derivation references store paths
+    dontFixup = true;
+
+    outputHash =
+      {
+        x86_64-linux = "sha256-YOTuzwo0ZjqVswW3bUu3pFJcmfl0X0Se8Z5jKg8/rQs=";
+        aarch64-linux = "sha256-pLtE1Cyv4jHYGFQlVHMeKZbQqC2SkxTu2KRHN4E1NPw=";
+        x86_64-darwin = "sha256-3JxXe889dL7TBuHPRYDsviUuwnp38XWAwFN3Te6JtDg=";
+        aarch64-darwin = "sha256-RHg55NvI52EGTWUCCJVrilXqr3qc+vqQoT/uIUjDVvg=";
+      }
+      .${stdenv.hostPlatform.system};
+    outputHashAlgo = "sha256";
+    outputHashMode = "recursive";
+  };
+
+  nativeBuildInputs = [
+    bun
+    models-dev
   ];
 
-  buildInputs = lib.optionals stdenv.isLinux [
-    stdenv.cc.cc.lib
+  patches = [
+    # Patch `packages/opencode/src/provider/models-macro.ts` to get contents of
+    # `_api.json` from the file bundled with `bun build`.
+    ./local-models-dev.patch
   ];
 
-  dontBuild = true;
+  configurePhase = ''
+    runHook preConfigure
+
+    cp -R ${finalAttrs.node_modules}/node_modules .
+
+    runHook postConfigure
+  '';
+
+  env.MODELS_DEV_API_JSON = "${models-dev}/dist/_api.json";
+
+  buildPhase = ''
+    runHook preBuild
+
+    bun build \
+      --define OPENCODE_TUI_PATH="'${finalAttrs.tui}/bin/tui'" \
+      --define OPENCODE_VERSION="'${finalAttrs.version}'" \
+      --compile \
+      --target=${bun-target.${stdenvNoCC.hostPlatform.system}} \
+      --outfile=opencode \
+      ./packages/opencode/src/index.ts \
+
+    runHook postBuild
+  '';
+
   dontStrip = true;
 
   installPhase = ''
     runHook preInstall
 
-
-    mkdir -p $out/bin
-    cp opencode $out/bin/
-    chmod +x $out/bin/opencode
+    install -Dm755 opencode $out/bin/opencode
 
     runHook postInstall
   '';
 
-  postFixup = lib.optionalString stdenv.isLinux ''
-    patchelf --add-needed "$(patchelf --print-soname ${stdenv.cc.cc.lib}/lib/libstdc++.so)" $out/bin/opencode
-  '';
-
   passthru = {
-    updateScript = ./update.sh;
+    tests.version = testers.testVersion {
+      package = finalAttrs.finalPackage;
+      command = "HOME=$(mktemp -d) opencode --version";
+      inherit (finalAttrs) version;
+    };
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--subpackage"
+        "tui"
+        "--subpackage"
+        "node_modules"
+      ];
+    };
   };
 
-  meta = with lib; {
-    description = "AI coding agent, built for the terminal";
+  meta = {
+    description = "AI coding agent built for the terminal";
+    longDescription = ''
+      OpenCode is a terminal-based agent that can build anything.
+      It combines a TypeScript/JavaScript core with a Go-based TUI
+      to provide an interactive AI coding experience.
+    '';
     homepage = "https://github.com/sst/opencode";
-    license = licenses.mit;
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    license = lib.licenses.mit;
+    platforms = lib.platforms.unix;
     mainProgram = "opencode";
   };
-}
+})
