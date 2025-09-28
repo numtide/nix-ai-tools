@@ -53,6 +53,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "OpenAI Codex CLI - a coding agent that runs locally on your computer";
     homepage = "https://github.com/openai/codex";
     changelog = "https://github.com/openai/codex/releases/tag/rust-v${finalAttrs.version}";
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     license = lib.licenses.asl20;
     mainProgram = "codex";
     platforms = lib.platforms.unix;

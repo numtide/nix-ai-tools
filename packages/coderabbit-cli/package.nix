@@ -61,7 +61,7 @@ stdenv.mkDerivation rec {
     description = "AI-powered code review CLI tool";
     homepage = "https://coderabbit.ai";
     license = licenses.unfree;
-    maintainers = with maintainers; [ ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [
       "x86_64-linux"
       "aarch64-linux"

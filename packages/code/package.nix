@@ -53,6 +53,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     changelog = "https://github.com/just-every/code/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     mainProgram = "code";
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.unix;
   };
 })
