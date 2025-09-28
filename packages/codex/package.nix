@@ -7,6 +7,7 @@
   pkg-config,
   openssl,
   versionCheckHook,
+  nix-update-script,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -48,6 +49,15 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
+
+  passthru = {
+    updateScript = nix-update-script {
+      extraArgs = [
+        "--version-regex"
+        "^rust-v(\\d+\\.\\d+\\.\\d+)$"
+      ];
+    };
+  };
 
   meta = {
     description = "OpenAI Codex CLI - a coding agent that runs locally on your computer";
