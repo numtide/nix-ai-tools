@@ -33,6 +33,7 @@ buildNpmPackage rec {
     description = "A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒";
     homepage = "https://github.com/Mote-Software/nanocoder";
     changelog = "https://github.com/Mote-Software/nanocoder/releases";
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     license = licenses.mit;
     platforms = platforms.all;
     mainProgram = "nanocoder";
