@@ -10,18 +10,18 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "code";
-  version = "0.2.174";
+  version = "0.2.178";
 
   src = fetchFromGitHub {
     owner = "just-every";
     repo = "code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-d1s/y5ELptHtfBqslq1xHjT5aps81IxPMUwLlQLueS0=";
+    hash = "sha256-pZVsr20jtaDinwtmbLTO1mD4Bh0VINj7q9nIcumMCGQ=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
-  cargoHash = "sha256-21qwu67retz0IGMQ0/7fs425qzgQ6kpX5B6M4veUKfc=";
+  cargoHash = "sha256-iksQJGhn0BxBrn4nUPIeq81SqFvxXK/9bWFJ4Uv/eoA=";
 
   nativeBuildInputs = [
     installShellFiles
