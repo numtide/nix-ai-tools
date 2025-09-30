@@ -240,6 +240,23 @@ nix run github:numtide/nix-ai-tools#qwen-code
 # etc...
 ```
 
+### Binary Cache
+
+Pre-built binaries are available from the Numtide Cachix cache. All packages are built daily via CI and pushed to the cache, so you can avoid compiling from source.
+
+This cache is automatically configured when this flake is used directly (e.g `nix run github:numtide/nix-ai-tools#claude-code`)
+
+To use the binary cache when using this flake as an input, add `nixConfig` to your flake:
+
+```nix
+{
+  nixConfig = {
+    extra-substituters = [ "https://numtide.cachix.org" ];
+    extra-trusted-public-keys = [ "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE=" ];
+  };
+}
+```
+
 ## Development
 
 ### Setup Development Environment
