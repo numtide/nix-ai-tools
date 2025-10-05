@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hash-${{ matrix.platform }}
-          path: packages/opencode/hashes.json
+          path: hash-${{ matrix.platform }}.txt
           retention-days: 1
   # Final job: Merge all updates and create PR
   create-pr:

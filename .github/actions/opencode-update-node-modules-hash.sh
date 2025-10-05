@@ -22,8 +22,5 @@ fi
 
 echo "Hash for $platform: $hash"
 
-# Update hashes.json
-jq --arg platform "$platform" --arg hash "$hash" \
-  '.node_modules[$platform] = $hash' \
-  packages/opencode/hashes.json > packages/opencode/hashes.json.tmp
-mv packages/opencode/hashes.json.tmp packages/opencode/hashes.json
+# Write just the hash to a text file for this platform
+echo "$hash" > "hash-$platform.txt"
