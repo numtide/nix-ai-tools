@@ -23,4 +23,4 @@ fi
 echo "Hash for $platform: $hash"
 
 # Write just the hash to a text file for this platform
-echo "$hash" > "hash-$platform.txt"
+echo "$hash" >"hash-$platform.txt"
