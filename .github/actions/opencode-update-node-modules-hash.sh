@@ -11,7 +11,7 @@ if nix build --log-format bar-with-logs ".#packages.$platform.opencode.node_modu
   hash=$(nix eval --raw ".#packages.$platform.opencode.node_modules.outputHash")
 else
   # Build failed due to hash mismatch, extract the actual hash
-  hash=$(grep -oP 'got:\s+\K\S+' build.log | head -1)
+  hash=$(grep 'got:' build.log | head -1 | sed -E 's/.*got:[[:space:]]+([^[:space:]]+).*/\1/')
 fi
 
 if [ -z "$hash" ]; then
