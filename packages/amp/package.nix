@@ -4,6 +4,7 @@
   fetchurl,
   fetchNpmDeps,
   nodejs_22,
+  ripgrep,
   runCommand,
 }:
 
@@ -36,6 +37,12 @@ buildNpmPackage rec {
   dontNpmBuild = true;
 
   nodejs = nodejs_22;
+
+  postInstall = ''
+    wrapProgram $out/bin/amp \
+      --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
+      --set AMP_SKIP_UPDATE_CHECK 1
+  '';
 
   passthru = {
     updateScript = ./update.sh;
