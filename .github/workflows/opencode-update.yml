@@ -141,7 +141,7 @@ jobs:
           name: opencode-x86_64-linux
           path: packages/opencode/
       - name: Merge hash updates
-        run: .github/actions/opencode-merge-hashes.sh
+        run: .github/actions/opencode-merge-hashes.py
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v7
