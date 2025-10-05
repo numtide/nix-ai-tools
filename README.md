@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
-- **Version**: 0.122.2
+- **Version**: 0.123.0
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
@@ -182,7 +182,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.13.5
+- **Version**: 0.14.3
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
