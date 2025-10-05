@@ -14,7 +14,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-zt5VHf9uVUsvQpi8pyKIStaxHoko1OT6q7MY+yjFEuM=";
   };
 
-  npmDepsHash = "sha256-zCpShaWX6N28EWZ4V3kcJbJzlFyFlul5OYCLLgp4nZ4=";
+  npmDepsHash = "sha256-jZXMADwtgLmI7H8sX5TkkdF3Vfxw5Xt82xLOqedKh6s=";
 
   nodejs = nodejs_22;
 
