@@ -39,7 +39,7 @@ jobs:
           echo "current_version=$current_version" >> $GITHUB_OUTPUT
 
           # Run nix-update for the main package (including tui and node_modules for x86_64-linux)
-          nix run --inputs-from . nixpkgs#nix-update -- --flake opencode
+          nix run --inputs-from . nixpkgs#nix-update -- --flake opencode --subpackage tui
 
           # Get new version
           new_version=$(nix eval .#packages.x86_64-linux.opencode.version --raw)
@@ -51,24 +51,15 @@ jobs:
           else
             echo "Updated from $current_version to $new_version"
             echo "updated=true" >> $GITHUB_OUTPUT
-
-            nix run --inputs-from . nixpkgs#nix-update -- \
-              --version skip \
-              --subpackage tui \
-              --subpackage node_modules \
-              --flake opencode
-
-            # Stage the changes
-            git add packages/opencode/package.nix
           fi
       - name: Upload updated package
         if: steps.update.outputs.updated == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: opencode-x86_64-linux
-          path: packages/opencode/package.nix
+          path: |
+            packages/opencode/package.nix
           retention-days: 1
-  # Second job: Update node_modules hashes for other platforms
   update-hashes:
     needs: update-package
     if: needs.update-package.outputs.updated == 'true'
@@ -76,14 +67,17 @@ jobs:
     strategy:
       matrix:
         include:
+          # x86_64-linux runner
+          - os: ubuntu-latest
+            platform: "x86_64-linux"
           # macOS runner (covers both Darwin platforms)
           - os: macos-latest
-            platforms: "x86_64-darwin aarch64-darwin"
-            cache-key: "darwin"
+            platform: "x86_64-darwin"
+          - os: macos-latest
+            platform: "aarch64-darwin"
           # aarch64-linux (native ARM runner)
           - os: ubuntu-22.04-arm
-            platforms: "aarch64-linux"
-            cache-key: "aarch64-linux"
+            platform: "aarch64-linux"
     permissions:
       contents: write
     steps:
@@ -109,29 +103,13 @@ jobs:
             system-features = nixos-test benchmark big-parallel kvm
       - name: Setup Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Update node_modules hashes
-        run: |
-          set -euo pipefail
-
-          # Update node_modules hashes for each platform in this job
-          for platform in ${{ matrix.platforms }}; do
-            echo "Updating node_modules hash for $platform..."
-
-            # Run nix-update with --version skip to only update the node_modules hash
-            nix run --inputs-from . nixpkgs#nix-update -- \
-              --flake \
-              --version skip \
-              --subpackage tui \
-              --subpackage node_modules \
-              opencode
-
-            # The above might fail if the hash is already correct, that's ok
-          done
-      - name: Upload platform-specific update
+      - name: Update node_modules hash for ${{ matrix.platform }}
+        run: .github/actions/opencode-update-node-modules-hash.sh "${{ matrix.platform }}"
+      - name: Upload hash update
         uses: actions/upload-artifact@v4
         with:
-          name: opencode-${{ matrix.cache-key }}
-          path: packages/opencode/package.nix
+          name: hash-${{ matrix.platform }}
+          path: packages/opencode/hashes.json
           retention-days: 1
   # Final job: Merge all updates and create PR
   create-pr:
@@ -155,38 +133,15 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: opencode-*
-          path: /tmp/artifacts/
-      - name: Setup Nix
-        uses: cachix/install-nix-action@v31
-      - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-      - name: Merge updates
-        run: |
-          # Start with x86_64-linux as base
-          cp /tmp/artifacts/opencode-x86_64-linux/package.nix packages/opencode/package.nix
-
-          # Extract hashes from other platform updates and merge them
-          for artifact in /tmp/artifacts/opencode-*/package.nix; do
-            if [[ "$artifact" == *"darwin"* ]]; then
-              # Extract Darwin hashes
-              x86_64_darwin=$(grep 'x86_64-darwin = "sha256-' "$artifact" | head -1 || true)
-              aarch64_darwin=$(grep 'aarch64-darwin = "sha256-' "$artifact" | head -1 || true)
-
-              if [ -n "$x86_64_darwin" ]; then
-                sed -i "s|.*x86_64-darwin = \"sha256-.*|$x86_64_darwin|" packages/opencode/package.nix
-              fi
-              if [ -n "$aarch64_darwin" ]; then
-                sed -i "s|.*aarch64-darwin = \"sha256-.*|$aarch64_darwin|" packages/opencode/package.nix
-              fi
-            elif [[ "$artifact" == *"aarch64-linux"* ]]; then
-              # Extract aarch64-linux hash
-              aarch64_linux=$(grep 'aarch64-linux = "sha256-' "$artifact" | head -1 || true)
-              if [ -n "$aarch64_linux" ]; then
-                sed -i "s|.*aarch64-linux = \"sha256-.*|$aarch64_linux|" packages/opencode/package.nix
-              fi
-            fi
-          done
+          pattern: hash-*
+          path: /tmp/hashes/
+      - name: Download package update
+        uses: actions/download-artifact@v4
+        with:
+          name: opencode-x86_64-linux
+          path: packages/opencode/
+      - name: Merge hash updates
+        run: .github/actions/opencode-merge-hashes.sh
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v7

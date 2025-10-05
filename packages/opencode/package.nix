@@ -102,14 +102,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash =
-      {
-        x86_64-linux = "sha256-YOTuzwo0ZjqVswW3bUu3pFJcmfl0X0Se8Z5jKg8/rQs=";
-        aarch64-linux = "sha256-pLtE1Cyv4jHYGFQlVHMeKZbQqC2SkxTu2KRHN4E1NPw=";
-        x86_64-darwin = "sha256-3JxXe889dL7TBuHPRYDsviUuwnp38XWAwFN3Te6JtDg=";
-        aarch64-darwin = "sha256-RHg55NvI52EGTWUCCJVrilXqr3qc+vqQoT/uIUjDVvg=";
-      }
-      .${stdenv.hostPlatform.system};
+    outputHash = (lib.importJSON ./hashes.json).node_modules.${stdenv.hostPlatform.system};
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
