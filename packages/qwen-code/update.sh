@@ -24,4 +24,3 @@ latest_version=$(npm view @qwen-code/qwen-code version)
 )
 cd ../..
 nix run --inputs-from . nixpkgs#nix-update -- --flake --version "$latest_version" qwen-code
-
