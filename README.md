@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
-- **Version**: 0.123.0
+- **Version**: 0.123.1
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
@@ -191,7 +191,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.13
+- **Version**: 0.0.14
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
