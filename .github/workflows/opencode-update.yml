@@ -40,6 +40,7 @@ jobs:
 
           # Run nix-update for the main package (including tui and node_modules for x86_64-linux)
           nix run --inputs-from . nixpkgs#nix-update -- \
+            --build \
             --subpackage tui \
             --subpackage node_modules \
             --flake opencode
