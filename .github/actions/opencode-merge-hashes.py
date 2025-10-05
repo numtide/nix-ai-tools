@@ -15,17 +15,16 @@ def main() -> None:
     with base_file.open() as f:
         merged = json.load(f)
 
-    # Merge all platform-specific hash updates
-    for hash_file in sorted(hash_dir.glob("hash-*/hashes.json")):
-        print(f"Merging hashes from {hash_file}")
-        with hash_file.open() as f:
-            platform_hashes = json.load(f)
+    # Merge all platform-specific hash updates from text files
+    for hash_file in sorted(hash_dir.glob("hash-*/hash-*.txt")):
+        # Extract platform from filename: hash-aarch64-linux.txt -> aarch64-linux
+        platform = hash_file.stem.replace("hash-", "")
+        print(f"Merging hash for {platform} from {hash_file}")
 
-        # Merge node_modules hashes, with platform-specific updates taking precedence
-        if "node_modules" in platform_hashes:
-            merged.setdefault("node_modules", {}).update(
-                platform_hashes["node_modules"]
-            )
+        with hash_file.open() as f:
+            hash_value = f.read().strip()
+
+        merged.setdefault("node_modules", {})[platform] = hash_value
 
     # Validate all platforms have hashes
     required_platforms = [
