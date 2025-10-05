@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1759665694-gf9ec5f
+- **Version**: 0.0.1759680083-gf9ec5f
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -191,7 +191,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.0.13
+- **Version**: 0.0.14
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
