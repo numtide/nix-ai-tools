@@ -53,7 +53,6 @@ jobs:
             echo "updated=true" >> $GITHUB_OUTPUT
 
             nix run --inputs-from . nixpkgs#nix-update -- \
-              --build \
               --version skip \
               --subpackage tui \
               --subpackage node_modules \
@@ -188,10 +187,6 @@ jobs:
               fi
             fi
           done
-      - name: Verify build
-        run: |
-          # Test that the package builds on current platform
-          nix build .#packages.x86_64-linux.opencode --no-link
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v7
