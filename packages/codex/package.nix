@@ -24,6 +24,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-sR7Y1SfP0akLRRvP/6tu3gZRNvQbG/a+4bOSEbbrV30=";
 
+  cargoBuildFlags = [ "--package" "codex-cli" ];
+
   nativeBuildInputs = [
     installShellFiles
     pkg-config
