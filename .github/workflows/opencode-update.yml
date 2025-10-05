@@ -39,11 +39,7 @@ jobs:
           echo "current_version=$current_version" >> $GITHUB_OUTPUT
 
           # Run nix-update for the main package (including tui and node_modules for x86_64-linux)
-          nix run --inputs-from . nixpkgs#nix-update -- \
-            --build \
-            --subpackage tui \
-            --subpackage node_modules \
-            --flake opencode
+          nix run --inputs-from . nixpkgs#nix-update -- --flake opencode
 
           # Get new version
           new_version=$(nix eval .#packages.x86_64-linux.opencode.version --raw)
@@ -55,6 +51,13 @@ jobs:
           else
             echo "Updated from $current_version to $new_version"
             echo "updated=true" >> $GITHUB_OUTPUT
+
+            nix run --inputs-from . nixpkgs#nix-update -- \
+              --build \
+              --version skip \
+              --subpackage tui \
+              --subpackage node_modules \
+              --flake opencode
 
             # Stage the changes
             git add packages/opencode/package.nix
