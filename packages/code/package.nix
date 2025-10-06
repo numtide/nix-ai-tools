@@ -10,18 +10,18 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "code";
-  version = "0.2.185";
+  version = "0.2.186";
 
   src = fetchFromGitHub {
     owner = "just-every";
     repo = "code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-iLZayb+68ZdqPmb5QzzrY3w+HedjMOPEXmT5G8avYuk=";
+    hash = "sha256-5He33g7hJft5GYhlY42U0pgn1BM5j9kjsqUODr4/v0s=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/codex-rs";
 
-  cargoHash = "sha256-dS7yfXqZT1SnqbK+6s+SvnwyQmG1+jhTuzDJrQvhgho=";
+  cargoHash = "sha256-ECUU2rUzRkhg6M3DAckfQT1czMJA3WmzaKYOUjJNumE=";
 
   cargoBuildFlags = [
     "--package"
@@ -45,9 +45,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   postInstall = lib.optionalString installShellCompletions ''
     installShellCompletion --cmd code \
-      --bash <($out/bin/code completion bash) \
-      --fish <($out/bin/code completion fish) \
-      --zsh <($out/bin/code completion zsh)
+      --bash <($out/bin/codex completion bash) \
+      --fish <($out/bin/codex completion fish) \
+      --zsh <($out/bin/codex completion zsh)
   '';
 
   doInstallCheck = true;
