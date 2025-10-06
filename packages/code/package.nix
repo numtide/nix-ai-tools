@@ -45,9 +45,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   postInstall = lib.optionalString installShellCompletions ''
     installShellCompletion --cmd code \
-      --bash <($out/bin/code completion bash) \
-      --fish <($out/bin/code completion fish) \
-      --zsh <($out/bin/code completion zsh)
+      --bash <($out/bin/codex completion bash) \
+      --fish <($out/bin/codex completion fish) \
+      --zsh <($out/bin/codex completion zsh)
   '';
 
   doInstallCheck = true;
