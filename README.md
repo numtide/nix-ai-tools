@@ -110,7 +110,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### copilot-cli
 
 - **Description**: GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.
-- **Version**: 0.0.338
+- **Version**: 0.0.339
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://github.com/github/copilot-cli
@@ -182,7 +182,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.14.6
+- **Version**: 0.14.7
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
