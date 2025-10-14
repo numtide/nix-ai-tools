@@ -1,8 +1,8 @@
 name: Update Dependencies
 on:
   schedule:
-    # Run daily at 2 AM UTC
-    - cron: '0 2 * * *'
+    # Run twice daily at 2 AM and 2 PM UTC
+    - cron: '0 2,14 * * *'
   workflow_dispatch:
     inputs:
       packages:
