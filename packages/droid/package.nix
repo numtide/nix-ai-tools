@@ -80,6 +80,7 @@ stdenv.mkDerivation {
   ];
 
   dontUnpack = true;
+  dontStrip = true;
 
   installPhase = ''
     runHook preInstall
