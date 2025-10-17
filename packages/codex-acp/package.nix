@@ -13,7 +13,7 @@ rustPlatform.buildRustPackage rec {
     owner = "zed-industries";
     repo = "codex-acp";
     rev = "v${version}";
-    hash = "sha256-6SAWbVsda8a7nVrj/b2slTQOtFzAIxiUaSC6XbzoNJc=";
+    hash = "sha256-1eVcHllfo8GMWFGKM+PS1MwTvp+NutHoe/XqoVZqwxg=";
   };
 
   cargoHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
