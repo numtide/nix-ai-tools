@@ -18,7 +18,7 @@ let
     };
     aarch64-linux = {
       url = "https://downloads.factory.ai/factory-cli/releases/${version}/linux/arm64/droid";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      hash = "sha256-u7Dn0ML36VUEOy2ivG2m+Oi+9bB1pLFlCrlxRi7CP3U=";
     };
     x86_64-darwin = {
       url = "https://downloads.factory.ai/factory-cli/releases/${version}/darwin/x64/droid";
@@ -38,7 +38,7 @@ let
     };
     aarch64-linux = {
       url = "https://downloads.factory.ai/ripgrep/linux/arm64/rg";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      hash = "sha256-Js5szrF6xxDuclPEnqglxhjU+eSaE11StO3OM2xA9iA=";
     };
     x86_64-darwin = {
       url = "https://downloads.factory.ai/ripgrep/darwin/x64/rg";
