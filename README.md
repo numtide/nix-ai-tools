@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1760673682-g1d3f74
+- **Version**: 0.0.1760702488-g77958f
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -107,6 +107,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run .#codex -- --help`
 
+#### codex-acp
+
+- **Description**: An ACP-compatible coding agent powered by Codex
+- **Version**: 0.2.9
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/zed-industries/codex-acp
+- **Usage**: `nix run .#codex-acp -- --help`
+
 #### copilot-cli
 
 - **Description**: GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.
@@ -133,6 +142,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: unfree
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run .#cursor-agent -- --help`
+
+#### droid
+
+- **Description**: Factory AI's Droid - AI-powered development agent for your terminal
+- **Version**: 0.15.0
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://factory.ai
+- **Usage**: `nix run .#droid -- --help`
 
 #### forge
 
@@ -182,7 +200,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.3
+- **Version**: 0.15.7
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
