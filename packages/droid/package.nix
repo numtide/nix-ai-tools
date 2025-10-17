@@ -42,7 +42,7 @@ let
     };
     x86_64-darwin = {
       url = "https://downloads.factory.ai/ripgrep/darwin/x64/rg";
-      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      hash = "sha256-Jz6MZQpCvuwShJEOGCW2Gj5698DOH87BN/4dbMcd77c=";
     };
     aarch64-darwin = {
       url = "https://downloads.factory.ai/ripgrep/darwin/arm64/rg";
