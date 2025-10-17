@@ -4,6 +4,7 @@
   fetchurl,
   autoPatchelfHook,
   gcc-unwrapped,
+  openssl,
 }:
 
 let
@@ -42,6 +43,7 @@ stdenv.mkDerivation {
 
   buildInputs = lib.optionals stdenv.isLinux [
     gcc-unwrapped.lib
+    openssl
   ];
 
   sourceRoot = ".";
