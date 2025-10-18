@@ -9,14 +9,14 @@
 }:
 
 let
-  version = "0.0.1760745707-g3750ff";
+  version = "0.0.1760788881-gc378d2";
   # First, create a source with package-lock.json included
   srcWithLock = runCommand "amp-src-with-lock" { } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
-        url = "https://registry.npmjs.org/@sourcegraph/amp/-/amp-0.0.1760745707-g3750ff.tgz";
-        hash = "sha256-OJ0vNJxX5wmchXD3J/d8FENr6lgku/Dr02sqdfVA7QI=";
+        url = "https://registry.npmjs.org/@sourcegraph/amp/-/amp-0.0.1760788881-gc378d2.tgz";
+        hash = "sha256-tDB9qflyhirKm+HPwIcUugifxfGS+Kg9/NcqEen70lU=";
       }
     } -C $out --strip-components=1
     cp ${./package-lock.json} $out/package-lock.json
@@ -30,7 +30,7 @@ buildNpmPackage rec {
 
   npmDeps = fetchNpmDeps {
     inherit src;
-    hash = "sha256-sBd6Ds7oYaVvpGynyVfHdvjMu0UgBq7vYb9PIJGfInI=";
+    hash = "sha256-4v6PwBijULCSTXR38cjWpClGBFRX2gENi0x7E/OKCyQ=";
   };
 
   # The package from npm is already built
