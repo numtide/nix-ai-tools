@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1760840445-gae81c8
+- **Version**: 0.0.1760875293-g377863
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -200,7 +200,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.7
+- **Version**: 0.15.8
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
