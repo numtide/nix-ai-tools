@@ -12,7 +12,7 @@ buildNpmPackage rec {
     owner = "zed-industries";
     repo = "claude-code-acp";
     rev = "v${version}";
-    hash = "sha256-+yeCfPtVghRhCCUnp/6eMYU4b9L/O2uOlKIXnGWUEN4=";
+    hash = "sha256-v32Q02ALWw6Upd4rrHGZH7Vt25+xSnKJCNGJob/irgM=";
   };
 
   npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
