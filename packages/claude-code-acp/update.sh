@@ -43,14 +43,6 @@ src_hash=$(nix hash to-sri --type sha256 "$src_hash_raw")
 echo "Source hash: $src_hash"
 sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$src_hash\"|" package.nix
 
-# Download and update package.json and package-lock.json
-echo "Updating package.json and package-lock.json..."
-curl -sL "https://raw.githubusercontent.com/zed-industries/claude-code-acp/v$latest_version/package.json" -o package.json
-
-# Generate new package-lock.json
-rm -f package-lock.json
-npm install --package-lock-only
-
 # Set dummy npm deps hash to get the real one
 sed -i 's|npmDepsHash = "sha256-[^"]*"|npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="|' package.nix
 

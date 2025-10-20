@@ -17,11 +17,6 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-oUAHkB4EPuo8YCxi9Y/Lc8cipjJQ05o51MpdUsCjiiQ=";
 
-  postPatch = ''
-    # Update package-lock.json with the one we generated
-    cp ${./package-lock.json} package-lock.json
-  '';
-
   meta = with lib; {
     description = "An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)";
     homepage = "https://github.com/zed-industries/claude-code-acp";
