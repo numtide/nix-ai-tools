@@ -1,6 +1,6 @@
 # claudebox - responsible YOLO
 
-Open your project in a liteweight sandbox, and avoid unwanted surprises.
+Open your project in a lightweight sandbox, and avoid unwanted surprises.
 
 The project shadows your $HOME, so no credentials are accessible (except
 ~/.claude).
@@ -14,19 +14,42 @@ We also patch Claude to monitor all the executed commands in a tmux side-pane.
 ## Usage
 
 ```bash
-claudebox
+claudebox [OPTIONS]
 ```
+
+### Options
+
+- `--split-direction horizontal|vertical` - Set tmux split direction (default: `horizontal`)
+- `--no-tmux-config` - Don't load user tmux configuration (use default tmux settings)
+- `-h, --help` - Show help message
+
+### Examples
+
+```bash
+# Default: user tmux config with horizontal split
+claudebox
+
+# Vertical split
+claudebox --split-direction vertical
+
+# Use default tmux settings (ignore user config)
+claudebox --no-tmux-config
+```
+
+### Layout
 
 Opens Claude Code with:
 
-- Left pane: Claude interface
-- Right pane: Live command log
+- Left pane (horizontal) / Top pane (vertical): Claude interface
+- Right pane (horizontal) / Bottom pane (vertical): Live command log
 
 ## What it does
 
 - Lightweight sandbox using bubblewrap
 - Intercepts all commands via Node.js instrumentation
 - Shows commands in real-time in tmux
+- Supports custom split direction (horizontal/vertical)
+- Loads user tmux configuration by default (can be disabled with `--no-tmux-config`)
 - Disables telemetry and auto-updates
 - Uses `--dangerously-skip-permissions` (safe in sandbox)
 
