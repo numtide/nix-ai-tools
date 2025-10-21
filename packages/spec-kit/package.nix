@@ -6,14 +6,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "spec-kit";
-  version = "0.0.20";
+  version = "0.0.72";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "github";
     repo = "spec-kit";
-    rev = "ea90d02c4149658def15dd37aa4358788de70012";
-    hash = lib.fakeHash;
+    rev = "v${version}";
+    hash = "sha256-bu1bEfZ0bxL9zSpTX5+hnd698MY9Ecx/3qqmpuC6BP4=";
   };
 
   build-system = with python3.pkgs; [
@@ -31,10 +31,6 @@ python3.pkgs.buildPythonApplication rec {
   ];
 
   pythonImportsCheck = [ "specify_cli" ];
-
-  passthru = {
-    updateScript = ./update.sh;
-  };
 
   meta = with lib; {
     description = "Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)";
