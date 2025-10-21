@@ -51,13 +51,13 @@ let
       outputHashMode = "recursive";
     };
 
-  version = "1.17.1";
+  version = "1.17.2";
 
   src = fetchFromGitHub {
     owner = "MrLesk";
     repo = "Backlog.md";
     rev = "v${version}";
-    hash = "sha256-eZtyd/D3CpXEsQRnwFb3I8Ba+Z3Lxhp1hsihZ0CqBhs=";
+    hash = "sha256-Jcfjxgvo+pgVyK2U5z8YWFk/KwPzJmMdPKJK6No0XGw=";
   };
 
   # Create a fixed-output derivation for dependencies
