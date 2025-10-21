@@ -32,11 +32,11 @@ python3.pkgs.buildPythonApplication rec {
 
   pythonImportsCheck = [ "specify_cli" ];
 
-  meta = {
+  meta = with lib; {
     description = "Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)";
     homepage = "https://github.com/github/spec-kit";
-    license = lib.licenses.mit;
-    sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    license = licenses.mit;
+    sourceProvenance = with sourceTypes; [ fromSource ];
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
