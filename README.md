@@ -53,10 +53,19 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run .#claude-code -- --help`
 
+#### claude-code-acp
+
+- **Description**: An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)
+- **Version**: 0.6.7
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/zed-industries/claude-code-acp
+- **Usage**: `nix run .#claude-code-acp -- --help`
+
 #### claude-code-router
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
-- **Version**: 1.0.63
+- **Version**: 1.0.64
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
@@ -200,7 +209,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.8
+- **Version**: 0.15.10
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
