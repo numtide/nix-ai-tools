@@ -24,6 +24,7 @@ python3.pkgs.buildPythonApplication rec {
     typer
     rich
     httpx
+    socksio
     platformdirs
     readchar
     truststore
