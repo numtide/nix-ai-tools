@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1761004910-g9da836
+- **Version**: 0.0.1761050239-g36fe88
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -52,6 +52,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run .#claude-code -- --help`
+
+#### claude-code-acp
+
+- **Description**: An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)
+- **Version**: 0.6.7
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/zed-industries/claude-code-acp
+- **Usage**: `nix run .#claude-code-acp -- --help`
 
 #### claude-code-router
 
@@ -200,7 +209,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.8
+- **Version**: 0.15.10
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
