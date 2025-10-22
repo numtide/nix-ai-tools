@@ -5,8 +5,19 @@ set -euo pipefail
 # Shows all commands Claude executes in a tmux split pane
 
 # Default options
-SPLIT_DIRECTION=horizontal
-LOAD_TMUX_CONFIG=true
+read -r rows cols < <(stty size 2>/dev/null || echo "24 80")
+# If the terminal is very wide (at least 3 times as wide as it is tall),
+# use a horizontal split (top/bottom panes).
+# Note: In tmux, "horizontal" refers to the dividing line being horizontal,
+# which produces stacked panes.
+if ((cols >= rows * 3)); then
+  split_direction="horizontal"
+else
+  # Otherwise, use a vertical split (side-by-side panes).
+  # Here, the dividing line is vertical, giving more height to each pane.
+  split_direction="vertical"
+fi
+load_tmux_config=true
 
 # Parse command-line arguments
 show_help() {
@@ -29,15 +40,15 @@ EOF
 while [[ $# -gt 0 ]]; do
   case $1 in
   --split-direction)
-    SPLIT_DIRECTION="$2"
-    if [[ $SPLIT_DIRECTION != "horizontal" && $SPLIT_DIRECTION != "vertical" ]]; then
+    split_direction="$2"
+    if [[ $split_direction != "horizontal" && $split_direction != "vertical" ]]; then
       echo "Error: --split-direction must be 'horizontal' or 'vertical'" >&2
       exit 1
     fi
     shift 2
     ;;
   --no-tmux-config)
-    LOAD_TMUX_CONFIG=false
+    load_tmux_config=false
     shift
     ;;
   -h | --help)
@@ -128,12 +139,16 @@ bwrap_args=(
 )
 
 # Mount tmux configuration (support both traditional and XDG locations)
-if [[ $LOAD_TMUX_CONFIG == "true" ]]; then
+if [[ $load_tmux_config == "true" ]]; then
+  # Traditional location: ~/.tmux.conf
   if [[ -f "${HOME}/.tmux.conf" ]]; then
     bwrap_args+=(--ro-bind "${HOME}/.tmux.conf" "$HOME/.tmux.conf")
   fi
-  if [[ -d "${HOME}/.config/tmux" ]]; then
-    bwrap_args+=(--ro-bind "${HOME}/.config/tmux" "$HOME/.config/tmux")
+
+  # XDG location: $XDG_CONFIG_HOME/tmux or ~/.config/tmux
+  xdg_config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
+  if [[ -d "${xdg_config_home}/tmux" ]]; then
+    bwrap_args+=(--ro-bind "${xdg_config_home}/tmux" "$HOME/.config/tmux")
   fi
 fi
 
@@ -149,10 +164,10 @@ bwrap_args+=(--bind "$repo_root" "$repo_root")
 logfile="/tmp/claudebox-commands-${session_name}.log"
 
 # Determine split flag based on direction
-if [[ $SPLIT_DIRECTION == "vertical" ]]; then
-  SPLIT_FLAG="-v"
+if [[ $split_direction == "vertical" ]]; then
+  split_flag="-v"
 else
-  SPLIT_FLAG="-h"
+  split_flag="-h"
 fi
 
 # Add logfile to bwrap environment
@@ -171,7 +186,7 @@ bwrap "${bwrap_args[@]}" bash -c "
   tmux set-option -t '$session_name' history-limit 50000
 
   # Create right pane for command viewer (keep focus on current pane with -d)
-  tmux split-window -d $SPLIT_FLAG -t '$session_name:main' \"exec command-viewer '$logfile'\"
+  tmux split-window -d $split_flag -t '$session_name:main' \"exec command-viewer '$logfile'\"
 
   exec tmux attach -t '$session_name'
 "

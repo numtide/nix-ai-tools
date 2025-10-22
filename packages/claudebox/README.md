@@ -26,7 +26,7 @@ claudebox [OPTIONS]
 ### Examples
 
 ```bash
-# Default: user tmux config with horizontal split
+# Default: run with users tmux config
 claudebox
 
 # Vertical split
@@ -42,6 +42,10 @@ Opens Claude Code with:
 
 - Left pane (horizontal) / Top pane (vertical): Claude interface
 - Right pane (horizontal) / Bottom pane (vertical): Live command log
+
+When the layout is not explicitly set, the application adapts to the terminal dimensions.
+For very wide terminals, the interface splits vertically: Claude on the left, live command log on the right.
+For narrower terminals, the layout adjusts accordingly (stacked panes).
 
 ## What it does
 
