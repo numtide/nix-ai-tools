@@ -17,7 +17,7 @@ trap cleanup EXIT
 
 # Fetch latest version from GitHub API
 echo "Fetching latest version..."
-latest_version=$(curl -s https://api.github.com/repos/sst/opencode/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+latest_version=$(curl -s https://api.github.com/repos/sst/opencode/releases/latest | jq -r '.tag_name' | sed 's/^v\d+\.\d+\.\d+$//')
 
 if [ -z "$latest_version" ]; then
   echo "Error: Failed to fetch latest version from GitHub API"
