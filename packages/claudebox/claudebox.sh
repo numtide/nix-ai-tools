@@ -4,6 +4,64 @@ set -euo pipefail
 # claudebox - Run Claude Code in YOLO mode with transparency
 # Shows all commands Claude executes in a tmux split pane
 
+# Default options
+read -r rows cols < <(stty size 2>/dev/null || echo "24 80")
+# If the terminal is very wide (at least 3 times as wide as it is tall),
+# use a horizontal split (top/bottom panes).
+# Note: In tmux, "horizontal" refers to the dividing line being horizontal,
+# which produces stacked panes.
+if ((cols >= rows * 3)); then
+  split_direction="horizontal"
+else
+  # Otherwise, use a vertical split (side-by-side panes).
+  # Here, the dividing line is vertical, giving more height to each pane.
+  split_direction="vertical"
+fi
+load_tmux_config=true
+
+# Parse command-line arguments
+show_help() {
+  cat <<EOF
+Usage: claudebox [OPTIONS]
+
+Options:
+  --split-direction horizontal|vertical   Set tmux split direction (default: horizontal)
+  --no-tmux-config                        Don't load user tmux configuration
+  -h, --help                              Show this help message
+
+Examples:
+  claudebox                               # Run with default settings (user tmux config, and horizontal split)
+  claudebox --split-direction vertical
+  claudebox --no-tmux-config              # Use default tmux settings
+EOF
+  exit 0
+}
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --split-direction)
+    split_direction="$2"
+    if [[ $split_direction != "horizontal" && $split_direction != "vertical" ]]; then
+      echo "Error: --split-direction must be 'horizontal' or 'vertical'" >&2
+      exit 1
+    fi
+    shift 2
+    ;;
+  --no-tmux-config)
+    load_tmux_config=false
+    shift
+    ;;
+  -h | --help)
+    show_help
+    ;;
+  *)
+    echo "Unknown option: $1" >&2
+    echo "Use --help for usage information" >&2
+    exit 1
+    ;;
+  esac
+done
+
 # Generate unique session name for this sandbox
 project_dir="$(pwd)"
 
@@ -26,6 +84,9 @@ mkdir -p "$claude_home"
 claude_config="${HOME}/.claude"
 mkdir -p "$claude_config"
 claude_json="${HOME}/.claude.json"
+
+# Prepare tmux configuration directories
+mkdir -p "$claude_home/.config/tmux"
 
 # Ensure Claude is initialized before sandboxing
 if [[ ! -f $claude_json ]]; then
@@ -77,6 +138,20 @@ bwrap_args=(
   --setenv TMP "/tmp"
 )
 
+# Mount tmux configuration (support both traditional and XDG locations)
+if [[ $load_tmux_config == "true" ]]; then
+  # Traditional location: ~/.tmux.conf
+  if [[ -f "${HOME}/.tmux.conf" ]]; then
+    bwrap_args+=(--ro-bind "${HOME}/.tmux.conf" "$HOME/.tmux.conf")
+  fi
+
+  # XDG location: $XDG_CONFIG_HOME/tmux or ~/.config/tmux
+  xdg_config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
+  if [[ -d "${xdg_config_home}/tmux" ]]; then
+    bwrap_args+=(--ro-bind "${xdg_config_home}/tmux" "$HOME/.config/tmux")
+  fi
+fi
+
 # Mount parent directory tree if working under home
 if [[ $share_tree != "$repo_root" ]]; then
   bwrap_args+=(--ro-bind "$share_tree" "$share_tree")
@@ -88,6 +163,13 @@ bwrap_args+=(--bind "$repo_root" "$repo_root")
 # Define log file path
 logfile="/tmp/claudebox-commands-${session_name}.log"
 
+# Determine split flag based on direction
+if [[ $split_direction == "vertical" ]]; then
+  split_flag="-v"
+else
+  split_flag="-h"
+fi
+
 # Add logfile to bwrap environment
 bwrap_args+=(--setenv CLAUDEBOX_LOG_FILE "$logfile")
 
@@ -96,23 +178,15 @@ bwrap "${bwrap_args[@]}" bash -c "
   # Change to original working directory
   cd '$project_dir'
 
-  # Create the log file
-  touch '$logfile'
-
-  # Create session with two panes
-  tmux new-session -d -s '$session_name' -n main 2>/dev/null
+  # Create session with Claude directly (no send-keys needed)
+  # Launch Claude with --dangerously-skip-permissions (safe in sandbox)
+  tmux new-session -d -s '$session_name' -n main 'claude --dangerously-skip-permissions' 2>/dev/null
 
   # Set large history limit for both panes (50k lines)
   tmux set-option -t '$session_name' history-limit 50000
 
-  # Create right pane for command viewer
-  tmux split-window -h -t '$session_name' \"exec command-viewer '$logfile'\"
-
-  # Return focus to left pane
-  tmux select-pane -t '${session_name}:0.0'
-
-  # Launch Claude with --dangerously-skip-permissions (safe in sandbox)
-  tmux send-keys -t '${session_name}:0.0' 'exec claude --dangerously-skip-permissions' C-m
+  # Create right pane for command viewer (keep focus on current pane with -d)
+  tmux split-window -d $split_flag -t '$session_name:main' \"exec command-viewer '$logfile'\"
 
   exec tmux attach -t '$session_name'
 "
