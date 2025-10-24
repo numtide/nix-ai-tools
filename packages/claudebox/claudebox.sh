@@ -18,6 +18,7 @@ else
   split_direction="vertical"
 fi
 load_tmux_config=true
+enable_monitor=true
 
 # Parse command-line arguments
 show_help() {
@@ -25,12 +26,15 @@ show_help() {
 Usage: claudebox [OPTIONS]
 
 Options:
+  --no-monitor                            Skip tmux monitoring pane (run Claude directly)
   --split-direction horizontal|vertical   Set tmux split direction (default: horizontal)
   --no-tmux-config                        Don't load user tmux configuration
   -h, --help                              Show this help message
 
 Examples:
   claudebox                               # Run with default settings (user tmux config, and horizontal split)
+  claudebox --no-monitor                  # Run without monitoring pane
+                                            Commands are still logged to /tmp/claudebox-commands-*.log
   claudebox --split-direction vertical
   claudebox --no-tmux-config              # Use default tmux settings
 EOF
@@ -39,6 +43,10 @@ EOF
 
 while [[ $# -gt 0 ]]; do
   case $1 in
+  --no-monitor)
+    enable_monitor=false
+    shift
+    ;;
   --split-direction)
     split_direction="$2"
     if [[ $split_direction != "horizontal" && $split_direction != "vertical" ]]; then
@@ -61,6 +69,13 @@ while [[ $# -gt 0 ]]; do
     ;;
   esac
 done
+
+# Prevent running monitoring mode inside tmux
+if [[ "$enable_monitor" == "true" && -n "${TMUX-}" ]]; then
+  echo "Error: claudebox monitoring mode cannot be run inside a tmux session." >&2
+  echo "       Use 'claudebox --no-monitor' to run inside tmux." >&2
+  exit 1
+fi
 
 # Generate unique session name for this sandbox
 project_dir="$(pwd)"
@@ -163,6 +178,9 @@ bwrap_args+=(--bind "$repo_root" "$repo_root")
 # Define log file path
 logfile="/tmp/claudebox-commands-${session_name}.log"
 
+# Create log file on host so it's accessible outside the sandbox
+touch "$logfile"
+
 # Determine split flag based on direction
 if [[ $split_direction == "vertical" ]]; then
   split_flag="-v"
@@ -173,20 +191,35 @@ fi
 # Add logfile to bwrap environment
 bwrap_args+=(--setenv CLAUDEBOX_LOG_FILE "$logfile")
 
-# Launch tmux with Claude in left pane, commands in right
-bwrap "${bwrap_args[@]}" bash -c "
-  # Change to original working directory
-  cd '$project_dir'
+# Bind-mount the log file into the sandbox
+bwrap_args+=(--bind "$logfile" "$logfile")
 
-  # Create session with Claude directly (no send-keys needed)
+# Launch Claude with appropriate monitoring setup
+if [[ $enable_monitor == true ]]; then
+  # Launch tmux with Claude in left pane, commands in right
+  bwrap "${bwrap_args[@]}" bash -c "
+    # Change to original working directory
+    cd '$project_dir'
+
+    # Create session with Claude directly (no send-keys needed)
+    # Launch Claude with --dangerously-skip-permissions (safe in sandbox)
+    tmux new-session -d -s '$session_name' -n main 'claude --dangerously-skip-permissions' 2>/dev/null
+
+    # Set large history limit for both panes (50k lines)
+    tmux set-option -t '$session_name' history-limit 50000
+
+    # Create right pane for command viewer (keep focus on current pane with -d)
+    tmux split-window -d $split_flag -t '$session_name:main' \"exec command-viewer '$logfile'\"
+
+    exec tmux attach -t '$session_name'
+  "
+else
+  # No monitoring - run Claude directly without tmux
   # Launch Claude with --dangerously-skip-permissions (safe in sandbox)
-  tmux new-session -d -s '$session_name' -n main 'claude --dangerously-skip-permissions' 2>/dev/null
-
-  # Set large history limit for both panes (50k lines)
-  tmux set-option -t '$session_name' history-limit 50000
-
-  # Create right pane for command viewer (keep focus on current pane with -d)
-  tmux split-window -d $split_flag -t '$session_name:main' \"exec command-viewer '$logfile'\"
-
-  exec tmux attach -t '$session_name'
-"
+  bwrap "${bwrap_args[@]}" bash -c "
+    cd '$project_dir'
+    echo 'claudebox: Commands logged to $logfile' >&2
+    echo 'claudebox: Use tail -f $logfile to monitor in another terminal' >&2
+    exec claude --dangerously-skip-permissions
+  "
+fi

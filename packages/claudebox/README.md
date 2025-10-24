@@ -19,6 +19,7 @@ claudebox [OPTIONS]
 
 ### Options
 
+- `--no-monitor` - Skip tmux monitoring pane (run Claude directly in current terminal)
 - `--split-direction horizontal|vertical` - Set tmux split direction (default: `horizontal`)
 - `--no-tmux-config` - Don't load user tmux configuration (use default tmux settings)
 - `-h, --help` - Show help message
@@ -26,7 +27,7 @@ claudebox [OPTIONS]
 ### Examples
 
 ```bash
-# Default: run with users tmux config
+# Default: run with users tmux config and enable monitoring
 claudebox
 
 # Vertical split
@@ -34,6 +35,9 @@ claudebox --split-direction vertical
 
 # Use default tmux settings (ignore user config)
 claudebox --no-tmux-config
+
+# Run without monitoring pane, this can run outside of tmux
+claudebox --no-monitor
 ```
 
 ### Layout
@@ -47,6 +51,11 @@ When the layout is not explicitly set, the application adapts to the terminal di
 For very wide terminals, the interface splits vertically: Claude on the left, live command log on the right.
 For narrower terminals, the layout adjusts accordingly (stacked panes).
 
+### Behavior
+
+- **Default**: Opens tmux with two panels, once for Claude interface and one for live command log.
+- **With `--no-monitor`**: Runs Claude directly, without `tmux`
+
 ## What it does
 
 - Lightweight sandbox using bubblewrap
@@ -54,6 +63,7 @@ For narrower terminals, the layout adjusts accordingly (stacked panes).
 - Shows commands in real-time in tmux
 - Supports custom split direction (horizontal/vertical)
 - Loads user tmux configuration by default (can be disabled with `--no-tmux-config`)
+- Displays commands in real time in tmux and stores them in a log file under `/tmp`.
 - Disables telemetry and auto-updates
 - Uses `--dangerously-skip-permissions` (safe in sandbox)
 
