@@ -34,21 +34,69 @@ fi
 
 echo "Update available: $current_version -> $latest_version"
 
-# Calculate new source hash
-echo "Calculating source hash for new version..."
-url="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
-new_src_hash=$(nix-prefetch-url "$url" 2>&1 | tail -1 | xargs -I {} nix hash to-sri --type sha256 {})
-echo "New source hash: $new_src_hash"
+# Calculate hashes for all platforms
+echo "Calculating hashes for all platforms..."
 
-# Update version and source hash in package.nix
-sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "$package_file"
+# Create temporary file for updated content
+tmp_file=$(mktemp)
+cp "$package_file" "$tmp_file"
 
-# Extract old hash and replace it
-old_src_hash=$(grep -A2 'src = fetchurl' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
-sed -i "s|$old_src_hash|$new_src_hash|" "$package_file"
+# Update version
+sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "$tmp_file"
 
-echo "Building package to verify..."
-nix build .#eca
+# Platform-specific URLs and hash calculation
+declare -A platforms=(
+  ["x86_64-linux"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca-native-linux-amd64.zip"
+  ["aarch64-linux"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
+  ["x86_64-darwin"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
+  ["aarch64-darwin"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
+)
 
-echo "Update completed successfully!"
-echo "eca has been updated from $current_version to $latest_version"
+for platform in "${!platforms[@]}"; do
+  url="${platforms[$platform]}"
+  echo "  Calculating hash for $platform..."
+  
+  # Use nix-build to automatically get the correct hash
+  export NIX_PATH=nixpkgs=flake:nixpkgs
+  
+  if [[ "$platform" == "x86_64-linux" ]]; then
+    # Use fetchzip for native binary zip file
+    hash_output=$(nix-build -E "with import <nixpkgs> {}; fetchzip { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
+  else
+    # Use fetchurl for JAR files
+    hash_output=$(nix-build -E "with import <nixpkgs> {}; fetchurl { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
+  fi
+  
+  new_hash=$(echo "$hash_output" | grep "got:" | awk '{print $2}')
+  
+  if [ -z "$new_hash" ]; then
+    echo "    ERROR: Failed to calculate hash for $platform"
+    echo "    Output: $hash_output"
+    continue
+  fi
+  
+  # Update the specific hash for this platform
+  # Find the line number for this platform's hash
+  line_num=$(grep -n "\"$platform\" = " "$tmp_file" | cut -d: -f1)
+  if [ -n "$line_num" ]; then
+    # Find the sha256 line after the platform declaration (within next 3 lines)
+    sha_line=$((line_num + 2))
+    sed -i "${sha_line}s|sha256 = \"[^\"]*\";|sha256 = \"${new_hash}\";|" "$tmp_file"
+    echo "    $platform: $new_hash"
+  fi
+done
+
+# Check if any changes were made
+if ! diff -q "$tmp_file" "$package_file" >/dev/null 2>&1; then
+  # Move updated file back
+  mv "$tmp_file" "$package_file"
+  
+  echo "Building package to verify..."
+  nix build .#eca
+  
+  echo "Update completed successfully!"
+  echo "eca has been updated from $current_version to $latest_version"
+else
+  echo "No changes needed - all hashes are already correct"
+  rm -f "$tmp_file"
+fi
