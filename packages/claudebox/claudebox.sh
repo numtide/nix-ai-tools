@@ -71,7 +71,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Prevent running monitoring mode inside tmux
-if [[ "$enable_monitor" == "true" && -n "${TMUX-}" ]]; then
+if [[ $enable_monitor == "true" && -n ${TMUX-} ]]; then
   echo "Error: claudebox monitoring mode cannot be run inside a tmux session." >&2
   echo "       Use 'claudebox --no-monitor' to run inside tmux." >&2
   exit 1

@@ -56,7 +56,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code-acp
 
 - **Description**: An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)
-- **Version**: 0.6.9
+- **Version**: 0.6.10
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/claude-code-acp
@@ -209,7 +209,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.14
+- **Version**: 0.15.16
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
