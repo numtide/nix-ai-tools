@@ -36,7 +36,7 @@ echo "Update available: $current_version -> $latest_version"
 
 # Calculate new source hash
 echo "Calculating source hash for new version..."
-url="https://github.com/editor-code-assistant/eca/releases/download/v${latest_version}/eca.jar"
+url="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
 new_src_hash=$(nix-prefetch-url "$url" 2>&1 | tail -1 | xargs -I {} nix hash to-sri --type sha256 {})
 echo "New source hash: $new_src_hash"
 
