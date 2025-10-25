@@ -2,7 +2,7 @@
 
 pkgs.stdenv.mkDerivation rec {
   pname = "eca";
-  version = "0.72.0";
+  version = "0.72.1";
 
   src = pkgs.fetchurl {
     url = "https://github.com/editor-code-assistant/eca/releases/download/${version}/eca.jar";
