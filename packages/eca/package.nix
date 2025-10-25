@@ -1,27 +1,20 @@
-{
-  lib,
-  stdenvNoCC,
-  fetchurl,
-  makeWrapper,
-  jre,
-  writeShellScript,
-}:
+{ pkgs }:
 
-stdenvNoCC.mkDerivation rec {
+pkgs.stdenv.mkDerivation rec {
   pname = "eca";
   version = "0.72.0";
 
-  src = fetchurl {
+  src = pkgs.fetchurl {
     url = "https://github.com/editor-code-assistant/eca/releases/download/${version}/eca.jar";
     hash = "sha256-Dw5oLVcxJLV5Tzc2rSxFJdVLpoTQ2sJ6A2Q2Vq7ou4A=";
   };
 
   nativeBuildInputs = [
-    makeWrapper
+    pkgs.makeWrapper
   ];
 
   buildInputs = [
-    jre
+    pkgs.jre
   ];
 
   dontUnpack = true;
@@ -38,10 +31,10 @@ stdenvNoCC.mkDerivation rec {
 
     # Create a wrapper script
     cat > $out/bin/eca << EOF
-    #!${stdenvNoCC.shell}
-    export JAVA_HOME="${jre}"
-    export PATH="${jre}/bin:\$PATH"
-    exec "${jre}/bin/java" -jar "$out/lib/eca.jar" "\$@"
+    #!${pkgs.stdenv.shell}
+    export JAVA_HOME="${pkgs.jre}"
+    export PATH="${pkgs.jre}/bin:\$PATH"
+    exec "${pkgs.jre}/bin/java" -jar "$out/lib/eca.jar" "\$@"
     EOF
 
     chmod +x $out/bin/eca
@@ -49,7 +42,7 @@ stdenvNoCC.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = with pkgs.lib; {
     description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
     homepage = "https://github.com/editor-code-assistant/eca";
     license = licenses.mit;
