@@ -44,6 +44,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/wandb/catnip
 - **Usage**: `nix run .#catnip -- --help`
 
+#### eca
+
+- **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
+- **Version**: 0.72.0
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/editor-code-assistant/eca
+- **Usage**: `nix run .#eca -- --help`
+
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
