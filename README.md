@@ -38,7 +38,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### catnip
 
 - **Description**: Developer environment that's like catnip for agentic programming
-- **Version**: 0.11.0
+- **Version**: 0.11.2
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/wandb/catnip
@@ -209,7 +209,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.16
+- **Version**: 0.15.17
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
