@@ -7,13 +7,13 @@
 
 buildNpmPackage rec {
   pname = "nanocoder";
-  version = "1.13.9";
+  version = "1.14.0";
 
   src = fetchFromGitHub {
     owner = "Mote-Software";
     repo = "nanocoder";
     rev = "v${version}";
-    hash = "sha256-5+j/pN+9d7kRb2PGZY4S7vyNFonp9/CFSlxLzrjFJ/c=";
+    hash = "sha256-v99Y/Hr4QuR+dU6/8J8SsErXyhHat0oS74IeJkHhyDw=";
     postFetch = ''
       rm -f $out/pnpm-workspace.yaml
     '';
@@ -24,7 +24,7 @@ buildNpmPackage rec {
   pnpmDeps = pnpm_9.fetchDeps {
     inherit pname version src;
     fetcherVersion = 2;
-    hash = "sha256-74u8m0+m4rDzXiccNtc9fxwlhZF99p3Uv11sPvhcYC4=";
+    hash = "sha256-bnhWF/sAO7dCYd+NQZK+Q/dY7oMRbijUPN0rarOB+M4=";
   };
 
   dontNpmPrune = true; # hangs forever on both Linux/darwin
