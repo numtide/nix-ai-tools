@@ -197,6 +197,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
 - **Usage**: `nix run .#groq-code-cli -- --help`
 
+#### llm
+
+- **Description**: CLI tool and Python library for interacting with Large Language Models
+- **Version**: 0.27.1
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://llm.datasette.io/
+- **Usage**: `nix run .#llm -- --help`
+
 #### nanocoder
 
 - **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
