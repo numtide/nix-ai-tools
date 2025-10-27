@@ -74,26 +74,31 @@ for platform in "${!platforms[@]}"; do
   # Find the line number for this platform's hash
   line_num=$(grep -n "system = \"$platform\"" "$tmp_file" | cut -d: -f1)
   if [ -n "$line_num" ]; then
-    # Find the hash = line after the system declaration (within next 5 lines)
-    hash_line_end=$((line_num + 5))
-    hash_line=$(sed -n "${line_num},${hash_line_end}p" "$tmp_file" | grep -n "hash = " | head -1 | cut -d: -f1)
+    # Find the next hash = line after the system declaration
+    # Look for the pattern in the rest of the file from the system declaration
+    hash_line=$(tail -n "+$line_num" "$tmp_file" | grep -n "hash = " | head -1 | cut -d: -f1)
     if [ -n "$hash_line" ]; then
       actual_line=$((line_num + hash_line - 1))
       sed -i "${actual_line}s|hash = \"[^\"]*\";|hash = \"${new_hash}\";|" "$tmp_file"
       echo "    $platform: $new_hash"
+    else
+      echo "    WARNING: Could not find hash line for $platform"
     fi
   else
     # If not found in platform-specific section, try to find JAR version hash
     jar_line=$(grep -n "eca.jar" "$tmp_file" | head -1 | cut -d: -f1)
     if [ -n "$jar_line" ]; then
       # Find the hash line near the JAR file URL
-      hash_line_end=$((jar_line + 3))
-      hash_line=$(sed -n "${jar_line},${hash_line_end}p" "$tmp_file" | grep -n "hash = " | head -1 | cut -d: -f1)
+      hash_line=$(tail -n "+$jar_line" "$tmp_file" | grep -n "hash = " | head -1 | cut -d: -f1)
       if [ -n "$hash_line" ]; then
         actual_line=$((jar_line + hash_line - 1))
         sed -i "${actual_line}s|hash = \"[^\"]*\";|hash = \"${new_hash}\";|" "$tmp_file"
         echo "    JAR version: $new_hash"
+      else
+        echo "    WARNING: Could not find hash line for JAR version"
       fi
+    else
+      echo "    WARNING: Could not find platform or JAR section for $platform"
     fi
   fi
 done
