@@ -47,9 +47,9 @@ sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "
 # Platform-specific URLs and hash calculation
 declare -A platforms=(
   ["x86_64-linux"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca-native-linux-amd64.zip"
-  ["aarch64-linux"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
-  ["x86_64-darwin"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
-  ["aarch64-darwin"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca.jar"
+  ["aarch64-linux"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca-native-linux-aarch64.zip"
+  ["x86_64-darwin"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca-native-macos-amd64.zip"
+  ["aarch64-darwin"]="https://github.com/editor-code-assistant/eca/releases/download/${latest_version}/eca-native-macos-aarch64.zip"
 )
 
 for platform in "${!platforms[@]}"; do
@@ -59,13 +59,8 @@ for platform in "${!platforms[@]}"; do
   # Use nix-build to automatically get the correct hash
   export NIX_PATH=nixpkgs=flake:nixpkgs
   
-  if [[ "$platform" == "x86_64-linux" ]]; then
-    # Use fetchzip for native binary zip file
-    hash_output=$(nix-build -E "with import <nixpkgs> {}; fetchzip { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
-  else
-    # Use fetchurl for JAR files
-    hash_output=$(nix-build -E "with import <nixpkgs> {}; fetchurl { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
-  fi
+  # All platforms now use native binary zip files
+  hash_output=$(nix-build -E "with import <nixpkgs> {}; fetchzip { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
   
   new_hash=$(echo "$hash_output" | grep "got:" | awk '{print $2}')
   
@@ -77,12 +72,29 @@ for platform in "${!platforms[@]}"; do
   
   # Update the specific hash for this platform
   # Find the line number for this platform's hash
-  line_num=$(grep -n "\"$platform\" = " "$tmp_file" | cut -d: -f1)
+  line_num=$(grep -n "system = \"$platform\"" "$tmp_file" | cut -d: -f1)
   if [ -n "$line_num" ]; then
-    # Find the sha256 line after the platform declaration (within next 3 lines)
-    sha_line=$((line_num + 2))
-    sed -i "${sha_line}s|sha256 = \"[^\"]*\";|sha256 = \"${new_hash}\";|" "$tmp_file"
-    echo "    $platform: $new_hash"
+    # Find the hash = line after the system declaration (within next 5 lines)
+    hash_line_end=$((line_num + 5))
+    hash_line=$(sed -n "${line_num},${hash_line_end}p" "$tmp_file" | grep -n "hash = " | head -1 | cut -d: -f1)
+    if [ -n "$hash_line" ]; then
+      actual_line=$((line_num + hash_line - 1))
+      sed -i "${actual_line}s|hash = \"[^\"]*\";|hash = \"${new_hash}\";|" "$tmp_file"
+      echo "    $platform: $new_hash"
+    fi
+  else
+    # If not found in platform-specific section, try to find JAR version hash
+    jar_line=$(grep -n "eca.jar" "$tmp_file" | head -1 | cut -d: -f1)
+    if [ -n "$jar_line" ]; then
+      # Find the hash line near the JAR file URL
+      hash_line_end=$((jar_line + 3))
+      hash_line=$(sed -n "${jar_line},${hash_line_end}p" "$tmp_file" | grep -n "hash = " | head -1 | cut -d: -f1)
+      if [ -n "$hash_line" ]; then
+        actual_line=$((jar_line + hash_line - 1))
+        sed -i "${actual_line}s|hash = \"[^\"]*\";|hash = \"${new_hash}\";|" "$tmp_file"
+        echo "    JAR version: $new_hash"
+      fi
+    fi
   fi
 done
 
