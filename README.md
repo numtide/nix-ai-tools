@@ -1,7 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/nix-ai-tools-banner--dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/nix-ai-tools-banner--white.svg">
-  <img alt="nix-ai-tools" src="docs/nix-ai-tools-banner--white.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/numtide/nix-ai-tools/releases/download/assets/nix-ai-tools-banner--dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/numtide/nix-ai-tools/releases/download/assets/nix-ai-tools-banner--white.svg">
+  <img alt="nix-ai-tools" src="https://github.com/numtide/nix-ai-tools/releases/download/assets/nix-ai-tools-banner--white.svg">
 </picture>
 
 [![Mentioned in Awesome Gemini CLI](https://awesome.re/mentioned-badge.svg)](https://github.com/Piebald-AI/awesome-gemini-cli)
