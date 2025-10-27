@@ -27,7 +27,7 @@ let
     meta = with pkgs.lib; {
       description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
       homepage = "https://github.com/editor-code-assistant/eca";
-      license = licenses.mit;
+      license = licenses.asl20;
       maintainers = with maintainers; [ jojo ];
       mainProgram = "eca";
       platforms = [ system ];
@@ -102,7 +102,7 @@ else
     meta = with pkgs.lib; {
       description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
       homepage = "https://github.com/editor-code-assistant/eca";
-      license = licenses.mit;
+      license = licenses.asl20;
       maintainers = with maintainers; [ jojo ];
       mainProgram = "eca";
     };
