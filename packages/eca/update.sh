@@ -10,7 +10,7 @@ fetch_latest_version() {
   # Use GitHub API to get the latest release tag
   curl -s \
     -H "Accept: application/vnd.github.v3+json" \
-    https://api.github.com/repos/editor-code-assistant/eca/releases/latest | \
+    https://api.github.com/repos/editor-code-assistant/eca/releases/latest |
     jq -r '.tag_name'
 }
 
@@ -55,21 +55,21 @@ declare -A platforms=(
 for platform in "${!platforms[@]}"; do
   url="${platforms[$platform]}"
   echo "  Calculating hash for $platform..."
-  
+
   # Use nix-build to automatically get the correct hash
   export NIX_PATH=nixpkgs=flake:nixpkgs
-  
+
   # All platforms now use native binary zip files
   hash_output=$(nix-build -E "with import <nixpkgs> {}; fetchzip { url = \"${url}\"; sha256 = \"\"; }" 2>&1 || true)
-  
+
   new_hash=$(echo "$hash_output" | grep "got:" | awk '{print $2}')
-  
+
   if [ -z "$new_hash" ]; then
     echo "    ERROR: Failed to calculate hash for $platform"
     echo "    Output: $hash_output"
     continue
   fi
-  
+
   # Update the specific hash for this platform
   # Find the line number for this platform's hash
   line_num=$(grep -n "system = \"$platform\"" "$tmp_file" | cut -d: -f1)
@@ -107,10 +107,10 @@ done
 if ! diff -q "$tmp_file" "$package_file" >/dev/null 2>&1; then
   # Move updated file back
   mv "$tmp_file" "$package_file"
-  
+
   echo "Building package to verify..."
   nix build .#eca
-  
+
   echo "Update completed successfully!"
   echo "eca has been updated from $current_version to $latest_version"
 else
