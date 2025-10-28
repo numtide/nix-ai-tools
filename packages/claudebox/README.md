@@ -9,7 +9,7 @@ other dependencies.
 
 We also patch Claude to monitor all the executed commands in a tmux side-pane.
 
-![Demo](./claudebox-demo.svg)
+![Demo](https://github.com/numtide/nix-ai-tools/releases/download/assets/claudebox-demo.svg)
 
 ## Usage
 
