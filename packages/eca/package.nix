@@ -2,37 +2,43 @@
 
 let
   version = "0.73.5";
-  
+
   # Function to create native binary derivation for each platform
-  mkNativeBinary = { system, url, hash }: pkgs.stdenv.mkDerivation rec {
-    pname = "eca";
-    inherit version;
+  mkNativeBinary =
+    {
+      system,
+      url,
+      hash,
+    }:
+    pkgs.stdenv.mkDerivation rec {
+      pname = "eca";
+      inherit version;
 
-    src = pkgs.fetchzip {
-      inherit url hash;
-      stripRoot = false;
+      src = pkgs.fetchzip {
+        inherit url hash;
+        stripRoot = false;
+      };
+
+      dontUnpack = true;
+      dontBuild = true;
+
+      installPhase = ''
+        runHook preInstall
+        mkdir -p $out/bin
+        cp $src/eca $out/bin/eca
+        chmod +x $out/bin/eca
+        runHook postInstall
+      '';
+
+      meta = with pkgs.lib; {
+        description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
+        homepage = "https://github.com/editor-code-assistant/eca";
+        license = licenses.asl20;
+        maintainers = with maintainers; [ jojo ];
+        mainProgram = "eca";
+        platforms = [ system ];
+      };
     };
-
-    dontUnpack = true;
-    dontBuild = true;
-
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out/bin
-      cp $src/eca $out/bin/eca
-      chmod +x $out/bin/eca
-      runHook postInstall
-    '';
-
-    meta = with pkgs.lib; {
-      description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
-      homepage = "https://github.com/editor-code-assistant/eca";
-      license = licenses.asl20;
-      maintainers = with maintainers; [ jojo ];
-      mainProgram = "eca";
-      platforms = [ system ];
-    };
-  };
 
 in
 # Use native binary for all supported platforms
