@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1761609709-g7e6816
+- **Version**: 0.0.1761652889-gfe133f
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -43,15 +43,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/wandb/catnip
 - **Usage**: `nix run .#catnip -- --help`
-
-#### eca
-
-- **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
-- **Version**: 0.72.0
-- **Source**: binary
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/editor-code-assistant/eca
-- **Usage**: `nix run .#eca -- --help`
 
 #### claude-code
 
@@ -170,6 +161,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://factory.ai
 - **Usage**: `nix run .#droid -- --help`
 
+#### eca
+
+- **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
+- **Version**: 0.73.5
+- **Source**: unknown
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/editor-code-assistant/eca
+- **Usage**: `nix run .#eca -- --help`
+
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
@@ -232,6 +232,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run .#qwen-code -- --help`
+
+#### spec-kit
+
+- **Description**: Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)
+- **Version**: 0.0.72
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/github/spec-kit
+- **Usage**: `nix run .#spec-kit -- --help`
 
 <!-- END mdsh -->
 
