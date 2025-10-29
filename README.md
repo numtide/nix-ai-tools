@@ -155,7 +155,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
-- **Version**: 0.15.0
+- **Version**: 0.22.5
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
@@ -218,7 +218,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.18
+- **Version**: 0.15.19
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
