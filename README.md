@@ -146,7 +146,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.10.22-f894c20
+- **Version**: 2025.10.28-0a91dc2
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
@@ -218,7 +218,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.19
+- **Version**: 0.15.23
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
