@@ -35,20 +35,27 @@ echo "Updating droid to version $VERSION..."
 # Update version
 sed -i "s/version = \".*\"/version = \"$VERSION\"/" "$FILE"
 
-# Update droid binary hashes
-sed -i "/x86_64-linux = {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$(fetch_hash linux x64)\"|" "$FILE"
-sed -i "/aarch64-linux = {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$(fetch_hash linux arm64)\"|" "$FILE"
-sed -i "/aarch64-darwin = {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$(fetch_hash darwin arm64)\"|" "$FILE"
+# Fetch all hashes first to avoid issues with command substitution in sed
+echo "Fetching droid binary hashes..."
+HASH_LINUX_X64=$(fetch_hash linux x64)
+HASH_LINUX_ARM64=$(fetch_hash linux arm64)
+HASH_DARWIN_ARM64=$(fetch_hash darwin arm64)
 
-# Update ripgrep hashes
-sed -i "/rgSources = {/,/};/ {
-  /x86_64-linux = {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$(fetch_rg_hash linux x64)\"|
-}" "$FILE"
-sed -i "/rgSources = {/,/};/ {
-  /aarch64-linux = {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$(fetch_rg_hash linux arm64)\"|
-}" "$FILE"
-sed -i "/rgSources = {/,/};/ {
-  /aarch64-darwin = {/,/};/ s|hash = \"sha256-[^\"]*\"|hash = \"$(fetch_rg_hash darwin arm64)\"|
-}" "$FILE"
+echo "Fetching ripgrep hashes..."
+RG_HASH_LINUX_X64=$(fetch_rg_hash linux x64)
+RG_HASH_LINUX_ARM64=$(fetch_rg_hash linux arm64)
+RG_HASH_DARWIN_ARM64=$(fetch_rg_hash darwin arm64)
+
+# Update droid binary hashes in sources section
+# Use more specific patterns that include the URL pattern to target only sources section
+sed -i "/factory-cli\/releases.*x64\/droid/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${HASH_LINUX_X64}\"|" "$FILE"
+sed -i "/factory-cli\/releases.*arm64\/droid/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${HASH_LINUX_ARM64}\"|" "$FILE"  
+sed -i "/factory-cli\/releases.*darwin.*arm64\/droid/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${HASH_DARWIN_ARM64}\"|" "$FILE"
+
+# Update ripgrep hashes in rgSources section  
+# Use URL patterns specific to ripgrep
+sed -i "/ripgrep.*linux\/x64\/rg/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${RG_HASH_LINUX_X64}\"|" "$FILE"
+sed -i "/ripgrep.*linux\/arm64\/rg/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${RG_HASH_LINUX_ARM64}\"|" "$FILE"
+sed -i "/ripgrep.*darwin\/arm64\/rg/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${RG_HASH_DARWIN_ARM64}\"|" "$FILE"
 
 echo "Updated droid to $VERSION"
