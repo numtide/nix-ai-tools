@@ -74,7 +74,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-desktop
 
 - **Description**: Claude Desktop - AI assistant from Anthropic
-- **Version**: 0.14.7
+- **Version**: 0.14.10
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://claude.ai
@@ -218,7 +218,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.18
+- **Version**: 0.15.19
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
