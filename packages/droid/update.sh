@@ -14,20 +14,37 @@ VERSION=$(curl -fsSL https://app.factory.ai/cli | grep -oP 'VER="\K[^"]+')
 
 echo "Found version: $VERSION"
 
-fetch_hash() {
-  local platform=$1
-  local arch=$2
-  local url="https://downloads.factory.ai/factory-cli/releases/${VERSION}/${platform}/${arch}/droid"
-  echo "Fetching hash for ${platform}/${arch}..." >&2
-  nix store prefetch-file --hash-type sha256 "$url" --json | jq -r .hash
-}
-
-fetch_rg_hash() {
-  local platform=$1
-  local arch=$2
-  local url="https://downloads.factory.ai/ripgrep/${platform}/${arch}/rg"
-  echo "Fetching rg hash for ${platform}/${arch}..." >&2
-  nix store prefetch-file --hash-type sha256 "$url" --json | jq -r .hash
+fetch_and_update_hash() {
+  local url_pattern=$1
+  local platform=$2
+  local arch=$3
+  local binary_name=$4
+  
+  # Build URL - ripgrep doesn't use version in path
+  local url
+  if [[ "$url_pattern" == "ripgrep" ]]; then
+    url="https://downloads.factory.ai/${url_pattern}/${platform}/${arch}/${binary_name}"
+  else
+    url="https://downloads.factory.ai/${url_pattern}/${VERSION}/${platform}/${arch}/${binary_name}"
+  fi
+  
+  echo "Fetching hash for ${platform}/${arch} ${binary_name}..." >&2
+  local new_hash
+  new_hash=$(nix store prefetch-file --hash-type sha256 "$url" --json | jq -r .hash)
+  
+  # Extract the old hash from the file for this specific URL line
+  local old_hash
+  old_hash=$(grep -A1 "${url_pattern}.*${platform}.*${arch}.*${binary_name}" "$FILE" | grep hash | grep -oP 'sha256-[^"]+')
+  
+  if [ -n "$old_hash" ] && [ "$old_hash" != "$new_hash" ]; then
+    echo "Replacing $old_hash with $new_hash for ${platform}/${arch} ${binary_name}" >&2
+    # Use a more targeted sed that finds the URL line and replaces the hash on the next line
+    sed -i "/${url_pattern//\//\\/}.*${platform}.*${arch}.*${binary_name}/,/hash =/ s|${old_hash}|${new_hash}|" "$FILE"
+  elif [ "$old_hash" == "$new_hash" ]; then
+    echo "Hash for ${platform}/${arch} ${binary_name} is already up to date" >&2
+  else
+    echo "Warning: Could not find old hash for ${platform}/${arch} ${binary_name}" >&2
+  fi
 }
 
 echo "Updating droid to version $VERSION..."
@@ -35,27 +52,14 @@ echo "Updating droid to version $VERSION..."
 # Update version
 sed -i "s/version = \".*\"/version = \"$VERSION\"/" "$FILE"
 
-# Fetch all hashes first to avoid issues with command substitution in sed
-echo "Fetching droid binary hashes..."
-HASH_LINUX_X64=$(fetch_hash linux x64)
-HASH_LINUX_ARM64=$(fetch_hash linux arm64)
-HASH_DARWIN_ARM64=$(fetch_hash darwin arm64)
+# Update droid binary hashes
+fetch_and_update_hash "factory-cli/releases" "linux" "x64" "droid"
+fetch_and_update_hash "factory-cli/releases" "linux" "arm64" "droid"
+fetch_and_update_hash "factory-cli/releases" "darwin" "arm64" "droid"
 
-echo "Fetching ripgrep hashes..."
-RG_HASH_LINUX_X64=$(fetch_rg_hash linux x64)
-RG_HASH_LINUX_ARM64=$(fetch_rg_hash linux arm64)
-RG_HASH_DARWIN_ARM64=$(fetch_rg_hash darwin arm64)
-
-# Update droid binary hashes in sources section
-# Use more specific patterns that include the URL pattern to target only sources section
-sed -i "/factory-cli\/releases.*x64\/droid/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${HASH_LINUX_X64}\"|" "$FILE"
-sed -i "/factory-cli\/releases.*arm64\/droid/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${HASH_LINUX_ARM64}\"|" "$FILE"  
-sed -i "/factory-cli\/releases.*darwin.*arm64\/droid/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${HASH_DARWIN_ARM64}\"|" "$FILE"
-
-# Update ripgrep hashes in rgSources section  
-# Use URL patterns specific to ripgrep
-sed -i "/ripgrep.*linux\/x64\/rg/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${RG_HASH_LINUX_X64}\"|" "$FILE"
-sed -i "/ripgrep.*linux\/arm64\/rg/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${RG_HASH_LINUX_ARM64}\"|" "$FILE"
-sed -i "/ripgrep.*darwin\/arm64\/rg/,/hash =/ s|hash = \"sha256-[^\"]*\"|hash = \"${RG_HASH_DARWIN_ARM64}\"|" "$FILE"
+# Update ripgrep hashes
+fetch_and_update_hash "ripgrep" "linux" "x64" "rg"
+fetch_and_update_hash "ripgrep" "linux" "arm64" "rg"
+fetch_and_update_hash "ripgrep" "darwin" "arm64" "rg"
 
 echo "Updated droid to $VERSION"
