@@ -164,7 +164,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### eca
 
 - **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
-- **Version**: 0.75.0
+- **Version**: 0.75.1
 - **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/editor-code-assistant/eca
