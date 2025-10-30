@@ -128,7 +128,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### copilot-cli
 
 - **Description**: GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.
-- **Version**: 0.0.349
+- **Version**: 0.0.353
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://github.com/github/copilot-cli
@@ -209,7 +209,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### nanocoder
 
 - **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
-- **Version**: 1.14.1
+- **Version**: 1.14.2
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
@@ -236,7 +236,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### spec-kit
 
 - **Description**: Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)
-- **Version**: 0.0.72
+- **Version**: 0.0.79
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/github/spec-kit
