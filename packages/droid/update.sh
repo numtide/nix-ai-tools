@@ -15,15 +15,15 @@ VERSION=$(curl -fsSL https://app.factory.ai/cli | grep -oP 'VER="\K[^"]+')
 echo "Found version: $VERSION"
 
 fetch_and_update_hash() {
-  local section=$1      # "sources" or "rgSources"
-  local platform=$2     # "x86_64-linux", "aarch64-linux", or "aarch64-darwin"
+  local section=$1  # "sources" or "rgSources"
+  local platform=$2 # "x86_64-linux", "aarch64-linux", or "aarch64-darwin"
   local path_platform=$3
   local arch=$4
   local binary_name=$5
 
   # Build URL - ripgrep doesn't use version in path
   local url
-  if [[ "$section" == "rgSources" ]]; then
+  if [[ $section == "rgSources" ]]; then
     url="https://downloads.factory.ai/ripgrep/${path_platform}/${arch}/${binary_name}"
   else
     url="https://downloads.factory.ai/factory-cli/releases/${VERSION}/${path_platform}/${arch}/${binary_name}"
