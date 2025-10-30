@@ -94,6 +94,10 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru = {
+    inherit sources rgSources;
+  };
+
   meta = with lib; {
     description = "Factory AI's Droid - AI-powered development agent for your terminal";
     homepage = "https://factory.ai";
