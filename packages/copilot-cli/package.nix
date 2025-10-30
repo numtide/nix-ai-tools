@@ -7,23 +7,31 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "copilot-cli";
-  version = "0.0.349";
+  version = "0.0.353";
 
   src = fetchurl {
     url = "https://registry.npmjs.org/@github/copilot/-/copilot-${finalAttrs.version}.tgz";
-    hash = "sha256-IGETErkuxx97jNhZVTo0UJ1Y5SKcNJY4wpFmF9f3t4M=";
+    hash = "sha256-JjQ8Xh7Ct+a6MK4om+3EB4Yancxdeb4CRAdzsIbcIX4=";
   };
 
-  npmDepsHash = "sha256-LH5nt5PbwdVXjtdnlZGhhRKRIPrLbCW7cyL7WhKV1ps=";
+  # Dependencies are bundled in the tarball
+  npmDepsHash = "sha256-JhXoiLrG/CDNlgwSnhUG1wgLjnVmBKgz0twMx5wVbEE=";
+  forceEmptyCache = true;
 
   nodejs = nodejs_22;
-
-  npmInstallFlags = [ "--omit=dev" ];
 
   dontNpmBuild = true;
 
   postPatch = ''
-    cp ${./package-lock.json} package-lock.json
+    # Create minimal package-lock.json for buildNpmPackage
+    cat > package-lock.json << 'EOF'
+    {
+      "name": "@github/copilot",
+      "lockfileVersion": 3,
+      "requires": true,
+      "packages": {}
+    }
+    EOF
   '';
 
   installPhase = ''
