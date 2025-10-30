@@ -34,13 +34,14 @@ fetch_and_update_hash() {
   local new_hash
   new_hash=$(nix store prefetch-file --hash-type sha256 "$url" --json | jq -r .hash)
   
-  # Extract the old hash from the file using nix eval
+  # Extract the old hash - since sources/rgSources are in let bindings,
+  # we use grep to extract from the file
   local old_hash
-  old_hash=$(nix eval --raw ".#droid.passthru.${section}.${platform}.hash" 2>/dev/null || echo "")
+  old_hash=$(grep -A1 "${url_pattern}.*${path_platform}.*${arch}.*${binary_name}" "$FILE" | grep "hash = " | grep -oP 'sha256-[^"]+')
   
   if [ -z "$old_hash" ]; then
-    echo "Warning: Could not extract old hash using nix eval, falling back to grep" >&2
-    old_hash=$(grep -A1 "${url_pattern}.*${path_platform}.*${arch}.*${binary_name}" "$FILE" | grep hash | grep -oP 'sha256-[^"]+')
+    echo "Warning: Could not find old hash for ${platform} ${binary_name}" >&2
+    return
   fi
   
   if [ -n "$old_hash" ] && [ "$old_hash" != "$new_hash" ]; then
