@@ -84,6 +84,6 @@ for package in "${sorted_packages[@]}"; do
   if [ "$homepage" != "null" ]; then
     echo "- **Homepage**: $homepage"
   fi
-  echo "- **Usage**: \`nix run .#$package -- --help\`"
+  echo "- **Usage**: \`nix run github:numtide/nix-ai-tools#$package -- --help\`"
   echo ""
 done
