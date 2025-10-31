@@ -152,6 +152,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run .#cursor-agent -- --help`
 
+#### darwinOpenptyHook
+
+- **Description**: No description available
+- **Version**: unknown
+- **Source**: unknown
+- **License**: Check package
+- **Usage**: `nix run .#darwinOpenptyHook -- --help`
+
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
@@ -228,7 +236,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
 - **Version**: 0.1.2
-- **Source**: bytecode
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run .#qwen-code -- --help`

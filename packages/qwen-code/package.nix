@@ -25,15 +25,14 @@ buildNpmPackage (finalAttrs: {
 
   npmDepsHash = "sha256-TTzZyoJ617F5P8lsPJu3RlA0+aVZAiDc+7bW4r4+mWU=";
 
-  nativeBuildInputs =
-    [
-      pkg-config
-      git
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      clang_20 # Works around node-addon-api constant expression issue with clang 21+ (keytar)
-      darwinOpenptyHook # Fixes node-pty openpty/forkpty build issue
-    ];
+  nativeBuildInputs = [
+    pkg-config
+    git
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    clang_20 # Works around node-addon-api constant expression issue with clang 21+ (keytar)
+    darwinOpenptyHook # Fixes node-pty openpty/forkpty build issue
+  ];
 
   buildInputs = [
     ripgrep
