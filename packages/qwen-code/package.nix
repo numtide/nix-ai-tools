@@ -20,10 +20,10 @@ buildNpmPackage (finalAttrs: {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-5XC4Pwf+vuK1T3/bPptUejg8v9wj3izF80Mt+iqVr9Y=";
+    hash = "sha256-+1u5sv6PDnOGi2zLLJLBRcIX8LGVYg67323SR9GCXNY=";
   };
 
-  npmDepsHash = "sha256-E2+OuYXPoocqT87+u7fhzXx5p1tixbjxlcO6wq2huTc=";
+  npmDepsHash = "sha256-TTzZyoJ617F5P8lsPJu3RlA0+aVZAiDc+7bW4r4+mWU=";
 
   nativeBuildInputs =
     [
