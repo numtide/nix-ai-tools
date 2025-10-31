@@ -50,5 +50,6 @@ makeSetupHook {
   meta = {
     description = "Setup hook that injects openpty/forkpty prototypes on Darwin";
     platforms = lib.platforms.darwin;
+    hideFromDocs = true;
   };
 } hookScript
