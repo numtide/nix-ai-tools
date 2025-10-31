@@ -1,1 +1,4 @@
-{ pkgs, ... }: pkgs.callPackage ./package.nix { }
+{ pkgs }:
+pkgs.callPackage ./package.nix {
+  darwinOpenptyHook = pkgs.callPackage ../darwinOpenptyHook { };
+}

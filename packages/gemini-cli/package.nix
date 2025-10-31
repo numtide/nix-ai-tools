@@ -4,10 +4,10 @@
   buildNpmPackage,
   fetchFromGitHub,
   ripgrep,
-  jq,
   pkg-config,
-  clang_20,
   libsecret,
+  darwinOpenptyHook,
+  clang_20,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -23,11 +23,14 @@ buildNpmPackage (finalAttrs: {
 
   npmDepsHash = "sha256-RQp58gGN7gG9J0c8CN2CMg/P3ykNi3XlxLk2rpbSV/U=";
 
-  nativeBuildInputs = [
-    jq
-    pkg-config
-  ]
-  ++ lib.optionals stdenv.isDarwin [ clang_20 ]; # clang_21 breaks @vscode/vsce's optionalDependencies keytar
+  nativeBuildInputs =
+    [
+      pkg-config
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      clang_20 # Works around node-addon-api constant expression issue with clang 21+
+      darwinOpenptyHook # Fixes node-pty openpty/forkpty build issue
+    ];
 
   buildInputs = [
     ripgrep
@@ -37,14 +40,6 @@ buildNpmPackage (finalAttrs: {
   preConfigure = ''
     mkdir -p packages/generated
     echo "export const GIT_COMMIT_INFO = { commitHash: '${finalAttrs.src.rev}' };" > packages/generated/git-commit.ts
-  '';
-
-  postPatch = ''
-    # Remove node-pty dependency from package.json
-    ${jq}/bin/jq 'del(.optionalDependencies."node-pty")' package.json > package.json.tmp && mv package.json.tmp package.json
-
-    # Remove node-pty dependency from packages/core/package.json
-    ${jq}/bin/jq 'del(.optionalDependencies."node-pty")' packages/core/package.json > packages/core/package.json.tmp && mv packages/core/package.json.tmp packages/core/package.json
   '';
 
   installPhase = ''
