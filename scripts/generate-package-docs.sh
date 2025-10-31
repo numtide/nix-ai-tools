@@ -10,10 +10,13 @@ packages=()
 for package_dir in packages/*/; do
   if [ -f "$package_dir/package.nix" ] || [ -f "$package_dir/default.nix" ]; then
     package_name=$(basename "$package_dir")
-    # Skip the formatter package
-    if [ "$package_name" = "formatter" ]; then
+
+    # Check if package should be hidden from docs
+    hideFromDocs=$(nix eval --json ".#$package_name.meta.hideFromDocs" 2>/dev/null || echo "false")
+    if [ "$hideFromDocs" = "true" ]; then
       continue
     fi
+
     packages+=("$package_name")
   fi
 done
@@ -81,6 +84,6 @@ for package in "${sorted_packages[@]}"; do
   if [ "$homepage" != "null" ]; then
     echo "- **Homepage**: $homepage"
   fi
-  echo "- **Usage**: \`nix run .#$package -- --help\`"
+  echo "- **Usage**: \`nix run github:numtide/nix-ai-tools#$package -- --help\`"
   echo ""
 done

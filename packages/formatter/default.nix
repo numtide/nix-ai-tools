@@ -42,6 +42,7 @@ in
 formatter
 // {
   meta = formatter.meta // {
+    hideFromDocs = true;
     tests = {
       check = check;
     };
