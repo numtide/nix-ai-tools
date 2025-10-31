@@ -227,7 +227,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.1.1
+- **Version**: 0.1.2
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code

@@ -9,11 +9,11 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "qwen-code";
-  version = "0.1.1";
+  version = "0.1.2";
 
   src = fetchurl {
     url = "https://registry.npmjs.org/@qwen-code/qwen-code/-/qwen-code-${finalAttrs.version}.tgz";
-    hash = "sha256-iFV3v6VP9C5Opr1VbGLe0LVfEZ8e38om6O3gyfLMEeI=";
+    hash = "sha256-JcpnaFZVIMmSNz6kE8O/14PUEfnyTRQBjdiKHwuq5+c=";
   };
 
   postPatch = ''
@@ -26,7 +26,7 @@ buildNpmPackage (finalAttrs: {
       tar -xzf ${finalAttrs.src} -C $out --strip-components=1
       cp ${./package-lock.json} $out/package-lock.json
     '';
-    hash = "sha256-jIxLGpPmzBpyMBsZAgnphyv7frOROrSR5jQjGRBbTs8=";
+    hash = "sha256-PZtQGG0hRCMAkYzQcfNBByC9GfhRW2HONycSj2rjOJw=";
   };
 
   npmFlags = [ "--ignore-scripts" ];
