@@ -163,7 +163,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
-- **Version**: 0.22.7
+- **Version**: 0.22.9
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
