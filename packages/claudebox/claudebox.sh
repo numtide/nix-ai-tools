@@ -129,9 +129,6 @@ bwrap_args=(
   --dev /dev
   --proc /proc
   --ro-bind /usr /usr
-  --ro-bind /bin /bin
-  --ro-bind /lib /lib
-  --ro-bind /lib64 /lib64
   --ro-bind /etc /etc
   --ro-bind /nix /nix
   --bind /nix/var/nix/daemon-socket /nix/var/nix/daemon-socket # For package installs
@@ -152,6 +149,11 @@ bwrap_args=(
   --setenv TEMP "/tmp"
   --setenv TMP "/tmp"
 )
+
+# Conditionally bind directories that may not exist on all systems (e.g., NixOS)
+[[ -d /bin ]] && bwrap_args+=(--ro-bind /bin /bin)
+[[ -d /lib ]] && bwrap_args+=(--ro-bind /lib /lib)
+[[ -d /lib64 ]] && bwrap_args+=(--ro-bind /lib64 /lib64)
 
 # Mount tmux configuration (support both traditional and XDG locations)
 if [[ $load_tmux_config == "true" ]]; then
