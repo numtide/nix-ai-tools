@@ -45,22 +45,37 @@ To use the NixOS-compatible version of codex-acp with Zed:
 
 2. Replace Zed's version with a symlink to the Nix-built binary:
    ```bash
-   # Replace v0.3.12 with the version Zed is using
-   ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/v0.3.12/codex-acp
+   # First, check which version Zed is using
+   ls ~/.local/share/zed/external_agents/codex/
+   
+   # Then create the symlink (replace VERSION with the version from above)
+   ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/VERSION/codex-acp
    ```
 
 3. Restart Zed if it's running.
 
 ### Automatic Setup Script
 
-For convenience, you can use this one-liner to build and link codex-acp:
+For convenience, you can use this script to automatically detect Zed's version and create the symlink:
+
+```bash
+# Build the package
+nix build github:numtide/nix-ai-tools#codex-acp
+
+# Find the latest version and create symlink
+VERSION=$(ls -1 ~/.local/share/zed/external_agents/codex/ | sort -V | tail -n1)
+ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/$VERSION/codex-acp
+echo "Linked codex-acp for Zed version: $VERSION"
+```
+
+Alternatively, if you want a manual one-liner (replace `VERSION` with your Zed's version):
 
 ```bash
 nix build github:numtide/nix-ai-tools#codex-acp && \
-  ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/v0.3.12/codex-acp
+  ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/VERSION/codex-acp
 ```
 
-> **Note**: Make sure to check which version of codex-acp Zed is using by looking in `~/.local/share/zed/external_agents/codex/` and adjust the version number in the command accordingly.
+> **Note**: Make sure to check which version of codex-acp Zed is using by looking in `~/.local/share/zed/external_agents/codex/` and adjust the version in the command if using the manual approach.
 
 ## Updating
 
