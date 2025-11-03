@@ -128,22 +128,21 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook preConfigure
 
     cp -R ${finalAttrs.node_modules}/node_modules .
+    cp ${./build.ts} ./build.ts
 
     runHook postConfigure
   '';
 
   env.MODELS_DEV_API_JSON = "${models-dev}/dist/_api.json";
+  env.OPENCODE_TUI_PATH = "${finalAttrs.tui}/bin/tui";
+  env.OPENCODE_VERSION = finalAttrs.version;
+  env.TARGET = bun-target.${stdenvNoCC.hostPlatform.system};
+  env.OUTFILE = "opencode";
 
   buildPhase = ''
     runHook preBuild
 
-    bun build \
-      --define OPENCODE_TUI_PATH="'${finalAttrs.tui}/bin/tui'" \
-      --define OPENCODE_VERSION="'${finalAttrs.version}'" \
-      --compile \
-      --target=${bun-target.${stdenvNoCC.hostPlatform.system}} \
-      --outfile=opencode \
-      ./packages/opencode/src/index.ts \
+    bun ./build.ts
 
     runHook postBuild
   '';
