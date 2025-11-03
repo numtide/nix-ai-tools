@@ -63,8 +63,14 @@ For convenience, you can use this script to automatically detect Zed's version a
 nix build github:numtide/nix-ai-tools#codex-acp
 
 # Find the latest version and create symlink
-VERSION=$(ls -1 ~/.local/share/zed/external_agents/codex/ | sort -V | tail -n1)
-ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/$VERSION/codex-acp
+ZED_CODEX_DIR="$HOME/.local/share/zed/external_agents/codex"
+if [ ! -d "$ZED_CODEX_DIR" ] || [ -z "$(ls -A "$ZED_CODEX_DIR")" ]; then
+  echo "Error: Zed codex directory not found or empty. Please run Zed at least once to let it download codex-acp."
+  exit 1
+fi
+
+VERSION=$(ls -1 "$ZED_CODEX_DIR" | sort -V | tail -n1)
+ln -sf $(realpath result/bin/codex-acp) "$ZED_CODEX_DIR/$VERSION/codex-acp"
 echo "Linked codex-acp for Zed version: $VERSION"
 ```
 
@@ -89,8 +95,8 @@ When Zed updates its codex-acp version or when this package is updated:
 
 ### Zed doesn't recognize codex-acp
 
-- Verify the symlink is correct: `ls -l ~/.local/share/zed/external_agents/codex/v*/codex-acp`
-- Make sure the binary is executable: `chmod +x ~/.local/share/zed/external_agents/codex/v*/codex-acp`
+- Verify the symlink is correct: `ls -l ~/.local/share/zed/external_agents/codex/*/codex-acp`
+- Make sure the binary is executable: `chmod +x ~/.local/share/zed/external_agents/codex/*/codex-acp`
 - Check Zed's logs for any error messages
 
 ### Version mismatch
@@ -102,9 +108,9 @@ If you see version-related errors:
 
 ## Links
 
-- [codex-acp GitHub Repository](https://github.com/zed-industries/codex-acp)
+- [codex-acp GitHub Repository](https://github.com/zed-industries/codex-acp) - Main project repository with protocol implementation
 - [Zed Editor](https://zed.dev/)
-- [ACP Protocol Documentation](https://github.com/zed-industries/codex-acp)
+- [Agent Communication Protocol Specification](https://github.com/zed-industries/acp) - ACP protocol specification
 
 ## Building from Source
 
