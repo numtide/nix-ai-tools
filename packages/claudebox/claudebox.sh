@@ -128,7 +128,6 @@ fi
 bwrap_args=(
   --dev /dev
   --proc /proc
-  --ro-bind /usr /usr
   --ro-bind /etc /etc
   --ro-bind /nix /nix
   --bind /nix/var/nix/daemon-socket /nix/var/nix/daemon-socket # For package installs
@@ -151,6 +150,7 @@ bwrap_args=(
 )
 
 # Conditionally bind directories that may not exist on all systems (e.g., NixOS)
+[[ -d /usr ]] && bwrap_args+=(--ro-bind /usr /usr)
 [[ -d /bin ]] && bwrap_args+=(--ro-bind /bin /bin)
 [[ -d /lib ]] && bwrap_args+=(--ro-bind /lib /lib)
 [[ -d /lib64 ]] && bwrap_args+=(--ro-bind /lib64 /lib64)
