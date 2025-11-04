@@ -38,57 +38,28 @@ Zed editor automatically downloads codex-acp and places it under `~/.local/share
 
 To use the NixOS-compatible version of codex-acp with Zed:
 
-1. Build the package:
+1. Install the package to your profile:
    ```bash
-   nix build github:numtide/nix-ai-tools#codex-acp
+   nix profile install github:numtide/nix-ai-tools#codex-acp
    ```
 
-2. Replace Zed's version with a symlink to the Nix-built binary:
+2. Replace Zed's version with a symlink to the installed binary:
    ```bash
    # First, check which version Zed is using
    ls ~/.local/share/zed/external_agents/codex/
    
    # Then create the symlink (replace VERSION with the version from above)
-   ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/VERSION/codex-acp
+   ln -sf $(which codex-acp) ~/.local/share/zed/external_agents/codex/VERSION/codex-acp
    ```
 
 3. Restart Zed if it's running.
-
-### Automatic Setup Script
-
-For convenience, you can use this script to automatically detect Zed's version and create the symlink:
-
-```bash
-# Build the package
-nix build github:numtide/nix-ai-tools#codex-acp
-
-# Find the latest version and create symlink
-ZED_CODEX_DIR="$HOME/.local/share/zed/external_agents/codex"
-if [ ! -d "$ZED_CODEX_DIR" ] || [ -z "$(ls -A "$ZED_CODEX_DIR")" ]; then
-  echo "Error: Zed codex directory not found or empty. Please run Zed at least once to let it download codex-acp."
-  exit 1
-fi
-
-VERSION=$(ls -1 "$ZED_CODEX_DIR" | sort -V | tail -n1)
-ln -sf $(realpath result/bin/codex-acp) "$ZED_CODEX_DIR/$VERSION/codex-acp"
-echo "Linked codex-acp for Zed version: $VERSION"
-```
-
-Alternatively, if you want a manual one-liner (replace `VERSION` with your Zed's version):
-
-```bash
-nix build github:numtide/nix-ai-tools#codex-acp && \
-  ln -sf $(realpath result/bin/codex-acp) ~/.local/share/zed/external_agents/codex/VERSION/codex-acp
-```
-
-> **Note**: Make sure to check which version of codex-acp Zed is using by looking in `~/.local/share/zed/external_agents/codex/` and adjust the version in the command if using the manual approach.
 
 ## Updating
 
 When Zed updates its codex-acp version or when this package is updated:
 
 1. Check the new version directory in `~/.local/share/zed/external_agents/codex/`
-2. Rebuild the package: `nix build github:numtide/nix-ai-tools#codex-acp`
+2. Update the package: `nix profile upgrade '.*codex-acp.*'`
 3. Update the symlink to point to the new version directory
 
 ## Troubleshooting
