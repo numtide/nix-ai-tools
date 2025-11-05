@@ -85,5 +85,11 @@ for package in "${sorted_packages[@]}"; do
     echo "- **Homepage**: $homepage"
   fi
   echo "- **Usage**: \`nix run github:numtide/nix-ai-tools#$package -- --help\`"
+  
+  # Check for package-specific README
+  if [ -f "packages/$package/README.md" ]; then
+    echo "- **Documentation**: See [packages/$package/README.md](packages/$package/README.md) for detailed usage"
+  fi
+  
   echo ""
 done
