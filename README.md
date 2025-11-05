@@ -137,7 +137,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### crush
 
 - **Description**: The glamourous AI coding agent for your favourite terminal
-- **Version**: 0.13.7
+- **Version**: 0.14.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
