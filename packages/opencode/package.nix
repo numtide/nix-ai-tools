@@ -55,7 +55,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         --filter=opencode \
         --frozen-lockfile \
         --linker=hoisted \
-        --no-progress
+        --no-progress \
+        --production
 
       runHook postBuild
     '';
