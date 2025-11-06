@@ -88,6 +88,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Check package
 - **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
 - **Usage**: `nix run github:numtide/nix-ai-tools#claudebox -- --help`
+- **Documentation**: See [packages/claudebox/README.md](packages/claudebox/README.md) for detailed usage
 
 #### code
 
@@ -124,6 +125,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/codex-acp
 - **Usage**: `nix run github:numtide/nix-ai-tools#codex-acp -- --help`
+- **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
 
 #### copilot-cli
 
@@ -163,7 +165,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
-- **Version**: 0.22.10
+- **Version**: 0.22.11
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
@@ -186,6 +188,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
 - **Usage**: `nix run github:numtide/nix-ai-tools#forge -- --help`
+- **Documentation**: See [packages/forge/README.md](packages/forge/README.md) for detailed usage
 
 #### gemini-cli
 
