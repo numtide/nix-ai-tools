@@ -128,10 +128,10 @@ fi
 bwrap_args=(
   --dev /dev
   --proc /proc
-  --ro-bind /usr /usr
-  --ro-bind /bin /bin
-  --ro-bind /lib /lib
-  --ro-bind /lib64 /lib64
+  --ro-bind-try /usr /usr
+  --ro-bind-try /bin /bin
+  --ro-bind-try /lib /lib
+  --ro-bind-try /lib64 /lib64
   --ro-bind /etc /etc
   --ro-bind /nix /nix
   --bind /nix/var/nix/daemon-socket /nix/var/nix/daemon-socket # For package installs
