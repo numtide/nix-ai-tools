@@ -2,8 +2,8 @@
   lib,
   stdenv,
   stdenvNoCC,
-  buildGoModule,
   bun,
+  nodejs,
   fetchFromGitHub,
   models-dev,
   nix-update-script,
@@ -11,48 +11,14 @@
   writableTmpDirAsHomeHook,
 }:
 
-let
-  bun-target = {
-    "aarch64-darwin" = "bun-darwin-arm64";
-    "aarch64-linux" = "bun-linux-arm64";
-    "x86_64-darwin" = "bun-darwin-x64";
-    "x86_64-linux" = "bun-linux-x64";
-  };
-in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "0.15.30";
+  version = "1.0.29";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-jKl33wv7jafLNnNJrWfzeMuKwiGBcvTOsfWs9WInnSw=";
-  };
-
-  tui = buildGoModule {
-    pname = "opencode-tui";
-    inherit (finalAttrs) version src;
-
-    modRoot = "packages/tui";
-
-    vendorHash = "sha256-muwry7B0GlgueV8+9pevAjz3Cg3MX9AMr+rBwUcQ9CM=";
-
-    subPackages = [ "cmd/opencode" ];
-
-    env.CGO_ENABLED = 0;
-
-    ldflags = [
-      "-s"
-      "-X=main.Version=${finalAttrs.version}"
-    ];
-
-    installPhase = ''
-      runHook preInstall
-
-      install -Dm755 $GOPATH/bin/opencode $out/bin/tui
-
-      runHook postInstall
-    '';
+    hash = "sha256-5Nk6NjCHcb7x0pX3WFAAxaaA/H1P+oQaVPOCgzDa6WM=";
   };
 
   node_modules = stdenvNoCC.mkDerivation {
@@ -80,18 +46,16 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       # shebang issues
       # NOTE: `--linker=hoisted` temporarily disables Bun's isolated installs,
       # which became the default in Bun 1.3.0.
-      # See: https://bun.com/blog/bun-v1.3#isolated-installs-are-now-the-default-for-workspaces
       # This workaround is required because the 'yargs' dependency is currently
       # missing when building opencode. Remove this flag once upstream is
       # compatible with Bun 1.3.0.
       bun install \
-        --filter=opencode \
         --force \
-        --frozen-lockfile \
         --ignore-scripts \
+        --filter=opencode \
+        --frozen-lockfile \
         --linker=hoisted \
-        --no-progress \
-        --production
+        --no-progress
 
       runHook postBuild
     '';
@@ -115,35 +79,46 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     bun
+    nodejs
     models-dev
   ];
+
+  patchFlags = [ "-p1" ];
 
   patches = [
     # Patch `packages/opencode/src/provider/models-macro.ts` to get contents of
     # `_api.json` from the file bundled with `bun build`.
     ./local-models-dev.patch
+    # Skip npm pack commands in build.ts since packages are already in node_modules
+    ./skip-npm-pack.patch
   ];
 
   configurePhase = ''
     runHook preConfigure
 
+    cd packages/opencode
     cp -R ${finalAttrs.node_modules}/node_modules .
+    chmod -R u+w ./node_modules
+    # make symlinks absolute to avoid issues with bun build
+    rm ./node_modules/@opencode-ai/script
+    ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
+    rm -f ./node_modules/@opencode-ai/sdk
+    ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
+    rm -f ./node_modules/@opencode-ai/plugin
+    ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
 
     runHook postConfigure
   '';
 
   env.MODELS_DEV_API_JSON = "${models-dev}/dist/_api.json";
+  env.OPENCODE_VERSION = finalAttrs.version;
+  env.OPENCODE_CHANNEL = "stable";
 
   buildPhase = ''
     runHook preBuild
 
-    bun build \
-      --define OPENCODE_TUI_PATH="'${finalAttrs.tui}/bin/tui'" \
-      --define OPENCODE_VERSION="'${finalAttrs.version}'" \
-      --compile \
-      --target=${bun-target.${stdenvNoCC.hostPlatform.system}} \
-      --outfile=opencode \
-      ./packages/opencode/src/index.ts \
+    # Run the build script which will create the compiled binary
+    bun run ./script/build.ts --single
 
     runHook postBuild
   '';
@@ -153,7 +128,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 opencode $out/bin/opencode
+    install -Dm755 dist/opencode-*/bin/opencode $out/bin/opencode
 
     runHook postInstall
   '';
@@ -166,8 +141,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     };
     updateScript = nix-update-script {
       extraArgs = [
-        "--subpackage"
-        "tui"
         "--subpackage"
         "node_modules"
       ];
