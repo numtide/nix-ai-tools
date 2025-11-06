@@ -174,7 +174,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### eca
 
 - **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
-- **Version**: 0.77.0
+- **Version**: 0.77.1
 - **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/editor-code-assistant/eca
@@ -229,7 +229,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 0.15.30
+- **Version**: 1.0.29
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
