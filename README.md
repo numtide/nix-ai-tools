@@ -93,7 +93,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### code
 
 - **Description**: Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.
-- **Version**: 0.4.9
+- **Version**: 0.4.10
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
@@ -229,7 +229,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.35
+- **Version**: 1.0.39
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
