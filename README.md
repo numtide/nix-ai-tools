@@ -139,7 +139,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### crush
 
 - **Description**: The glamourous AI coding agent for your favourite terminal
-- **Version**: 0.15.2
+- **Version**: 0.16.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
@@ -229,7 +229,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.35
+- **Version**: 1.0.39
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
