@@ -120,7 +120,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### codex-acp
 
 - **Description**: An ACP-compatible coding agent powered by Codex
-- **Version**: 0.3.13
+- **Version**: 0.3.14
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/codex-acp
@@ -229,7 +229,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.35
+- **Version**: 1.0.39
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
