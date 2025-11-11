@@ -2,6 +2,7 @@
   lib,
   buildGo125Module,
   fetchFromGitHub,
+  installShellFiles,
 }:
 buildGo125Module rec {
   pname = "crush";
@@ -16,6 +17,8 @@ buildGo125Module rec {
 
   vendorHash = "sha256-mjHMAqqaZJnpbUex+lwP4wFIy3ueOc/IhubIuZZX4e0=";
 
+  nativeBuildInputs = [ installShellFiles ];
+
   # Tests require config files that aren't available in the build environment
   doCheck = false;
 
@@ -24,6 +27,13 @@ buildGo125Module rec {
     "-w"
     "-X=github.com/charmbracelet/crush/internal/version.Version=${version}"
   ];
+
+  postInstall = ''
+    installShellCompletion --cmd crush \
+      --bash <($out/bin/crush completion bash) \
+      --fish <($out/bin/crush completion fish) \
+      --zsh <($out/bin/crush completion zsh)
+  '';
 
   meta = with lib; {
     description = "The glamourous AI coding agent for your favourite terminal";
