@@ -193,7 +193,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
-- **Version**: 0.13.0
+- **Version**: 0.14.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
@@ -229,7 +229,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.39
+- **Version**: 1.0.55
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
