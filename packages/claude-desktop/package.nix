@@ -3,11 +3,14 @@
   stdenv,
   fetchurl,
   makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
   p7zip,
   unzip,
   electron,
   nodejs,
   asar,
+  graphicsmagick,
 }:
 
 let
@@ -60,13 +63,29 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     makeWrapper
+    copyDesktopItems
     p7zip
     unzip
     nodejs
+    graphicsmagick
   ];
 
   buildInputs = [
     electron
+  ];
+
+  desktopItems = [
+    (makeDesktopItem {
+      name = "claude-desktop";
+      desktopName = "Claude";
+      comment = "AI assistant from Anthropic";
+      exec = "claude-desktop %u";
+      icon = "claude-desktop";
+      categories = [ "Network" "Chat" "Office" ];
+      mimeTypes = [ "x-scheme-handler/claude" ];
+      startupNotify = true;
+      startupWMClass = "Claude";
+    })
   ];
 
   unpackPhase = ''
@@ -80,17 +99,17 @@ stdenv.mkDerivation rec {
       echo "Found NuGet package, extracting..."
       # NuGet packages are just zip files
       unzip -q ./extracted/AnthropicClaude-*-full.nupkg -d ./nupkg
-      
+
       # Extract app.asar to modify it
       if [ -f ./nupkg/lib/net45/resources/app.asar ]; then
         echo "Extracting app.asar..."
         ${asar}/bin/asar extract ./nupkg/lib/net45/resources/app.asar ./app
-        
+
         # Also copy the unpacked resources
         if [ -d ./nupkg/lib/net45/resources/app.asar.unpacked ]; then
           cp -r ./nupkg/lib/net45/resources/app.asar.unpacked/* ./app/
         fi
-        
+
         # Copy additional resources
         mkdir -p ./app/resources
         mkdir -p ./app/resources/i18n
@@ -166,6 +185,24 @@ stdenv.mkDerivation rec {
       --add-flags "$out/lib/claude-desktop/resources/app.asar" \
       --set DISABLE_AUTOUPDATER 1 \
       --set NODE_ENV production
+
+    # Extract and install icons in multiple sizes
+    if [ -f ./extracted/setupIcon.ico ]; then
+      echo "Converting and installing icons..."
+      gm convert ./extracted/setupIcon.ico ./extracted/setupIcon.png
+
+      # Loop through converted icons and install them by size
+      for img in ./extracted/setupIcon-*.png; do
+        if [ -f "$img" ]; then
+          size=$(gm identify -format "%wx%h" "$img")
+          # Skip smallest icons (16x16 and 32x32) as they're too low quality
+          if [ "$size" != "16x16" ] && [ "$size" != "32x32" ]; then
+            mkdir -p "$out/share/icons/hicolor/$size/apps"
+            cp "$img" "$out/share/icons/hicolor/$size/apps/claude-desktop.png"
+          fi
+        fi
+      done
+    fi
 
     runHook postInstall
   '';
