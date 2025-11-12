@@ -1,24 +1,24 @@
 {
   lib,
-  stdenv,
   stdenvNoCC,
   bun,
-  nodejs,
   fetchFromGitHub,
+  fzf,
+  makeBinaryWrapper,
   models-dev,
-  nix-update-script,
+  ripgrep,
   testers,
   writableTmpDirAsHomeHook,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.55";
+  version = "1.0.62";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-iKD58BA1ueIVsQXvsAZwXCMkSAM1ZzYPL8WGtKANfIE=";
+    hash = "sha256-E3bND81OlgnzO2f0ZYk//d0gDa1mrJ4ai8//cRRJ6Hg=";
   };
 
   node_modules = stdenvNoCC.mkDerivation {
@@ -42,20 +42,14 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
       export BUN_INSTALL_CACHE_DIR=$(mktemp -d)
 
-      # NOTE: Disabling post-install scripts with `--ignore-scripts` to avoid
-      # shebang issues
-      # NOTE: `--linker=hoisted` temporarily disables Bun's isolated installs,
-      # which became the default in Bun 1.3.0.
-      # This workaround is required because the 'yargs' dependency is currently
-      # missing when building opencode. Remove this flag once upstream is
-      # compatible with Bun 1.3.0.
       bun install \
+        --cpu="*" \
+        --filter=./packages/opencode \
         --force \
-        --ignore-scripts \
-        --filter=opencode \
         --frozen-lockfile \
-        --linker=hoisted \
+        --ignore-scripts \
         --no-progress \
+        --os="*" \
         --production
 
       runHook postBuild
@@ -64,51 +58,47 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/node_modules
-      cp -R ./node_modules $out
+      mkdir -p $out
+      while IFS= read -r dir; do
+        rel="''${dir#./}"
+        dest="$out/$rel"
+        mkdir -p "$(dirname "$dest")"
+        cp -R "$dir" "$dest"
+      done < <(find . -type d -name node_modules -prune | sort)
 
       runHook postInstall
     '';
 
-    # Required else we get errors that our fixed-output derivation references store paths
+    # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = (lib.importJSON ./hashes.json).node_modules.${stdenv.hostPlatform.system};
+    outputHash = "sha256-C1gu8PyV7Byu84i7wM7oSwYQCyG2JG/Qe7g1Csarr0M=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
 
   nativeBuildInputs = [
     bun
-    nodejs
+    makeBinaryWrapper
     models-dev
   ];
 
-  patchFlags = [ "-p1" ];
-
   patches = [
-    # Patch `packages/opencode/src/provider/models-macro.ts` to get contents of
-    # `_api.json` from the file bundled with `bun build`.
+    # NOTE: Get `_api.json` from the packaged `models-dev` package instead of https://models.dev/.
     ./local-models-dev.patch
-    # Skip npm pack commands in build.ts since packages are already in node_modules
-    ./skip-npm-pack.patch
-    # Relax Bun version check to be a warning instead of an error
+    # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
+    # NOTE: Removes unnecessary build targets in `packages/opencode/script/build.ts`
+    ./remove-unnecessary-build-targets.patch
+    # NOTE: Skip platform-specific build install commands in
+    # `packages/opencode/script/build.ts` since packages are already in node_modules
+    ./skip-bun-install.patch
   ];
 
   configurePhase = ''
     runHook preConfigure
 
-    cd packages/opencode
-    cp -R ${finalAttrs.node_modules}/node_modules .
-    chmod -R u+w ./node_modules
-    # make symlinks absolute to avoid issues with bun build
-    rm ./node_modules/@opencode-ai/script
-    ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
-    rm -f ./node_modules/@opencode-ai/sdk
-    ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
-    rm -f ./node_modules/@opencode-ai/plugin
-    ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
+    cp -R ${finalAttrs.node_modules}/. .
 
     runHook postConfigure
   '';
@@ -117,10 +107,27 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   env.OPENCODE_VERSION = finalAttrs.version;
   env.OPENCODE_CHANNEL = "stable";
 
+  preBuild = ''
+    chmod -R u+w ./packages/opencode/node_modules
+    pushd ./packages/opencode/node_modules/@parcel/
+      for pkg in ../../../../node_modules/.bun/@parcel+watcher-*; do
+        linkName=$(basename "$pkg" | sed 's/@.*+\(.*\)@.*/\1/')
+        ln -sf "$pkg/node_modules/@parcel/$linkName" "$linkName"
+      done
+    popd
+
+    pushd ./packages/opencode/node_modules/@opentui/
+      for pkg in ../../../../node_modules/.bun/@opentui+core-*; do
+        linkName=$(basename "$pkg" | sed 's/@.*+\(.*\)@.*/\1/')
+        ln -sf "$pkg/node_modules/@opentui/$linkName" "$linkName"
+      done
+    popd
+  '';
+
   buildPhase = ''
     runHook preBuild
 
-    # Run the build script which will create the compiled binary
+    cd ./packages/opencode
     bun run ./script/build.ts --single
 
     runHook postBuild
@@ -136,18 +143,23 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
+  postInstall = ''
+    wrapProgram $out/bin/opencode \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          fzf
+          ripgrep
+        ]
+      }
+  '';
+
   passthru = {
     tests.version = testers.testVersion {
       package = finalAttrs.finalPackage;
       command = "HOME=$(mktemp -d) opencode --version";
       inherit (finalAttrs) version;
     };
-    updateScript = nix-update-script {
-      extraArgs = [
-        "--subpackage"
-        "node_modules"
-      ];
-    };
+    updateScript = ./update.sh;
   };
 
   meta = {
