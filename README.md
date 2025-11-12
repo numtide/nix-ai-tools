@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1762819311-g5cca1b
+- **Version**: 0.0.1762905706-gf9470e
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -65,7 +65,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code-router
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
-- **Version**: 1.0.65
+- **Version**: 1.0.66
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
@@ -165,7 +165,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
-- **Version**: 0.23.0
+- **Version**: 0.24.0
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
@@ -183,7 +183,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### forge
 
 - **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
-- **Version**: 1.3.0
+- **Version**: 1.4.0
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
@@ -193,7 +193,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
-- **Version**: 0.13.0
+- **Version**: 0.14.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
@@ -202,7 +202,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### goose-cli
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
-- **Version**: 1.13.2
+- **Version**: 1.14.0
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
@@ -220,7 +220,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### nanocoder
 
 - **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
-- **Version**: 1.16.2
+- **Version**: 1.16.3
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
@@ -229,7 +229,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.39
+- **Version**: 1.0.55
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
