@@ -92,6 +92,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     ./local-models-dev.patch
     # Skip npm pack commands in build.ts since packages are already in node_modules
     ./skip-npm-pack.patch
+    # Relax Bun version check to be a warning instead of an error
+    ./relax-bun-version-check.patch
   ];
 
   configurePhase = ''
