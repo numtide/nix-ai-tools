@@ -3,6 +3,7 @@
   buildNpmPackage,
   fetchzip,
   ripgrep,
+  makeWrapper,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -16,28 +17,19 @@ buildNpmPackage (finalAttrs: {
 
   npmDepsHash = "sha256-1iwD6Ok45LR2QFjIBERcv32jhIejB2Te+zNZLshLYms=";
 
-  buildInputs = [ ripgrep ];
-
-  # Disable the problematic postinstall script
-  npmFlags = [ "--ignore-scripts" ];
-
-  # After npm install, we need to handle the ripgrep dependency
-  postInstall = ''
-    # Make ripgrep available by creating a symlink or setting environment variable
-    mkdir -p node_modules/@vscode/ripgrep/bin
-    ln -s ${ripgrep}/bin/rg node_modules/@vscode/ripgrep/bin/rg
-
-    # Run the postinstall script manually if needed
-    if [ -f node_modules/@vscode/ripgrep/lib/postinstall.js ]; then
-      HOME=$TMPDIR node node_modules/@vscode/ripgrep/lib/postinstall.js || true
-    fi
-  '';
+  nativeBuildInputs = [ makeWrapper ];
 
   dontNpmBuild = true;
 
-  doInstallCheck = true;
-  versionCheckKeepEnvironment = [ "HOME" ];
-  versionCheckProgramArg = "--version";
+  # Make ripgrep available in PATH for the kilocode binary
+  postInstall = ''
+    wrapProgram $out/bin/kilocode \
+      --prefix PATH : ${lib.makeBinPath [ ripgrep ]}
+  '';
+
+  passthru = {
+    updateScript = ./update.sh;
+  };
 
   meta = {
     description = "The open-source AI coding agent. Now available in your terminal.";
