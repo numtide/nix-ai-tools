@@ -22,6 +22,11 @@ fi
 
 echo "Update available: $current_version -> $latest_version"
 
+# Generate updated lock file
+echo "Updating package-lock.json..."
+cd "$script_dir"
+npm i --package-lock-only @kilocode/cli@"$latest_version"
+
 # Calculate new source hash
 echo "Calculating source hash for new version..."
 new_src_hash=$(nix-prefetch-url --unpack "https://registry.npmjs.org/@kilocode/cli/-/cli-${latest_version}.tgz" 2>&1 | tail -1 | xargs -I {} nix hash to-sri --type sha256 {})

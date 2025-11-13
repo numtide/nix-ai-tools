@@ -19,6 +19,10 @@ buildNpmPackage (finalAttrs: {
 
   nativeBuildInputs = [ makeWrapper ];
 
+  postPatch = ''
+    cp ${./package-lock.json} package-lock.json
+  '';
+
   dontNpmBuild = true;
 
   # Make ripgrep available in PATH for the kilocode binary
