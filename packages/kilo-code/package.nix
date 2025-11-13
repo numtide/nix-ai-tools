@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchzip,
+  fetchNpmDeps,
   ripgrep,
   makeWrapper,
 }:
@@ -15,7 +16,10 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-uMAloANznWpnA2fMHH9gVnJTIS4mfT1quZ8J+aPWp6k=";
   };
 
-  npmDepsHash = "sha256-Ee8qC3+/uZ+ku7bZ4qH3oh/bdPey+jDFrWrp8XnSO4w=";
+  npmDeps = fetchNpmDeps {
+    inherit (finalAttrs) src;
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
 
   nativeBuildInputs = [ makeWrapper ];
 

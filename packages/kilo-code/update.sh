@@ -45,34 +45,48 @@ sed -i "s/version = \"${current_version}\";/version = \"${latest_version}\";/" "
 old_src_hash=$(grep -A2 'src = fetchzip' "$package_file" | grep 'hash = ' | sed -E 's/.*hash = "([^"]+)".*/\1/')
 sed -i "s|$old_src_hash|$new_src_hash|" "$package_file"
 
-echo "Updated version and source hash. Now building to get new npmDepsHash..."
+echo "Updated version and source hash. Now calculating npmDeps hash..."
 
-# Build with dummy hash to get the correct one
-old_npm_hash=$(grep 'npmDepsHash = ' "$package_file" | sed -E 's/.*npmDepsHash = "([^"]+)".*/\1/')
-sed -i "s|$old_npm_hash|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|" "$package_file"
+# Set a dummy hash for npmDeps to trigger the error with the correct hash
+awk '
+  /npmDeps = fetchNpmDeps/ { in_npmDeps=1 }
+  in_npmDeps && /hash = / {
+    sub(/hash = "sha256-[^"]*"/, "hash = \"sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\"")
+    in_npmDeps=0
+  }
+  { print }
+' "$package_file" >"$package_file.tmp" && mv "$package_file.tmp" "$package_file"
 
-# Try to build and capture the correct hash
-echo "Building to get correct npmDepsHash..."
-if output=$(nix build .#kilo-code 2>&1); then
-  echo "Build succeeded unexpectedly with dummy hash!"
-else
-  # Extract the correct hash from error output
-  new_npm_hash=$(echo "$output" | grep -E "got:[[:space:]]+sha256-" | sed -E 's/.*got:[[:space:]]+(sha256-[^[:space:]]+).*/\1/' | head -1)
-  if [ -n "$new_npm_hash" ] && [ "$new_npm_hash" != "" ]; then
-    echo "New npmDepsHash: $new_npm_hash"
-    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$new_npm_hash|" "$package_file"
+# Try to build and capture the correct npmDeps hash from the error message
+echo "Building to get correct npmDeps hash..."
+if ! npm_deps_output=$(nix build "$script_dir/../.."#kilo-code 2>&1); then
+  # Extract the correct hash from the error message - looking for the "got:" line
+  correct_npm_hash=$(echo "$npm_deps_output" | grep -E "got:[[:space:]]*sha256-" | awk '{print $2}' | head -1)
+
+  if [ -n "$correct_npm_hash" ]; then
+    echo "Updating npmDeps hash to: $correct_npm_hash"
+    # Update the npmDeps hash specifically
+    awk -v new_hash="$correct_npm_hash" '
+      /npmDeps = fetchNpmDeps/ { in_npmDeps=1 }
+      in_npmDeps && /hash = / {
+        sub(/hash = "sha256-[^"]*"/, "hash = \"" new_hash "\"")
+        in_npmDeps=0
+      }
+      { print }
+    ' "$package_file" >"$package_file.tmp" && mv "$package_file.tmp" "$package_file"
   else
-    echo "ERROR: Could not extract npmDepsHash from build output"
-    echo "Build output:"
-    echo "$output" | tail -20
-    # Restore original hash
-    sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$old_npm_hash|" "$package_file"
+    echo "Warning: Could not extract npmDeps hash from error output"
+    echo "Error output was:"
+    echo "$npm_deps_output" | grep -A2 -B2 "hash mismatch" || echo "$npm_deps_output" | tail -20
     exit 1
   fi
+else
+  echo "Build succeeded unexpectedly with dummy hash!"
+  exit 1
 fi
 
 echo "Building package to verify..."
-nix build .#kilo-code
+nix build "$script_dir/../.."#kilo-code
 
 echo "Update completed successfully!"
 echo "kilo-code has been updated from $current_version to $latest_version"
