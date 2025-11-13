@@ -3,6 +3,7 @@
   stdenvNoCC,
   bun,
   fetchFromGitHub,
+  fetchurl,
   fzf,
   makeBinaryWrapper,
   models-dev,
@@ -12,6 +13,17 @@
   writableTmpDirAsHomeHook,
 }:
 
+let
+  # Use baseline Bun on Linux to avoid AVX512 crash issues
+  bunToUse = if stdenvNoCC.hostPlatform.isLinux then
+    bun.overrideAttrs (old: {
+      src = fetchurl {
+        url = "https://github.com/oven-sh/bun/releases/download/bun-v${bun.version}/bun-linux-x64-baseline.zip";
+        hash = "sha256-f/CaSlGeggbWDXt2MHLL82Qvg3BpAWVYbTA/ryFpIXI=";
+      };
+    })
+  else bun;
+in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
   version = "1.0.61";
@@ -32,7 +44,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     ];
 
     nativeBuildInputs = [
-      bun
+      bunToUse
       writableTmpDirAsHomeHook
     ];
 
@@ -74,7 +86,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   };
 
   nativeBuildInputs = [
-    bun
+    bunToUse
     makeBinaryWrapper
     models-dev
   ];
@@ -83,8 +95,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Patch `packages/opencode/src/provider/models-macro.ts` to get contents of
     # `_api.json` from the file bundled with `bun build`.
     ./local-models-dev.patch
-    # NOTE: Skip platform-specific build install commands in build.ts since packages are already in node_modules
-    ./skip-bun-install.patch
     # Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
   ];
@@ -95,23 +105,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       --replace-fail "if (process.versions.bun !== expectedBunVersion)" "if (false)"
   '';
 
-  configurePhase = ''
-    runHook preConfigure
-
-    cd packages/opencode
-    cp -R ${finalAttrs.node_modules}/. .
-
-    chmod -R u+w ./node_modules
-    # Make symlinks absolute to avoid issues with bun build
-    rm ./node_modules/@opencode-ai/script
-    ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
-    rm -f ./node_modules/@opencode-ai/sdk
-    ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
-    rm -f ./node_modules/@opencode-ai/plugin
-    ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
-
-    runHook postConfigure
-  '';
+  dontConfigure = true;
 
   env.MODELS_DEV_API_JSON = "${models-dev}/dist/_api.json";
   env.OPENCODE_VERSION = finalAttrs.version;
@@ -120,30 +114,50 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
-    bun run ./script/build.ts --single
+    cd packages/opencode
+    cp -r ${finalAttrs.node_modules}/node_modules .
+
+    # Fix symlinks to workspace packages
+    chmod -R u+w ./node_modules
+    rm -f ./node_modules/@opencode-ai/{script,sdk,plugin}
+    ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
+    ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
+    ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
+
+    # Bundle the application with version defines
+    cp ${./bundle.ts} ./bundle.ts
+    chmod +x ./bundle.ts
+    bun run ./bundle.ts
 
     runHook postBuild
   '';
 
-  dontStrip = true;
-
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 dist/opencode-*/bin/opencode $out/bin/opencode
+    mkdir -p $out/lib/opencode
+    # Copy the bundled dist directory
+    cp -r dist $out/lib/opencode/
+    # Also copy node_modules for native modules like @opentui/core-<platform>
+    cp -r node_modules $out/lib/opencode/
+
+    mkdir -p $out/bin
+    makeWrapper ${bunToUse}/bin/bun $out/bin/opencode \
+      --add-flags "run" \
+      --add-flags "$out/lib/opencode/dist/index.js" \
+      --prefix PATH : ${lib.makeBinPath [ fzf ripgrep ]} \
+      --argv0 opencode
 
     runHook postInstall
   '';
 
   postInstall = ''
-    wrapProgram $out/bin/opencode \
-      --prefix PATH : ${
-        lib.makeBinPath [
-          fzf
-          ripgrep
-        ]
-      }
+    # Remove workspace symlinks that point to build directory
+    rm -f $out/lib/opencode/node_modules/@opencode-ai/{script,sdk,plugin}
+    rm -f $out/lib/opencode/node_modules/opencode
+    rm -f $out/lib/opencode/node_modules/.bin/opencode 2>/dev/null || true
   '';
+
 
   passthru = {
     tests.version = testers.testVersion {
