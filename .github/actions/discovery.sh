@@ -41,12 +41,6 @@ else
     package_names=$(echo "$packages_json" | jq -r 'keys[]' | sort)
 
     for package in $package_names; do
-      # Skip opencode as it requires special multi-platform handling
-      if [ "$package" = "opencode" ]; then
-        echo "Skipping opencode (requires multi-platform update workflow)"
-        continue
-      fi
-
       # Try to get the version
       version=$(nix eval .#packages."$system"."$package".version --raw 2>/dev/null || echo "")
       if [ -n "$version" ]; then
