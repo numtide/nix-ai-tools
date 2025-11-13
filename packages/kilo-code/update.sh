@@ -22,10 +22,18 @@ fi
 
 echo "Update available: $current_version -> $latest_version"
 
-# Generate updated lock file
-echo "Updating package-lock.json..."
-cd "$script_dir"
-npm i --package-lock-only @kilocode/cli@"$latest_version"
+# Extract npm-shrinkwrap.json from the package tarball
+echo "Extracting npm-shrinkwrap.json from package..."
+temp_dir=$(mktemp -d)
+trap "rm -rf '$temp_dir'" EXIT
+curl -sL "https://registry.npmjs.org/@kilocode/cli/-/cli-${latest_version}.tgz" | tar xz -C "$temp_dir"
+if [ -f "$temp_dir/package/npm-shrinkwrap.json" ]; then
+  cp "$temp_dir/package/npm-shrinkwrap.json" "$script_dir/package-lock.json"
+  echo "Updated package-lock.json from npm-shrinkwrap.json"
+else
+  echo "ERROR: npm-shrinkwrap.json not found in package"
+  exit 1
+fi
 
 # Calculate new source hash
 echo "Calculating source hash for new version..."
