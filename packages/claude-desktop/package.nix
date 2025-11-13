@@ -81,7 +81,11 @@ stdenv.mkDerivation rec {
       comment = "AI assistant from Anthropic";
       exec = "claude-desktop %u";
       icon = "claude-desktop";
-      categories = [ "Network" "Chat" "Office" ];
+      categories = [
+        "Network"
+        "Chat"
+        "Office"
+      ];
       mimeTypes = [ "x-scheme-handler/claude" ];
       startupNotify = true;
       startupWMClass = "Claude";
