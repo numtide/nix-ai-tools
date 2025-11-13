@@ -7,13 +7,13 @@
 
 buildNpmPackage rec {
   pname = "nanocoder";
-  version = "1.16.3";
+  version = "1.16.4";
 
   src = fetchFromGitHub {
     owner = "Mote-Software";
     repo = "nanocoder";
     rev = "v${version}";
-    hash = "sha256-mdL6EHjV1Xa+2ZJZ7W9YhcO2QMnKiNa2jQrRVenoXQM=";
+    hash = "sha256-+Q6MW4ndqRWpJUuJmKznaVWno58INuFw2ri1ZP/+bhQ=";
     postFetch = ''
       rm -f $out/pnpm-workspace.yaml
     '';
