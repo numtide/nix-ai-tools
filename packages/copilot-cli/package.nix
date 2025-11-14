@@ -2,7 +2,7 @@
   lib,
   buildNpmPackage,
   fetchurl,
-  nodejs_22,
+  nodejs,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -17,8 +17,6 @@ buildNpmPackage (finalAttrs: {
   # Dependencies are bundled in the tarball
   npmDepsHash = "sha256-JhXoiLrG/CDNlgwSnhUG1wgLjnVmBKgz0twMx5wVbEE=";
   forceEmptyCache = true;
-
-  nodejs = nodejs_22;
 
   dontNpmBuild = true;
 
@@ -41,7 +39,7 @@ buildNpmPackage (finalAttrs: {
     cp -r . $out/lib/${finalAttrs.pname}
 
     mkdir -p $out/bin
-    makeWrapper ${nodejs_22}/bin/node $out/bin/copilot \
+    makeWrapper ${nodejs}/bin/node $out/bin/copilot \
       --add-flags "$out/lib/${finalAttrs.pname}/index.js"
 
     runHook postInstall
