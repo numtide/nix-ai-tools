@@ -130,7 +130,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### copilot-cli
 
 - **Description**: GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.
-- **Version**: 0.0.355
+- **Version**: 0.0.357
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://github.com/github/copilot-cli
