@@ -1,5 +1,5 @@
 diff --git i/packages/opencode/script/build.ts w/packages/opencode/script/build.ts
-index 97631d907..917891a5c 100755
+index 502baed..f71b4c6 100755
 --- i/packages/opencode/script/build.ts
 +++ w/packages/opencode/script/build.ts
 @@ -31,27 +31,27 @@ const allTargets: {
@@ -61,11 +61,11 @@ index 97631d907..917891a5c 100755
 -    avx2: false,
 -  },
 -  {
--    os: "windows",
+-    os: "win32",
 -    arch: "x64",
 -  },
 -  {
--    os: "windows",
+-    os: "win32",
 -    arch: "x64",
 -    avx2: false,
 -  },
@@ -75,14 +75,14 @@ index 97631d907..917891a5c 100755
 +  //   avx2: false,
 +  // },
 +  // {
-+  //   os: "windows",
++  //   os: "win32",
 +  //   arch: "x64",
 +  // },
 +  // {
-+  //   os: "windows",
++  //   os: "win32",
 +  //   arch: "x64",
 +  //   avx2: false,
 +  // },
  ]
- 
+
  const targets = singleFlag
