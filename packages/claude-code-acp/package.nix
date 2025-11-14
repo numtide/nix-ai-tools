@@ -6,16 +6,19 @@
 
 buildNpmPackage rec {
   pname = "claude-code-acp";
-  version = "0.10.2";
+  version = "0.10.3";
 
   src = fetchFromGitHub {
     owner = "zed-industries";
     repo = "claude-code-acp";
     rev = "v${version}";
-    hash = "sha256-G1ahJjGw8THuCDmidrPYP8Vr12e91tCYbR4/M39HBYI=";
+    hash = "sha256-f9NGkSH3+4jB5lyol0iQ/EvCvM+vmJLsMrfgxhYeAHA=";
   };
 
-  npmDepsHash = "sha256-poBDJpgzWLvRu4fN6ToLJJI+Dev9Dynn/mW1OZPP60g=";
+  npmDepsHash = "sha256-I5/f4H/aW+lexBriVZoqIzbhwmdW1eZTMZftoE9XaAs=";
+
+  # Disable install scripts to avoid platform-specific dependency fetching issues
+  npmFlags = [ "--ignore-scripts" ];
 
   meta = with lib; {
     description = "An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)";
