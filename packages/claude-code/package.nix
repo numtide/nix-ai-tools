@@ -2,15 +2,12 @@
   lib,
   buildNpmPackage,
   fetchzip,
-  nodejs_20,
   makeWrapper,
 }:
 
 buildNpmPackage rec {
   pname = "claude-code";
   version = "2.0.37";
-
-  nodejs = nodejs_20; # required for sandboxed Nix builds on Darwin
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
