@@ -7,18 +7,17 @@
   makeBinaryWrapper,
   models-dev,
   ripgrep,
-  testers,
-  writableTmpDirAsHomeHook,
+  testers, writableTmpDirAsHomeHook,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.62";
+  version = "1.0.65";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-E3bND81OlgnzO2f0ZYk//d0gDa1mrJ4ai8//cRRJ6Hg=";
+    hash = "sha256-lNgn2k8rOtPG6ZhHRU18H1B0mzfkGcQPR2IjEuoochQ=";
   };
 
   node_modules = stdenvNoCC.mkDerivation {
@@ -88,69 +87,78 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     ./local-models-dev.patch
     # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
-    # NOTE: Removes unnecessary build targets in `packages/opencode/script/build.ts`
-    ./remove-unnecessary-build-targets.patch
-    # NOTE: Skip platform-specific build install commands in
-    # `packages/opencode/script/build.ts` since packages are already in node_modules
-    ./skip-bun-install.patch
   ];
 
-  configurePhase = ''
-    runHook preConfigure
-
-    cp -R ${finalAttrs.node_modules}/. .
-
-    runHook postConfigure
-  '';
+  dontConfigure = true;
 
   env.MODELS_DEV_API_JSON = "${models-dev}/dist/_api.json";
   env.OPENCODE_VERSION = finalAttrs.version;
   env.OPENCODE_CHANNEL = "stable";
 
-  preBuild = ''
-    chmod -R u+w ./packages/opencode/node_modules
-    pushd ./packages/opencode/node_modules/@parcel/
-      for pkg in ../../../../node_modules/.bun/@parcel+watcher-*; do
-        linkName=$(basename "$pkg" | sed 's/@.*+\(.*\)@.*/\1/')
-        ln -sf "$pkg/node_modules/@parcel/$linkName" "$linkName"
-      done
-    popd
-
-    pushd ./packages/opencode/node_modules/@opentui/
-      for pkg in ../../../../node_modules/.bun/@opentui+core-*; do
-        linkName=$(basename "$pkg" | sed 's/@.*+\(.*\)@.*/\1/')
-        ln -sf "$pkg/node_modules/@opentui/$linkName" "$linkName"
-      done
-    popd
-  '';
-
   buildPhase = ''
     runHook preBuild
 
-    cd ./packages/opencode
-    bun run ./script/build.ts --single
+    # Copy all node_modules including the .bun directory with actual packages
+    cp -r ${finalAttrs.node_modules}/node_modules .
+    cp -r ${finalAttrs.node_modules}/packages .
+
+    cd packages/opencode
+
+    # Fix symlinks to workspace packages
+    chmod -R u+w ./node_modules
+    mkdir -p ./node_modules/@opencode-ai
+    rm -f ./node_modules/@opencode-ai/{script,sdk,plugin}
+    ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
+    ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
+    ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
+
+    # Bundle the application with version defines
+    cp ${./bundle.ts} ./bundle.ts
+    chmod +x ./bundle.ts
+    bun run ./bundle.ts
 
     runHook postBuild
   '';
 
-  dontStrip = true;
-
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 dist/opencode-*/bin/opencode $out/bin/opencode
+    mkdir -p $out/lib/opencode
+    # Copy the bundled dist directory
+    cp -r dist $out/lib/opencode/
+
+    # Copy only the native modules we need (marked as external in bundle.ts)
+    mkdir -p $out/lib/opencode/node_modules/.bun
+    mkdir -p $out/lib/opencode/node_modules/@opentui
+
+    # Copy @opentui/core platform-specific packages
+    for pkg in ../../node_modules/.bun/@opentui+core-*; do
+      if [ -d "$pkg" ]; then
+        cp -r "$pkg" $out/lib/opencode/node_modules/.bun/$(basename "$pkg")
+      fi
+    done
+
+
+    mkdir -p $out/bin
+    makeWrapper ${bun}/bin/bun $out/bin/opencode \
+      --add-flags "run" \
+      --add-flags "$out/lib/opencode/dist/index.js" \
+      --prefix PATH : ${lib.makeBinPath [ fzf ripgrep ]} \
+      --argv0 opencode
 
     runHook postInstall
   '';
 
   postInstall = ''
-    wrapProgram $out/bin/opencode \
-      --prefix PATH : ${
-        lib.makeBinPath [
-          fzf
-          ripgrep
-        ]
-      }
+    # Add symlinks for platform-specific native modules
+    for pkg in $out/lib/opencode/node_modules/.bun/@opentui+core-*; do
+      if [ -d "$pkg" ]; then
+        pkgName=$(basename "$pkg" | sed 's/@opentui+\(core-[^@]*\)@.*/\1/')
+        ln -sf ../.bun/$(basename "$pkg")/node_modules/@opentui/$pkgName \
+               $out/lib/opencode/node_modules/@opentui/$pkgName
+      fi
+    done
+
   '';
 
   passthru = {
