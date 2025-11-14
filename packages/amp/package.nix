@@ -3,7 +3,6 @@
   buildNpmPackage,
   fetchurl,
   fetchNpmDeps,
-  nodejs_22,
   ripgrep,
   runCommand,
 }:
@@ -35,8 +34,6 @@ buildNpmPackage rec {
 
   # The package from npm is already built
   dontNpmBuild = true;
-
-  nodejs = nodejs_22;
 
   postInstall = ''
     wrapProgram $out/bin/amp \
