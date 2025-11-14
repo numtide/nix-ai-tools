@@ -7,7 +7,8 @@
   makeBinaryWrapper,
   models-dev,
   ripgrep,
-  testers, writableTmpDirAsHomeHook,
+  testers,
+  writableTmpDirAsHomeHook,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
@@ -143,7 +144,12 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     makeWrapper ${bun}/bin/bun $out/bin/opencode \
       --add-flags "run" \
       --add-flags "$out/lib/opencode/dist/index.js" \
-      --prefix PATH : ${lib.makeBinPath [ fzf ripgrep ]} \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          fzf
+          ripgrep
+        ]
+      } \
       --argv0 opencode
 
     runHook postInstall
