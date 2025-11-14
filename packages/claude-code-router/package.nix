@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchzip,
-  nodejs_20,
+  nodejs,
 }:
 
 stdenv.mkDerivation rec {
@@ -14,7 +14,7 @@ stdenv.mkDerivation rec {
     hash = "sha256-x2zouqP24Mk+JrKBU2QNwideF1F0BxAkindxj0leH+4=";
   };
 
-  nativeBuildInputs = [ nodejs_20 ];
+  nativeBuildInputs = [ nodejs ];
 
   installPhase = ''
     runHook preInstall
@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
 
     # Replace the shebang with the correct node path
     substituteInPlace $out/bin/ccr \
-      --replace-quiet "#!/usr/bin/env node" "#!${nodejs_20}/bin/node"
+      --replace-quiet "#!/usr/bin/env node" "#!${nodejs}/bin/node"
 
     # Install the WASM file in the same directory as the CLI
     cp $src/dist/tiktoken_bg.wasm $out/bin/
