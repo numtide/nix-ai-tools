@@ -20,7 +20,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1763078504-g7866a7
+- **Version**: 0.0.1763121689-g408f62
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -211,11 +211,20 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### groq-code-cli
 
 - **Description**: A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration
-- **Version**: 1.0.2-unstable-2025-09-05
+- **Version**: 0-unstable-2025-09-05
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#groq-code-cli -- --help`
+
+#### kilocode-cli
+
+- **Description**: The open-source AI coding agent. Now available in your terminal.
+- **Version**: 0.4.2
+- **Source**: unknown
+- **License**: Apache-2.0
+- **Homepage**: https://kilocode.ai/cli
+- **Usage**: `nix run github:numtide/nix-ai-tools#kilocode-cli -- --help`
 
 #### nanocoder
 
