@@ -6,14 +6,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "spec-kit";
-  version = "0.0.79";
+  version = "0.0.85";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "github";
     repo = "spec-kit";
     rev = "v${version}";
-    hash = "sha256-A5WQ6/YeEfYrGRxO/V7grKB3O2wv4WIXBvNBAYxAx4Y=";
+    hash = "sha256-h4QPGg7KilfxzkWf1Hrk4bkveapKRkbzeEhioxdx1do=";
   };
 
   build-system = with python3.pkgs; [
