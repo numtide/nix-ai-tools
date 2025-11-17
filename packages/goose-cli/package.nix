@@ -1,81 +1,58 @@
 {
   lib,
-  stdenv,
-  fetchurl,
-  autoPatchelfHook,
-  makeWrapper,
+  fetchFromGitHub,
+  rustPlatform,
+  pkg-config,
+  openssl,
   libxcb,
-  gcc,
+  dbus,
 }:
 
-let
+rustPlatform.buildRustPackage rec {
+  pname = "goose-cli";
   version = "1.14.0";
 
-  sources = {
-    x86_64-linux = {
-      url = "https://github.com/block/goose/releases/download/v${version}/goose-x86_64-unknown-linux-gnu.tar.bz2";
-      hash = "sha256-fd1oFj7ELXb8x7mh1+7srGCZlqj3r7nlkEQ6UkzHtHw=";
-    };
-    aarch64-linux = {
-      url = "https://github.com/block/goose/releases/download/v${version}/goose-aarch64-unknown-linux-gnu.tar.bz2";
-      hash = "sha256-vrgdogISINQT4WW7E+ZsowDnxsDTZxkbmknKNfy9Y/k=";
-    };
-    x86_64-darwin = {
-      url = "https://github.com/block/goose/releases/download/v${version}/goose-x86_64-apple-darwin.tar.bz2";
-      hash = "sha256-SFclt7AeXssp4XTJZZo4ArSo5ILTJ4HMWxmVk2GudVk=";
-    };
-    aarch64-darwin = {
-      url = "https://github.com/block/goose/releases/download/v${version}/goose-aarch64-apple-darwin.tar.bz2";
-      hash = "sha256-5WRzcTTu4F9qHwAd8hDZICjX9uDtLFlbyvxHCvOS+fo=";
-    };
+  src = fetchFromGitHub {
+    owner = "block";
+    repo = "goose";
+    rev = "v${version}";
+    hash = "sha256-MEFHVuTejAn1vwTwaxM7XEBSCuFAwLwjptIhKHR6cMM=";
   };
 
-  source =
-    sources.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
-in
-stdenv.mkDerivation rec {
-  pname = "goose-cli";
-  inherit version;
+  cargoHash = "sha256-3SiYbiuDCvGnMPUgc58LFobcijGv2qcrbyCIrPdtcTw=";
 
-  src = fetchurl source;
+  nativeBuildInputs = [ pkg-config ];
 
-  nativeBuildInputs = [
-    makeWrapper
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [
-    autoPatchelfHook
-  ];
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+  buildInputs = [
+    openssl
     libxcb
-    gcc.cc.lib
+    dbus
   ];
 
-  sourceRoot = ".";
+  # Build only the CLI package
+  cargoBuildFlags = [
+    "--package"
+    "goose-cli"
+  ];
 
-  installPhase = ''
-    runHook preInstall
+  # Enable tests with proper environment
+  doCheck = true;
+  checkPhase = ''
+    export HOME=$(mktemp -d)
+    export XDG_CONFIG_HOME=$HOME/.config
+    export XDG_DATA_HOME=$HOME/.local/share
+    export XDG_STATE_HOME=$HOME/.local/state
+    export XDG_CACHE_HOME=$HOME/.cache
+    mkdir -p $XDG_CONFIG_HOME $XDG_DATA_HOME $XDG_STATE_HOME $XDG_CACHE_HOME
 
-    mkdir -p $out/bin
-    cp goose $out/bin/goose
-    chmod +x $out/bin/goose
-
-    runHook postInstall
+    # Run tests for goose-cli package only
+    cargo test --package goose-cli --release
   '';
 
   meta = with lib; {
     description = "CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks";
     homepage = "https://github.com/block/goose";
     license = licenses.asl20;
-    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    maintainers = with maintainers; [ ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
     mainProgram = "goose";
   };
 }
