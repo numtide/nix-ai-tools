@@ -118,9 +118,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     chmod +x ./bundle.ts
     bun run ./bundle.ts
 
-    # Fix WASM paths in worker.ts - they should be relative to dist/, not ../../../
+    # Fix WASM paths in worker.ts - use absolute paths to the installed location
     substituteInPlace ./dist/worker.ts \
-      --replace-fail 'module2.exports = "../../../tree-sitter-' 'module2.exports = "./tree-sitter-'
+      --replace-fail 'module2.exports = "../../../tree-sitter-' 'module2.exports = "'"$out"'/lib/opencode/dist/tree-sitter-'
 
     runHook postBuild
   '';
