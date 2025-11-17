@@ -2,7 +2,6 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  nix-update-script,
 }:
 
 buildNpmPackage {
@@ -17,10 +16,6 @@ buildNpmPackage {
   };
 
   npmDepsHash = "sha256-0ly0yumpqQPGUcMvO0x3ZGZ6X/dVM48X4QapXR05Ugk=";
-
-  passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version=branch" ];
-  };
 
   meta = with lib; {
     description = "A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration";
