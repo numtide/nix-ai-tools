@@ -72,7 +72,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = "sha256-C1gu8PyV7Byu84i7wM7oSwYQCyG2JG/Qe7g1Csarr0M=";
+    outputHash = "sha256-Q3008o4dEZdf/4ATOmOfJIJa7B+MeLVMWzfTLVDcWjg=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
@@ -118,10 +118,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     chmod +x ./bundle.ts
     bun run ./bundle.ts
 
-    # Fix WASM paths in worker.ts - use absolute paths to the installed location
-    substituteInPlace ./dist/worker.ts \
-      --replace-fail 'module2.exports = "../../../tree-sitter-' 'module2.exports = "'"$out"'/lib/opencode/dist/tree-sitter-'
-
     runHook postBuild
   '';
 
@@ -131,6 +127,14 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     mkdir -p $out/lib/opencode
     # Copy the bundled dist directory
     cp -r dist $out/lib/opencode/
+
+    # Fix WASM paths in worker.ts - use absolute paths to the installed location
+    # Main wasm is tree-sitter-<hash>.wasm, language wasms are tree-sitter-<lang>-<hash>.wasm
+    main_wasm=$(find "$out/lib/opencode/dist" -maxdepth 1 -name 'tree-sitter-[a-z0-9]*.wasm' -print -quit)
+
+    substituteInPlace $out/lib/opencode/dist/worker.ts \
+      --replace-fail 'module2.exports = "../../../tree-sitter-' 'module2.exports = "'"$out"'/lib/opencode/dist/tree-sitter-' \
+      --replace-fail 'new URL("tree-sitter.wasm", import.meta.url).href' "\"$main_wasm\""
 
     # Copy only the native modules we need (marked as external in bundle.ts)
     mkdir -p $out/lib/opencode/node_modules/.bun
