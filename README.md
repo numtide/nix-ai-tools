@@ -203,7 +203,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
 - **Version**: 1.14.0
-- **Source**: binary
+- **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/nix-ai-tools#goose-cli -- --help`
@@ -247,7 +247,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### qwen-code
 
 - **Description**: Command-line AI workflow tool for Qwen3-Coder models
-- **Version**: 0.2.1
+- **Version**: 0.2.3
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
