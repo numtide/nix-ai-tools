@@ -139,7 +139,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### crush
 
 - **Description**: The glamourous AI coding agent for your favourite terminal
-- **Version**: 0.18.1
+- **Version**: 0.18.4
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
@@ -203,7 +203,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
 - **Version**: 1.14.0
-- **Source**: binary
+- **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/nix-ai-tools#goose-cli -- --help`
