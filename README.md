@@ -120,7 +120,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### codex-acp
 
 - **Description**: An ACP-compatible coding agent powered by Codex
-- **Version**: 0.4.0
+- **Version**: 0.5.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/codex-acp
