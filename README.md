@@ -17,6 +17,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 <!-- `> ./scripts/generate-package-docs.sh` -->
 
 <!-- BEGIN mdsh -->
+
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
