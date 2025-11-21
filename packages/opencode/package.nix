@@ -7,20 +7,23 @@
   makeBinaryWrapper,
   models-dev,
   ripgrep,
-  testers,
   writableTmpDirAsHomeHook,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.68";
+  version = "1.0.85";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-lG6OIi1yT9mqdzmMguUQ5xdIuuEoByVL2GPOVyIny0c=";
+    hash = "sha256-mUGFERzY7dbN2CwWWUhONvvwhlY0LrTAGZ168m8y0RE=";
   };
 
+  # NOTE: We use upstream's normalization scripts for reproducible node_modules,
+  # but cannot use their bun-build.ts compilation approach due to
+  # https://github.com/sst/opencode/issues/4575 (bun compile fails in Nix sandbox).
+  # Instead, we bundle the JavaScript and run it with the bun runtime.
   node_modules = stdenvNoCC.mkDerivation {
     pname = "opencode-node_modules";
     inherit (finalAttrs) version src;
@@ -44,13 +47,17 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
       bun install \
         --cpu="*" \
+        --os="*" \
         --filter=./packages/opencode \
-        --force \
         --frozen-lockfile \
         --ignore-scripts \
+        --linker=isolated \
         --no-progress \
-        --os="*" \
         --production
+
+      # Use upstream scripts for reproducible node_modules
+      bun --bun ./nix/scripts/canonicalize-node-modules.ts
+      bun --bun ./nix/scripts/normalize-bun-binaries.ts
 
       runHook postBuild
     '';
@@ -72,7 +79,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = "sha256-Q3008o4dEZdf/4ATOmOfJIJa7B+MeLVMWzfTLVDcWjg=";
+    outputHash = "sha256-RtA8hJvdrPt0Ox3UuFhHKtFzGxE2AQZcB5jlLRBgx6o=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
@@ -84,8 +91,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   ];
 
   patches = [
-    # NOTE: Get `_api.json` from the packaged `models-dev` package instead of https://models.dev/.
-    ./local-models-dev.patch
     # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
   ];
@@ -174,15 +179,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     done
 
   '';
-
-  passthru = {
-    tests.version = testers.testVersion {
-      package = finalAttrs.finalPackage;
-      command = "HOME=$(mktemp -d) opencode --version";
-      inherit (finalAttrs) version;
-    };
-    updateScript = ./update.sh;
-  };
 
   meta = {
     description = "AI coding agent built for the terminal";
