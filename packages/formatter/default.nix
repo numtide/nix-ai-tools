@@ -18,16 +18,14 @@ let
           formatter
           pkgs.git
         ];
-
-        # only check on Linux
-        meta.platforms = pkgs.lib.platforms.linux;
       }
       ''
         export HOME=$NIX_BUILD_TOP/home
 
         # keep timestamps so that treefmt is able to detect mtime changes
-        cp --no-preserve=mode --preserve=timestamps -r ${flake} source
+        cp --preserve=mode,timestamps -r ${flake} source
         cd source
+        chmod -R u+w .
         git init --quiet
         git add .
         treefmt --no-cache
@@ -41,7 +39,7 @@ let
 in
 formatter
 // {
-  meta = formatter.meta // {
+  passthru = formatter.passthru // {
     hideFromDocs = true;
     tests = {
       check = check;
