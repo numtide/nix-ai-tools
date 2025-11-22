@@ -12,12 +12,12 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.85";
+  version = "1.0.98";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-mUGFERzY7dbN2CwWWUhONvvwhlY0LrTAGZ168m8y0RE=";
+    hash = "sha256-l/7W0jKfeezSHs+Dl9AnVuRsSrNRLvOe14jiKphIhhA=";
   };
 
   # NOTE: We use upstream's normalization scripts for reproducible node_modules,
