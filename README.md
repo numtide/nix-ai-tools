@@ -21,7 +21,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1763712078-g89acb5
+- **Version**: 0.0.1763857589-g40edea
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -39,7 +39,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### catnip
 
 - **Description**: Developer environment that's like catnip for agentic programming
-- **Version**: 0.11.2
+- **Version**: 0.11.3
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/wandb/catnip
@@ -48,7 +48,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
-- **Version**: 2.0.49
+- **Version**: 2.0.50
 - **Source**: source
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
@@ -66,7 +66,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### claude-code-router
 
 - **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
-- **Version**: 1.0.70
+- **Version**: 1.0.71
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
@@ -94,7 +94,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### code
 
 - **Description**: Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.
-- **Version**: 0.4.21
+- **Version**: 0.5.2
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
@@ -112,7 +112,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### codex
 
 - **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
-- **Version**: 0.61.0
+- **Version**: 0.63.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
@@ -140,7 +140,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### crush
 
 - **Description**: The glamourous AI coding agent for your favourite terminal
-- **Version**: 0.18.4
+- **Version**: 0.18.5
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
@@ -149,7 +149,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### cursor-agent
 
 - **Description**: Cursor Agent - CLI tool for Cursor AI code editor
-- **Version**: 2025.11.06-8fe8a63
+- **Version**: 2025.11.20-a4d3945
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
@@ -166,7 +166,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
-- **Version**: 0.26.10
+- **Version**: 0.26.12
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
@@ -191,10 +191,19 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Usage**: `nix run github:numtide/nix-ai-tools#forge -- --help`
 - **Documentation**: See [packages/forge/README.md](packages/forge/README.md) for detailed usage
 
+#### formatter
+
+- **Description**: One CLI to format the code tree
+- **Version**: unknown
+- **Source**: unknown
+- **License**: MIT
+- **Homepage**: https://github.com/numtide/treefmt
+- **Usage**: `nix run github:numtide/nix-ai-tools#formatter -- --help`
+
 #### gemini-cli
 
 - **Description**: AI agent that brings the power of Gemini directly into your terminal
-- **Version**: 0.17.0
+- **Version**: 0.17.1
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
@@ -221,7 +230,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### kilocode-cli
 
 - **Description**: The open-source AI coding agent. Now available in your terminal.
-- **Version**: 0.4.2
+- **Version**: 0.6.0
 - **Source**: unknown
 - **License**: Apache-2.0
 - **Homepage**: https://kilocode.ai/cli
@@ -244,6 +253,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run github:numtide/nix-ai-tools#opencode -- --help`
+
+#### openskills
+
+- **Description**: Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent
+- **Version**: 1.2.1
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/numman-ali/openskills
+- **Usage**: `nix run github:numtide/nix-ai-tools#openskills -- --help`
 
 #### qwen-code
 
