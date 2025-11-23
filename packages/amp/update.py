@@ -14,8 +14,6 @@ from urllib.request import urlretrieve
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-import contextlib
-
 from updater import (
     calculate_url_hash,
     fetch_npm_version,
@@ -198,9 +196,6 @@ class AmpUpdater:
                 self.package_file.write_text(final_content)
                 print(f"Updated npmDeps hash to {npm_deps_hash}")
         except (OSError, ValueError, subprocess.CalledProcessError) as e:
-            # Restore original content on any error
-            with contextlib.suppress(Exception):
-                self.package_file.write_text(content)
             print(f"Warning: Could not update npmDeps hash: {e}")
 
     def update(self) -> bool:

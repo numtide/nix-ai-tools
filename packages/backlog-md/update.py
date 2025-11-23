@@ -3,8 +3,6 @@
 
 """Update script for backlog-md package."""
 
-import builtins
-import contextlib
 import subprocess
 import sys
 from pathlib import Path
@@ -102,17 +100,13 @@ class BacklogMdUpdater(SimplePackageUpdater):
 
         try:
             node_modules_hash = self._get_node_modules_hash(original_content)
-            # Restore original and update with correct hash
-            self.package_file.write_text(original_content)
+            # Update with correct hash
             updated_content = self._replace_nth_hash(
                 original_content, self.NODE_MODULES_HASH_INDEX, node_modules_hash
             )
             self.package_file.write_text(updated_content)
         except (OSError, ValueError, subprocess.CalledProcessError) as e:
             print(f"Warning: Could not update node_modules hash: {e}")
-            # Restore original content if something went wrong
-            with contextlib.suppress(builtins.BaseException):
-                self.package_file.write_text(original_content)
 
         return True
 
