@@ -3,32 +3,15 @@ set -euo pipefail
 
 # Script to generate markdown documentation for all packages using nix eval
 
-# Array to store package names
-packages=()
-
-# Discover all packages
-for package_dir in packages/*/; do
-  if [ -f "$package_dir/package.nix" ] || [ -f "$package_dir/default.nix" ]; then
-    package_name=$(basename "$package_dir")
-
-    # Check if package should be hidden from docs
-    hideFromDocs=$(nix eval --json ".#$package_name.meta.hideFromDocs" 2>/dev/null || echo "false")
-    if [ "$hideFromDocs" = "true" ]; then
-      continue
-    fi
-
-    packages+=("$package_name")
-  fi
-done
-
-# Sort packages reproducibly with LC_ALL=C
-mapfile -t sorted_packages < <(printf '%s\n' "${packages[@]}" | LC_ALL=C sort)
+# Discover and sort all packages
+# Find directories containing package.nix or default.nix, extract basename, and sort
+mapfile -t packages < <(
+  find packages -maxdepth 2 -type f \( -name "package.nix" -o -name "default.nix" \) \
+    -exec dirname {} \; | xargs -n1 basename | LC_ALL=C sort -u
+)
 
 # Generate markdown for each package
-for package in "${sorted_packages[@]}"; do
-  echo "#### $package"
-  echo ""
-
+for package in "${packages[@]}"; do
   # Get all metadata in a single eval using the flake output
   metadata=$(nix eval --json ".#$package" --apply '
     pkg:
@@ -58,11 +41,19 @@ for package in "${sorted_packages[@]}"; do
       license = licenseStr;
       homepage = pkg.meta.homepage or null;
       sourceType = sourceType;
+      hideFromDocs = pkg.passthru.hideFromDocs or false;
     }
   ' 2>/dev/null || echo '{}')
 
   # Extract values from JSON
   if [ "$metadata" != "{}" ]; then
+    hideFromDocs=$(echo "$metadata" | jq -r '.hideFromDocs')
+
+    # Skip if package should be hidden from docs
+    if [ "$hideFromDocs" = "true" ]; then
+      continue
+    fi
+
     description=$(echo "$metadata" | jq -r '.description')
     version=$(echo "$metadata" | jq -r '.version')
     license=$(echo "$metadata" | jq -r '.license')
@@ -75,6 +66,9 @@ for package in "${sorted_packages[@]}"; do
     homepage="null"
     sourceType="unknown"
   fi
+
+  echo "#### $package"
+  echo ""
 
   # Format the output
   echo "- **Description**: $description"
