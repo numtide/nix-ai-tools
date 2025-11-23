@@ -32,8 +32,6 @@ python3.pkgs.buildPythonApplication rec {
 
   pythonImportsCheck = [ "specify_cli" ];
 
-  passthru.updateScript = null;
-
   meta = with lib; {
     description = "Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)";
     homepage = "https://github.com/github/spec-kit";

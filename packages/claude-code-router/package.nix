@@ -34,10 +34,6 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  passthru = {
-    updateScript = ./update.sh;
-  };
-
   meta = with lib; {
     description = "Use Claude Code without an Anthropics account and route it to another LLM provider";
     homepage = "https://github.com/musistudio/claude-code-router";

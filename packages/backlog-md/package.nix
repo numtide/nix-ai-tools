@@ -137,10 +137,6 @@ stdenv.mkDerivation rec {
   # in the executable and stripping would remove it
   dontStrip = true;
 
-  passthru = {
-    updateScript = ./update.sh;
-  };
-
   meta = with lib; {
     description = "Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem";
     homepage = "https://github.com/MrLesk/Backlog.md";

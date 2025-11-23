@@ -41,10 +41,6 @@ buildNpmPackage rec {
       --set AMP_SKIP_UPDATE_CHECK 1
   '';
 
-  passthru = {
-    updateScript = ./update.sh;
-  };
-
   meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";
     homepage = "https://ampcode.com/";
