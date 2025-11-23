@@ -20,7 +20,7 @@ if [ "$type" = "package" ]; then
   # Check if package has an update script
   if [ -f "packages/$name/update.py" ]; then
     echo "Running update script for $name..."
-    if output=$(packages/"$name"/update.sh 2>&1); then
+    if output=$(packages/"$name"/update.py 2>&1); then
       echo "$output"
     else
       echo "::error::Update script failed for package $name"
