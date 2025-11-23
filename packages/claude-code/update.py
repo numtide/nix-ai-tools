@@ -72,6 +72,7 @@ def main() -> None:
         package="claude-code",
         npm_package_name="@anthropic-ai/claude-code",
         has_npm_deps_hash=True,
+        unpack=True,  # Uses fetchzip which requires unpacked hash
     )
     if updater.update():
         print("Update complete for claude-code!")

@@ -42,3 +42,7 @@ ignore = [
   "EXE005", # nix multi-line shebang is valid
   "COM812", # conflicts with formatter
 ]
+
+[tool.ruff.lint.pylint]
+max-args = 7     # Allow more arguments for updater classes
+max-returns = 10

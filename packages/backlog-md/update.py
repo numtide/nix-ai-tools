@@ -3,7 +3,7 @@
 
 """Update script for backlog-md package."""
 
-import subprocess
+import json
 import sys
 from pathlib import Path
 
@@ -11,102 +11,76 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    SimplePackageUpdater,
+    BaseUpdater,
     fetch_github_latest_release,
+    get_node_modules_hash,
+    nix,
+    should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
-from updater.nix import NixCommandError, nix_build
+from updater.hash import calculate_url_hash
 
 
-class BacklogMdUpdater(SimplePackageUpdater):
-    """Custom updater for backlog-md with node_modules hash handling."""
-
-    # Second hash in the file is for node_modules
-    NODE_MODULES_HASH_INDEX = 2
+class BacklogMdUpdater(BaseUpdater):
+    """Custom updater for backlog-md using JSON sources file."""
 
     def __init__(self) -> None:
         """Initialize the backlog-md updater."""
-        super().__init__(
-            package="backlog-md",
-            version_fetcher=lambda: fetch_github_latest_release("MrLesk", "Backlog.md"),
-            url_template="https://github.com/MrLesk/Backlog.md/archive/v{version}.tar.gz",
-        )
+        super().__init__("backlog-md")
+        self.sources_file = Path(__file__).parent / "sources.json"
 
-    def _replace_nth_hash(self, content: str, n: int, new_hash: str) -> str:
-        """Replace the nth occurrence of a hash in the content.
-
-        Args:
-            content: File content
-            n: Which hash occurrence to replace (1-indexed)
-            new_hash: New hash value
-
-        Returns:
-            Updated content
-
-        """
-        lines = content.split("\n")
-        updated_lines = []
-        hash_count = 0
-        for line in lines:
-            if 'hash = "sha256-' in line:
-                hash_count += 1
-                if hash_count == n:
-                    indent = len(line) - len(line.lstrip())
-                    updated_lines.append(f'{" " * indent}hash = "{new_hash}";')
-                else:
-                    updated_lines.append(line)
-            else:
-                updated_lines.append(line)
-        return "\n".join(updated_lines)
-
-    def _get_node_modules_hash(self, original_content: str) -> str:
-        """Get node_modules hash by building with dummy hash.
+    def _write_sources(
+        self,
+        version: str,
+        src_hash: str,
+        node_modules_hash: str,
+    ) -> None:
+        """Write sources to sources.json.
 
         Args:
-            original_content: Original file content to restore on error
-
-        Returns:
-            Correct node_modules hash
+            version: Package version
+            src_hash: Source hash
+            node_modules_hash: Node modules hash
 
         """
-        # Replace second hash with dummy
-        content_with_dummy = self._replace_nth_hash(
-            original_content, self.NODE_MODULES_HASH_INDEX, DUMMY_SHA256_HASH
-        )
-        self.package_file.write_text(content_with_dummy)
-
-        try:
-            # Build for x86_64-linux (use remote builders if needed)
-            nix_build(f".#packages.x86_64-linux.{self.package}", check=True)
-            msg = "Build succeeded with dummy hash - unexpected"
-            raise ValueError(msg)
-        except NixCommandError as e:
-            # Extract hash from error
-            node_modules_hash = extract_hash_from_build_error(e.args[0])
-            if not node_modules_hash:
-                msg = f"Could not extract hash from build error:\n{e.args[0]}"
-                raise ValueError(msg) from e
-            return node_modules_hash
+        sources = {
+            "version": version,
+            "src_hash": src_hash,
+            "node_modules_hash": node_modules_hash,
+        }
+        self.sources_file.write_text(json.dumps(sources, indent=2) + "\n")
 
     def update(self) -> bool:
-        """Update the package including node_modules hash."""
-        # First do the basic update (version and source hash)
-        if not super().update():
+        """Update the package by writing to sources.json."""
+        current = self.get_current_version()
+        latest = fetch_github_latest_release("MrLesk", "Backlog.md")
+
+        if not should_update(current, latest):
             return False
 
-        # Now update the node_modules hash
-        print("Calculating new node_modules hash...")
-        original_content = self.package_file.read_text()
+        print(f"Updating backlog-md from {current} to {latest}")
 
+        # Calculate source hash for fetchFromGitHub
+        tag = f"v{latest}"
+        url = f"https://github.com/MrLesk/Backlog.md/archive/{tag}.tar.gz"
+        source_hash = calculate_url_hash(url, unpack=True)
+
+        # Write temporary sources.json with dummy node_modules hash
+        self._write_sources(
+            latest,
+            source_hash,
+            "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        )
+
+        # Calculate correct node_modules hash by building
         try:
-            node_modules_hash = self._get_node_modules_hash(original_content)
-            # Update with correct hash
-            updated_content = self._replace_nth_hash(
-                original_content, self.NODE_MODULES_HASH_INDEX, node_modules_hash
-            )
-            self.package_file.write_text(updated_content)
-        except (OSError, ValueError, subprocess.CalledProcessError) as e:
-            print(f"Warning: Could not update node_modules hash: {e}")
+            node_modules_hash = get_node_modules_hash("backlog-md", self.package_file)
+        except (nix.NixCommandError, ValueError) as e:
+            print(f"Error: Could not calculate node_modules hash: {e}")
+            return False
+
+        # Write final sources.json with all correct values
+        self._write_sources(latest, source_hash, node_modules_hash)
+        print(f"Updated sources.json with version {latest}")
 
         return True
 

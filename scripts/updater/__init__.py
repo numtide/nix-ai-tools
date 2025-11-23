@@ -9,6 +9,7 @@ from .core import (
     BaseUpdater,
     MultiPlatformUpdater,
     NpmPackageUpdater,
+    RustPackageUpdater,
     SimplePackageUpdater,
     UpdaterError,
 )
@@ -25,6 +26,7 @@ from .file_ops import (
 # Hash utilities
 from .hash import (
     calculate_url_hash,
+    get_cargo_hash,
     get_node_modules_hash,
     get_npm_deps_hash,
 )
@@ -41,6 +43,7 @@ from .http import (
 from .nix import (
     NixCommandError,
     nix_eval,
+    nix_prefetch_url,
     nix_store_prefetch_file,
     nix_update,
 )
@@ -59,7 +62,7 @@ from .version import (
     should_update,
 )
 
-__all__ = [
+__all__ = [  # noqa: RUF022 - grouped by category for readability
     # Platforms
     "ALL_PLATFORMS",
     # Core
@@ -69,10 +72,12 @@ __all__ = [
     "NixCommandError",
     "NpmPackageUpdater",
     "Platform",
+    "RustPackageUpdater",
     "SimplePackageUpdater",
     "UpdaterError",
     # Hash
     "calculate_url_hash",
+    "get_cargo_hash",
     # HTTP
     "check_url_accessible",
     "download_file",
@@ -85,6 +90,7 @@ __all__ = [
     "get_npm_deps_hash",
     "make_platform_mapper",
     "nix_eval",
+    "nix_prefetch_url",
     "nix_store_prefetch_file",
     "nix_update",
     # File operations

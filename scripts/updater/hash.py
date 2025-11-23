@@ -4,22 +4,27 @@ import re
 from pathlib import Path
 
 from .file_ops import replace_in_file
-from .nix import NixCommandError, nix_build, nix_store_prefetch_file
+from .nix import NixCommandError, nix_build, nix_prefetch_url, nix_store_prefetch_file
 
 # Dummy hash used to trigger Nix build errors to extract correct hash
 DUMMY_SHA256_HASH = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
 
-def calculate_url_hash(url: str) -> str:
-    """Calculate hash for a URL using nix store prefetch-file.
+def calculate_url_hash(url: str, *, unpack: bool = False) -> str:
+    """Calculate hash for a URL.
 
     Args:
         url: URL to calculate hash for
+        unpack: Whether to unpack the archive (use True for fetchzip packages)
 
     Returns:
         Hash in SRI format (sha256-...)
 
     """
+    if unpack:
+        # Use nix-prefetch-url --unpack for fetchzip packages
+        return nix_prefetch_url(url, unpack=True)
+    # Use nix store prefetch-file for regular fetchurl packages
     return nix_store_prefetch_file(url)
 
 
@@ -148,3 +153,22 @@ def get_node_modules_hash(
 
     """
     return get_hash_via_build(package, "outputHash", package_file)
+
+
+def get_cargo_hash(
+    package: str,
+    package_file: Path,
+) -> str:
+    """Get cargoHash by building with dummy hash.
+
+    This is used for Rust packages that use buildRustPackage.
+
+    Args:
+        package: Package name
+        package_file: Path to package.nix file
+
+    Returns:
+        Correct cargoHash
+
+    """
+    return get_hash_via_build(package, "cargoHash", package_file)

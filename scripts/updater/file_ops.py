@@ -19,7 +19,7 @@ def replace_in_file(
         old: Text or pattern to replace
         new: Replacement text
         regex: Whether to treat 'old' as a regex pattern
-        count: Maximum number of replacements (-1 for all)
+        count: Maximum number of replacements (-1 for first match, 0 for all)
 
     Returns:
         True if any replacements were made
@@ -28,7 +28,10 @@ def replace_in_file(
     content = file_path.read_text()
 
     if regex:
-        new_content = re.sub(old, new, content, count=max(count, 0))
+        # Convert count: -1 means "first match", 0 means "all matches"
+        # re.sub uses: 0 for "all", 1+ for "that many"
+        regex_count = 1 if count == -1 else (0 if count == 0 else count)
+        new_content = re.sub(old, new, content, count=regex_count)
     else:
         new_content = content.replace(old, new, count if count >= 0 else -1)
 
