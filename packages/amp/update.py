@@ -14,14 +14,17 @@ from urllib.request import urlretrieve
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
+import contextlib
+
 from updater import (
     calculate_url_hash,
     fetch_npm_version,
     file_ops,
-    get_npm_deps_hash,
     nix,
     should_update,
 )
+from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
+from updater.nix import NixCommandError, nix_build
 
 
 class AmpUpdater:
@@ -141,19 +144,63 @@ class AmpUpdater:
         print("ERROR: Failed to generate package-lock.json")
         return False
 
+    def _validate_hash_replacement(self, content: str, dummy_content: str) -> None:
+        """Validate that hash replacement was successful.
+
+        Args:
+            content: Original content
+            dummy_content: Content after hash replacement
+
+        Raises:
+            ValueError: If hash pattern was not found
+
+        """
+        if dummy_content == content:
+            msg = "Could not find npmDeps hash pattern in package.nix"
+            raise ValueError(msg)
+
     def _update_npm_deps_hash(self) -> None:
         """Update the npmDeps hash in fetchNpmDeps block."""
         print("Calculating new npmDeps hash...")
         try:
-            npm_deps_hash = get_npm_deps_hash(self.package, self.package_file)
+            # Read current content
             content = self.package_file.read_text()
+
+            # Replace hash with dummy to trigger build error
             pattern = (
                 r"(npmDeps = fetchNpmDeps \{[^}]*hash = \")sha256-[A-Za-z0-9+/=]+(\";)"
             )
-            replacement = rf"\1{npm_deps_hash}\2"
-            content = re.sub(pattern, replacement, content, flags=re.DOTALL)
-            self.package_file.write_text(content)
+            dummy_content = re.sub(
+                pattern, rf"\1{DUMMY_SHA256_HASH}\2", content, flags=re.DOTALL
+            )
+
+            self._validate_hash_replacement(content, dummy_content)
+
+            # Write dummy hash temporarily
+            self.package_file.write_text(dummy_content)
+
+            try:
+                # Try to build, should fail with hash mismatch
+                nix_build(f".#{self.package}", check=True)
+                msg = "Build succeeded with dummy hash - unexpected"
+                raise ValueError(msg)
+            except NixCommandError as e:
+                # Extract correct hash from error
+                npm_deps_hash = extract_hash_from_build_error(e.args[0])
+                if not npm_deps_hash:
+                    msg = f"Could not extract hash from build error:\n{e.args[0]}"
+                    raise ValueError(msg) from e
+
+                # Update with correct hash
+                final_content = re.sub(
+                    pattern, rf"\1{npm_deps_hash}\2", content, flags=re.DOTALL
+                )
+                self.package_file.write_text(final_content)
+                print(f"Updated npmDeps hash to {npm_deps_hash}")
         except (OSError, ValueError, subprocess.CalledProcessError) as e:
+            # Restore original content on any error
+            with contextlib.suppress(Exception):
+                self.package_file.write_text(content)
             print(f"Warning: Could not update npmDeps hash: {e}")
 
     def update(self) -> bool:
