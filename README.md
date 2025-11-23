@@ -218,6 +218,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/build-with-groq/groq-code-cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#groq-code-cli -- --help`
 
+#### handy
+
+- **Description**: Fast and accurate local transcription app using AI models
+- **Version**: 0.6.2
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://handy.computer/
+- **Usage**: `nix run github:numtide/nix-ai-tools#handy -- --help`
+
 #### kilocode-cli
 
 - **Description**: The open-source AI coding agent. Now available in your terminal.
