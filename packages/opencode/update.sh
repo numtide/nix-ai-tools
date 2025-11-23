@@ -19,8 +19,14 @@ if ! git diff --quiet "$package_file"; then
   # Step 2: Update node_modules hash
   echo "Updating node_modules hash..."
   
-  # Get the current node_modules hash
-  old_node_hash=$(grep -E '^\s*outputHash = "sha256-[^"]+";' "$package_file" | sed -E 's/.*outputHash = "([^"]+)".*/\1/')
+  # Get the current node_modules hash (the outputHash within the node_modules derivation)
+  # We look for the line after "node_modules = " up to the closing brace to find the right outputHash
+  old_node_hash=$(awk '/node_modules = stdenvNoCC\.mkDerivation/,/^  \};/ { if (/^\s*outputHash = "sha256-/) { print $0; exit } }' "$package_file" | sed -E 's/.*outputHash = "([^"]+)".*/\1/')
+  
+  if [ -z "$old_node_hash" ]; then
+    echo "ERROR: Could not find node_modules outputHash"
+    exit 1
+  fi
   
   # Replace with dummy hash to trigger rebuild
   sed -i "s|$old_node_hash|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|" "$package_file"
@@ -35,7 +41,7 @@ if ! git diff --quiet "$package_file"; then
     # Extract the correct hash from error output
     # Look for the pattern "got:    sha256-..." in the output
     new_node_hash=$(echo "$output" | grep -E "got:[[:space:]]+sha256-" | sed -E 's/.*got:[[:space:]]+(sha256-[^[:space:]]+).*/\1/' | head -n1)
-    if [ -n "$new_node_hash" ] && [ "$new_node_hash" != "" ]; then
+    if [ -n "$new_node_hash" ]; then
       echo "New node_modules hash: $new_node_hash"
       sed -i "s|sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=|$new_node_hash|" "$package_file"
     else
