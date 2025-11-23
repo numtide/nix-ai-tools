@@ -4,14 +4,14 @@
   fetchFromGitHub,
 }:
 
-buildNpmPackage rec {
+buildNpmPackage (finalAttrs: {
   pname = "openskills";
   version = "1.2.1";
 
   src = fetchFromGitHub {
     owner = "numman-ali";
     repo = "openskills";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-YSfLzaoHZIDfpCcLBf9ES5dhxweesjqkfeSfClZNAzE=";
   };
 
@@ -26,4 +26,4 @@ buildNpmPackage rec {
     mainProgram = "openskills";
     platforms = lib.platforms.all;
   };
-}
+})
