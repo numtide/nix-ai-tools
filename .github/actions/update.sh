@@ -18,7 +18,7 @@ if [ "$type" = "package" ]; then
   echo "Updating package $name..."
 
   # Check if package has an update script
-  if [ -f "packages/$name/update.sh" ]; then
+  if [ -f "packages/$name/update.py" ]; then
     echo "Running update script for $name..."
     if output=$(packages/"$name"/update.sh 2>&1); then
       echo "$output"
