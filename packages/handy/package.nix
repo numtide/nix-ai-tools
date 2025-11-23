@@ -41,7 +41,8 @@ let
   };
 
   src =
-    srcs.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+    srcs.${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}. Supported systems: x86_64-linux, x86_64-darwin, aarch64-darwin");
 
   desktopItem = makeDesktopItem {
     name = "handy";
