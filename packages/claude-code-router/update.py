@@ -18,6 +18,7 @@ def main() -> None:
         package="claude-code-router",
         npm_package_name="@musistudio/claude-code-router",
         has_npm_deps_hash=False,
+        unpack=True,  # Uses fetchzip which requires unpacked hash
     )
     updater.update()
 

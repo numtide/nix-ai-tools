@@ -10,6 +10,8 @@
 }:
 
 let
+  sources = lib.importJSON ./sources.json;
+
   fetchBunDeps =
     { src, hash, ... }@args:
     stdenvNoCC.mkDerivation {
@@ -51,20 +53,20 @@ let
       outputHashMode = "recursive";
     };
 
-  version = "1.20.1";
+  inherit (sources) version;
 
   src = fetchFromGitHub {
     owner = "MrLesk";
     repo = "Backlog.md";
     rev = "v${version}";
-    hash = "sha256-WpfFhFqqVTHGEfa1jTOU4kY3eFpAVu2G1O8lFBIScVA=";
+    hash = sources.src_hash;
   };
 
   # Create a fixed-output derivation for dependencies
   node_modules = fetchBunDeps {
     pname = "backlog-md-bun-deps";
     inherit version src;
-    hash = "sha256-mzah9FUHq7JrnPGts8M8VkCAGTwXpU2LeppKBmx5Wg8=";
+    hash = sources.node_modules_hash;
   };
 in
 stdenv.mkDerivation rec {

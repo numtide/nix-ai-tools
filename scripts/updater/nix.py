@@ -145,6 +145,34 @@ def nix_store_prefetch_file(url: str, hash_type: str = "sha256") -> str:
     return cast("str", data["hash"])
 
 
+def nix_prefetch_url(url: str, *, unpack: bool = False) -> str:
+    """Prefetch a URL using nix-prefetch-url and return its hash.
+
+    This is useful for fetchzip which needs the hash of unpacked contents.
+
+    Args:
+        url: URL to prefetch
+        unpack: Whether to unpack the archive (for fetchzip)
+
+    Returns:
+        Hash in SRI format (sha256-...)
+
+    """
+    args = ["nix-prefetch-url", "--type", "sha256"]
+    if unpack:
+        args.append("--unpack")
+    args.append(url)
+
+    result = run_command(args)
+    # nix-prefetch-url returns base32-encoded hash, convert to SRI
+    hash_b32 = result.stdout.strip()
+
+    # Convert to SRI format by using nix hash convert
+    convert_args = ["hash", "convert", "--hash-algo", "sha256", hash_b32]
+    convert_result = nix_command(convert_args)
+    return convert_result.stdout.strip()
+
+
 def nix_update(package: str, *, extra_args: list[str] | None = None) -> None:
     """Run nix-update on a package.
 

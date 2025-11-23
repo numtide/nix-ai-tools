@@ -18,23 +18,24 @@ from updater import (
 
 def main() -> None:
     """Update the eca package."""
+    # ECA uses fetchzip which requires unpacked hash
     updater = MultiPlatformUpdater(
         package="eca",
         version_fetcher=lambda: fetch_github_latest_release(
-            "editor-code-assistant",
-            "eca",
+            "editor-code-assistant", "eca"
         ),
         url_template="https://github.com/editor-code-assistant/eca/releases/download/{version}/eca-native-{platform}.zip",
         platform_to_url_arch=make_platform_mapper(
             {"x86_64": "amd64", "aarch64": "aarch64"},
             {"linux": "linux", "darwin": "macos"},
         ),
+        unpack=True,  # Uses fetchzip which requires unpacked hash
     )
 
     if updater.update():
         print("Update complete for eca!")
     else:
-        print("Already up-to-date!")
+        print("eca is already up-to-date!")
 
 
 if __name__ == "__main__":

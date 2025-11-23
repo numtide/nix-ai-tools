@@ -3,7 +3,6 @@
 
 """Update script for opencode package."""
 
-import subprocess
 import sys
 from pathlib import Path
 
@@ -11,37 +10,68 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    get_node_modules_hash,
-    nix_update,
-    update_hash,
+    BaseUpdater,
+    fetch_github_latest_release,
+    file_ops,
+    nix,
+    should_update,
+)
+from updater import (
+    hash as hash_utils,
 )
 
 
-def main() -> None:
-    """Update opencode package and node_modules hash."""
-    package = "opencode"
-    script_dir = Path(__file__).parent.resolve()
-    package_file = script_dir / "package.nix"
+class OpencodeUpdater(BaseUpdater):
+    """Custom updater for opencode with node_modules hash."""
 
-    # Read original content to detect changes
-    original_content = package_file.read_text()
+    def __init__(self) -> None:
+        """Initialize the updater."""
+        super().__init__("opencode")
 
-    # Step 1: Update the main package version and source hash
-    nix_update(package)
+    def update(self) -> bool:
+        """Update the opencode package."""
+        current = self.get_current_version()
+        latest = fetch_github_latest_release("sst", "opencode")
 
-    # Check if there were changes by comparing file content
-    current_content = package_file.read_text()
-    if current_content != original_content:
-        # Step 2: Update node_modules hash
+        if not should_update(current, latest):
+            return False
+
+        print(f"Updating opencode from {current} to {latest}")
+
+        # Update version
+        file_ops.update_version(self.package_file, current, latest)
+        file_ops.update_url(self.package_file, current, latest)
+
+        # Update source hash
+        tag = f"v{latest}"
+        url = f"https://github.com/sst/opencode/archive/refs/tags/{tag}.tar.gz"
         try:
-            new_hash = get_node_modules_hash(package, package_file)
-            update_hash(package_file, "outputHash", new_hash)
-            print(f"Updated {package} and node_modules hash!")
-        except (subprocess.CalledProcessError, ValueError) as e:
-            print(f"Error updating node_modules hash: {e}", file=sys.stderr)
-            sys.exit(1)
+            # fetchFromGitHub unpacks, so use unpack=True
+            source_hash = hash_utils.calculate_url_hash(url, unpack=True)
+            file_ops.update_hash(self.package_file, "hash", source_hash)
+        except (nix.NixCommandError, ValueError) as e:
+            print(f"Warning: Could not update source hash: {e}")
+
+        # Update node_modules hash
+        try:
+            node_modules_hash = hash_utils.get_node_modules_hash(
+                "opencode",
+                self.package_file,
+            )
+            file_ops.update_hash(self.package_file, "outputHash", node_modules_hash)
+        except (nix.NixCommandError, ValueError) as e:
+            print(f"Warning: Could not update node_modules hash: {e}")
+
+        return True
+
+
+def main() -> None:
+    """Update the opencode package."""
+    updater = OpencodeUpdater()
+    if updater.update():
+        print("Update complete for opencode!")
     else:
-        print(f"{package} is already up-to-date!")
+        print("opencode is already up-to-date!")
 
 
 if __name__ == "__main__":

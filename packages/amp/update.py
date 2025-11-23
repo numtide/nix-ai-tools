@@ -3,7 +3,7 @@
 
 """Update script for amp package."""
 
-import re
+import json
 import subprocess
 import sys
 import tarfile
@@ -14,13 +14,7 @@ from urllib.request import urlretrieve
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import (
-    calculate_url_hash,
-    fetch_npm_version,
-    file_ops,
-    nix,
-    should_update,
-)
+from updater import calculate_url_hash, fetch_npm_version, nix, should_update
 from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
 from updater.nix import NixCommandError, nix_build
 
@@ -33,50 +27,20 @@ class AmpUpdater:
         self.package = "amp"
         self.npm_package_name = "@sourcegraph/amp"
         self.script_dir = Path(__file__).parent
-        self.package_file = self.script_dir / "package.nix"
+        self.version_file = self.script_dir / "version.json"
 
     def get_current_version(self) -> str:
         """Get current version from nix."""
         return nix.nix_eval(f".#{self.package}.version")
 
-    def _update_source_hash(self, tarball_url: str) -> str:
-        """Update the source hash for the tarball.
+    def _read_version_data(self) -> dict[str, str]:
+        """Read version data from JSON file."""
+        data: dict[str, str] = json.loads(self.version_file.read_text())
+        return data
 
-        Args:
-            tarball_url: URL of the tarball
-
-        Returns:
-            The new source hash
-
-        """
-        print("Calculating new source hash...")
-        new_source_hash = calculate_url_hash(tarball_url)
-
-        content = self.package_file.read_text()
-
-        # Update the URL
-        content = re.sub(
-            r'url = "https://registry\.npmjs\.org/@sourcegraph/amp/-/amp-[^"]+\.tgz";',
-            f'url = "{tarball_url}";',
-            content,
-        )
-
-        # Update the first hash (fetchurl hash) that comes after the url line
-        lines = content.split("\n")
-        updated_lines = []
-        found_url = False
-        for line in lines:
-            if 'url = "https://registry.npmjs.org/@sourcegraph/amp' in line:
-                found_url = True
-                updated_lines.append(line)
-            elif found_url and "hash =" in line:
-                updated_lines.append(f'        hash = "{new_source_hash}";')
-                found_url = False
-            else:
-                updated_lines.append(line)
-
-        self.package_file.write_text("\n".join(updated_lines))
-        return new_source_hash
+    def _write_version_data(self, data: dict[str, str]) -> None:
+        """Write version data to JSON file."""
+        self.version_file.write_text(json.dumps(data, indent=2) + "\n")
 
     def _extract_package_lock(self, tarball_url: str) -> bool:
         """Extract package-lock.json from tarball or generate it.
@@ -142,40 +106,22 @@ class AmpUpdater:
         print("ERROR: Failed to generate package-lock.json")
         return False
 
-    def _validate_hash_replacement(self, content: str, dummy_content: str) -> None:
-        """Validate that hash replacement was successful.
+    def _update_npm_deps_hash(self) -> str:
+        """Calculate the npmDeps hash by building with dummy hash.
 
-        Args:
-            content: Original content
-            dummy_content: Content after hash replacement
-
-        Raises:
-            ValueError: If hash pattern was not found
+        Returns:
+            The new npmDeps hash
 
         """
-        if dummy_content == content:
-            msg = "Could not find npmDeps hash pattern in package.nix"
-            raise ValueError(msg)
-
-    def _update_npm_deps_hash(self) -> None:
-        """Update the npmDeps hash in fetchNpmDeps block."""
         print("Calculating new npmDeps hash...")
         try:
-            # Read current content
-            content = self.package_file.read_text()
-
-            # Replace hash with dummy to trigger build error
-            pattern = (
-                r"(npmDeps = fetchNpmDeps \{[^}]*hash = \")sha256-[A-Za-z0-9+/=]+(\";)"
-            )
-            dummy_content = re.sub(
-                pattern, rf"\1{DUMMY_SHA256_HASH}\2", content, flags=re.DOTALL
-            )
-
-            self._validate_hash_replacement(content, dummy_content)
+            # Read current version data
+            version_data = self._read_version_data()
+            original_hash = version_data["npmDepsHash"]
 
             # Write dummy hash temporarily
-            self.package_file.write_text(dummy_content)
+            version_data["npmDepsHash"] = DUMMY_SHA256_HASH
+            self._write_version_data(version_data)
 
             try:
                 # Try to build, should fail with hash mismatch
@@ -186,17 +132,17 @@ class AmpUpdater:
                 # Extract correct hash from error
                 npm_deps_hash = extract_hash_from_build_error(e.args[0])
                 if not npm_deps_hash:
+                    # Restore original hash on failure
+                    version_data["npmDepsHash"] = original_hash
+                    self._write_version_data(version_data)
                     msg = f"Could not extract hash from build error:\n{e.args[0]}"
                     raise ValueError(msg) from e
 
-                # Update with correct hash
-                final_content = re.sub(
-                    pattern, rf"\1{npm_deps_hash}\2", content, flags=re.DOTALL
-                )
-                self.package_file.write_text(final_content)
                 print(f"Updated npmDeps hash to {npm_deps_hash}")
+                return npm_deps_hash
         except (OSError, ValueError, subprocess.CalledProcessError) as e:
             print(f"Warning: Could not update npmDeps hash: {e}")
+            raise
 
     def update(self) -> bool:
         """Update the amp package."""
@@ -211,18 +157,34 @@ class AmpUpdater:
 
         print(f"Update available: {current} -> {latest}")
 
-        file_ops.update_version(self.package_file, current, latest)
-
         tarball_url = (
             f"https://registry.npmjs.org/{self.npm_package_name}/-/amp-{latest}.tgz"
         )
 
-        self._update_source_hash(tarball_url)
+        # Calculate source hash
+        print("Calculating new source hash...")
+        source_hash = calculate_url_hash(tarball_url)
 
+        # Extract package-lock.json
         if not self._extract_package_lock(tarball_url):
             return False
 
-        self._update_npm_deps_hash()
+        # Update version.json with new version and source hash first
+        version_data = {
+            "version": latest,
+            "sourceHash": source_hash,
+            "npmDepsHash": DUMMY_SHA256_HASH,  # Temporary, will be updated below
+        }
+        self._write_version_data(version_data)
+
+        # Calculate and update npmDeps hash
+        try:
+            npm_deps_hash = self._update_npm_deps_hash()
+            version_data["npmDepsHash"] = npm_deps_hash
+            self._write_version_data(version_data)
+        except (ValueError, NixCommandError) as e:
+            print(f"Error updating npmDeps hash: {e}")
+            return False
 
         return True
 
