@@ -45,6 +45,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/wandb/catnip
 - **Usage**: `nix run github:numtide/nix-ai-tools#catnip -- --help`
 
+#### ccstatusline
+
+- **Description**: A highly customizable status line formatter for Claude Code CLI
+- **Version**: 2.0.23
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/sirmalloc/ccstatusline
+- **Usage**: `nix run github:numtide/nix-ai-tools#ccstatusline -- --help`
+
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
