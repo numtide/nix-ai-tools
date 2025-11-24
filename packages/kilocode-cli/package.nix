@@ -53,6 +53,7 @@ buildNpmPackage (finalAttrs: {
     homepage = "https://kilocode.ai/cli";
     downloadPage = "https://www.npmjs.com/package/@kilocode/cli";
     license = lib.licenses.asl20;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     mainProgram = "kilocode";
   };
 })

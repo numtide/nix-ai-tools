@@ -25,6 +25,7 @@ buildNpmPackage (finalAttrs: {
     homepage = "https://github.com/Fission-AI/OpenSpec";
     downloadPage = "https://www.npmjs.com/package/@fission-ai/openspec";
     license = lib.licenses.mit;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     mainProgram = "openspec";
   };
 })

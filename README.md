@@ -17,11 +17,10 @@ This repository uses GitHub Actions to automatically update all packages and fla
 <!-- `> ./scripts/generate-package-docs.py` -->
 
 <!-- BEGIN mdsh -->
-
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1763913676-g4c6d64
+- **Version**: 0.0.1763942525-gea5db0
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -168,7 +167,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
 - **Version**: 0.79.1
-- **Source**: unknown
+- **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/editor-code-assistant/eca
 - **Usage**: `nix run github:numtide/nix-ai-tools#eca -- --help`
@@ -196,7 +195,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
 - **Version**: 1.15.0
-- **Source**: unknown
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/nix-ai-tools#goose-cli -- --help`
@@ -205,7 +204,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: The open-source AI coding agent. Now available in your terminal.
 - **Version**: 0.6.0
-- **Source**: unknown
+- **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://kilocode.ai/cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#kilocode-cli -- --help`
@@ -223,7 +222,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: AI coding agent built for the terminal
 - **Version**: 1.0.106
-- **Source**: unknown
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run github:numtide/nix-ai-tools#opencode -- --help`
@@ -241,7 +240,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 - **Description**: Spec-driven development for AI coding assistants
 - **Version**: 0.16.0
-- **Source**: unknown
+- **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/Fission-AI/OpenSpec
 - **Usage**: `nix run github:numtide/nix-ai-tools#openspec -- --help`

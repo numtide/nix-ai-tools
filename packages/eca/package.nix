@@ -34,6 +34,7 @@ let
         description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
         homepage = "https://github.com/editor-code-assistant/eca";
         license = licenses.asl20;
+        sourceProvenance = with sourceTypes; [ binaryNativeCode ];
         maintainers = with maintainers; [ jojo ];
         mainProgram = "eca";
         platforms = [ system ];
