@@ -14,14 +14,14 @@ This repository uses GitHub Actions to automatically update all packages and fla
 
 ## Available Tools
 
-<!-- `> ./scripts/generate-package-docs.sh` -->
+<!-- `> ./scripts/generate-package-docs.py` -->
 
 <!-- BEGIN mdsh -->
 
 #### amp
 
 - **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1763857589-g40edea
+- **Version**: 0.0.1763913676-g4c6d64
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -80,15 +80,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code-router -- --help`
-
-#### claude-desktop
-
-- **Description**: Claude Desktop - AI assistant from Anthropic
-- **Version**: 0.14.10
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://claude.ai
-- **Usage**: `nix run github:numtide/nix-ai-tools#claude-desktop -- --help`
 
 #### claudebox
 
@@ -164,14 +155,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run github:numtide/nix-ai-tools#cursor-agent -- --help`
 
-#### darwinOpenptyHook
-
-- **Description**: No description available
-- **Version**: unknown
-- **Source**: unknown
-- **License**: Check package
-- **Usage**: `nix run github:numtide/nix-ai-tools#darwinOpenptyHook -- --help`
-
 #### droid
 
 - **Description**: Factory AI's Droid - AI-powered development agent for your terminal
@@ -199,15 +182,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/antinomyhq/forge
 - **Usage**: `nix run github:numtide/nix-ai-tools#forge -- --help`
 - **Documentation**: See [packages/forge/README.md](packages/forge/README.md) for detailed usage
-
-#### formatter
-
-- **Description**: One CLI to format the code tree
-- **Version**: unknown
-- **Source**: unknown
-- **License**: MIT
-- **Homepage**: https://github.com/numtide/treefmt
-- **Usage**: `nix run github:numtide/nix-ai-tools#formatter -- --help`
 
 #### gemini-cli
 
@@ -248,7 +222,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### opencode
 
 - **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.85
+- **Version**: 1.0.106
 - **Source**: unknown
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
@@ -262,6 +236,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/numman-ali/openskills
 - **Usage**: `nix run github:numtide/nix-ai-tools#openskills -- --help`
+
+#### openspec
+
+- **Description**: Spec-driven development for AI coding assistants
+- **Version**: 0.16.0
+- **Source**: unknown
+- **License**: MIT
+- **Homepage**: https://github.com/Fission-AI/OpenSpec
+- **Usage**: `nix run github:numtide/nix-ai-tools#openspec -- --help`
 
 #### qwen-code
 
