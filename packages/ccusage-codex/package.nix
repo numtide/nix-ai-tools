@@ -1,0 +1,44 @@
+{
+  lib,
+  stdenv,
+  fetchzip,
+  nodejs,
+}:
+
+stdenv.mkDerivation rec {
+  pname = "ccusage-codex";
+  version = "17.1.6";
+
+  src = fetchzip {
+    url = "https://registry.npmjs.org/@ccusage/codex/-/codex-${version}.tgz";
+    hash = "sha256-6LS8DGt91kiylIU/D0HJkxZJzXDKIZ4zgaZk3quqJLQ=";
+  };
+
+  nativeBuildInputs = [ nodejs ];
+
+  installPhase = ''
+    runHook preInstall
+
+    mkdir -p $out/bin
+
+    cp -r dist/* $out/bin/
+
+    chmod +x $out/bin/index.js
+    mv $out/bin/index.js $out/bin/ccusage-codex
+
+    substituteInPlace $out/bin/ccusage-codex \
+      --replace-quiet "#!/usr/bin/env node" "#!${nodejs}/bin/node"
+
+    runHook postInstall
+  '';
+
+  meta = with lib; {
+    description = "Usage analysis tool for OpenAI Codex sessions";
+    homepage = "https://github.com/ryoppippi/ccusage";
+    license = licenses.mit;
+    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    maintainers = with maintainers; [ ryoppippi ];
+    mainProgram = "ccusage-codex";
+    platforms = platforms.all;
+  };
+}
