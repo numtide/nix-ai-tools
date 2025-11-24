@@ -110,6 +110,7 @@ else
       description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
       homepage = "https://github.com/editor-code-assistant/eca";
       license = licenses.asl20;
+      sourceProvenance = with sourceTypes; [ binaryBytecode ];
       maintainers = with maintainers; [ jojo ];
       mainProgram = "eca";
     };
