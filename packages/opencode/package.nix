@@ -229,6 +229,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     '';
     homepage = "https://github.com/sst/opencode";
     license = lib.licenses.mit;
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.unix;
     mainProgram = "opencode";
   };
