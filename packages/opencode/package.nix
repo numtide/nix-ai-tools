@@ -3,7 +3,6 @@
   stdenvNoCC,
   bun,
   fetchFromGitHub,
-  fetchpatch,
   fzf,
   makeBinaryWrapper,
   models-dev,
@@ -94,29 +93,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   patches = [
     # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
-
-    # NOTE: Packaging improvements from PR #4644
-    # Add bundle.ts for bundling with bun runtime
-    (fetchpatch {
-      url = "https://github.com/sst/opencode/commit/0b0cccaad07a05015ce6cc9c166452e9216a98cd.patch";
-      includes = [ "nix/bundle.ts" ];
-      hash = "sha256-+BXH+nEbiQu3IUKpKxbvKISkndBbyXCKcGqEQCoTsDM=";
-    })
-    # Add patch-wasm.ts script for more robust wasm path rewriting
-    (fetchpatch {
-      url = "https://github.com/sst/opencode/commit/5a1af8917ee213b5c9015283c5158534e5f259d9.patch";
-      includes = [ "nix/scripts/patch-wasm.ts" ];
-      hash = "sha256-GW5TSJ8MpNy1d2t5vZJPjNwVFjhBquxhIk2c2ki7ijA=";
-    })
-    # Update canonicalize-node-modules to skip missing targets
-    (fetchpatch {
-      url = "https://github.com/sst/opencode/commit/d289c9cb77b0f4d17be029a8802faae9df246f8e.patch";
-      includes = [ "nix/scripts/canonicalize-node-modules.ts" ];
-      hash = "sha256-yx+viE+BvGI+sDITRUqRHCRszY8aYyNBsGR1ZoP431k=";
-    })
-
-    # NOTE: Update thread.ts to use new bundled worker paths from PR #4644
-    ./fix-thread-worker-path.patch
   ];
 
   dontConfigure = true;
