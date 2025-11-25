@@ -5,7 +5,7 @@ inputs.nixpkgs.lib.extend (
       ryoppippi = {
         github = "ryoppippi";
         githubId = 1560508;
-        name = "ryoppippi";
+        name = "Ryo Osawa";
       };
     };
   }
