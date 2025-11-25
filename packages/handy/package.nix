@@ -1,0 +1,162 @@
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoPatchelfHook,
+  gcc-unwrapped,
+  dpkg,
+  makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
+  # Runtime dependencies for Linux
+  alsa-lib,
+  cairo,
+  gdk-pixbuf,
+  glib,
+  gtk3,
+  libsoup_3,
+  openssl,
+  vulkan-loader,
+  webkitgtk_4_1,
+}:
+
+let
+  pname = "handy";
+  version = "0.6.2";
+
+  # Linux uses deb packages, macOS uses app tarballs
+  srcs = {
+    x86_64-linux = fetchurl {
+      url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_${version}_amd64.deb";
+      hash = "sha256-6SZW7qCsI+h9jpC6o5StM9cm67o7OoWP9o7oK0tMpKc=";
+    };
+    x86_64-darwin = fetchurl {
+      url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_x64.app.tar.gz";
+      hash = "sha256-trxKKIEeuH8Eikf5XWKP2NBW5aSKgrpLxHm5p3iQSwc=";
+    };
+    aarch64-darwin = fetchurl {
+      url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_aarch64.app.tar.gz";
+      hash = "sha256-xVlPaZ5HW2cxFfskJ8zzOabFRYp/SK8c9GeH30Gp2F0=";
+    };
+  };
+
+  src =
+    srcs.${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}. Supported systems: x86_64-linux, x86_64-darwin, aarch64-darwin");
+
+  desktopItem = makeDesktopItem {
+    name = "handy";
+    desktopName = "Handy";
+    comment = "Fast and accurate local transcription app";
+    exec = "handy";
+    icon = "handy";
+    categories = [
+      "Audio"
+      "AudioVideo"
+      "Utility"
+    ];
+    startupNotify = true;
+  };
+in
+stdenv.mkDerivation {
+  inherit pname version src;
+
+  nativeBuildInputs =
+    lib.optionals stdenv.isLinux [
+      autoPatchelfHook
+      dpkg
+      copyDesktopItems
+    ]
+    ++ lib.optionals stdenv.isDarwin [
+      makeWrapper
+    ];
+
+  buildInputs = lib.optionals stdenv.isLinux [
+    gcc-unwrapped.lib
+    alsa-lib
+    cairo
+    gdk-pixbuf
+    glib
+    gtk3
+    libsoup_3
+    openssl
+    vulkan-loader
+    webkitgtk_4_1
+  ];
+
+  runtimeDependencies = lib.optionals stdenv.isLinux [
+    stdenv.cc.cc.lib
+  ];
+
+  desktopItems = lib.optionals stdenv.isLinux [ desktopItem ];
+
+  unpackPhase =
+    if stdenv.isLinux then
+      ''
+        runHook preUnpack
+
+        dpkg -x $src .
+
+        runHook postUnpack
+      ''
+    else
+      ''
+        runHook preUnpack
+
+        mkdir -p ./unpacked
+        tar -xzf $src -C ./unpacked
+
+        runHook postUnpack
+      '';
+
+  installPhase =
+    if stdenv.isLinux then
+      ''
+        runHook preInstall
+
+        # Install the binary
+        install -Dm755 usr/bin/handy $out/bin/handy
+
+        # Install resources
+        mkdir -p $out/lib/Handy/resources
+        cp -r usr/lib/Handy/resources/* $out/lib/Handy/resources/
+
+        # Install icons
+        mkdir -p $out/share/icons/hicolor
+        if [ -d usr/share/icons/hicolor ]; then
+          cp -r usr/share/icons/hicolor/* $out/share/icons/hicolor/
+        fi
+
+        runHook postInstall
+      ''
+    else
+      ''
+        runHook preInstall
+
+        mkdir -p $out/Applications
+        cp -r ./unpacked/Handy.app $out/Applications/
+
+        # Create a wrapper script in bin
+        mkdir -p $out/bin
+        makeWrapper $out/Applications/Handy.app/Contents/MacOS/Handy $out/bin/handy
+
+        runHook postInstall
+      '';
+
+  passthru.updateScript = ./update.sh;
+
+  meta = with lib; {
+    description = "Fast and accurate local transcription app using AI models";
+    homepage = "https://handy.computer/";
+    changelog = "https://github.com/cjpais/Handy/releases/tag/v${version}";
+    license = licenses.unfree;
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+    maintainers = with maintainers; [ ];
+    platforms = [
+      "x86_64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+    mainProgram = "handy";
+  };
+}
