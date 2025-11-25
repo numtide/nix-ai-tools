@@ -119,7 +119,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
       ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
 
-      # Use upstream bundle.ts from the patched source
+      # Use upstream bundle.ts for Nix-compatible bundling
       cp ../../nix/bundle.ts ./bundle.ts
       chmod +x ./bundle.ts
       bun run ./bundle.ts
