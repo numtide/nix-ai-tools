@@ -14,6 +14,7 @@
   gdk-pixbuf,
   glib,
   gtk3,
+  libayatana-appindicator,
   libsoup_3,
   openssl,
   vulkan-loader,
@@ -86,6 +87,7 @@ stdenv.mkDerivation {
 
   runtimeDependencies = lib.optionals stdenv.isLinux [
     stdenv.cc.cc.lib
+    libayatana-appindicator
   ];
 
   desktopItems = lib.optionals stdenv.isLinux [ desktopItem ];
