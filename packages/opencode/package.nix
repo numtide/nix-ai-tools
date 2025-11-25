@@ -3,7 +3,6 @@
   stdenvNoCC,
   bun,
   fetchFromGitHub,
-  fetchpatch,
   fzf,
   makeBinaryWrapper,
   models-dev,
@@ -13,12 +12,12 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.106";
+  version = "1.0.109";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Xh94GIcTPp6JNUZpd6S32pmbnjy0v1ma8IJDhgYb5Rg=";
+    hash = "sha256-nTanFoEJCQMIbFbyLxB73Qvw4ToecaFo2RAkOuPievc=";
   };
 
   # NOTE: We use upstream's normalization scripts for reproducible node_modules,
@@ -80,7 +79,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = "sha256-2d8/pzQIBVxydeRVqlYpwqxFRa72yJMbZwJdb4zWWSw=";
+    outputHash = "sha256-9BOVWvd134TEro2TfFSjekqtrbXdPWznowRFjKcoxDQ=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
@@ -94,29 +93,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   patches = [
     # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
-
-    # NOTE: Packaging improvements from PR #4644
-    # Add bundle.ts for bundling with bun runtime
-    (fetchpatch {
-      url = "https://github.com/sst/opencode/commit/0b0cccaad07a05015ce6cc9c166452e9216a98cd.patch";
-      includes = [ "nix/bundle.ts" ];
-      hash = "sha256-+BXH+nEbiQu3IUKpKxbvKISkndBbyXCKcGqEQCoTsDM=";
-    })
-    # Add patch-wasm.ts script for more robust wasm path rewriting
-    (fetchpatch {
-      url = "https://github.com/sst/opencode/commit/5a1af8917ee213b5c9015283c5158534e5f259d9.patch";
-      includes = [ "nix/scripts/patch-wasm.ts" ];
-      hash = "sha256-GW5TSJ8MpNy1d2t5vZJPjNwVFjhBquxhIk2c2ki7ijA=";
-    })
-    # Update canonicalize-node-modules to skip missing targets
-    (fetchpatch {
-      url = "https://github.com/sst/opencode/commit/d289c9cb77b0f4d17be029a8802faae9df246f8e.patch";
-      includes = [ "nix/scripts/canonicalize-node-modules.ts" ];
-      hash = "sha256-yx+viE+BvGI+sDITRUqRHCRszY8aYyNBsGR1ZoP431k=";
-    })
-
-    # NOTE: Update thread.ts to use new bundled worker paths from PR #4644
-    ./fix-thread-worker-path.patch
   ];
 
   dontConfigure = true;
@@ -143,7 +119,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
       ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
 
-      # Use upstream bundle.ts from the patched source
+      # Use upstream bundle.ts for Nix-compatible bundling
       cp ../../nix/bundle.ts ./bundle.ts
       chmod +x ./bundle.ts
       bun run ./bundle.ts
