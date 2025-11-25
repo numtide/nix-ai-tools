@@ -54,10 +54,11 @@ def main() -> None:
     except NixCommandError as e:
         # Extract hash from error
         error_output = e.args[0] if e.args else str(e)
-        node_modules_hash = extract_hash_from_build_error(error_output)
-        if not node_modules_hash:
+        extracted_hash = extract_hash_from_build_error(error_output)
+        if not extracted_hash:
             print(f"Error: Could not extract hash from build error:\n{error_output}")
             return
+        node_modules_hash = extracted_hash
         print(f"Extracted node_modules hash: {node_modules_hash}")
 
     # Write final sources.json with all correct values
