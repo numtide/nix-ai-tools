@@ -10,88 +10,62 @@ from pathlib import Path
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import (
-    BaseUpdater,
-    fetch_github_latest_release,
-    get_node_modules_hash,
-    nix,
-    should_update,
-)
-from updater.hash import calculate_url_hash
-
-
-class BacklogMdUpdater(BaseUpdater):
-    """Custom updater for backlog-md using JSON sources file."""
-
-    def __init__(self) -> None:
-        """Initialize the backlog-md updater."""
-        super().__init__("backlog-md")
-        self.sources_file = Path(__file__).parent / "sources.json"
-
-    def _write_sources(
-        self,
-        version: str,
-        src_hash: str,
-        node_modules_hash: str,
-    ) -> None:
-        """Write sources to sources.json.
-
-        Args:
-            version: Package version
-            src_hash: Source hash
-            node_modules_hash: Node modules hash
-
-        """
-        sources = {
-            "version": version,
-            "src_hash": src_hash,
-            "node_modules_hash": node_modules_hash,
-        }
-        self.sources_file.write_text(json.dumps(sources, indent=2) + "\n")
-
-    def update(self) -> bool:
-        """Update the package by writing to sources.json."""
-        current = self.get_current_version()
-        latest = fetch_github_latest_release("MrLesk", "Backlog.md")
-
-        if not should_update(current, latest):
-            return False
-
-        print(f"Updating backlog-md from {current} to {latest}")
-
-        # Calculate source hash for fetchFromGitHub
-        tag = f"v{latest}"
-        url = f"https://github.com/MrLesk/Backlog.md/archive/{tag}.tar.gz"
-        source_hash = calculate_url_hash(url, unpack=True)
-
-        # Write temporary sources.json with dummy node_modules hash
-        self._write_sources(
-            latest,
-            source_hash,
-            "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-        )
-
-        # Calculate correct node_modules hash by building
-        try:
-            node_modules_hash = get_node_modules_hash("backlog-md", self.package_file)
-        except (nix.NixCommandError, ValueError) as e:
-            print(f"Error: Could not calculate node_modules hash: {e}")
-            return False
-
-        # Write final sources.json with all correct values
-        self._write_sources(latest, source_hash, node_modules_hash)
-        print(f"Updated sources.json with version {latest}")
-
-        return True
+from updater import calculate_url_hash, fetch_github_latest_release, nix_eval
+from updater.hash import extract_hash_from_build_error
+from updater.nix import NixCommandError, nix_build
 
 
 def main() -> None:
     """Update the backlog-md package."""
-    updater = BacklogMdUpdater()
-    if updater.update():
-        print("Update complete for backlog-md!")
-    else:
+    script_dir = Path(__file__).parent
+    sources_file = script_dir / "sources.json"
+
+    # Get current version (backlog-md is x86_64-linux only)
+    current = nix_eval(".#packages.x86_64-linux.backlog-md.version")
+    latest = fetch_github_latest_release("MrLesk", "Backlog.md")
+
+    if current == latest:
         print("backlog-md is already up-to-date!")
+        return
+
+    print(f"Updating backlog-md from {current} to {latest}")
+
+    # Calculate source hash for fetchFromGitHub
+    tag = f"v{latest}"
+    url = f"https://github.com/MrLesk/Backlog.md/archive/{tag}.tar.gz"
+    print("Fetching source hash...")
+    source_hash = calculate_url_hash(url, unpack=True)
+
+    # Write temporary sources.json with dummy node_modules hash
+    sources = {
+        "version": latest,
+        "src_hash": source_hash,
+        "node_modules_hash": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    }
+    sources_file.write_text(json.dumps(sources, indent=2) + "\n")
+
+    # Calculate correct node_modules hash by building (backlog-md is x86_64-linux only)
+    print("Building to get node_modules hash...")
+    try:
+        nix_build(".#packages.x86_64-linux.backlog-md", check=True)
+        # If build succeeds, something went wrong
+        print("Warning: Build succeeded with dummy hash - using dummy hash")
+        node_modules_hash = sources["node_modules_hash"]
+    except NixCommandError as e:
+        # Extract hash from error
+        error_output = e.args[0] if e.args else str(e)
+        extracted_hash = extract_hash_from_build_error(error_output)
+        if not extracted_hash:
+            print(f"Error: Could not extract hash from build error:\n{error_output}")
+            return
+        node_modules_hash = extracted_hash
+        print(f"Extracted node_modules hash: {node_modules_hash}")
+
+    # Write final sources.json with all correct values
+    sources["node_modules_hash"] = node_modules_hash
+    sources_file.write_text(json.dumps(sources, indent=2) + "\n")
+    print(f"Updated sources.json with version {latest}")
+    print("Update complete for backlog-md!")
 
 
 if __name__ == "__main__":
