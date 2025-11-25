@@ -54,6 +54,15 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/sirmalloc/ccstatusline
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccstatusline -- --help`
 
+#### ccusage-codex
+
+- **Description**: Usage analysis tool for OpenAI Codex sessions
+- **Version**: 17.1.6
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/nix-ai-tools#ccusage-codex -- --help`
+
 #### claude-code
 
 - **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
