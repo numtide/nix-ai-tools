@@ -39,6 +39,49 @@ meta = with lib; {
 };
 ```
 
+#### Custom Maintainers
+
+For maintainers not yet in nixpkgs, define them in `lib/default.nix`:
+
+```nix
+{ inputs, ... }:
+inputs.nixpkgs.lib.extend (
+  _final: prev: {
+    maintainers = prev.maintainers // {
+      username = {
+        github = "github-username";
+        githubId = 123456; # Get from: curl -s https://api.github.com/users/username | jq -r '.id'
+        name = "Full Name";
+      };
+    };
+  }
+)
+```
+
+Then in `packages/<package>/default.nix`, pass `flake` to the package:
+
+```nix
+{ pkgs, flake }: pkgs.callPackage ./package.nix { inherit flake; }
+```
+
+And in `packages/<package>/package.nix`, reference custom maintainers:
+
+```nix
+{
+  lib,
+  flake,
+  # ... other args
+}:
+
+stdenv.mkDerivation rec {
+  # ...
+  meta = with lib; {
+    maintainers = with flake.lib.maintainers; [ username ];
+    # ... other meta
+  };
+}
+```
+
 ## Testing Guidelines
 
 - Build locally: `nix build .#<package>`.
