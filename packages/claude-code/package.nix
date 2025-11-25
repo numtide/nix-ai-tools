@@ -7,14 +7,14 @@
 
 buildNpmPackage rec {
   pname = "claude-code";
-  version = "2.0.50";
+  version = "2.0.53";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-    hash = "sha256-mZQkqeL/F/9u5esy1j1pUjcyzeaShREx+vMuvZ5Zrz8=";
+    hash = "sha256-GDk3oROfwlreyZ95oWkUc/OAv8pRHhHLDcwmRzXq3Wg=";
   };
 
-  npmDepsHash = "sha256-e76CMtdyqWtiKP+U4aiKKfxm7hbISL/+VhNY6TcHjRk=";
+  npmDepsHash = "sha256-owrDXjUvqxnKxZ1iGgeIlWxzTDRdTSzgy+6DrKrOrQE=";
 
   nativeBuildInputs = [ makeWrapper ];
 
@@ -35,10 +35,6 @@ buildNpmPackage rec {
       --set DISABLE_TELEMETRY 1 \
       --unset DEV
   '';
-
-  passthru = {
-    updateScript = ./update.sh;
-  };
 
   meta = with lib; {
     description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";

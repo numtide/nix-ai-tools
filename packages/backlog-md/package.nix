@@ -10,6 +10,8 @@
 }:
 
 let
+  sources = lib.importJSON ./sources.json;
+
   fetchBunDeps =
     { src, hash, ... }@args:
     stdenvNoCC.mkDerivation {
@@ -51,20 +53,20 @@ let
       outputHashMode = "recursive";
     };
 
-  version = "1.20.1";
+  inherit (sources) version;
 
   src = fetchFromGitHub {
     owner = "MrLesk";
     repo = "Backlog.md";
     rev = "v${version}";
-    hash = "sha256-WpfFhFqqVTHGEfa1jTOU4kY3eFpAVu2G1O8lFBIScVA=";
+    hash = sources.src_hash;
   };
 
   # Create a fixed-output derivation for dependencies
   node_modules = fetchBunDeps {
     pname = "backlog-md-bun-deps";
     inherit version src;
-    hash = "sha256-mzah9FUHq7JrnPGts8M8VkCAGTwXpU2LeppKBmx5Wg8=";
+    hash = sources.node_modules_hash;
   };
 in
 stdenv.mkDerivation rec {
@@ -136,10 +138,6 @@ stdenv.mkDerivation rec {
   # Don't strip the binary - bun compile embeds the JavaScript program
   # in the executable and stripping would remove it
   dontStrip = true;
-
-  passthru = {
-    updateScript = ./update.sh;
-  };
 
   meta = with lib; {
     description = "Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem";

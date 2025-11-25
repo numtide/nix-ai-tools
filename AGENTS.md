@@ -10,18 +10,77 @@
 ## Build, Test, and Development Commands
 
 - Enter dev shell: `nix develop`.
-- Build a package: `nix build .#<package>` (e.g., `nix build .#claude-code`).
+- Build a package: `nix build --accept-flake-config .#<package>` (e.g., `nix build .#claude-code`).
 - Run without installing: `nix run .#<package> -- --help`.
 - Repo checks (builds + lints): `nix flake check`.
 - Format everything: `nix fmt`.
-- Regenerate README package section: `mdsh` or `./scripts/generate-package-docs.sh`.
+- Regenerate README package section: `./scripts/generate-package-docs.sh`.
 
 ## Coding Style & Naming Conventions
 
 - Indentation: 2 spaces; avoid tabs.
 - Nix: small, composable derivations; prefer `buildNpmPackage`/`rustPlatform.buildRustPackage`/`stdenv.mkDerivation` as in existing packages.
-- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.sh` (optional updater).
+- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.sh` (optional updater, avoid if nix-update is sufficient).
 - Tools via treefmt: nixfmt, deadnix, shfmt, shellcheck, mdformat, yamlfmt, taplo. Always run `nix fmt` before committing.
+
+### Package Metadata Requirements
+
+Every package MUST have proper metadata in `package.nix`:
+
+```nix
+meta = with lib; {
+  description = "Clear, concise description";
+  homepage = "https://project-homepage.com";
+  license = licenses.mit; # or licenses.unfree, etc.
+  sourceProvenance = with lib.sourceTypes; [ fromSource ];
+  maintainers = with maintainers; [ username ];
+  mainProgram = "binary-name";
+  platforms = platforms.all; # or specific platforms
+};
+```
+
+#### Custom Maintainers
+
+For maintainers not yet in nixpkgs, define them in `lib/default.nix`:
+
+```nix
+{ inputs, ... }:
+inputs.nixpkgs.lib.extend (
+  _final: prev: {
+    maintainers = prev.maintainers // {
+      username = {
+        github = "github-username";
+        githubId = 123456; # Get from: curl -s https://api.github.com/users/username | jq -r '.id'
+        name = "Full Name";
+      };
+    };
+  }
+)
+```
+
+Then in `packages/<package>/default.nix`, pass `flake` to the package:
+
+```nix
+{ pkgs, flake }: pkgs.callPackage ./package.nix { inherit flake; }
+```
+
+And in `packages/<package>/package.nix`, reference custom maintainers:
+
+```nix
+{
+  lib,
+  flake,
+  # ... other args
+}:
+
+stdenv.mkDerivation rec {
+  # ...
+  meta = with lib; {
+    maintainers = with flake.lib.maintainers; [ username ];
+    # ... other meta
+  };
+}
+```
 
 ## Testing Guidelines
 
@@ -42,6 +101,26 @@
 - Some tools are unfree; enable unfree if needed in your Nix config.
 - Sandbox experiments: see `packages/claudebox/` for a confined execution wrapper.
 - Pin sources with hashes; avoid network access at build time.
+
+## Installing Nix (Required for Package Testing)
+
+When working on package requests or fixes, you MUST install Nix from the official installer to properly test changes,
+unless already present
+
+```bash
+# Install Nix with daemon mode
+sh <(curl -L https://nixos.org/nix/install) --daemon
+
+# Enable flakes and nix-command (required for this repository)
+echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+
+# Restart the Nix daemon to apply changes
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sudo launchctl kickstart -k system/org.nixos.nix-daemon
+else
+  sudo systemctl restart nix-daemon
+fi
+```
 
 ### Common Issues and Solutions
 

@@ -31,7 +31,7 @@ on:
         required: true
 jobs:
   discover:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
       has-updates: ${{ steps.build-matrix.outputs.has-updates }}
@@ -50,7 +50,7 @@ jobs:
   update:
     needs: discover
     if: needs.discover.outputs.has-updates == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
@@ -103,7 +103,7 @@ jobs:
             "${{ steps.update.outputs.new_version }}"
   summary:
     needs: [discover, update]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: always() && needs.discover.outputs.has-updates == 'true'
     steps:
       - name: Generate summary

@@ -8,14 +8,15 @@
 }:
 
 let
-  version = "0.0.1763857589-g40edea";
+  versionData = lib.importJSON ./version.json;
+  version = versionData.version;
   # First, create a source with package-lock.json included
   srcWithLock = runCommand "amp-src-with-lock" { } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
-        url = "https://registry.npmjs.org/@sourcegraph/amp/-/amp-0.0.1763857589-g40edea.tgz";
-        hash = "sha256-Xl9bejk6aXUT9qYyo1DJyaA8eqnNUoAAUD1FGkPGNUE=";
+        url = "https://registry.npmjs.org/@sourcegraph/amp/-/amp-${version}.tgz";
+        hash = versionData.sourceHash;
       }
     } -C $out --strip-components=1
     cp ${./package-lock.json} $out/package-lock.json
@@ -29,7 +30,7 @@ buildNpmPackage rec {
 
   npmDeps = fetchNpmDeps {
     inherit src;
-    hash = "sha256-2/cpySEiS+tBsiG4aUZ5m8wUAhhMhkZC/P0wkj5hGw4=";
+    hash = versionData.npmDepsHash;
   };
 
   # The package from npm is already built
@@ -40,10 +41,6 @@ buildNpmPackage rec {
       --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
       --set AMP_SKIP_UPDATE_CHECK 1
   '';
-
-  passthru = {
-    updateScript = ./update.sh;
-  };
 
   meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";

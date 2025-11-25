@@ -12,12 +12,12 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.85";
+  version = "1.0.109";
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-mUGFERzY7dbN2CwWWUhONvvwhlY0LrTAGZ168m8y0RE=";
+    hash = "sha256-nTanFoEJCQMIbFbyLxB73Qvw4ToecaFo2RAkOuPievc=";
   };
 
   # NOTE: We use upstream's normalization scripts for reproducible node_modules,
@@ -79,7 +79,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = "sha256-RtA8hJvdrPt0Ox3UuFhHKtFzGxE2AQZcB5jlLRBgx6o=";
+    outputHash = "sha256-9BOVWvd134TEro2TfFSjekqtrbXdPWznowRFjKcoxDQ=";
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };
@@ -108,20 +108,22 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     cp -r ${finalAttrs.node_modules}/node_modules .
     cp -r ${finalAttrs.node_modules}/packages .
 
-    cd packages/opencode
+    (
+      cd packages/opencode
 
-    # Fix symlinks to workspace packages
-    chmod -R u+w ./node_modules
-    mkdir -p ./node_modules/@opencode-ai
-    rm -f ./node_modules/@opencode-ai/{script,sdk,plugin}
-    ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
-    ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
-    ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
+      # Fix symlinks to workspace packages
+      chmod -R u+w ./node_modules
+      mkdir -p ./node_modules/@opencode-ai
+      rm -f ./node_modules/@opencode-ai/{script,sdk,plugin}
+      ln -s $(pwd)/../../packages/script ./node_modules/@opencode-ai/script
+      ln -s $(pwd)/../../packages/sdk/js ./node_modules/@opencode-ai/sdk
+      ln -s $(pwd)/../../packages/plugin ./node_modules/@opencode-ai/plugin
 
-    # Bundle the application with version defines
-    cp ${./bundle.ts} ./bundle.ts
-    chmod +x ./bundle.ts
-    bun run ./bundle.ts
+      # Use upstream bundle.ts for Nix-compatible bundling
+      cp ../../nix/bundle.ts ./bundle.ts
+      chmod +x ./bundle.ts
+      bun run ./bundle.ts
+    )
 
     runHook postBuild
   '';
@@ -129,34 +131,43 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
+    cd packages/opencode
+    if [ ! -d dist ]; then
+      echo "ERROR: dist directory missing after bundle step"
+      exit 1
+    fi
+
     mkdir -p $out/lib/opencode
-    # Copy the bundled dist directory
     cp -r dist $out/lib/opencode/
+    chmod -R u+w $out/lib/opencode/dist
 
-    # Fix WASM paths in worker.ts - use absolute paths to the installed location
-    # Main wasm is tree-sitter-<hash>.wasm, language wasms are tree-sitter-<lang>-<hash>.wasm
-    main_wasm=$(find "$out/lib/opencode/dist" -maxdepth 1 -name 'tree-sitter-[a-z0-9]*.wasm' -print -quit)
+    # Select bundled worker assets deterministically (sorted find output)
+    worker_file=$(find "$out/lib/opencode/dist" -type f \( -path '*/tui/worker.*' -o -name 'worker.*' \) | sort | head -n1)
+    parser_worker_file=$(find "$out/lib/opencode/dist" -type f -name 'parser.worker.*' | sort | head -n1)
+    if [ -z "$worker_file" ]; then
+      echo "ERROR: bundled worker not found"
+      exit 1
+    fi
 
-    substituteInPlace $out/lib/opencode/dist/worker.ts \
-      --replace-fail 'module2.exports = "../../../tree-sitter-' 'module2.exports = "'"$out"'/lib/opencode/dist/tree-sitter-' \
-      --replace-fail 'new URL("tree-sitter.wasm", import.meta.url).href' "\"$main_wasm\""
-
-    # Copy only the native modules we need (marked as external in bundle.ts)
-    mkdir -p $out/lib/opencode/node_modules/.bun
-    mkdir -p $out/lib/opencode/node_modules/@opentui
-
-    # Copy @opentui/core platform-specific packages
-    for pkg in ../../node_modules/.bun/@opentui+core-*; do
-      if [ -d "$pkg" ]; then
-        cp -r "$pkg" $out/lib/opencode/node_modules/.bun/$(basename "$pkg")
+    main_wasm=$(printf '%s\n' "$out"/lib/opencode/dist/tree-sitter-*.wasm | sort | head -n1)
+    wasm_list=$(find "$out/lib/opencode/dist" -maxdepth 1 -name 'tree-sitter-*.wasm' -print)
+    for patch_file in "$worker_file" "$parser_worker_file"; do
+      [ -z "$patch_file" ] && continue
+      [ ! -f "$patch_file" ] && continue
+      if [ -n "$wasm_list" ] && grep -q 'tree-sitter' "$patch_file"; then
+        # Rewrite wasm references to absolute store paths to avoid runtime resolve failures.
+        bun --bun ../../nix/scripts/patch-wasm.ts "$patch_file" "$main_wasm" $wasm_list
       fi
     done
 
+    mkdir -p $out/lib/opencode/node_modules
+    cp -r ../../node_modules/.bun $out/lib/opencode/node_modules/
+    mkdir -p $out/lib/opencode/node_modules/@opentui
 
     mkdir -p $out/bin
     makeWrapper ${bun}/bin/bun $out/bin/opencode \
       --add-flags "run" \
-      --add-flags "$out/lib/opencode/dist/index.js" \
+      --add-flags "$out/lib/opencode/dist/src/index.js" \
       --prefix PATH : ${
         lib.makeBinPath [
           fzf
@@ -170,14 +181,19 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   postInstall = ''
     # Add symlinks for platform-specific native modules
-    for pkg in $out/lib/opencode/node_modules/.bun/@opentui+core-*; do
+    pkgs=(
+      $out/lib/opencode/node_modules/.bun/@opentui+core-*
+      $out/lib/opencode/node_modules/.bun/@opentui+solid-*
+      $out/lib/opencode/node_modules/.bun/@opentui+core@*
+      $out/lib/opencode/node_modules/.bun/@opentui+solid@*
+    )
+    for pkg in "''${pkgs[@]}"; do
       if [ -d "$pkg" ]; then
-        pkgName=$(basename "$pkg" | sed 's/@opentui+\(core-[^@]*\)@.*/\1/')
+        pkgName=$(basename "$pkg" | sed 's/@opentui+\([^@]*\)@.*/\1/')
         ln -sf ../.bun/$(basename "$pkg")/node_modules/@opentui/$pkgName \
-               $out/lib/opencode/node_modules/@opentui/$pkgName
+          $out/lib/opencode/node_modules/@opentui/$pkgName
       fi
     done
-
   '';
 
   meta = {
@@ -189,6 +205,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     '';
     homepage = "https://github.com/sst/opencode";
     license = lib.licenses.mit;
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.unix;
     mainProgram = "opencode";
   };
