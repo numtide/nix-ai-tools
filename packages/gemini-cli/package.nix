@@ -35,7 +35,6 @@ buildNpmPackage (finalAttrs: {
   ];
 
   buildInputs = [
-    ripgrep
     libsecret
   ];
 
@@ -64,7 +63,12 @@ buildNpmPackage (finalAttrs: {
 
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
       wrapProgram $out/bin/gemini \
-        --prefix PATH : ${lib.makeBinPath [ xsel ]}
+        --prefix PATH : ${
+          lib.makeBinPath [
+            xsel
+            ripgrep
+          ]
+        }
     ''}
 
     runHook postInstall
