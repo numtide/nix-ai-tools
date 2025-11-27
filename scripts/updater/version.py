@@ -1,8 +1,9 @@
 """Version fetching from various sources (GitHub, npm, custom APIs)."""
 
+import re
 from typing import cast
 
-from .http import fetch_json
+from .http import fetch_json, fetch_text
 from .nix import run_command
 
 
@@ -128,3 +129,25 @@ def should_update(current: str, latest: str) -> bool:
 
     """
     return compare_versions(current, latest) < 0
+
+
+def fetch_version_from_text(url: str, pattern: str) -> str:
+    """Fetch text from URL and extract version using regex pattern.
+
+    Args:
+        url: URL to fetch text from
+        pattern: Regex pattern with a capture group for the version
+
+    Returns:
+        Extracted version string
+
+    Raises:
+        ValueError: If version cannot be extracted
+
+    """
+    text = fetch_text(url)
+    match = re.search(pattern, text)
+    if not match:
+        msg = f"Could not extract version from {url} using pattern {pattern}"
+        raise ValueError(msg)
+    return match.group(1)

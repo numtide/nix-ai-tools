@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for forge package."""
+"""Update script for handy package."""
 
 import sys
 from pathlib import Path
@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    calculate_platform_hashes,
+    calculate_url_hash,
     fetch_github_latest_release,
     load_hashes,
     save_hashes,
@@ -18,19 +18,19 @@ from updater import (
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
+# Platform filenames use different patterns, not suitable for calculate_platform_hashes
 PLATFORMS = {
-    "x86_64-linux": "x86_64-unknown-linux-gnu",
-    "aarch64-linux": "aarch64-unknown-linux-gnu",
-    "x86_64-darwin": "x86_64-apple-darwin",
-    "aarch64-darwin": "aarch64-apple-darwin",
+    "x86_64-linux": "Handy_{version}_amd64.deb",
+    "x86_64-darwin": "Handy_x64.app.tar.gz",
+    "aarch64-darwin": "Handy_aarch64.app.tar.gz",
 }
 
 
 def main() -> None:
-    """Update the forge package."""
+    """Update the handy package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_github_latest_release("antinomyhq", "forge")
+    latest = fetch_github_latest_release("cjpais", "Handy")
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -38,8 +38,12 @@ def main() -> None:
         print("Already up to date")
         return
 
-    url_template = f"https://github.com/antinomyhq/forge/releases/download/v{latest}/forge-{{platform}}"
-    hashes = calculate_platform_hashes(url_template, PLATFORMS)
+    base_url = f"https://github.com/cjpais/Handy/releases/download/v{latest}"
+    hashes = {}
+    for platform, filename in PLATFORMS.items():
+        url = f"{base_url}/{filename.format(version=latest)}"
+        print(f"Fetching hash for {platform}...")
+        hashes[platform] = calculate_url_hash(url)
 
     save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
     print(f"Updated to {latest}")

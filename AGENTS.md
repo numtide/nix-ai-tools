@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 
 - Root: `flake.nix`, `flake.lock`, `devshell.nix`, `README.md`.
-- Packages live under `packages/<tool>/` with `package.nix`, `default.nix`, optional `update.sh`, and lockfiles when needed.
+- Packages live under `packages/<tool>/` with `package.nix`, `default.nix`, optional `update.py`, and lockfiles when needed.
 - Formatting config: `packages/formatter/treefmt.nix`.
 - Utilities and docs: `scripts/`, `docs/`, `.github/`.
 
@@ -20,7 +20,7 @@
 
 - Indentation: 2 spaces; avoid tabs.
 - Nix: small, composable derivations; prefer `buildNpmPackage`/`rustPlatform.buildRustPackage`/`stdenv.mkDerivation` as in existing packages.
-- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.sh` (optional updater, avoid if nix-update is sufficient).
+- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional updater using `scripts/updater/` library).
 - Tools via treefmt: nixfmt, deadnix, shfmt, shellcheck, mdformat, yamlfmt, taplo. Always run `nix fmt` before committing.
 
 ### Package Metadata Requirements

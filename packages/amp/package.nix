@@ -8,7 +8,7 @@
 }:
 
 let
-  versionData = lib.importJSON ./version.json;
+  versionData = lib.importJSON ./hashes.json;
   version = versionData.version;
   # First, create a source with package-lock.json included
   srcWithLock = runCommand "amp-src-with-lock" { } ''

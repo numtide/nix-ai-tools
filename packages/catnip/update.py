@@ -6,33 +6,43 @@
 import sys
 from pathlib import Path
 
-# Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    MultiPlatformUpdater,
+    calculate_platform_hashes,
     fetch_github_latest_release,
-    make_platform_mapper,
+    load_hashes,
+    save_hashes,
+    should_update,
 )
+
+HASHES_FILE = Path(__file__).parent / "hashes.json"
+
+PLATFORMS = {
+    "x86_64-linux": "linux_amd64",
+    "aarch64-linux": "linux_arm64",
+    "x86_64-darwin": "darwin_amd64",
+    "aarch64-darwin": "darwin_arm64",
+}
 
 
 def main() -> None:
     """Update the catnip package."""
-    updater = MultiPlatformUpdater(
-        package="catnip",
-        version_fetcher=lambda: fetch_github_latest_release("wandb", "catnip"),
-        url_template="https://github.com/wandb/catnip/releases/download/v{version}/catnip_{version}_{platform}.tar.gz",
-        platform_to_url_arch=make_platform_mapper(
-            {"x86_64": "amd64", "aarch64": "arm64"},
-            {"linux": "linux", "darwin": "darwin"},
-            separator="_",
-        ),
-    )
+    data = load_hashes(HASHES_FILE)
+    current = data["version"]
+    latest = fetch_github_latest_release("wandb", "catnip")
 
-    if updater.update():
-        print("Update complete for catnip!")
-    else:
-        print("Already up-to-date!")
+    print(f"Current: {current}, Latest: {latest}")
+
+    if not should_update(current, latest):
+        print("Already up to date")
+        return
+
+    url_template = f"https://github.com/wandb/catnip/releases/download/v{latest}/catnip_{latest}_{{platform}}.tar.gz"
+    hashes = calculate_platform_hashes(url_template, PLATFORMS)
+
+    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
+    print(f"Updated to {latest}")
 
 
 if __name__ == "__main__":

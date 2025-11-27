@@ -7,45 +7,65 @@ import re
 import sys
 from pathlib import Path
 
-# Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import RustPackageUpdater, fetch_github_latest_release
+from updater import (
+    calculate_dependency_hash,
+    calculate_url_hash,
+    fetch_github_latest_release,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
+from updater.hash import DUMMY_SHA256_HASH
+from updater.nix import NixCommandError
+
+HASHES_FILE = Path(__file__).parent / "hashes.json"
 
 
-def fetch_codex_version() -> str:
-    """Fetch latest codex version from GitHub releases.
-
-    Returns:
-        Latest version matching rust-v* pattern
-
-    """
-    # Get the latest release tag (e.g., "rust-v0.63.0")
+def fetch_version() -> str:
+    """Fetch latest codex version from GitHub releases."""
     tag = fetch_github_latest_release("openai", "codex")
-
-    # Extract version from tag (rust-v0.63.0 -> 0.63.0)
     match = re.match(r"^rust-v(.+)$", tag)
-    if match:
-        return match.group(1)
-
-    # If no match, return the tag as-is
-    return tag
+    return match.group(1) if match else tag
 
 
 def main() -> None:
     """Update the codex package."""
-    updater = RustPackageUpdater(
-        package="codex",
-        version_fetcher=fetch_codex_version,
-        repo_owner="openai",
-        repo_name="codex",
-        tag_template="rust-v{version}",
-    )
+    data = load_hashes(HASHES_FILE)
+    current = data["version"]
+    latest = fetch_version()
 
-    if updater.update():
-        print("Update complete for codex!")
-    else:
-        print("codex is already up-to-date!")
+    print(f"Current: {current}, Latest: {latest}")
+
+    if not should_update(current, latest):
+        print("Already up to date")
+        return
+
+    tag = f"rust-v{latest}"
+    url = f"https://github.com/openai/codex/archive/refs/tags/{tag}.tar.gz"
+
+    print("Calculating source hash...")
+    source_hash = calculate_url_hash(url, unpack=True)
+
+    data = {
+        "version": latest,
+        "hash": source_hash,
+        "cargoHash": DUMMY_SHA256_HASH,
+    }
+    save_hashes(HASHES_FILE, data)
+
+    try:
+        cargo_hash = calculate_dependency_hash(
+            ".#codex", "cargoHash", HASHES_FILE, data
+        )
+        data["cargoHash"] = cargo_hash
+        save_hashes(HASHES_FILE, data)
+    except (ValueError, NixCommandError) as e:
+        print(f"Error: {e}")
+        return
+
+    print(f"Updated to {latest}")
 
 
 if __name__ == "__main__":

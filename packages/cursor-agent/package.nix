@@ -8,29 +8,23 @@
 
 let
   pname = "cursor-agent";
-  version = "2025.11.25-d5b3271";
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hashes;
 
-  srcs = {
-    x86_64-linux = fetchurl {
-      url = "https://downloads.cursor.com/lab/${version}/linux/x64/agent-cli-package.tar.gz";
-      hash = "sha256-oWYGMIlp7d0cpS7iQxbj62XdfhXnztTqlu1yFmhVKVU=";
-    };
-    aarch64-linux = fetchurl {
-      url = "https://downloads.cursor.com/lab/${version}/linux/arm64/agent-cli-package.tar.gz";
-      hash = "sha256-Cqoc+42LbrKTQv1YEQeX8Vfoj7KosUOWsdVTf6whxw4=";
-    };
-    x86_64-darwin = fetchurl {
-      url = "https://downloads.cursor.com/lab/${version}/darwin/x64/agent-cli-package.tar.gz";
-      hash = "sha256-PRxUE0AhEe/5EpXahWx5WW68uUkncwHGxG5eTjFxwyk=";
-    };
-    aarch64-darwin = fetchurl {
-      url = "https://downloads.cursor.com/lab/${version}/darwin/arm64/agent-cli-package.tar.gz";
-      hash = "sha256-IOb37qUv9R/ZfH5ooThZmFbWxl592Zv8F7bAifsWvjk=";
-    };
+  platformMap = {
+    x86_64-linux = "linux/x64";
+    aarch64-linux = "linux/arm64";
+    x86_64-darwin = "darwin/x64";
+    aarch64-darwin = "darwin/arm64";
   };
 
-  src =
-    srcs.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  platform = stdenv.hostPlatform.system;
+  platformPath = platformMap.${platform} or (throw "Unsupported system: ${platform}");
+
+  src = fetchurl {
+    url = "https://downloads.cursor.com/lab/${version}/${platformPath}/agent-cli-package.tar.gz";
+    hash = hashes.${platform};
+  };
 in
 stdenv.mkDerivation rec {
   inherit pname version src;

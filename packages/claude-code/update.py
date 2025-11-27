@@ -7,77 +7,78 @@ import subprocess
 import sys
 from pathlib import Path
 
-# Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    NpmPackageUpdater,
+    calculate_dependency_hash,
+    calculate_url_hash,
     fetch_npm_version,
+    load_hashes,
+    save_hashes,
     should_update,
 )
+from updater.hash import DUMMY_SHA256_HASH
+from updater.nix import NixCommandError
+
+SCRIPT_DIR = Path(__file__).parent
+HASHES_FILE = SCRIPT_DIR / "hashes.json"
+NPM_PACKAGE = "@anthropic-ai/claude-code"
 
 
-class ClaudeCodeUpdater(NpmPackageUpdater):
-    """Custom updater for claude-code that handles package-lock.json generation."""
-
-    def update(self) -> bool:
-        """Update the package with package-lock.json generation."""
-        current = self.get_current_version()
-        latest = fetch_npm_version(self.npm_package_name)
-
-        print(f"Current version: {current}")
-        print(f"Latest version: {latest}")
-
-        if not should_update(current, latest):
-            return False
-
-        print(f"Update available: {current} -> {latest}")
-
-        # Generate package-lock.json in the package directory
-        script_dir = Path(__file__).parent
-        package_json_path = script_dir / "package.json"
-        script_dir / "package-lock.json"
-
-        # Clean up any existing package.json (temporary)
-        package_json_created = False
-        if not package_json_path.exists():
-            package_json_created = True
-
-        try:
-            # Generate package-lock.json
-            print("Updating package-lock.json...")
-            subprocess.run(
-                [
-                    "npm",
-                    "i",
-                    "--package-lock-only",
-                    f"{self.npm_package_name}@{latest}",
-                ],
-                cwd=script_dir,
-                check=True,
-            )
-
-            # Now do the standard update
-            return super().update()
-
-        finally:
-            # Clean up temporary package.json if we created it
-            if package_json_created and package_json_path.exists():
-                package_json_path.unlink()
+def generate_package_lock(version: str) -> None:
+    """Generate package-lock.json for the given version."""
+    print("Updating package-lock.json...")
+    subprocess.run(
+        ["npm", "i", "--package-lock-only", f"{NPM_PACKAGE}@{version}"],
+        cwd=SCRIPT_DIR,
+        check=True,
+    )
+    # Clean up temporary package.json if created
+    package_json = SCRIPT_DIR / "package.json"
+    if package_json.exists():
+        package_json.unlink()
 
 
 def main() -> None:
     """Update the claude-code package."""
-    updater = ClaudeCodeUpdater(
-        package="claude-code",
-        npm_package_name="@anthropic-ai/claude-code",
-        has_npm_deps_hash=True,
-        unpack=True,  # Uses fetchzip which requires unpacked hash
-    )
-    if updater.update():
-        print("Update complete for claude-code!")
-    else:
-        print("claude-code is already up-to-date!")
+    data = load_hashes(HASHES_FILE)
+    current = data["version"]
+    latest = fetch_npm_version(NPM_PACKAGE)
+
+    print(f"Current: {current}, Latest: {latest}")
+
+    if not should_update(current, latest):
+        print("Already up to date")
+        return
+
+    tarball_url = f"https://registry.npmjs.org/{NPM_PACKAGE}/-/claude-code-{latest}.tgz"
+
+    print("Calculating source hash...")
+    source_hash = calculate_url_hash(tarball_url, unpack=True)
+
+    # Generate package-lock.json
+    generate_package_lock(latest)
+
+    # Update hashes.json
+    data = {
+        "version": latest,
+        "hash": source_hash,
+        "npmDepsHash": DUMMY_SHA256_HASH,
+    }
+    save_hashes(HASHES_FILE, data)
+
+    # Calculate npmDepsHash
+    try:
+        npm_deps_hash = calculate_dependency_hash(
+            ".#claude-code", "npmDepsHash", HASHES_FILE, data
+        )
+        data["npmDepsHash"] = npm_deps_hash
+        save_hashes(HASHES_FILE, data)
+    except (ValueError, NixCommandError) as e:
+        print(f"Error: {e}")
+        return
+
+    print(f"Updated to {latest}")
 
 
 if __name__ == "__main__":

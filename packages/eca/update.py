@@ -3,7 +3,6 @@
 
 """Update script for eca package."""
 
-import json
 import sys
 from pathlib import Path
 
@@ -14,15 +13,21 @@ from updater import (
     calculate_url_hash,
     fetch_github_latest_release,
     nix_eval,
+    save_hashes,
 )
+
+HASHES_FILE = Path(__file__).parent / "hashes.json"
+
+PLATFORMS = {
+    "x86_64-linux": "linux-amd64",
+    "aarch64-linux": "linux-aarch64",
+    "x86_64-darwin": "macos-amd64",
+    "aarch64-darwin": "macos-aarch64",
+}
 
 
 def main() -> None:
     """Update the eca package."""
-    script_dir = Path(__file__).parent
-    script_dir / "package.nix"
-    hashes_file = script_dir / "hashes.json"
-
     # Get current version
     current = nix_eval(".#eca.version")
     latest = fetch_github_latest_release("editor-code-assistant", "eca")
@@ -33,17 +38,9 @@ def main() -> None:
 
     print(f"Updating eca from {current} to {latest}")
 
-    # Calculate hashes for all platforms
-    platforms = [
-        ("x86_64-linux", "linux-amd64"),
-        ("aarch64-linux", "linux-aarch64"),
-        ("x86_64-darwin", "macos-amd64"),
-        ("aarch64-darwin", "macos-aarch64"),
-    ]
+    hashes: dict[str, str] = {"version": latest}
 
-    hashes = {"version": latest}
-
-    for platform, url_arch in platforms:
+    for platform, url_arch in PLATFORMS.items():
         url = f"https://github.com/editor-code-assistant/eca/releases/download/{latest}/eca-native-{url_arch}.zip"
         print(f"Fetching hash for {platform}...")
         hashes[platform] = calculate_url_hash(url, unpack=False)
@@ -53,11 +50,8 @@ def main() -> None:
     print("Fetching hash for JAR...")
     hashes["jar"] = calculate_url_hash(jar_url, unpack=False)
 
-    # Write hashes to JSON file
-    hashes_file.write_text(json.dumps(hashes, indent=2) + "\n")
-    print(f"Wrote hashes to {hashes_file}")
-
-    print("Update complete for eca!")
+    save_hashes(HASHES_FILE, hashes)
+    print(f"Updated to {latest}")
 
 
 if __name__ == "__main__":

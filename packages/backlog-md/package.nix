@@ -10,7 +10,7 @@
 }:
 
 let
-  sources = lib.importJSON ./sources.json;
+  sources = lib.importJSON ./hashes.json;
 
   fetchBunDeps =
     { src, hash, ... }@args:

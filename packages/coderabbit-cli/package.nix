@@ -7,37 +7,26 @@
 }:
 
 let
-  version = "0.3.4";
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hashes;
 
-  sources = {
-    x86_64-linux = {
-      url = "https://cli.coderabbit.ai/releases/${version}/coderabbit-linux-x64.zip";
-      hash = "sha256-pppu5Ej5ZbNqSWtO9zqcvYeYIKLZPGEyOfMY9mnVIEs=";
-    };
-    aarch64-linux = {
-      url = "https://cli.coderabbit.ai/releases/${version}/coderabbit-linux-arm64.zip";
-      hash = "sha256-tJc1BQ/gr9e8o80RA66h2D9av5daPjB97BWA4teOmfA=";
-    };
-    x86_64-darwin = {
-      url = "https://cli.coderabbit.ai/releases/${version}/coderabbit-darwin-x64.zip";
-      hash = "sha256-ivxgbTAX6RAjvl275cWgg8crwCkZV5kijldtEhHzkqw=";
-    };
-    aarch64-darwin = {
-      url = "https://cli.coderabbit.ai/releases/${version}/coderabbit-darwin-arm64.zip";
-      hash = "sha256-6D8Lh+vLxH6vK9ebVMgaZm6iATSO23VcdXQ/yieoXE8=";
-    };
+  platformMap = {
+    x86_64-linux = "linux-x64";
+    aarch64-linux = "linux-arm64";
+    x86_64-darwin = "darwin-x64";
+    aarch64-darwin = "darwin-arm64";
   };
 
-  source =
-    sources.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  platform = stdenv.hostPlatform.system;
+  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation rec {
   pname = "coderabbit-cli";
   inherit version;
 
   src = fetchurl {
-    inherit (source) url hash;
+    url = "https://cli.coderabbit.ai/releases/${version}/coderabbit-${platformSuffix}.zip";
+    hash = hashes.${platform};
   };
 
   nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
