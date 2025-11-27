@@ -27,7 +27,10 @@ def fetch_version() -> str:
     """Fetch latest codex version from GitHub releases."""
     tag = fetch_github_latest_release("openai", "codex")
     match = re.match(r"^rust-v(.+)$", tag)
-    return match.group(1) if match else tag
+    if not match:
+        msg = f"Unexpected tag format: {tag!r}, expected 'rust-v<version>'"
+        raise ValueError(msg)
+    return match.group(1)
 
 
 def main() -> None:
