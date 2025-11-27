@@ -16,10 +16,10 @@ rustPlatform.buildRustPackage rec {
     owner = "block";
     repo = "goose";
     rev = "v${version}";
-    hash = "sha256-MEFHVuTejAn1vwTwaxM7XEBSCuFAwLwjptIhKHR6cMM=";
+    hash = "sha256-i9BMq9PPwTGfhSAbDrck+B74g14U+8uYOmpfN5xeyis=";
   };
 
-  cargoHash = "sha256-3SiYbiuDCvGnMPUgc58LFobcijGv2qcrbyCIrPdtcTw=";
+  cargoHash = "sha256-V6Vf6YzCNDwMlLFHICianR6f6zz7fEbm7+1Qeel3GDI=";
 
   nativeBuildInputs = [ pkg-config ];
 
