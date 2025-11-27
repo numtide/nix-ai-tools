@@ -3,13 +3,18 @@
 
 """Update script for forge package."""
 
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import calculate_url_hash, fetch_github_latest_release, should_update
+from updater import (
+    calculate_platform_hashes,
+    fetch_github_latest_release,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
@@ -23,7 +28,7 @@ PLATFORMS = {
 
 def main() -> None:
     """Update the forge package."""
-    data = json.loads(HASHES_FILE.read_text())
+    data = load_hashes(HASHES_FILE)
     current = data["version"]
     latest = fetch_github_latest_release("antinomyhq", "forge")
 
@@ -33,16 +38,10 @@ def main() -> None:
         print("Already up to date")
         return
 
-    base_url = f"https://github.com/antinomyhq/forge/releases/download/v{latest}"
-    hashes = {}
-    for platform, triple in PLATFORMS.items():
-        url = f"{base_url}/forge-{triple}"
-        print(f"Fetching hash for {platform}...")
-        hashes[platform] = calculate_url_hash(url)
+    url_template = f"https://github.com/antinomyhq/forge/releases/download/v{latest}/forge-{{platform}}"
+    hashes = calculate_platform_hashes(url_template, PLATFORMS)
 
-    HASHES_FILE.write_text(
-        json.dumps({"version": latest, "hashes": hashes}, indent=2) + "\n"
-    )
+    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
     print(f"Updated to {latest}")
 
 

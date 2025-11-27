@@ -3,13 +3,18 @@
 
 """Update script for claude-code-router package."""
 
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import calculate_url_hash, fetch_npm_version, should_update
+from updater import (
+    calculate_url_hash,
+    fetch_npm_version,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 NPM_PACKAGE = "@musistudio/claude-code-router"
@@ -17,7 +22,7 @@ NPM_PACKAGE = "@musistudio/claude-code-router"
 
 def main() -> None:
     """Update the claude-code-router package."""
-    data = json.loads(HASHES_FILE.read_text())
+    data = load_hashes(HASHES_FILE)
     current = data["version"]
     latest = fetch_npm_version(NPM_PACKAGE)
 
@@ -34,9 +39,7 @@ def main() -> None:
     print("Calculating source hash...")
     source_hash = calculate_url_hash(tarball_url, unpack=True)
 
-    HASHES_FILE.write_text(
-        json.dumps({"version": latest, "hash": source_hash}, indent=2) + "\n"
-    )
+    save_hashes(HASHES_FILE, {"version": latest, "hash": source_hash})
     print(f"Updated to {latest}")
 
 

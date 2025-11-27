@@ -3,13 +3,18 @@
 
 """Update script for coderabbit-cli package."""
 
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import calculate_url_hash, fetch_text, should_update
+from updater import (
+    calculate_platform_hashes,
+    fetch_text,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
@@ -28,7 +33,7 @@ def fetch_version() -> str:
 
 def main() -> None:
     """Update the coderabbit-cli package."""
-    data = json.loads(HASHES_FILE.read_text())
+    data = load_hashes(HASHES_FILE)
     current = data["version"]
     latest = fetch_version()
 
@@ -38,16 +43,12 @@ def main() -> None:
         print("Already up to date")
         return
 
-    base_url = f"https://cli.coderabbit.ai/releases/{latest}"
-    hashes = {}
-    for platform, suffix in PLATFORMS.items():
-        url = f"{base_url}/coderabbit-{suffix}.zip"
-        print(f"Fetching hash for {platform}...")
-        hashes[platform] = calculate_url_hash(url)
-
-    HASHES_FILE.write_text(
-        json.dumps({"version": latest, "hashes": hashes}, indent=2) + "\n"
+    url_template = (
+        f"https://cli.coderabbit.ai/releases/{latest}/coderabbit-{{platform}}.zip"
     )
+    hashes = calculate_platform_hashes(url_template, PLATFORMS)
+
+    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
     print(f"Updated to {latest}")
 
 

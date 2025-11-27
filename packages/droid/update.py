@@ -3,14 +3,18 @@
 
 """Update script for droid package."""
 
-import json
-import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import calculate_url_hash, fetch_text, should_update
+from updater import (
+    calculate_platform_hashes,
+    fetch_version_from_text,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
@@ -20,22 +24,15 @@ PLATFORMS = {
     "aarch64-darwin": "darwin/arm64",
 }
 
-
-def fetch_version() -> str:
-    """Fetch the latest version from Factory AI's install script."""
-    script_content = fetch_text("https://app.factory.ai/cli")
-    match = re.search(r'VER="([^"]+)"', script_content)
-    if not match:
-        msg = "Could not extract version from install script"
-        raise ValueError(msg)
-    return match.group(1)
+VERSION_URL = "https://app.factory.ai/cli"
+VERSION_PATTERN = r'VER="([^"]+)"'
 
 
 def main() -> None:
     """Update the droid package."""
-    data = json.loads(HASHES_FILE.read_text())
+    data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_version()
+    latest = fetch_version_from_text(VERSION_URL, VERSION_PATTERN)
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -43,26 +40,19 @@ def main() -> None:
         print("Already up to date")
         return
 
-    droid_hashes = {}
-    ripgrep_hashes = {}
+    # Droid binaries
+    droid_url_template = (
+        f"https://downloads.factory.ai/factory-cli/releases/{latest}/{{platform}}/droid"
+    )
+    droid_hashes = calculate_platform_hashes(droid_url_template, PLATFORMS)
 
-    for platform, path in PLATFORMS.items():
-        # Droid binary
-        url = f"https://downloads.factory.ai/factory-cli/releases/{latest}/{path}/droid"
-        print(f"Fetching droid hash for {platform}...")
-        droid_hashes[platform] = calculate_url_hash(url)
+    # Ripgrep binaries (no version in URL)
+    ripgrep_url_template = "https://downloads.factory.ai/ripgrep/{platform}/rg"
+    ripgrep_hashes = calculate_platform_hashes(ripgrep_url_template, PLATFORMS)
 
-        # Ripgrep binary (no version in URL)
-        url = f"https://downloads.factory.ai/ripgrep/{path}/rg"
-        print(f"Fetching ripgrep hash for {platform}...")
-        ripgrep_hashes[platform] = calculate_url_hash(url)
-
-    HASHES_FILE.write_text(
-        json.dumps(
-            {"version": latest, "droid": droid_hashes, "ripgrep": ripgrep_hashes},
-            indent=2,
-        )
-        + "\n"
+    save_hashes(
+        HASHES_FILE,
+        {"version": latest, "droid": droid_hashes, "ripgrep": ripgrep_hashes},
     )
     print(f"Updated to {latest}")
 

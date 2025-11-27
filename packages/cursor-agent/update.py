@@ -3,14 +3,18 @@
 
 """Update script for cursor-agent package."""
 
-import json
-import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import calculate_url_hash, fetch_text, should_update
+from updater import (
+    calculate_platform_hashes,
+    fetch_version_from_text,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
@@ -21,25 +25,15 @@ PLATFORMS = {
     "aarch64-darwin": "darwin/arm64",
 }
 
-
-def fetch_version() -> str:
-    """Fetch the latest version by scraping the install script."""
-    install_script = fetch_text("https://cursor.com/install")
-    match = re.search(
-        r"downloads\.cursor\.com/lab/([0-9]{4}\.[0-9]{2}\.[0-9]{2}-[a-f0-9]+)",
-        install_script,
-    )
-    if not match:
-        msg = "Could not extract version from install script"
-        raise ValueError(msg)
-    return match.group(1)
+VERSION_URL = "https://cursor.com/install"
+VERSION_PATTERN = r"downloads\.cursor\.com/lab/([0-9]{4}\.[0-9]{2}\.[0-9]{2}-[a-f0-9]+)"
 
 
 def main() -> None:
     """Update the cursor-agent package."""
-    data = json.loads(HASHES_FILE.read_text())
+    data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_version()
+    latest = fetch_version_from_text(VERSION_URL, VERSION_PATTERN)
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -47,16 +41,10 @@ def main() -> None:
         print("Already up to date")
         return
 
-    base_url = f"https://downloads.cursor.com/lab/{latest}"
-    hashes = {}
-    for platform, path in PLATFORMS.items():
-        url = f"{base_url}/{path}/agent-cli-package.tar.gz"
-        print(f"Fetching hash for {platform}...")
-        hashes[platform] = calculate_url_hash(url)
+    url_template = f"https://downloads.cursor.com/lab/{latest}/{{platform}}/agent-cli-package.tar.gz"
+    hashes = calculate_platform_hashes(url_template, PLATFORMS)
 
-    HASHES_FILE.write_text(
-        json.dumps({"version": latest, "hashes": hashes}, indent=2) + "\n"
-    )
+    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
     print(f"Updated to {latest}")
 
 

@@ -3,7 +3,6 @@
 
 """Update script for amp package."""
 
-import json
 import subprocess
 import sys
 import tarfile
@@ -13,9 +12,16 @@ from urllib.request import urlretrieve
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import calculate_url_hash, fetch_npm_version, should_update
-from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
-from updater.nix import NixCommandError, nix_build
+from updater import (
+    calculate_dependency_hash,
+    calculate_url_hash,
+    fetch_npm_version,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
+from updater.hash import DUMMY_SHA256_HASH
+from updater.nix import NixCommandError
 
 SCRIPT_DIR = Path(__file__).parent
 HASHES_FILE = SCRIPT_DIR / "hashes.json"
@@ -63,33 +69,9 @@ def extract_package_lock(tarball_url: str) -> bool:
         return False
 
 
-def calculate_npm_deps_hash(data: dict[str, str]) -> str:
-    """Calculate npmDepsHash by building with dummy hash."""
-    print("Calculating npmDepsHash...")
-    original_hash = data["npmDepsHash"]
-
-    # Write dummy hash
-    data["npmDepsHash"] = DUMMY_SHA256_HASH
-    HASHES_FILE.write_text(json.dumps(data, indent=2) + "\n")
-
-    try:
-        nix_build(".#amp", check=True)
-        msg = "Build succeeded with dummy hash - unexpected"
-        raise ValueError(msg)
-    except NixCommandError as e:
-        npm_deps_hash = extract_hash_from_build_error(e.args[0])
-        if not npm_deps_hash:
-            # Restore original
-            data["npmDepsHash"] = original_hash
-            HASHES_FILE.write_text(json.dumps(data, indent=2) + "\n")
-            msg = f"Could not extract hash from build error:\n{e.args[0]}"
-            raise ValueError(msg) from e
-        return npm_deps_hash
-
-
 def main() -> None:
     """Update the amp package."""
-    data = json.loads(HASHES_FILE.read_text())
+    data = load_hashes(HASHES_FILE)
     current = data["version"]
     latest = fetch_npm_version(NPM_PACKAGE)
 
@@ -113,13 +95,15 @@ def main() -> None:
         "sourceHash": source_hash,
         "npmDepsHash": DUMMY_SHA256_HASH,
     }
-    HASHES_FILE.write_text(json.dumps(data, indent=2) + "\n")
+    save_hashes(HASHES_FILE, data)
 
     # Calculate npmDepsHash
     try:
-        npm_deps_hash = calculate_npm_deps_hash(data)
+        npm_deps_hash = calculate_dependency_hash(
+            ".#amp", "npmDepsHash", HASHES_FILE, data
+        )
         data["npmDepsHash"] = npm_deps_hash
-        HASHES_FILE.write_text(json.dumps(data, indent=2) + "\n")
+        save_hashes(HASHES_FILE, data)
     except (ValueError, NixCommandError) as e:
         print(f"Error: {e}")
         return
