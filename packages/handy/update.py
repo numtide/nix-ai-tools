@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import calculate_url_hash, fetch_github_latest_release, should_update
 
-VERSION_FILE = Path(__file__).parent / "version.json"
+HASHES_FILE = Path(__file__).parent / "hashes.json"
 
 PLATFORMS = {
     "x86_64-linux": "Handy_{version}_amd64.deb",
@@ -22,7 +22,7 @@ PLATFORMS = {
 
 def main() -> None:
     """Update the handy package."""
-    data = json.loads(VERSION_FILE.read_text())
+    data = json.loads(HASHES_FILE.read_text())
     current = data["version"]
     latest = fetch_github_latest_release("cjpais", "Handy")
 
@@ -39,7 +39,7 @@ def main() -> None:
         print(f"Fetching hash for {platform}...")
         hashes[platform] = calculate_url_hash(url)
 
-    VERSION_FILE.write_text(
+    HASHES_FILE.write_text(
         json.dumps({"version": latest, "hashes": hashes}, indent=2) + "\n"
     )
     print(f"Updated to {latest}")

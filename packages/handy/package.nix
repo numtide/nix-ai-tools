@@ -23,7 +23,7 @@
 
 let
   pname = "handy";
-  versionData = builtins.fromJSON (builtins.readFile ./version.json);
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hashes;
 
   # Linux uses deb packages, macOS uses app tarballs
