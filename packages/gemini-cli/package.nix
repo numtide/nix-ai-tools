@@ -8,6 +8,8 @@
   libsecret,
   darwinOpenptyHook,
   clang_20,
+  makeBinaryWrapper,
+  xsel,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -25,6 +27,7 @@ buildNpmPackage (finalAttrs: {
 
   nativeBuildInputs = [
     pkg-config
+    makeBinaryWrapper
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     clang_20 # Works around node-addon-api constant expression issue with clang 21+
@@ -32,7 +35,6 @@ buildNpmPackage (finalAttrs: {
   ];
 
   buildInputs = [
-    ripgrep
     libsecret
   ];
 
@@ -58,6 +60,16 @@ buildNpmPackage (finalAttrs: {
 
     ln -s $out/share/gemini-cli/node_modules/@google/gemini-cli/dist/index.js $out/bin/gemini
     chmod +x "$out/bin/gemini"
+
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
+      wrapProgram $out/bin/gemini \
+        --prefix PATH : ${
+          lib.makeBinPath [
+            xsel
+            ripgrep
+          ]
+        }
+    ''}
 
     runHook postInstall
   '';
