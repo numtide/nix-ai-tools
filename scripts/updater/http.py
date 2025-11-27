@@ -1,9 +1,7 @@
 """HTTP utilities for fetching data from URLs."""
 
 import json
-import urllib.error
 import urllib.request
-from pathlib import Path
 from typing import Any
 
 
@@ -44,39 +42,3 @@ def fetch_json(url: str, *, timeout: int = 30) -> dict[str, Any] | list[Any]:
     text = fetch_text(url, timeout=timeout)
     result: dict[str, Any] | list[Any] = json.loads(text)
     return result
-
-
-def download_file(url: str, path: Path, *, timeout: int = 300) -> None:
-    """Download a file from a URL.
-
-    Args:
-        url: URL to download from
-        path: Destination file path
-        timeout: Request timeout in seconds
-
-    Raises:
-        urllib.error.URLError: If the request fails
-
-    """
-    with urllib.request.urlopen(url, timeout=timeout) as response:
-        path.write_bytes(response.read())
-
-
-def check_url_accessible(url: str, *, timeout: int = 10) -> bool:
-    """Check if a URL is accessible.
-
-    Args:
-        url: URL to check
-        timeout: Request timeout in seconds
-
-    Returns:
-        True if URL is accessible (returns 200 OK)
-
-    """
-    try:
-        # Make a HEAD request to check accessibility without downloading content
-        req = urllib.request.Request(url, method="HEAD")
-        with urllib.request.urlopen(req, timeout=timeout):
-            return True
-    except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError):
-        return False

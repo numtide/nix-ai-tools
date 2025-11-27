@@ -171,28 +171,3 @@ def nix_prefetch_url(url: str, *, unpack: bool = False) -> str:
     convert_args = ["hash", "convert", "--hash-algo", "sha256", hash_b32]
     convert_result = nix_command(convert_args)
     return convert_result.stdout.strip()
-
-
-def nix_update(package: str, *, extra_args: list[str] | None = None) -> None:
-    """Run nix-update on a package.
-
-    Args:
-        package: Package name to update
-        extra_args: Additional arguments to pass to nix-update
-
-    """
-    cmd = [
-        "nix",
-        "--experimental-features",
-        "nix-command flakes",
-        "run",
-        "--inputs-from",
-        ".#",
-        "nixpkgs#nix-update",
-        "--",
-        "--flake",
-    ]
-    if extra_args:
-        cmd.extend(extra_args)
-    cmd.append(package)
-    run_command(cmd, capture_output=False)
