@@ -28,9 +28,9 @@ if [ "$type" = "package" ]; then
       exit 1
     fi
   else
-    # Try nix-update with update script if available
+    # Try nix-update
     echo "No update script found, trying nix-update..."
-    if output=$(nix-update --flake --use-update-script "$name" 2>&1); then
+    if output=$(nix-update --flake "$name" 2>&1); then
       echo "$output"
     else
       echo "::error::nix-update failed for package $name"
