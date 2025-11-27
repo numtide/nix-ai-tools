@@ -44,9 +44,7 @@ jobs:
         env:
           PACKAGES: "${{ inputs.packages }}"
           INPUTS: "${{ inputs.inputs }}"
-        run: |
-          # Use the discovery script
-          .github/actions/discovery.sh
+        run: python3 .github/actions/discovery.py
   update:
     needs: discover
     if: needs.discover.outputs.has-updates == 'true'
