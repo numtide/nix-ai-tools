@@ -5,16 +5,18 @@
   makeWrapper,
 }:
 
-buildNpmPackage rec {
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash npmDepsHash;
+in
+buildNpmPackage {
   pname = "claude-code";
-  version = "2.0.55";
+  inherit version npmDepsHash;
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-    hash = "sha256-wsjOkNxuBLMYprjaZQyUZHiqWl8UG7cZ1njkyKZpRYg=";
+    inherit hash;
   };
-
-  npmDepsHash = "sha256-NwlcZajDanA3jApgBLlvvU6sVPj5DLrp+ifWtIc9GrU=";
 
   nativeBuildInputs = [ makeWrapper ];
 

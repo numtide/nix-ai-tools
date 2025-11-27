@@ -5,13 +5,17 @@
   nodejs,
 }:
 
-stdenv.mkDerivation rec {
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash;
+in
+stdenv.mkDerivation {
   pname = "claude-code-router";
-  version = "1.0.71";
+  inherit version;
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-${version}.tgz";
-    hash = "sha256-kQSHL0Mp2Tq5a9oqjh8y8ftrbWRXqsQqP0I1W52xQHI=";
+    inherit hash;
   };
 
   nativeBuildInputs = [ nodejs ];

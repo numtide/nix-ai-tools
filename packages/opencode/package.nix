@@ -10,14 +10,19 @@
   writableTmpDirAsHomeHook,
 }:
 
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash outputHash;
+in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode";
-  version = "1.0.117";
+  inherit version;
+
   src = fetchFromGitHub {
     owner = "sst";
     repo = "opencode";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-pdnYOIWrY3VKppMEUpLLRsw1s7veey1O3YxiYZmy870=";
+    tag = "v${version}";
+    inherit hash;
   };
 
   # NOTE: We use upstream's normalization scripts for reproducible node_modules,
@@ -79,7 +84,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     # NOTE: Required else we get errors that our fixed-output derivation references store paths
     dontFixup = true;
 
-    outputHash = "sha256-rGmHVBhsyOmPD4kG8k0hhER5pZn2KVwBXk0O8MER8jc=";
+    inherit outputHash;
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
   };

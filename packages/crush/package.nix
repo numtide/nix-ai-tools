@@ -4,18 +4,21 @@
   fetchFromGitHub,
   installShellFiles,
 }:
-buildGo125Module rec {
+
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash vendorHash;
+in
+buildGo125Module {
   pname = "crush";
-  version = "0.19.2";
+  inherit version vendorHash;
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = "sha256-FNCCz1KSkEtD0+/4D5gXDLjWoNaOi5qWgOV5Gkx/hfk=";
+    inherit hash;
   };
-
-  vendorHash = "sha256-Iogl5H93PtwfnaLwPPrttXq0GNon7jZdAtpRdn3ynX4=";
 
   nativeBuildInputs = [ installShellFiles ];
 

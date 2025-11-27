@@ -3,24 +3,41 @@
 
 """Update script for claude-code-router package."""
 
+import json
 import sys
 from pathlib import Path
 
-# Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import NpmPackageUpdater
+from updater import calculate_url_hash, fetch_npm_version, should_update
+
+HASHES_FILE = Path(__file__).parent / "hashes.json"
+NPM_PACKAGE = "@musistudio/claude-code-router"
 
 
 def main() -> None:
     """Update the claude-code-router package."""
-    updater = NpmPackageUpdater(
-        package="claude-code-router",
-        npm_package_name="@musistudio/claude-code-router",
-        has_npm_deps_hash=False,
-        unpack=True,  # Uses fetchzip which requires unpacked hash
+    data = json.loads(HASHES_FILE.read_text())
+    current = data["version"]
+    latest = fetch_npm_version(NPM_PACKAGE)
+
+    print(f"Current: {current}, Latest: {latest}")
+
+    if not should_update(current, latest):
+        print("Already up to date")
+        return
+
+    tarball_url = (
+        f"https://registry.npmjs.org/{NPM_PACKAGE}/-/claude-code-router-{latest}.tgz"
     )
-    updater.update()
+
+    print("Calculating source hash...")
+    source_hash = calculate_url_hash(tarball_url, unpack=True)
+
+    HASHES_FILE.write_text(
+        json.dumps({"version": latest, "hash": source_hash}, indent=2) + "\n"
+    )
+    print(f"Updated to {latest}")
 
 
 if __name__ == "__main__":
