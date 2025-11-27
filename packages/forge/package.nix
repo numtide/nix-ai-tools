@@ -8,32 +8,27 @@
 }:
 
 let
-  inherit (stdenv.hostPlatform) system;
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hashes;
 
-  sources = {
-    x86_64-linux = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v1.6.0/forge-x86_64-unknown-linux-gnu";
-      hash = "sha256-GXTEcGvxle4YNjpSLnfsLTdzDapzvv7fvr2q3TAdFRY=";
-    };
-    aarch64-linux = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v1.6.0/forge-aarch64-unknown-linux-gnu";
-      hash = "sha256-+/+ZzhGJn8wm4WUV8tJSxxfrFkzODjSqCWpMiF9Nj80=";
-    };
-    x86_64-darwin = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v1.6.0/forge-x86_64-apple-darwin";
-      hash = "sha256-/GzlJtzeOWesjYJsoPTttSN2dGhZ7PCKMihtagK0AHI=";
-    };
-    aarch64-darwin = {
-      url = "https://github.com/antinomyhq/forge/releases/download/v1.6.0/forge-aarch64-apple-darwin";
-      hash = "sha256-GEsr91g/WEi6rmXltfIhDWOVNyYIK4rGhoEDVhizc5g=";
-    };
+  platformMap = {
+    x86_64-linux = "x86_64-unknown-linux-gnu";
+    aarch64-linux = "aarch64-unknown-linux-gnu";
+    x86_64-darwin = "x86_64-apple-darwin";
+    aarch64-darwin = "aarch64-apple-darwin";
   };
+
+  platform = stdenv.hostPlatform.system;
+  platformTriple = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation rec {
   pname = "forge";
-  version = "1.6.0";
+  inherit version;
 
-  src = fetchurl sources.${system};
+  src = fetchurl {
+    url = "https://github.com/antinomyhq/forge/releases/download/v${version}/forge-${platformTriple}";
+    hash = hashes.${platform};
+  };
 
   nativeBuildInputs = [
     makeWrapper

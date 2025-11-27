@@ -7,35 +7,26 @@
 }:
 
 let
-  version = "0.11.3";
-  sources = {
-    x86_64-linux = {
-      url = "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_linux_amd64.tar.gz";
-      hash = "sha256-Z6836xQe1MH0pz0QNtxmpQZpxgR+og4TKN4hwmM+rwU=";
-    };
-    aarch64-linux = {
-      url = "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_linux_arm64.tar.gz";
-      hash = "sha256-vIKFbKatoKC/IeH5UzbJnveyWFEtevax0OxGL9t5aAg=";
-    };
-    x86_64-darwin = {
-      url = "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_darwin_amd64.tar.gz";
-      hash = "sha256-RrQmzSlJPQd6ltuvQd083o9dBHcZB5n+hQfk+j1dRq8=";
-    };
-    aarch64-darwin = {
-      url = "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_darwin_arm64.tar.gz";
-      hash = "sha256-njMqGiz0dYlxlEtb3wm9SgQDuQcCe2RDjXyHZjEGjXk=";
-    };
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hashes;
+
+  platformMap = {
+    x86_64-linux = "linux_amd64";
+    aarch64-linux = "linux_arm64";
+    x86_64-darwin = "darwin_amd64";
+    aarch64-darwin = "darwin_arm64";
   };
-  source =
-    sources.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+
+  platform = stdenv.hostPlatform.system;
+  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "catnip";
   inherit version;
 
   src = fetchurl {
-    inherit (source) url hash;
+    url = "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_${platformSuffix}.tar.gz";
+    hash = hashes.${platform};
   };
 
   nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
