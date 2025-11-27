@@ -59,21 +59,20 @@ def main() -> None:
     # Generate package-lock.json
     generate_package_lock(latest)
 
-    # Update hashes.json
-    data = {
+    # Prepare new data with dummy hash for dependency calculation
+    new_data = {
         "version": latest,
         "hash": source_hash,
         "npmDepsHash": DUMMY_SHA256_HASH,
     }
-    save_hashes(HASHES_FILE, data)
 
-    # Calculate npmDepsHash
+    # Calculate npmDepsHash - only save if successful
     try:
         npm_deps_hash = calculate_dependency_hash(
-            ".#claude-code", "npmDepsHash", HASHES_FILE, data
+            ".#claude-code", "npmDepsHash", HASHES_FILE, new_data
         )
-        data["npmDepsHash"] = npm_deps_hash
-        save_hashes(HASHES_FILE, data)
+        new_data["npmDepsHash"] = npm_deps_hash
+        save_hashes(HASHES_FILE, new_data)
     except (ValueError, NixCommandError) as e:
         print(f"Error: {e}")
         return
