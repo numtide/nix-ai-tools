@@ -23,21 +23,22 @@
 
 let
   pname = "handy";
-  version = "0.6.2";
+  versionData = builtins.fromJSON (builtins.readFile ./version.json);
+  inherit (versionData) version hashes;
 
   # Linux uses deb packages, macOS uses app tarballs
   srcs = {
     x86_64-linux = fetchurl {
       url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_${version}_amd64.deb";
-      hash = "sha256-6SZW7qCsI+h9jpC6o5StM9cm67o7OoWP9o7oK0tMpKc=";
+      hash = hashes.x86_64-linux;
     };
     x86_64-darwin = fetchurl {
       url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_x64.app.tar.gz";
-      hash = "sha256-trxKKIEeuH8Eikf5XWKP2NBW5aSKgrpLxHm5p3iQSwc=";
+      hash = hashes.x86_64-darwin;
     };
     aarch64-darwin = fetchurl {
       url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_aarch64.app.tar.gz";
-      hash = "sha256-xVlPaZ5HW2cxFfskJ8zzOabFRYp/SK8c9GeH30Gp2F0=";
+      hash = hashes.aarch64-darwin;
     };
   };
 
@@ -144,8 +145,6 @@ stdenv.mkDerivation {
 
         runHook postInstall
       '';
-
-  passthru.updateScript = ./update.sh;
 
   meta = with lib; {
     description = "Fast and accurate local transcription app using AI models";
