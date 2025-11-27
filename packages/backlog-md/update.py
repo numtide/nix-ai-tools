@@ -18,7 +18,7 @@ from updater.nix import NixCommandError, nix_build
 def main() -> None:
     """Update the backlog-md package."""
     script_dir = Path(__file__).parent
-    sources_file = script_dir / "sources.json"
+    sources_file = script_dir / "hashes.json"
 
     # Get current version (backlog-md is x86_64-linux only)
     current = nix_eval(".#packages.x86_64-linux.backlog-md.version")

@@ -8,57 +8,30 @@
 }:
 
 let
-  version = "0.27.2";
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version;
 
-  # Map platforms to Factory AI download URLs
-  sources = {
-    x86_64-linux = {
-      url = "https://downloads.factory.ai/factory-cli/releases/${version}/linux/x64/droid";
-      hash = "sha256-q5ZW+epWsKkdMln41/CXMi5UdWS57K+eQ3g4nGLV9Ls=";
-    };
-    aarch64-linux = {
-      url = "https://downloads.factory.ai/factory-cli/releases/${version}/linux/arm64/droid";
-      hash = "sha256-GH6XuQBfIy7UaZTLhKUEfrKh0tx7Iq3a9icX1XD70qA=";
-    };
-    aarch64-darwin = {
-      url = "https://downloads.factory.ai/factory-cli/releases/${version}/darwin/arm64/droid";
-      hash = "sha256-nP3H5JYGG2P9kbnOqbm+BHepoyqwn2elJcHvCvU6HWQ=";
-    };
+  platformMap = {
+    x86_64-linux = "linux/x64";
+    aarch64-linux = "linux/arm64";
+    aarch64-darwin = "darwin/arm64";
   };
 
-  # Ripgrep is bundled with droid for code search functionality
-  rgSources = {
-    x86_64-linux = {
-      url = "https://downloads.factory.ai/ripgrep/linux/x64/rg";
-      hash = "sha256-viR2yXY0K5IWYRtKhMG8LsZIjsXHkeoBmhMnJ2RO8Zw=";
-    };
-    aarch64-linux = {
-      url = "https://downloads.factory.ai/ripgrep/linux/arm64/rg";
-      hash = "sha256-Js5szrF6xxDuclPEnqglxhjU+eSaE11StO3OM2xA9iA=";
-    };
-    aarch64-darwin = {
-      url = "https://downloads.factory.ai/ripgrep/darwin/arm64/rg";
-      hash = "sha256-Jz6MZQpCvuwShJEOGCW2Gj5698DOH87BN/4dbMcd77c=";
-    };
-  };
-
-  source =
-    sources.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
-  rgSource =
-    rgSources.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  platform = stdenv.hostPlatform.system;
+  platformPath = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "droid";
   inherit version;
 
   src = fetchurl {
-    inherit (source) url hash;
+    url = "https://downloads.factory.ai/factory-cli/releases/${version}/${platformPath}/droid";
+    hash = versionData.droid.${platform};
   };
 
   rgSrc = fetchurl {
-    inherit (rgSource) url hash;
+    url = "https://downloads.factory.ai/ripgrep/${platformPath}/rg";
+    hash = versionData.ripgrep.${platform};
   };
 
   nativeBuildInputs = [
@@ -93,10 +66,6 @@ stdenv.mkDerivation {
 
     runHook postInstall
   '';
-
-  passthru = {
-    inherit sources rgSources;
-  };
 
   meta = with lib; {
     description = "Factory AI's Droid - AI-powered development agent for your terminal";
