@@ -219,15 +219,6 @@ This repository uses GitHub Actions to automatically update all packages and fla
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/nix-ai-tools#goose-cli -- --help`
 
-#### groq-code-cli
-
-- **Description**: A highly customizable, lightweight, and open-source coding CLI powered by Groq for instant iteration
-- **Version**: 0-unstable-2025-09-05
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/build-with-groq/groq-code-cli
-- **Usage**: `nix run github:numtide/nix-ai-tools#groq-code-cli -- --help`
-
 #### handy
 
 - **Description**: Fast and accurate local transcription app using AI models
