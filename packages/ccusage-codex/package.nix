@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchzip,
-  bun,
+  nodejs,
   flake,
 }:
 
@@ -15,7 +15,7 @@ stdenv.mkDerivation rec {
     hash = "sha256-6LS8DGt91kiylIU/D0HJkxZJzXDKIZ4zgaZk3quqJLQ=";
   };
 
-  nativeBuildInputs = [ bun ];
+  nativeBuildInputs = [ nodejs ];
 
   installPhase = ''
     runHook preInstall
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
     mv $out/bin/index.js $out/bin/ccusage-codex
 
     substituteInPlace $out/bin/ccusage-codex \
-      --replace-fail "#!/usr/bin/env node" "#!${bun}/bin/bun"
+      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
 
     runHook postInstall
   '';
