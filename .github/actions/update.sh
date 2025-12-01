@@ -30,7 +30,12 @@ if [ "$type" = "package" ]; then
   else
     # Try nix-update
     echo "No update script found, trying nix-update..."
-    if output=$(nix-update --flake "$name" 2>&1); then
+    args=()
+    if [ -f "packages/$name/nix-update-args" ]; then
+      echo "Loading nix-update args from packages/$name/nix-update-args"
+      mapfile -t args <"packages/$name/nix-update-args"
+    fi
+    if output=$(nix-update --flake "$name" "${args[@]}" 2>&1); then
       echo "$output"
     else
       echo "::error::nix-update failed for package $name"

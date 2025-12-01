@@ -20,7 +20,7 @@
 
 - Indentation: 2 spaces; avoid tabs.
 - Nix: small, composable derivations; prefer `buildNpmPackage`/`rustPlatform.buildRustPackage`/`stdenv.mkDerivation` as in existing packages.
-- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional updater using `scripts/updater/` library).
+- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional updater using `scripts/updater/` library), `nix-update-args` (optional nix-update flags).
 - Tools via treefmt: nixfmt, deadnix, shfmt, shellcheck, mdformat, yamlfmt, taplo. Always run `nix fmt` before committing.
 
 ### Package Metadata Requirements
@@ -133,3 +133,14 @@ fi
    - Common missing libraries: `gcc-unwrapped.lib` for libgcc_s.so.1
 
 1. **Update scripts**: Follow shellcheck recommendations - declare and assign variables separately to avoid masking return values.
+
+1. **Custom nix-update arguments**: For packages that need special nix-update flags (e.g., filtering out nightly releases), create a `nix-update-args` file with one argument per line:
+
+   ```text
+   # packages/qwen-code/nix-update-args
+   --use-github-releases
+   --version-regex
+   ^v([0-9]+\.[0-9]+\.[0-9]+)$
+   ```
+
+   The CI workflow reads this file and passes the arguments to nix-update automatically.
