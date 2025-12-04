@@ -37,11 +37,10 @@ def get_all_packages_metadata() -> dict[str, dict[str, str | bool | None]]:
 
 def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -> None:
     """Generate markdown documentation for a package."""
-    print(f"#### {package}")
+    description = metadata.get("description", "No description available")
+    print("<details>")
+    print(f"<summary><strong>{package}</strong> - {description}</summary>")
     print()
-    print(
-        f"- **Description**: {metadata.get('description', 'No description available')}"
-    )
     print(f"- **Version**: {metadata.get('version', 'unknown')}")
     print(f"- **Source**: {metadata.get('sourceType', 'unknown')}")
     print(f"- **License**: {metadata.get('license', 'Check package')}")
@@ -61,6 +60,7 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
         )
 
     print()
+    print("</details>")
 
 
 def main() -> None:
