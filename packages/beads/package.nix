@@ -4,20 +4,18 @@
   fetchFromGitHub,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash vendorHash;
-in
-buildGoModule {
+buildGoModule rec {
   pname = "beads";
-  inherit version vendorHash;
+  version = "0.29.0";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-    inherit hash;
+    hash = "sha256-tS30cWkvrWm6MwMlGPup8dsB4Y53w+jqF8+rX8zwK9Q=";
   };
+
+  vendorHash = "sha256-iTPi8+pbKr2Q352hzvIOGL2EneF9agrDmBwTLMUjDBE=";
 
   subPackages = [ "cmd/bd" ];
 
