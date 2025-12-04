@@ -20,8 +20,48 @@
 
 - Indentation: 2 spaces; avoid tabs.
 - Nix: small, composable derivations; prefer `buildNpmPackage`/`rustPlatform.buildRustPackage`/`stdenv.mkDerivation` as in existing packages.
-- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional updater using `scripts/updater/` library), `nix-update-args` (optional nix-update flags).
+- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional custom updater), `nix-update-args` (optional nix-update flags).
 - Tools via treefmt: nixfmt, deadnix, shfmt, shellcheck, mdformat, yamlfmt, taplo. Always run `nix fmt` before committing.
+
+### Updating Packages
+
+**Prefer `nix-update` over custom update scripts.** Most packages can be updated with:
+
+```bash
+nix run nixpkgs#nix-update -- --flake <package>
+```
+
+For this to work, `package.nix` must have version/hash attributes inline (not loaded from JSON):
+
+```nix
+buildGoModule rec {
+  pname = "example";
+  version = "1.0.0";  # nix-update finds and updates this
+
+  src = fetchFromGitHub {
+    owner = "owner";
+    repo = "repo";
+    rev = "v${version}";
+    hash = "sha256-...";  # nix-update updates this
+  };
+
+  vendorHash = "sha256-...";  # nix-update updates this too
+}
+```
+
+**Testing updates**: After writing or modifying a package, verify updates work by:
+
+1. Temporarily downgrading the version in `package.nix`
+1. Running `nix run nixpkgs#nix-update -- --flake <package>`
+1. Confirming version and hashes are updated correctly
+
+**Only use custom `update.py` scripts when nix-update cannot handle the package**, such as:
+
+- Packages with complex version schemes nix-update cannot parse
+- Sources not supported by nix-update (non-GitHub, custom APIs)
+- Packages requiring special hash calculation logic
+
+Custom updaters should use the `scripts/updater/` library. See existing `update.py` files for examples.
 
 ### Package Metadata Requirements
 
