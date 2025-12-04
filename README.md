@@ -39,7 +39,7 @@ This repository uses GitHub Actions to automatically update all packages and fla
 #### beads
 
 - **Description**: A distributed issue tracker designed for AI-supervised coding workflows
-- **Version**: 0.28.0
+- **Version**: 0.29.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/steveyegge/beads
