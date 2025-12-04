@@ -71,8 +71,15 @@ buildNpmPackage (finalAttrs: {
         }
     ''}
 
+    # Install JSON schema
+    install -Dm644 schemas/settings.schema.json $out/share/gemini-cli/settings.schema.json
+
     runHook postInstall
   '';
+
+  passthru = {
+    jsonschema = "${placeholder "out"}/share/gemini-cli/settings.schema.json";
+  };
 
   meta = {
     description = "AI agent that brings the power of Gemini directly into your terminal";
