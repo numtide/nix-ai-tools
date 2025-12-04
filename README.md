@@ -17,7 +17,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>amp</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph</summary>
 
-- **Version**: 0.0.1764854305-g81c3fa
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
@@ -27,7 +26,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
 
-- **Version**: 1.26.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
@@ -37,7 +35,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>beads</strong> - A distributed issue tracker designed for AI-supervised coding workflows</summary>
 
-- **Version**: 0.29.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/steveyegge/beads
@@ -47,7 +44,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>catnip</strong> - Developer environment that's like catnip for agentic programming</summary>
 
-- **Version**: 0.11.4
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/wandb/catnip
@@ -57,7 +53,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>ccstatusline</strong> - A highly customizable status line formatter for Claude Code CLI</summary>
 
-- **Version**: 2.0.23
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/sirmalloc/ccstatusline
@@ -67,7 +62,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
 
-- **Version**: 17.1.6
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
@@ -77,7 +71,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>ccusage-codex</strong> - Usage analysis tool for OpenAI Codex sessions</summary>
 
-- **Version**: 17.1.6
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
@@ -87,7 +80,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
-- **Version**: 2.0.58
 - **Source**: source
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
@@ -97,7 +89,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
 
-- **Version**: 0.11.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/claude-code-acp
@@ -107,7 +98,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>claude-code-router</strong> - Use Claude Code without an Anthropics account and route it to another LLM provider</summary>
 
-- **Version**: 1.0.72
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
@@ -117,7 +107,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
 
-- **Version**: unknown
 - **Source**: source
 - **License**: Check package
 - **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
@@ -128,7 +117,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>code</strong> - Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.</summary>
 
-- **Version**: 0.5.15
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
@@ -138,7 +126,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>coderabbit-cli</strong> - AI-powered code review CLI tool</summary>
 
-- **Version**: 0.3.4
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
@@ -148,7 +135,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>codex</strong> - OpenAI Codex CLI - a coding agent that runs locally on your computer</summary>
 
-- **Version**: 0.64.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
@@ -158,7 +144,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>codex-acp</strong> - An ACP-compatible coding agent powered by Codex</summary>
 
-- **Version**: 0.6.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/codex-acp
@@ -169,7 +154,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>copilot-cli</strong> - GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.</summary>
 
-- **Version**: 0.0.366
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://github.com/github/copilot-cli
@@ -179,7 +163,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>crush</strong> - The glamourous AI coding agent for your favourite terminal</summary>
 
-- **Version**: 0.20.1
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
@@ -189,7 +172,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>cursor-agent</strong> - Cursor Agent - CLI tool for Cursor AI code editor</summary>
 
-- **Version**: 2025.11.25-d5b3271
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
@@ -199,7 +181,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>droid</strong> - Factory AI's Droid - AI-powered development agent for your terminal</summary>
 
-- **Version**: 0.30.0
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
@@ -209,7 +190,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>eca</strong> - Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor</summary>
 
-- **Version**: 0.85.1
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/editor-code-assistant/eca
@@ -219,7 +199,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>forge</strong> - AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment</summary>
 
-- **Version**: 1.9.0
 - **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
@@ -230,7 +209,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>gemini-cli</strong> - AI agent that brings the power of Gemini directly into your terminal</summary>
 
-- **Version**: 0.19.1
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
@@ -240,7 +218,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>goose-cli</strong> - CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks</summary>
 
-- **Version**: 1.15.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
@@ -250,7 +227,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
 
-- **Version**: 0.6.4
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://handy.computer/
@@ -260,7 +236,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>kilocode-cli</strong> - The open-source AI coding agent. Now available in your terminal.</summary>
 
-- **Version**: 0.12.0
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://kilocode.ai/cli
@@ -270,7 +245,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>nanocoder</strong> - A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒</summary>
 
-- **Version**: 1.17.3
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
@@ -280,7 +254,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>opencode</strong> - AI coding agent built for the terminal</summary>
 
-- **Version**: 1.0.132
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
@@ -290,7 +263,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
 
-- **Version**: 1.2.1
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/numman-ali/openskills
@@ -300,7 +272,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
-- **Version**: 0.16.0
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/Fission-AI/OpenSpec
@@ -310,7 +281,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>qwen-code</strong> - Command-line AI workflow tool for Qwen3-Coder models</summary>
 
-- **Version**: 0.3.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
@@ -320,7 +290,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>spec-kit</strong> - Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)</summary>
 
-- **Version**: 0.0.89
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/github/spec-kit
