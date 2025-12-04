@@ -8,10 +8,6 @@
 
 Nix packages for AI coding agents and development tools. Automatically updated daily.
 
-## Daily Updates
-
-This repository uses GitHub Actions to automatically update all packages and flake inputs daily.
-
 ## Available Tools
 
 <!-- `> ./scripts/generate-package-docs.py` -->
