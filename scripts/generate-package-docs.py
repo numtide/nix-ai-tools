@@ -49,6 +49,9 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
         print(f"- **Homepage**: {homepage}")
 
     print(f"- **Usage**: `nix run github:numtide/nix-ai-tools#{package} -- --help`")
+    print(
+        f"- **Nix**: [packages/{package}/package.nix](packages/{package}/package.nix)"
+    )
 
     # Check for package-specific README
     readme_path = Path(f"packages/{package}/README.md")

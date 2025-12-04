@@ -21,6 +21,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
 - **Usage**: `nix run github:numtide/nix-ai-tools#amp -- --help`
+- **Nix**: [packages/amp/package.nix](packages/amp/package.nix)
 
 </details>
 <details>
@@ -30,6 +31,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run github:numtide/nix-ai-tools#backlog-md -- --help`
+- **Nix**: [packages/backlog-md/package.nix](packages/backlog-md/package.nix)
 
 </details>
 <details>
@@ -39,6 +41,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/steveyegge/beads
 - **Usage**: `nix run github:numtide/nix-ai-tools#beads -- --help`
+- **Nix**: [packages/beads/package.nix](packages/beads/package.nix)
 
 </details>
 <details>
@@ -48,6 +51,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/wandb/catnip
 - **Usage**: `nix run github:numtide/nix-ai-tools#catnip -- --help`
+- **Nix**: [packages/catnip/package.nix](packages/catnip/package.nix)
 
 </details>
 <details>
@@ -57,6 +61,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/sirmalloc/ccstatusline
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccstatusline -- --help`
+- **Nix**: [packages/ccstatusline/package.nix](packages/ccstatusline/package.nix)
 
 </details>
 <details>
@@ -66,6 +71,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccusage -- --help`
+- **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
 
 </details>
 <details>
@@ -75,6 +81,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccusage-codex -- --help`
+- **Nix**: [packages/ccusage-codex/package.nix](packages/ccusage-codex/package.nix)
 
 </details>
 <details>
@@ -84,6 +91,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code -- --help`
+- **Nix**: [packages/claude-code/package.nix](packages/claude-code/package.nix)
 
 </details>
 <details>
@@ -93,6 +101,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/claude-code-acp
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code-acp -- --help`
+- **Nix**: [packages/claude-code-acp/package.nix](packages/claude-code-acp/package.nix)
 
 </details>
 <details>
@@ -102,6 +111,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code-router -- --help`
+- **Nix**: [packages/claude-code-router/package.nix](packages/claude-code-router/package.nix)
 
 </details>
 <details>
@@ -111,6 +121,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Check package
 - **Homepage**: https://github.com/numtide/nix-ai-tools/tree/main/packages/claudebox
 - **Usage**: `nix run github:numtide/nix-ai-tools#claudebox -- --help`
+- **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
 - **Documentation**: See [packages/claudebox/README.md](packages/claudebox/README.md) for detailed usage
 
 </details>
@@ -121,6 +132,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
 - **Usage**: `nix run github:numtide/nix-ai-tools#code -- --help`
+- **Nix**: [packages/code/package.nix](packages/code/package.nix)
 
 </details>
 <details>
@@ -130,6 +142,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run github:numtide/nix-ai-tools#coderabbit-cli -- --help`
+- **Nix**: [packages/coderabbit-cli/package.nix](packages/coderabbit-cli/package.nix)
 
 </details>
 <details>
@@ -139,6 +152,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run github:numtide/nix-ai-tools#codex -- --help`
+- **Nix**: [packages/codex/package.nix](packages/codex/package.nix)
 
 </details>
 <details>
@@ -148,6 +162,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/codex-acp
 - **Usage**: `nix run github:numtide/nix-ai-tools#codex-acp -- --help`
+- **Nix**: [packages/codex-acp/package.nix](packages/codex-acp/package.nix)
 - **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
 
 </details>
@@ -158,6 +173,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://github.com/github/copilot-cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#copilot-cli -- --help`
+- **Nix**: [packages/copilot-cli/package.nix](packages/copilot-cli/package.nix)
 
 </details>
 <details>
@@ -167,6 +183,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
 - **Usage**: `nix run github:numtide/nix-ai-tools#crush -- --help`
+- **Nix**: [packages/crush/package.nix](packages/crush/package.nix)
 
 </details>
 <details>
@@ -176,6 +193,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run github:numtide/nix-ai-tools#cursor-agent -- --help`
+- **Nix**: [packages/cursor-agent/package.nix](packages/cursor-agent/package.nix)
 
 </details>
 <details>
@@ -185,6 +203,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://factory.ai
 - **Usage**: `nix run github:numtide/nix-ai-tools#droid -- --help`
+- **Nix**: [packages/droid/package.nix](packages/droid/package.nix)
 
 </details>
 <details>
@@ -194,6 +213,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/editor-code-assistant/eca
 - **Usage**: `nix run github:numtide/nix-ai-tools#eca -- --help`
+- **Nix**: [packages/eca/package.nix](packages/eca/package.nix)
 
 </details>
 <details>
@@ -203,6 +223,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/antinomyhq/forge
 - **Usage**: `nix run github:numtide/nix-ai-tools#forge -- --help`
+- **Nix**: [packages/forge/package.nix](packages/forge/package.nix)
 - **Documentation**: See [packages/forge/README.md](packages/forge/README.md) for detailed usage
 
 </details>
@@ -213,6 +234,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#gemini-cli -- --help`
+- **Nix**: [packages/gemini-cli/package.nix](packages/gemini-cli/package.nix)
 
 </details>
 <details>
@@ -222,6 +244,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/nix-ai-tools#goose-cli -- --help`
+- **Nix**: [packages/goose-cli/package.nix](packages/goose-cli/package.nix)
 
 </details>
 <details>
@@ -231,6 +254,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: unfree
 - **Homepage**: https://handy.computer/
 - **Usage**: `nix run github:numtide/nix-ai-tools#handy -- --help`
+- **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
 
 </details>
 <details>
@@ -240,6 +264,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://kilocode.ai/cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#kilocode-cli -- --help`
+- **Nix**: [packages/kilocode-cli/package.nix](packages/kilocode-cli/package.nix)
 
 </details>
 <details>
@@ -249,6 +274,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
 - **Usage**: `nix run github:numtide/nix-ai-tools#nanocoder -- --help`
+- **Nix**: [packages/nanocoder/package.nix](packages/nanocoder/package.nix)
 
 </details>
 <details>
@@ -258,6 +284,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run github:numtide/nix-ai-tools#opencode -- --help`
+- **Nix**: [packages/opencode/package.nix](packages/opencode/package.nix)
 
 </details>
 <details>
@@ -267,6 +294,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/numman-ali/openskills
 - **Usage**: `nix run github:numtide/nix-ai-tools#openskills -- --help`
+- **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
 
 </details>
 <details>
@@ -276,6 +304,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/Fission-AI/OpenSpec
 - **Usage**: `nix run github:numtide/nix-ai-tools#openspec -- --help`
+- **Nix**: [packages/openspec/package.nix](packages/openspec/package.nix)
 
 </details>
 <details>
@@ -285,6 +314,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run github:numtide/nix-ai-tools#qwen-code -- --help`
+- **Nix**: [packages/qwen-code/package.nix](packages/qwen-code/package.nix)
 
 </details>
 <details>
@@ -294,6 +324,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **License**: MIT
 - **Homepage**: https://github.com/github/spec-kit
 - **Usage**: `nix run github:numtide/nix-ai-tools#spec-kit -- --help`
+- **Nix**: [packages/spec-kit/package.nix](packages/spec-kit/package.nix)
 
 </details>
 <!-- END mdsh -->
