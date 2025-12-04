@@ -38,7 +38,14 @@ buildNpmPackage (finalAttrs: {
     if [ -f node_modules/@vscode/ripgrep/lib/postinstall.js ]; then
       HOME=$TMPDIR node node_modules/@vscode/ripgrep/lib/postinstall.js || true
     fi
+
+    # Install JSON schema
+    install -Dm644 config/schema.json $out/share/kilocode-cli/schema.json
   '';
+
+  passthru = {
+    jsonschema = "${placeholder "out"}/share/kilocode-cli/schema.json";
+  };
 
   dontNpmBuild = true;
 

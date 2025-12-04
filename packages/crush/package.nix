@@ -36,7 +36,14 @@ buildGo125Module {
       --bash <($out/bin/crush completion bash) \
       --fish <($out/bin/crush completion fish) \
       --zsh <($out/bin/crush completion zsh)
+
+    # Install JSON schema
+    install -Dm644 schema.json $out/share/crush/schema.json
   '';
+
+  passthru = {
+    jsonschema = "${placeholder "out"}/share/crush/schema.json";
+  };
 
   meta = with lib; {
     description = "The glamourous AI coding agent for your favourite terminal";

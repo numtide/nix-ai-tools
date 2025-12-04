@@ -169,6 +169,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     cp -r ../../node_modules/.bun $out/lib/opencode/node_modules/
     mkdir -p $out/lib/opencode/node_modules/@opentui
 
+    # Generate and install JSON schema
+    mkdir -p $out/share/opencode
+    HOME=$TMPDIR bun --bun script/schema.ts $out/share/opencode/schema.json
+
     mkdir -p $out/bin
     makeWrapper ${bun}/bin/bun $out/bin/opencode \
       --add-flags "run" \
@@ -200,6 +204,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       fi
     done
   '';
+
+  passthru = {
+    jsonschema = "${placeholder "out"}/share/opencode/schema.json";
+  };
 
   meta = {
     description = "AI coding agent built for the terminal";
