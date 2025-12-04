@@ -55,10 +55,6 @@ if [ "$type" = "package" ]; then
   new_version=$(nix eval .#packages.x86_64-linux."$name".version --raw 2>/dev/null || echo "unknown")
   echo "New version: $new_version"
 
-  # Run formatter to update README with mdsh
-  echo "Running formatter to update documentation..."
-  nix fmt
-
   echo "updated=true" >>"$output_var"
   echo "new_version=$new_version" >>"$output_var"
 

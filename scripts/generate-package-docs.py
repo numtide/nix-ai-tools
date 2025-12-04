@@ -41,7 +41,6 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
     print("<details>")
     print(f"<summary><strong>{package}</strong> - {description}</summary>")
     print()
-    print(f"- **Version**: {metadata.get('version', 'unknown')}")
     print(f"- **Source**: {metadata.get('sourceType', 'unknown')}")
     print(f"- **License**: {metadata.get('license', 'Check package')}")
 

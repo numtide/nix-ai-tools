@@ -99,8 +99,54 @@ jobs:
             "${{ matrix.name }}" \
             "${{ matrix.current_version }}" \
             "${{ steps.update.outputs.new_version }}"
-  summary:
+  update-readme:
     needs: [discover, update]
+    runs-on: ubuntu-slim
+    if: always() && needs.discover.outputs.has-updates == 'true'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+      - name: Setup Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Set up git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Regenerate README
+        run: nix run nixpkgs#mdsh -- -i README.md
+      - name: Create pull request
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          if git diff --quiet README.md; then
+            echo "No README changes"
+            exit 0
+          fi
+          branch="update/readme-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$branch"
+          git add README.md
+          git commit -m "README: regenerate package documentation"
+          git push -u origin "$branch"
+          gh pr create \
+            --title "README: regenerate package documentation" \
+            --body "Automated README regeneration after package updates." \
+            --label "documentation,automated"
+  summary:
+    needs: [discover, update, update-readme]
     runs-on: ubuntu-slim
     if: always() && needs.discover.outputs.has-updates == 'true'
     steps:
