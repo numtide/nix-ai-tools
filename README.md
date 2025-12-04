@@ -14,99 +14,109 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 <!-- BEGIN mdsh -->
 
-#### amp
+<details>
+<summary><strong>amp</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph</summary>
 
-- **Description**: CLI for Amp, an agentic coding tool in research preview from Sourcegraph
-- **Version**: 0.0.1764720103-g0db7ac
+- **Version**: 0.0.1764854305-g81c3fa
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
 - **Usage**: `nix run github:numtide/nix-ai-tools#amp -- --help`
 
-#### backlog-md
+</details>
+<details>
+<summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
 
-- **Description**: Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem
-- **Version**: 1.25.1
+- **Version**: 1.26.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run github:numtide/nix-ai-tools#backlog-md -- --help`
 
-#### beads
+</details>
+<details>
+<summary><strong>beads</strong> - A distributed issue tracker designed for AI-supervised coding workflows</summary>
 
-- **Description**: A distributed issue tracker designed for AI-supervised coding workflows
 - **Version**: 0.29.0
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/steveyegge/beads
 - **Usage**: `nix run github:numtide/nix-ai-tools#beads -- --help`
 
-#### catnip
+</details>
+<details>
+<summary><strong>catnip</strong> - Developer environment that's like catnip for agentic programming</summary>
 
-- **Description**: Developer environment that's like catnip for agentic programming
-- **Version**: 0.11.3
+- **Version**: 0.11.4
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/wandb/catnip
 - **Usage**: `nix run github:numtide/nix-ai-tools#catnip -- --help`
 
-#### ccstatusline
+</details>
+<details>
+<summary><strong>ccstatusline</strong> - A highly customizable status line formatter for Claude Code CLI</summary>
 
-- **Description**: A highly customizable status line formatter for Claude Code CLI
 - **Version**: 2.0.23
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/sirmalloc/ccstatusline
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccstatusline -- --help`
 
-#### ccusage
+</details>
+<details>
+<summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
 
-- **Description**: Usage analysis tool for Claude Code
 - **Version**: 17.1.6
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccusage -- --help`
 
-#### ccusage-codex
+</details>
+<details>
+<summary><strong>ccusage-codex</strong> - Usage analysis tool for OpenAI Codex sessions</summary>
 
-- **Description**: Usage analysis tool for OpenAI Codex sessions
 - **Version**: 17.1.6
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
 - **Usage**: `nix run github:numtide/nix-ai-tools#ccusage-codex -- --help`
 
-#### claude-code
+</details>
+<details>
+<summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
-- **Description**: Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
-- **Version**: 2.0.56
+- **Version**: 2.0.58
 - **Source**: source
 - **License**: unfree
 - **Homepage**: https://github.com/anthropics/claude-code
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code -- --help`
 
-#### claude-code-acp
+</details>
+<details>
+<summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
 
-- **Description**: An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)
-- **Version**: 0.10.10
+- **Version**: 0.11.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/claude-code-acp
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code-acp -- --help`
 
-#### claude-code-router
+</details>
+<details>
+<summary><strong>claude-code-router</strong> - Use Claude Code without an Anthropics account and route it to another LLM provider</summary>
 
-- **Description**: Use Claude Code without an Anthropics account and route it to another LLM provider
 - **Version**: 1.0.72
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run github:numtide/nix-ai-tools#claude-code-router -- --help`
 
-#### claudebox
+</details>
+<details>
+<summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
 
-- **Description**: Sandboxed environment for Claude Code
 - **Version**: unknown
 - **Source**: source
 - **License**: Check package
@@ -114,91 +124,101 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Usage**: `nix run github:numtide/nix-ai-tools#claudebox -- --help`
 - **Documentation**: See [packages/claudebox/README.md](packages/claudebox/README.md) for detailed usage
 
-#### code
+</details>
+<details>
+<summary><strong>code</strong> - Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.</summary>
 
-- **Description**: Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.
 - **Version**: 0.5.15
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/just-every/code/
 - **Usage**: `nix run github:numtide/nix-ai-tools#code -- --help`
 
-#### coderabbit-cli
+</details>
+<details>
+<summary><strong>coderabbit-cli</strong> - AI-powered code review CLI tool</summary>
 
-- **Description**: AI-powered code review CLI tool
 - **Version**: 0.3.4
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://coderabbit.ai
 - **Usage**: `nix run github:numtide/nix-ai-tools#coderabbit-cli -- --help`
 
-#### codex
+</details>
+<details>
+<summary><strong>codex</strong> - OpenAI Codex CLI - a coding agent that runs locally on your computer</summary>
 
-- **Description**: OpenAI Codex CLI - a coding agent that runs locally on your computer
 - **Version**: 0.64.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run github:numtide/nix-ai-tools#codex -- --help`
 
-#### codex-acp
+</details>
+<details>
+<summary><strong>codex-acp</strong> - An ACP-compatible coding agent powered by Codex</summary>
 
-- **Description**: An ACP-compatible coding agent powered by Codex
-- **Version**: 0.5.3
+- **Version**: 0.6.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/zed-industries/codex-acp
 - **Usage**: `nix run github:numtide/nix-ai-tools#codex-acp -- --help`
 - **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
 
-#### copilot-cli
+</details>
+<details>
+<summary><strong>copilot-cli</strong> - GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.</summary>
 
-- **Description**: GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.
-- **Version**: 0.0.365
+- **Version**: 0.0.366
 - **Source**: bytecode
 - **License**: unfree
 - **Homepage**: https://github.com/github/copilot-cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#copilot-cli -- --help`
 
-#### crush
+</details>
+<details>
+<summary><strong>crush</strong> - The glamourous AI coding agent for your favourite terminal</summary>
 
-- **Description**: The glamourous AI coding agent for your favourite terminal
 - **Version**: 0.20.1
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/charmbracelet/crush
 - **Usage**: `nix run github:numtide/nix-ai-tools#crush -- --help`
 
-#### cursor-agent
+</details>
+<details>
+<summary><strong>cursor-agent</strong> - Cursor Agent - CLI tool for Cursor AI code editor</summary>
 
-- **Description**: Cursor Agent - CLI tool for Cursor AI code editor
 - **Version**: 2025.11.25-d5b3271
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://cursor.com/
 - **Usage**: `nix run github:numtide/nix-ai-tools#cursor-agent -- --help`
 
-#### droid
+</details>
+<details>
+<summary><strong>droid</strong> - Factory AI's Droid - AI-powered development agent for your terminal</summary>
 
-- **Description**: Factory AI's Droid - AI-powered development agent for your terminal
-- **Version**: 0.29.0
+- **Version**: 0.30.0
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://factory.ai
 - **Usage**: `nix run github:numtide/nix-ai-tools#droid -- --help`
 
-#### eca
+</details>
+<details>
+<summary><strong>eca</strong> - Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor</summary>
 
-- **Description**: Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor
 - **Version**: 0.85.1
 - **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/editor-code-assistant/eca
 - **Usage**: `nix run github:numtide/nix-ai-tools#eca -- --help`
 
-#### forge
+</details>
+<details>
+<summary><strong>forge</strong> - AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment</summary>
 
-- **Description**: AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment
 - **Version**: 1.9.0
 - **Source**: binary
 - **License**: MIT
@@ -206,96 +226,107 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Usage**: `nix run github:numtide/nix-ai-tools#forge -- --help`
 - **Documentation**: See [packages/forge/README.md](packages/forge/README.md) for detailed usage
 
-#### gemini-cli
+</details>
+<details>
+<summary><strong>gemini-cli</strong> - AI agent that brings the power of Gemini directly into your terminal</summary>
 
-- **Description**: AI agent that brings the power of Gemini directly into your terminal
 - **Version**: 0.19.1
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/google-gemini/gemini-cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#gemini-cli -- --help`
 
-#### goose-cli
+</details>
+<details>
+<summary><strong>goose-cli</strong> - CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks</summary>
 
-- **Description**: CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks
 - **Version**: 1.15.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/nix-ai-tools#goose-cli -- --help`
 
-#### handy
+</details>
+<details>
+<summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
 
-- **Description**: Fast and accurate local transcription app using AI models
 - **Version**: 0.6.4
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://handy.computer/
 - **Usage**: `nix run github:numtide/nix-ai-tools#handy -- --help`
 
-#### kilocode-cli
+</details>
+<details>
+<summary><strong>kilocode-cli</strong> - The open-source AI coding agent. Now available in your terminal.</summary>
 
-- **Description**: The open-source AI coding agent. Now available in your terminal.
-- **Version**: 0.10.2
+- **Version**: 0.12.0
 - **Source**: bytecode
 - **License**: Apache-2.0
 - **Homepage**: https://kilocode.ai/cli
 - **Usage**: `nix run github:numtide/nix-ai-tools#kilocode-cli -- --help`
 
-#### nanocoder
+</details>
+<details>
+<summary><strong>nanocoder</strong> - A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒</summary>
 
-- **Description**: A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒
 - **Version**: 1.17.3
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/Mote-Software/nanocoder
 - **Usage**: `nix run github:numtide/nix-ai-tools#nanocoder -- --help`
 
-#### opencode
+</details>
+<details>
+<summary><strong>opencode</strong> - AI coding agent built for the terminal</summary>
 
-- **Description**: AI coding agent built for the terminal
-- **Version**: 1.0.128
+- **Version**: 1.0.132
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run github:numtide/nix-ai-tools#opencode -- --help`
 
-#### openskills
+</details>
+<details>
+<summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
 
-- **Description**: Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent
 - **Version**: 1.2.1
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/numman-ali/openskills
 - **Usage**: `nix run github:numtide/nix-ai-tools#openskills -- --help`
 
-#### openspec
+</details>
+<details>
+<summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
-- **Description**: Spec-driven development for AI coding assistants
 - **Version**: 0.16.0
 - **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/Fission-AI/OpenSpec
 - **Usage**: `nix run github:numtide/nix-ai-tools#openspec -- --help`
 
-#### qwen-code
+</details>
+<details>
+<summary><strong>qwen-code</strong> - Command-line AI workflow tool for Qwen3-Coder models</summary>
 
-- **Description**: Command-line AI workflow tool for Qwen3-Coder models
 - **Version**: 0.3.0
 - **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run github:numtide/nix-ai-tools#qwen-code -- --help`
 
-#### spec-kit
+</details>
+<details>
+<summary><strong>spec-kit</strong> - Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)</summary>
 
-- **Description**: Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)
 - **Version**: 0.0.89
 - **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/github/spec-kit
 - **Usage**: `nix run github:numtide/nix-ai-tools#spec-kit -- --help`
 
+</details>
 <!-- END mdsh -->
 
 ## Installation
