@@ -48,7 +48,7 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
     if homepage:
         print(f"- **Homepage**: {homepage}")
 
-    print(f"- **Usage**: `nix run github:numtide/nix-ai-tools#{package} -- --help`")
+    print(f"- **Usage**: `nix run github:numtide/llm-agents.nix#{package} -- --help`")
     print(
         f"- **Nix**: [packages/{package}/package.nix](packages/{package}/package.nix)"
     )
