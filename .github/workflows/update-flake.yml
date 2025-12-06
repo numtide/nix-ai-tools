@@ -127,7 +127,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Regenerate README
-        run: nix run nixpkgs#mdsh -- -i README.md
+        run: ./scripts/generate-package-docs.py
       - name: Create pull request
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}

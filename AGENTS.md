@@ -14,7 +14,7 @@
 - Run without installing: `nix run .#<package> -- --help`.
 - Repo checks (builds + lints): `nix flake check`.
 - Format everything: `nix fmt`.
-- Regenerate README package section: `nix run nixpkgs#mdsh -- -i README.md`.
+- Regenerate README package section: `./scripts/generate-package-docs.py`.
 
 ## Coding Style & Naming Conventions
 
