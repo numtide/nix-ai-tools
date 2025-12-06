@@ -12,14 +12,14 @@ ACP (Agent Communication Protocol) is a protocol that allows editors and IDEs to
 
 ```bash
 # Build the package
-nix build github:numtide/nix-ai-tools#codex-acp
+nix build github:numtide/llm-agents.nix#codex-acp
 
 # Or add to your system configuration
 {
-  inputs.nix-ai-tools.url = "github:numtide/nix-ai-tools";
+  inputs.llm-agents.nix.url = "github:numtide/llm-agents.nix";
   
   environment.systemPackages = [
-    inputs.nix-ai-tools.packages.${pkgs.system}.codex-acp
+    inputs.llm-agents.nix.packages.${pkgs.system}.codex-acp
   ];
 }
 ```
@@ -27,7 +27,7 @@ nix build github:numtide/nix-ai-tools#codex-acp
 ### Try Without Installing
 
 ```bash
-nix run github:numtide/nix-ai-tools#codex-acp -- --help
+nix run github:numtide/llm-agents.nix#codex-acp -- --help
 ```
 
 ## Usage with Zed Editor
@@ -41,7 +41,7 @@ To use the NixOS-compatible version of codex-acp with Zed:
 1. Install the package to your profile:
 
    ```bash
-   nix profile install github:numtide/nix-ai-tools#codex-acp
+   nix profile install github:numtide/llm-agents.nix#codex-acp
    ```
 
 1. Replace Zed's version with a symlink to the installed binary:

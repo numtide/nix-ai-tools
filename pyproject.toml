@@ -1,5 +1,5 @@
 [project]
-name = "nix-ai-tools"
+name = "llm-agents-nix"
 version = "0.1.0"
 description = "Nix package updater library and tools"
 requires-python = ">=3.13"
