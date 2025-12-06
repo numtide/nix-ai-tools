@@ -136,7 +136,11 @@ jobs:
             echo "No README changes"
             exit 0
           fi
-          branch="update/readme-$(date +%Y%m%d-%H%M%S)"
+          branch="update/readme"
+          # Check if branch exists remotely and delete it
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            git push origin --delete "$branch" || true
+          fi
           git checkout -b "$branch"
           git add README.md
           git commit -m "README: regenerate package documentation"
