@@ -338,11 +338,11 @@ Add to your system configuration:
 ```nix
 {
   inputs = {
-    llm-agents.nix.url = "github:numtide/llm-agents.nix";
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
   # In your system packages:
-  environment.systemPackages = with inputs.llm-agents.nix.packages.${pkgs.system}; [
+  environment.systemPackages = with inputs.llm-agents.packages.${pkgs.system}; [
     claude-code
     opencode
     gemini-cli
