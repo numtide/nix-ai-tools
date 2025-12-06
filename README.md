@@ -109,6 +109,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>claude-plugins</strong> - CLI tool for managing Claude Code plugins</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/Kamalnrf/claude-plugins
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-plugins -- --help`
+- **Nix**: [packages/claude-plugins/package.nix](packages/claude-plugins/package.nix)
+
+</details>
+<details>
 <summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
 
 - **Source**: source
