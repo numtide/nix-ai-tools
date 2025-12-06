@@ -13,7 +13,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <!-- `> ./scripts/generate-package-docs.py` -->
 
 <!-- BEGIN mdsh -->
-
 <details>
 <summary><strong>amp</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph</summary>
 
