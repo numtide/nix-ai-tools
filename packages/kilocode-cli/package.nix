@@ -7,14 +7,14 @@
 }:
 buildNpmPackage (finalAttrs: {
   pname = "kilocode-cli";
-  version = "0.12.0";
+  version = "0.12.1";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@kilocode/cli/-/cli-${finalAttrs.version}.tgz";
-    hash = "sha256-AbZEwsMu2gcSOts1+BRkNJVoiPn4K6jDo1PS+j5Dsfw=";
+    hash = "sha256-bma5ipS5vUMm+cu2TUQOnPrryXkqnp7/WBwdHHRTvWk=";
   };
 
-  npmDepsHash = "sha256-4sejnvY28gjXah3cKwYNkvgykaE/Qt/Btx7KeVYCkVA=";
+  npmDepsHash = "sha256-5uyvG4/PsSHn6Bh4bfI2J7vceujI8ybjD5hzBzH3giY=";
 
   buildInputs = [
     ripgrep
