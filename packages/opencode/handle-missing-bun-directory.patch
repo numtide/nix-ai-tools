@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GitHub Copilot <noreply@github.com>
+Date: Sat, 7 Dec 2025 08:50:00 +0000
+Subject: [PATCH] Add error handling for missing node_modules/.bun directory
+
+The canonicalize-node-modules.ts and normalize-bun-binaries.ts scripts
+fail with ENOENT when the node_modules/.bun directory doesn't exist.
+This can happen with certain Bun versions or installation scenarios.
+
+This patch adds graceful error handling to both scripts to check if
+the .bun directory exists before attempting to process it. If the
+directory doesn't exist, the scripts will skip processing and exit
+successfully with a log message.
+
+Fixes: ENOENT error when building with Bun versions that don't create
+       the .bun directory in the expected location.
+---
+ nix/scripts/canonicalize-node-modules.ts | 9 +++++++++
+ nix/scripts/normalize-bun-binaries.ts    | 9 +++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/nix/scripts/canonicalize-node-modules.ts b/nix/scripts/canonicalize-node-modules.ts
+--- a/nix/scripts/canonicalize-node-modules.ts
++++ b/nix/scripts/canonicalize-node-modules.ts
+@@ -14,6 +14,15 @@ type Entry = {
+ 
+ const root = process.cwd()
+ const bunRoot = join(root, "node_modules/.bun")
++
++// Check if .bun directory exists
++try {
++  await lstat(bunRoot)
++} catch {
++  console.log("[canonicalize-node-modules] node_modules/.bun not found, skipping canonicalization")
++  process.exit(0)
++}
++
+ const linkRoot = join(bunRoot, "node_modules")
+ const directories = (await readdir(bunRoot)).sort()
+ const versions = new Map<string, Entry[]>()
+diff --git a/nix/scripts/normalize-bun-binaries.ts b/nix/scripts/normalize-bun-binaries.ts
+--- a/nix/scripts/normalize-bun-binaries.ts
++++ b/nix/scripts/normalize-bun-binaries.ts
+@@ -8,6 +8,15 @@ type PackageManifest = {
+ 
+ const root = process.cwd()
+ const bunRoot = join(root, "node_modules/.bun")
++
++// Check if .bun directory exists
++try {
++  await lstat(bunRoot)
++} catch {
++  console.log("[normalize-bun-binaries] node_modules/.bun not found, skipping normalization")
++  process.exit(0)
++}
++
+ const bunEntries = (await safeReadDir(bunRoot)).sort()
+ let rewritten = 0
+ 
+-- 
+2.51.0

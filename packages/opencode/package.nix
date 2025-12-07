@@ -98,6 +98,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   patches = [
     # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
+    # NOTE: Add error handling for missing node_modules/.bun directory
+    ./handle-missing-bun-directory.patch
   ];
 
   dontConfigure = true;
