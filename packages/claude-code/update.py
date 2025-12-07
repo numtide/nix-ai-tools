@@ -3,9 +3,13 @@
 
 """Update script for claude-code package."""
 
+import os
 import subprocess
 import sys
+import tarfile
+import tempfile
 from pathlib import Path
+from urllib.request import urlretrieve
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
@@ -25,18 +29,30 @@ HASHES_FILE = SCRIPT_DIR / "hashes.json"
 NPM_PACKAGE = "@anthropic-ai/claude-code"
 
 
-def generate_package_lock(version: str) -> None:
-    """Generate package-lock.json for the given version."""
-    print("Updating package-lock.json...")
-    subprocess.run(
-        ["npm", "i", "--package-lock-only", f"{NPM_PACKAGE}@{version}"],
-        cwd=SCRIPT_DIR,
-        check=True,
-    )
-    # Clean up temporary package.json if created
-    package_json = SCRIPT_DIR / "package.json"
-    if package_json.exists():
-        package_json.unlink()
+def generate_package_lock(tarball_url: str) -> None:
+    """Generate package-lock.json from tarball."""
+    print("Generating package-lock.json...")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir_path = Path(tmpdir)
+        tarball_path = tmpdir_path / "claude-code.tgz"
+        urlretrieve(tarball_url, tarball_path)
+
+        with tarfile.open(tarball_path, "r:gz") as tar:
+            tar.extractall(tmpdir_path, filter="data")
+
+        package_dir = tmpdir_path / "package"
+
+        subprocess.run(
+            ["npm", "install", "--package-lock-only"],
+            cwd=package_dir,
+            # `claude-code` has a `prepare` script that requires `AUTHORIZED=1`
+            env={**os.environ, "AUTHORIZED": "1"},
+            check=True,
+        )
+
+        (SCRIPT_DIR / "package-lock.json").write_text(
+            (package_dir / "package-lock.json").read_text()
+        )
 
 
 def main() -> None:
@@ -56,8 +72,7 @@ def main() -> None:
     print("Calculating source hash...")
     source_hash = calculate_url_hash(tarball_url, unpack=True)
 
-    # Generate package-lock.json
-    generate_package_lock(latest)
+    generate_package_lock(tarball_url)
 
     # Prepare new data with dummy hash for dependency calculation
     new_data = {
