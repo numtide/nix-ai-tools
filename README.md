@@ -246,16 +246,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>happy-coder</strong> - Happy Coder CLI to connect your local Claude Code to mobile device</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/slopus/happy-cli
-- **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
-- **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
-
-</details>
-<details>
 <summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
 
 - **Source**: binary
@@ -263,6 +253,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://handy.computer/
 - **Usage**: `nix run github:numtide/llm-agents.nix#handy -- --help`
 - **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
+
+</details>
+<details>
+<summary><strong>happy-coder</strong> - Happy Coder CLI to connect your local Claude Code to mobile device</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/slopus/happy-cli
+- **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
+- **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
 
 </details>
 <details>
