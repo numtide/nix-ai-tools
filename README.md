@@ -1,8 +1,4 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/numtide/llm-agents.nix/releases/download/assets/llm-agents.nix-banner--dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/numtide/llm-agents.nix/releases/download/assets/llm-agents.nix-banner--white.svg">
-  <img alt="llm-agents.nix" src="https://banner.numtide.com/banner/numtide/llm-agents.nix.svg">
-</picture>
+<img alt="llm-agents.nix" src="https://banner.numtide.com/banner/numtide/llm-agents.nix.svg">
 
 [![Mentioned in Awesome Gemini CLI](https://awesome.re/mentioned-badge.svg)](https://github.com/Piebald-AI/awesome-gemini-cli)
 
