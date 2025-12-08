@@ -32,24 +32,14 @@ stdenv.mkDerivation (finalAttrs: {
     makeWrapper
   ];
 
-  # Skip build phase since the app runs with tsx (no compilation needed)
-  dontBuild = true;
-
   # Create wrapper script that will run tsx with the main.ts entry point
   postInstall = ''
-    # Create the server wrapper
     mkdir -p $out/bin
-    cat > $out/bin/happy-server <<EOF
-#!/usr/bin/env bash
-set -e
-# Change to the package directory so tsconfig.json paths work
-cd $out/lib/node_modules/happy-server
-# Set NODE_PATH to help with module resolution
-export NODE_PATH="\$NODE_PATH:$out/lib/node_modules/happy-server/node_modules"
-# Users will need to run 'prisma generate' and set up the database before running
-exec ${lib.getExe nodejs} --import ./node_modules/tsx/dist/esm/index.mjs ./sources/main.ts "\$@"
-EOF
-    chmod +x $out/bin/happy-server
+    makeWrapper ${lib.getExe nodejs} $out/bin/happy-server \
+      --add-flags "--import $out/lib/node_modules/happy-server/node_modules/tsx/dist/esm/index.mjs" \
+      --add-flags "$out/lib/node_modules/happy-server/sources/main.ts" \
+      --chdir "$out/lib/node_modules/happy-server" \
+      --set NODE_PATH "$out/lib/node_modules/happy-server/node_modules"
   '';
 
   meta = {
