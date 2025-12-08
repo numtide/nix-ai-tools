@@ -7,16 +7,16 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "codex-acp";
-  version = "0.6.0";
+  version = "0.6.1";
 
   src = fetchFromGitHub {
     owner = "zed-industries";
     repo = "codex-acp";
     rev = "v${version}";
-    hash = "sha256-4up2F5p6vCnuaxo0NoUAXQt/yl2i4Roz6inTrFHoACI=";
+    hash = "sha256-ZK5ml19cjpQePysA29FMA9mMt0pU0RmCxGzZR5bziPg=";
   };
 
-  cargoHash = "sha256-dJehw2TPrBa9M87oKbvdz5KVPe+ARSkmiDaSqlUR8T8=";
+  cargoHash = "sha256-DGPwNbUGJBRReSr3KX9Z1R8ZaFfKttKiQeT1kKof9EM=";
 
   nativeBuildInputs = [
     pkg-config
