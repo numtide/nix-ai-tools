@@ -4,7 +4,6 @@
   fetchFromGitHub,
   fetchYarnDeps,
   yarnConfigHook,
-  yarnBuildHook,
   yarnInstallHook,
   nodejs,
   makeWrapper,
@@ -29,7 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     nodejs
     yarnConfigHook
-    yarnBuildHook
     yarnInstallHook
     makeWrapper
   ];
@@ -39,19 +37,19 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Create wrapper script that will run tsx with the main.ts entry point
   postInstall = ''
-        # Create the server wrapper
-        mkdir -p $out/bin
-        cat > $out/bin/happy-server <<EOF
-    #!/usr/bin/env bash
-    set -e
-    # Change to the package directory so tsconfig.json paths work
-    cd $out/lib/node_modules/happy-server
-    # Set NODE_PATH to help with module resolution
-    export NODE_PATH="\$NODE_PATH:$out/lib/node_modules/happy-server/node_modules"
-    # Users will need to run 'prisma generate' and set up the database before running
-    exec ${lib.getExe nodejs} --import ./node_modules/tsx/dist/esm/index.mjs ./sources/main.ts "\$@"
-    EOF
-        chmod +x $out/bin/happy-server
+    # Create the server wrapper
+    mkdir -p $out/bin
+    cat > $out/bin/happy-server <<EOF
+#!/usr/bin/env bash
+set -e
+# Change to the package directory so tsconfig.json paths work
+cd $out/lib/node_modules/happy-server
+# Set NODE_PATH to help with module resolution
+export NODE_PATH="\$NODE_PATH:$out/lib/node_modules/happy-server/node_modules"
+# Users will need to run 'prisma generate' and set up the database before running
+exec ${lib.getExe nodejs} --import ./node_modules/tsx/dist/esm/index.mjs ./sources/main.ts "\$@"
+EOF
+    chmod +x $out/bin/happy-server
   '';
 
   meta = {
