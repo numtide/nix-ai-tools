@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
     changelog = "https://github.com/Kamalnrf/claude-plugins/releases";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
-    maintainers = with maintainers; [ ];
+    maintainers = with pkgs.maintainers; [ ypares ];
     mainProgram = "claude-plugins";
     platforms = platforms.all;
   };

@@ -7,6 +7,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 1560508;
         name = "Ryo Osawa";
       };
+      ypares = {
+        github = "YPares";
+        githubId = 1377233;
+        name = "Yves Parès";
+      };
     };
   }
 )
