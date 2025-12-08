@@ -35,11 +35,12 @@ stdenv.mkDerivation (finalAttrs: {
   # Create wrapper script that will run tsx with the main.ts entry point
   postInstall = ''
     mkdir -p $out/bin
+    packageDir="$out/lib/node_modules/happy-server"
     makeWrapper ${lib.getExe nodejs} $out/bin/happy-server \
-      --add-flags "--import $out/lib/node_modules/happy-server/node_modules/tsx/dist/esm/index.mjs" \
-      --add-flags "$out/lib/node_modules/happy-server/sources/main.ts" \
-      --chdir "$out/lib/node_modules/happy-server" \
-      --set NODE_PATH "$out/lib/node_modules/happy-server/node_modules"
+      --add-flags "--import $packageDir/node_modules/tsx/dist/esm/index.mjs" \
+      --add-flags "$packageDir/sources/main.ts" \
+      --chdir "$packageDir" \
+      --set NODE_PATH "$packageDir/node_modules"
   '';
 
   meta = {
