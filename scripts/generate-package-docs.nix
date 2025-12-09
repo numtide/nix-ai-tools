@@ -43,6 +43,7 @@ let
       homepage = pkg.meta.homepage or null;
       sourceType = sourceType;
       hideFromDocs = pkg.passthru.hideFromDocs or false;
+      hasMainProgram = builtins.hasAttr "mainProgram" pkg.meta;
     };
 
   results = builtins.listToAttrs (
@@ -53,8 +54,11 @@ let
           pkg = flake.packages.x86_64-linux.${name} or null;
           metadata = if pkg != null then extractMetadata pkg else null;
         in
-        # Filter out packages with hideFromDocs = true
-        if metadata != null && !(metadata.hideFromDocs or false) then metadata else null;
+        # Filter out packages with hideFromDocs = true or no mainProgram
+        if metadata != null && !(metadata.hideFromDocs or false) && (metadata.hasMainProgram or false) then
+          metadata
+        else
+          null;
     }) packages
   );
 in
