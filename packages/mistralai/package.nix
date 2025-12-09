@@ -34,6 +34,5 @@ python3.pkgs.buildPythonPackage rec {
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     platforms = platforms.all;
-    mainProgram = "mistralai";
   };
 }

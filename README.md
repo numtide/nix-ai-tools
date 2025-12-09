@@ -272,6 +272,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>mistral-vibe</strong> - Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/mistralai/mistral-vibe
+- **Usage**: `nix run github:numtide/llm-agents.nix#mistral-vibe -- --help`
+- **Nix**: [packages/mistral-vibe/package.nix](packages/mistral-vibe/package.nix)
+
+</details>
+<details>
 <summary><strong>nanocoder</strong> - A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒</summary>
 
 - **Source**: source

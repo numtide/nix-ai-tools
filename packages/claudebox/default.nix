@@ -30,6 +30,7 @@ pkgs.runCommand "claudebox"
   {
     buildInputs = [ pkgs.makeWrapper ];
     meta = with pkgs.lib; {
+      mainProgram = "claudebox";
       description = "Sandboxed environment for Claude Code";
       homepage = "https://github.com/numtide/llm-agents.nix/tree/main/packages/claudebox";
       sourceProvenance = with sourceTypes; [ fromSource ];
