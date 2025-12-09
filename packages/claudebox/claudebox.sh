@@ -83,7 +83,9 @@ project_dir="$(pwd)"
 # Try to find git repo root, fallback to current directory
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || echo "$project_dir")"
 
-session_prefix="$(basename "$repo_root")"
+# Sanitize session prefix: tmux treats '.' and ':' as special characters
+# in session names (used as separators in target syntax like session.window:pane)
+session_prefix="$(basename "$repo_root" | tr './:' '_')"
 session_id="$(printf '%04x%04x' $RANDOM $RANDOM)"
 session_name="${session_prefix}-${session_id}"
 
