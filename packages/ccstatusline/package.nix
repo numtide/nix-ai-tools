@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/sirmalloc/ccstatusline";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
-    maintainers = with maintainers; [ ];
+    maintainers = with pkgs.maintainers; [ ypares ];
     mainProgram = "ccstatusline";
     platforms = platforms.all;
   };

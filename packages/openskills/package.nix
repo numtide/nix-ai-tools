@@ -22,7 +22,7 @@ buildNpmPackage (finalAttrs: {
     homepage = "https://github.com/numman-ali/openskills";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = [ ];
+    maintainers = with lib.pkgs.maintainers; [ ypares ];
     mainProgram = "openskills";
     platforms = lib.platforms.all;
   };
