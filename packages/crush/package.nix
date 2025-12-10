@@ -1,6 +1,6 @@
 {
   lib,
-  buildGo125Module,
+  buildGoModule,
   fetchFromGitHub,
   installShellFiles,
 }:
@@ -9,7 +9,7 @@ let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash vendorHash;
 in
-buildGo125Module {
+buildGoModule {
   pname = "crush";
   inherit version vendorHash;
 
@@ -21,6 +21,12 @@ buildGo125Module {
   };
 
   nativeBuildInputs = [ installShellFiles ];
+
+  # Patch go.mod to remove tight patch-level version constraint
+  # Converts "go X.Y.Z" to "go X.Y" to allow building with any patch version
+  preBuild = ''
+    sed -i -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+$/go \1/' go.mod
+  '';
 
   # Tests require config files that aren't available in the build environment
   doCheck = false;
