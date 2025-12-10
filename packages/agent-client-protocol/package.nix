@@ -15,7 +15,7 @@ python3.pkgs.buildPythonPackage rec {
     hash = "sha256-xmgRu4BIaMTncosYtnN5vLAzWvujscL/D839DEjZMCk=";
   };
 
-  build-system = with python3.pkgs; [ hatchling ];
+  build-system = with python3.pkgs; [ pdm-backend ];
 
   dependencies = with python3.pkgs; [
     pydantic
