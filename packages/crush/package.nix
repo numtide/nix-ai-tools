@@ -1,6 +1,6 @@
 {
   lib,
-  buildGo125Module,
+  buildGoModule,
   fetchFromGitHub,
   installShellFiles,
 }:
@@ -9,7 +9,7 @@ let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash vendorHash;
 in
-buildGo125Module {
+buildGoModule {
   pname = "crush";
   inherit version vendorHash;
 
