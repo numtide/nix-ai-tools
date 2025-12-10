@@ -6,16 +6,16 @@
 
 buildNpmPackage rec {
   pname = "claude-code-acp";
-  version = "0.12.1";
+  version = "0.12.2";
 
   src = fetchFromGitHub {
     owner = "zed-industries";
     repo = "claude-code-acp";
     rev = "v${version}";
-    hash = "sha256-cYkL0NeQRXEx2jRTNc1MRghN9nRvMReMLOQRLGg6aRc=";
+    hash = "sha256-DcOuAHDEFSinPBpRyIuQCtCfmcJxOAQE3HMO6cnBOO4=";
   };
 
-  npmDepsHash = "sha256-unpVHGJIoTLItvBxPHCAvhhaVwhRtl+/guyk/KU81xM=";
+  npmDepsHash = "sha256-o5AanK3Iv0uY1i7BJV41mGtHRTArAYW3T00+ESJiyRE=";
 
   # Disable install scripts to avoid platform-specific dependency fetching issues
   npmFlags = [ "--ignore-scripts" ];
