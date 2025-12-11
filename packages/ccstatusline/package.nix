@@ -3,6 +3,7 @@
   stdenv,
   fetchzip,
   nodejs,
+  flake,
 }:
 
 stdenv.mkDerivation rec {
@@ -36,7 +37,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/sirmalloc/ccstatusline";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
-    maintainers = with pkgs.maintainers; [ ypares ];
+    maintainers = with flake.lib.maintainers; [ ypares ];
     mainProgram = "ccstatusline";
     platforms = platforms.all;
   };
