@@ -396,7 +396,7 @@ nix run github:numtide/llm-agents.nix#qwen-code
 
 ### Binary Cache
 
-Pre-built binaries are available from the Numtide Cachix cache. All packages are built daily via CI and pushed to the cache, so you can avoid compiling from source.
+Pre-built binaries are available from the Numtide binary cache. All packages are built daily via CI and pushed to the cache, so you can avoid compiling from source.
 
 This cache is automatically configured when this flake is used directly (e.g `nix run github:numtide/llm-agents.nix#claude-code`)
 
@@ -405,10 +405,21 @@ To use the binary cache when using this flake as an input, add `nixConfig` to yo
 ```nix
 {
   nixConfig = {
-    extra-substituters = [ "https://numtide.cachix.org" ];
-    extra-trusted-public-keys = [ "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE=" ];
+    extra-substituters = [ "https://cache.numtide.com" ];
+    extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
   };
 }
+```
+
+Alternatively, you can configure this system-wide in your NixOS configuration:
+
+```nix
+nix.settings = {
+  extra-substituters = [ "https://cache.numtide.com" ];
+  extra-trusted-public-keys = [
+    "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+  ];
+};
 ```
 
 ## Development
