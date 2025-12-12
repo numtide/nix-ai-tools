@@ -1,8 +1,8 @@
 {
-  "version": "0.85.2",
-  "x86_64-linux": "sha256-q0aJR8/+ZXy++Y0q4xDO1e9Htl5tM3Ge/QWi633wwxs=",
-  "aarch64-linux": "sha256-n8uc2fHnXjAumDxS8Jo1lN6N09QOd+JYhgK/bMdKM5Q=",
-  "x86_64-darwin": "sha256-Wp+2zGYx1a1h35ZNJDBRSFTWdKSzw3WxPK1CbR8R6Ho=",
-  "aarch64-darwin": "sha256-00MtLLgTb8GNRNSM60mt4xBWyFIMk2AJW2jb9nkeFes=",
-  "jar": "sha256-rdl3P8vFmq2BVdCukAy1uW8nTZ2JtAhD9egBWN7fnOg="
+  "version": "0.85.3",
+  "x86_64-linux": "sha256-iCsNiT6jCYs+Ra51g8vnNKzPjJKVJssu+ehwEoYkrUI=",
+  "aarch64-linux": "sha256-LF+RBHWyVSMW1kRmJBEQvD00lYrXmUrINFsmhXCqBug=",
+  "x86_64-darwin": "sha256-2T60aejx8ASzdxe0ot397nrggXEVUkJ6C6ud4UYB7D0=",
+  "aarch64-darwin": "sha256-QbBYRoPxaH7U0XaGNqexQM1FgnS9fzRFj7EoXXwiguI=",
+  "jar": "sha256-jY7AP8XIJiTubRkNqfl+rRK71t2IQQne8HlfKXXNkEA="
 }
