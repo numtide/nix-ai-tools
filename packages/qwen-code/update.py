@@ -9,10 +9,18 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import fetch_text
-from updater.nix import NixCommandError, nix_eval, run_command
+from updater import (
+    calculate_dependency_hash,
+    fetch_text,
+    load_hashes,
+    save_hashes,
+    should_update,
+)
+from updater.hash import DUMMY_SHA256_HASH, calculate_url_hash
+from updater.nix import NixCommandError, run_command
 
 SCRIPT_DIR = Path(__file__).parent
+HASHES_FILE = SCRIPT_DIR / "hashes.json"
 PACKAGE_NAME = "qwen-code"
 GITHUB_OWNER = "QwenLM"
 GITHUB_REPO = "qwen-code"
@@ -45,18 +53,6 @@ def download_package_lock(version: str) -> bool:
         return False
 
 
-def calculate_npm_deps_hash() -> str:
-    """Calculate npmDepsHash using prefetch-npm-deps."""
-    package_lock = SCRIPT_DIR / "package-lock.json"
-    print("Calculating npmDepsHash...")
-    result = run_command(
-        ["prefetch-npm-deps", str(package_lock)],
-        check=True,
-        capture_output=True,
-    )
-    return result.stdout.strip()
-
-
 def run_nix_update(args: list[str]) -> None:
     """Run nix-update with given arguments."""
     cmd = ["nix-update", "--flake", PACKAGE_NAME] + args
@@ -69,18 +65,19 @@ def run_nix_update(args: list[str]) -> None:
 
 def main() -> None:
     """Update the qwen-code package."""
-    # Get current version
-    current_version = nix_eval(f".#packages.x86_64-linux.{PACKAGE_NAME}.version")
+    # Load current hashes
+    data = load_hashes(HASHES_FILE)
+    current_version = data["version"]
     print(f"Current version: {current_version}")
 
-    # Load nix-update args
+    # Load nix-update args to get version filter
     nix_update_args_file = SCRIPT_DIR / "nix-update-args"
     args = []
     if nix_update_args_file.exists():
         args = nix_update_args_file.read_text().strip().split("\n")
         args = [arg for arg in args if arg and not arg.startswith("#")]
 
-    # Run nix-update to update version and source hash
+    # Run nix-update to get the latest version and source hash
     print("Running nix-update...")
     try:
         run_nix_update(args)
@@ -88,11 +85,13 @@ def main() -> None:
         print(f"ERROR: {e}")
         return
 
-    # Get new version after nix-update
-    new_version = nix_eval(f".#packages.x86_64-linux.{PACKAGE_NAME}.version")
+    # Reload hashes to get updated version and hash from nix-update
+    data = load_hashes(HASHES_FILE)
+    new_version = data["version"]
+    source_hash = data["hash"]
     print(f"New version: {new_version}")
 
-    if current_version == new_version:
+    if not should_update(current_version, new_version):
         print("No update needed")
         return
 
@@ -101,29 +100,27 @@ def main() -> None:
         print("ERROR: Failed to update package-lock.json")
         return
 
-    # Calculate npmDepsHash
+    # Prepare data with dummy hash for npmDepsHash calculation
+    new_data = {
+        "version": new_version,
+        "hash": source_hash,
+        "npmDepsHash": DUMMY_SHA256_HASH,
+    }
+
+    # Calculate npmDepsHash using the helper
     try:
-        npm_deps_hash = calculate_npm_deps_hash()
-        print(f"npmDepsHash: {npm_deps_hash}")
-    except NixCommandError as e:
+        npm_deps_hash = calculate_dependency_hash(
+            f".#{PACKAGE_NAME}",
+            "npmDepsHash",
+            HASHES_FILE,
+            new_data,
+        )
+        new_data["npmDepsHash"] = npm_deps_hash
+        save_hashes(HASHES_FILE, new_data)
+        print(f"Successfully updated to version {new_version}")
+    except (ValueError, NixCommandError) as e:
         print(f"ERROR: Failed to calculate npmDepsHash: {e}")
         return
-
-    # Update package.nix with the new npmDepsHash
-    package_nix = SCRIPT_DIR / "package.nix"
-    content = package_nix.read_text()
-
-    # Find and replace npmDepsHash line
-    lines = content.split("\n")
-    for i, line in enumerate(lines):
-        if "npmDepsHash" in line and "=" in line:
-            # Preserve indentation
-            indent = len(line) - len(line.lstrip())
-            lines[i] = " " * indent + f'npmDepsHash = "{npm_deps_hash}";'
-            break
-
-    package_nix.write_text("\n".join(lines))
-    print(f"Successfully updated to version {new_version}")
 
 
 if __name__ == "__main__":
