@@ -4,15 +4,28 @@
   fetchFromGitHub,
   installShellFiles,
   runCommand,
+  fetchzip,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash vendorHash;
   
+  # Pre-fetch and patch catwalk to remove Go version constraint
+  # This is an FOD that vendors catwalk with a relaxed version requirement
+  patchedCatwalk = runCommand "catwalk-v0.10.1-patched" {} ''
+    cp -r ${fetchzip {
+      url = "https://github.com/charmbracelet/catwalk/archive/refs/tags/v0.10.1.tar.gz";
+      hash = "sha256-zcWKXojirBEoCUX8YS4JaCXyqn0jRD9uZsoLu//9358=";
+    }} $out
+    chmod -R +w $out
+    
+    # Patch catwalk's go.mod to relax version constraint
+    sed -i -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+$/go \1/' $out/go.mod
+  '';
+  
   # Fetch the source and patch go.mod to remove patch-level version constraints
-  # This addresses the issue where dependencies require Go 1.25.5 but nixpkgs has 1.25.4
-  # By relaxing the constraint to the minor version (1.25), the build can proceed
+  # Also add a replace directive to use our patched catwalk
   patchedSrc = runCommand "crush-${version}-src" {} ''
     cp -r ${fetchFromGitHub {
       owner = "charmbracelet";
@@ -23,8 +36,11 @@ let
     chmod -R +w $out
     
     # Patch go.mod to relax patch-level version constraints
-    # Converts "go X.Y.Z" to "go X.Y" to allow building with any patch version
     sed -i -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+$/go \1/' $out/go.mod
+    
+    # Add replace directive to use our patched catwalk
+    echo "" >> $out/go.mod
+    echo "replace github.com/charmbracelet/catwalk => ${patchedCatwalk}" >> $out/go.mod
   '';
 in
 buildGoModule {
