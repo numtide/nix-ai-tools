@@ -3,14 +3,14 @@
 
 """Update script for qwen-code package."""
 
-import subprocess
+import os
 import sys
 from pathlib import Path
-from urllib.request import urlretrieve
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from updater import NixCommandError, nix_eval
+from updater import fetch_text
+from updater.nix import NixCommandError, nix_eval, run_command
 
 SCRIPT_DIR = Path(__file__).parent
 PACKAGE_NAME = "qwen-code"
@@ -23,9 +23,21 @@ def download_package_lock(version: str) -> bool:
     url = f"https://raw.githubusercontent.com/{GITHUB_OWNER}/{GITHUB_REPO}/v{version}/package-lock.json"
     dest = SCRIPT_DIR / "package-lock.json"
 
+    # Add GitHub token to request if available
+    github_token = os.environ.get("GITHUB_TOKEN")
     print(f"Downloading package-lock.json from {url}...")
     try:
-        urlretrieve(url, dest)
+        # fetch_text handles authentication via urllib
+        if github_token:
+            import urllib.request
+            req = urllib.request.Request(url)
+            req.add_header("Authorization", f"token {github_token}")
+            with urllib.request.urlopen(req) as response:
+                content = response.read().decode("utf-8")
+        else:
+            content = fetch_text(url)
+        
+        dest.write_text(content)
         print("Successfully downloaded package-lock.json")
         return True
     except Exception as e:
@@ -37,11 +49,10 @@ def calculate_npm_deps_hash() -> str:
     """Calculate npmDepsHash using prefetch-npm-deps."""
     package_lock = SCRIPT_DIR / "package-lock.json"
     print("Calculating npmDepsHash...")
-    result = subprocess.run(
+    result = run_command(
         ["prefetch-npm-deps", str(package_lock)],
-        capture_output=True,
-        text=True,
         check=True,
+        capture_output=True,
     )
     return result.stdout.strip()
 
@@ -50,7 +61,7 @@ def run_nix_update(args: list[str]) -> None:
     """Run nix-update with given arguments."""
     cmd = ["nix-update", "--flake", PACKAGE_NAME] + args
     print(f"Running: {' '.join(cmd)}")
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = run_command(cmd, check=False, capture_output=True)
     if result.returncode != 0:
         raise NixCommandError(f"nix-update failed: {result.stderr}")
     print(result.stdout)
@@ -94,7 +105,7 @@ def main() -> None:
     try:
         npm_deps_hash = calculate_npm_deps_hash()
         print(f"npmDepsHash: {npm_deps_hash}")
-    except subprocess.CalledProcessError as e:
+    except NixCommandError as e:
         print(f"ERROR: Failed to calculate npmDepsHash: {e}")
         return
 
