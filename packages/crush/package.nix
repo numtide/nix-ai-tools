@@ -3,43 +3,37 @@
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
+  runCommand,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash vendorHash;
+  
+  # Fetch the source and patch go.mod to remove patch-level version constraints
+  # This addresses the issue where dependencies require Go 1.25.5 but nixpkgs has 1.25.4
+  # By relaxing the constraint to the minor version (1.25), the build can proceed
+  patchedSrc = runCommand "crush-${version}-src" {} ''
+    cp -r ${fetchFromGitHub {
+      owner = "charmbracelet";
+      repo = "crush";
+      rev = "v${version}";
+      inherit hash;
+    }} $out
+    chmod -R +w $out
+    
+    # Patch go.mod to relax patch-level version constraints
+    # Converts "go X.Y.Z" to "go X.Y" to allow building with any patch version
+    sed -i -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+$/go \1/' $out/go.mod
+  '';
 in
 buildGoModule {
   pname = "crush";
   inherit version vendorHash;
 
-  src = fetchFromGitHub {
-    owner = "charmbracelet";
-    repo = "crush";
-    rev = "v${version}";
-    inherit hash;
-  };
+  src = patchedSrc;
 
   nativeBuildInputs = [ installShellFiles ];
-  
-  # Generic solution for Go patch-level version mismatches:
-  # When dependencies require a newer Go patch version than available in nixpkgs,
-  # use GOTOOLCHAIN=auto in the FOD phase to download the required toolchain.
-  # For the main build, use proxyVendor with GOTOOLCHAIN=auto to use the cached toolchain.
-  proxyVendor = true;
-  
-  overrideModAttrs = oldAttrs: {
-    env = (oldAttrs.env or { }) // {
-      GOTOOLCHAIN = "auto";
-    };
-    preBuild = (oldAttrs.preBuild or "") + ''
-      export GOTOOLCHAIN=auto
-    '';
-  };
-  
-  preBuild = ''
-    export GOTOOLCHAIN=auto
-  '';
 
   # Tests require config files that aren't available in the build environment
   doCheck = false;
