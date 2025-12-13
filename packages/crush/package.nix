@@ -21,11 +21,24 @@ buildGoModule {
   };
 
   nativeBuildInputs = [ installShellFiles ];
-
-  # Patch go.mod to remove tight patch-level version constraint
-  # Converts "go X.Y.Z" to "go X.Y" to allow building with any patch version
+  
+  # Generic solution for Go patch-level version mismatches:
+  # When dependencies require a newer Go patch version than available in nixpkgs,
+  # use GOTOOLCHAIN=auto in the FOD phase to download the required toolchain.
+  # For the main build, use proxyVendor with GOTOOLCHAIN=auto to use the cached toolchain.
+  proxyVendor = true;
+  
+  overrideModAttrs = oldAttrs: {
+    env = (oldAttrs.env or { }) // {
+      GOTOOLCHAIN = "auto";
+    };
+    preBuild = (oldAttrs.preBuild or "") + ''
+      export GOTOOLCHAIN=auto
+    '';
+  };
+  
   preBuild = ''
-    sed -i -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+$/go \1/' go.mod
+    export GOTOOLCHAIN=auto
   '';
 
   # Tests require config files that aren't available in the build environment
