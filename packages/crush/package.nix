@@ -4,7 +4,6 @@
   fetchFromGitHub,
   installShellFiles,
   go_1_25,
-  runCommand,
 }:
 
 let
@@ -18,23 +17,19 @@ let
     inherit hash;
   };
   
-  # Extract the required Go version from crush's go.mod
-  # This makes the package future-compatible when crush updates its Go requirement
-  requiredGoVersion = lib.fileContents (
-    runCommand "extract-go-version" {} ''
-      grep -E "^go [0-9]+\.[0-9]+(\.[0-9]+)?" ${src}/go.mod | \
-        sed -E 's/^go ([0-9]+\.[0-9]+(\.[0-9]+)?)/\1/' > $out
-    ''
-  );
-  
   # Override Go to report the required version to satisfy all dependency version requirements
   # This is simpler than patching all transitive dependencies
   # The actual Go 1.25.4 toolchain is API-compatible with 1.25.5+ requirements
   go_1_25_patched = go_1_25.overrideAttrs (oldAttrs: {
     # Patch the version file that Go reads to determine its version
+    # Extract the required version from crush's go.mod to make it future-compatible
     postPatch = (oldAttrs.postPatch or "") + ''
+      # Extract the required Go version from crush's go.mod
+      REQUIRED_VERSION=$(grep -E "^go [0-9]+\.[0-9]+(\.[0-9]+)?" ${src}/go.mod | \
+        sed -E 's/^go ([0-9]+\.[0-9]+(\.[0-9]+)?)/\1/')
+      
       # Update VERSION file to report the required Go version
-      echo "go${requiredGoVersion}" > VERSION
+      echo "go$REQUIRED_VERSION" > VERSION
     '';
   });
 in
