@@ -12,20 +12,18 @@
   clang_20,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash npmDepsHash;
-in
 buildNpmPackage (finalAttrs: {
   pname = "qwen-code";
-  inherit version npmDepsHash;
+  version = "0.4.1";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
-    tag = "v${version}";
-    inherit hash;
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-x0ZGeD6qb7UkENfmiF00tx4JDLJbRk46MFquPcOoQLY=";
   };
+
+  npmDepsHash = "sha256-TsxDmJ7T5+RpYmgJJikdu5ez66I98wDTE2eKydJCTj0=";
 
   nativeBuildInputs = [
     pkg-config
