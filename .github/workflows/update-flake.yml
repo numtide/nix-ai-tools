@@ -76,8 +76,6 @@ jobs:
           extra_nix_config: |
             extra-substituters = https://cache.numtide.com
             extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
-      - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Set up git
         run: |
           git config user.name "github-actions[bot]"
@@ -132,8 +130,6 @@ jobs:
           extra_nix_config: |
             extra-substituters = https://cache.numtide.com
             extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
-      - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Set up git
         run: |
           git config user.name "github-actions[bot]"
