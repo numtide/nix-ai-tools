@@ -39,6 +39,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            extra-substituters = https://cache.numtide.com
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
       - name: Build update matrix
         id: build-matrix
         env:
@@ -68,6 +72,10 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            extra-substituters = https://cache.numtide.com
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
       - name: Setup Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Set up git
@@ -120,6 +128,10 @@ jobs:
           ref: main
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            extra-substituters = https://cache.numtide.com
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=
       - name: Setup Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Set up git
