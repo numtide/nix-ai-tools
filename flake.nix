@@ -6,7 +6,7 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:Mic92/nixpkgs/npm-prefetch";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     blueprint = {
       url = "github:numtide/blueprint";
       inputs.nixpkgs.follows = "nixpkgs";
