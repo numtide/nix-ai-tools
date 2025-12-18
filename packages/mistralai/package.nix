@@ -6,12 +6,12 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "mistralai";
-  version = "1.9.11";
+  version = "1.10.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-PfnkA8MadW7HnnjfJe5zzqPrFfhmk3c+FrFq2vWcm4o=";
+    hash = "sha256-yS6aXscFdXezJtR6SxwYb0JmC8y+lRZ/wlxob+ZYrSM=";
   };
 
   build-system = with python3.pkgs; [ poetry-core ];
