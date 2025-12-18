@@ -4,6 +4,7 @@
   fetchurl,
   unzip,
   autoPatchelfHook,
+  libsecret,
 }:
 
 let
@@ -30,6 +31,8 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+
+  runtimeDependencies = lib.optionals stdenv.isLinux [ libsecret ];
 
   unpackPhase = ''
     unzip $src
