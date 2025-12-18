@@ -96,6 +96,7 @@ python.pkgs.buildPythonApplication rec {
   # Relax version constraints - nixpkgs versions are slightly older but compatible
   pythonRelaxDeps = [
     "agent-client-protocol"
+    "mistralai"
     "pydantic"
     "pydantic-settings"
     "watchfiles"
