@@ -30,7 +30,9 @@ python3.pkgs.buildPythonPackage rec {
     pyyaml
   ];
 
-  # Relax version constraints - nixpkgs versions are slightly older but compatible
+  # Relax version constraints for OpenTelemetry packages where nixpkgs versions are older:
+  # - opentelemetry-exporter-otlp-proto-http: requires >=1.37.0, nixpkgs has 1.34.0
+  # - opentelemetry-semantic-conventions: requires >=0.59b0, nixpkgs has 0.55b0
   pythonRelaxDeps = [
     "opentelemetry-exporter-otlp-proto-http"
     "opentelemetry-semantic-conventions"
