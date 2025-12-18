@@ -99,6 +99,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>claude-code-native</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster (native binary)</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://github.com/anthropics/claude-code
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-native -- --help`
+- **Nix**: [packages/claude-code-native/package.nix](packages/claude-code-native/package.nix)
+
+</details>
+<details>
 <summary><strong>claude-code-router</strong> - Use Claude Code without an Anthropics account and route it to another LLM provider</summary>
 
 - **Source**: bytecode
