@@ -20,10 +20,20 @@ python3.pkgs.buildPythonPackage rec {
     eval-type-backport
     httpx
     invoke
+    opentelemetry-api
+    opentelemetry-exporter-otlp-proto-http
+    opentelemetry-sdk
+    opentelemetry-semantic-conventions
     pydantic
     python-dateutil
     typing-inspection
     pyyaml
+  ];
+
+  # Relax version constraints - nixpkgs versions are slightly older but compatible
+  pythonRelaxDeps = [
+    "opentelemetry-exporter-otlp-proto-http"
+    "opentelemetry-semantic-conventions"
   ];
 
   pythonImportsCheck = [ "mistralai" ];
