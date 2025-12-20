@@ -47,7 +47,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   doCheck = false;
 
-  postInstall = lib.optionalString installShellCompletions ''
+  postInstall = ''
+    # Add coder as an alias to avoid conflict with vscode
+    ln -s code $out/bin/coder
+  ''
+  + lib.optionalString installShellCompletions ''
     installShellCompletion --cmd code \
       --bash <($out/bin/code completion bash) \
       --fish <($out/bin/code completion fish) \
