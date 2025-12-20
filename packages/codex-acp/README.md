@@ -16,10 +16,10 @@ nix build github:numtide/llm-agents.nix#codex-acp
 
 # Or add to your system configuration
 {
-  inputs.llm-agents.nix.url = "github:numtide/llm-agents.nix";
+  inputs.llm-agents.url = "github:numtide/llm-agents.nix";
   
   environment.systemPackages = [
-    inputs.llm-agents.nix.packages.${pkgs.system}.codex-acp
+    inputs.llm-agents.packages.${pkgs.system}.codex-acp
   ];
 }
 ```
