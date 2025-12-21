@@ -2,7 +2,9 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  pnpm_9,
+  fetchPnpmDeps,
+  pnpm,
+  pnpmConfigHook,
 }:
 
 buildNpmPackage rec {
@@ -19,13 +21,16 @@ buildNpmPackage rec {
     '';
   };
 
-  npmConfigHook = pnpm_9.configHook;
-  npmDeps = pnpmDeps;
-  pnpmDeps = pnpm_9.fetchDeps {
+  npmDeps = null;
+  pnpmDeps = fetchPnpmDeps {
     inherit pname version src;
+    inherit pnpm;
     fetcherVersion = 2;
-    hash = "sha256-/rVrLC0JUSYlFk6rkAVbZ97PgT1RpUU1I/Lmf8bvoaA=";
+    hash = "sha256-Pwp1VKT7qiXWfMcCpjEmynpUghXCm/s52VWlzsc6m24=";
   };
+
+  nativeBuildInputs = [ pnpm ];
+  npmConfigHook = pnpmConfigHook;
 
   dontNpmPrune = true; # hangs forever on both Linux/darwin
 
