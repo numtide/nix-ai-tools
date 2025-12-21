@@ -77,6 +77,10 @@ function isDirectory(p) {
   }
 }
 
+function getTmpDir() {
+  return process.env.TMPDIR || process.env.TEMP || process.env.TMP || "/tmp";
+}
+
 // =============================================================================
 // Configuration
 // =============================================================================
@@ -320,7 +324,7 @@ class SeatbeltSandbox extends Sandbox {
 
     // Canonicalize paths (macOS symlinks: /var -> /private/var, /tmp -> /private/tmp)
     const canonicalRepoRoot = realpath(repoRoot);
-    const tmpdir = process.env.TMPDIR || "/tmp";
+    const tmpdir = getTmpDir();
     const canonicalTmpdir = realpath(tmpdir);
     const canonicalSlashTmp = realpath("/tmp");
 
@@ -558,7 +562,7 @@ function main() {
 
   // Create isolated home directory
   const home = process.env.HOME;
-  const claudeHome = `/tmp/${sessionName}`;
+  const claudeHome = path.join(getTmpDir(), sessionName);
 
   // Cleanup handler
   const cleanup = () => {
@@ -607,7 +611,7 @@ function main() {
   }
 
   // Log file setup (use config value or generate default)
-  const logfile = options.logFile || `/tmp/claudebox-commands-${sessionName}.log`;
+  const logfile = options.logFile || path.join(getTmpDir(), `claudebox-commands-${sessionName}.log`);
   // Ensure log file directory exists and create the file
   fs.mkdirSync(path.dirname(logfile), { recursive: true });
   fs.writeFileSync(logfile, "");
