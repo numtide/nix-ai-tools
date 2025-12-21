@@ -24,6 +24,10 @@ namespace_packages = true
 # Add scripts directory to path so updater module can be found
 mypy_path = "scripts"
 
+[[tool.mypy.overrides]]
+module = "elftools.*"
+ignore_missing_imports = true
+
 [tool.ruff]
 target-version = "py313"
 line-length = 88
