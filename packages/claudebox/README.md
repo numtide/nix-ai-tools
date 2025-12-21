@@ -24,6 +24,9 @@ claudebox [OPTIONS]
 - `--no-monitor` - Skip tmux monitoring pane (run Claude directly in current terminal)
 - `--split-direction horizontal|vertical` - Set tmux split direction (default: `horizontal`)
 - `--no-tmux-config` - Don't load user tmux configuration (use default tmux settings)
+- `--allow-ssh-agent` - Allow access to SSH agent socket (for git operations)
+- `--allow-gpg-agent` - Allow access to GPG agent socket (for signing)
+- `--allow-xdg-runtime` - Allow full XDG runtime directory access
 - `-h, --help` - Show help message
 
 ### Examples
@@ -69,7 +72,36 @@ For narrower terminals, the layout adjusts accordingly (stacked panes).
 - Disables telemetry and auto-updates
 - Uses `--dangerously-skip-permissions` (safe in sandbox)
 
-## Note
+## Security
+
+### XDG Runtime Directory Isolation
+
+By default, claudebox blocks access to `/run/user/$UID` (the XDG runtime directory).
+This directory contains security-sensitive sockets:
+
+| Path | Risk |
+|------|------|
+| `bus` | DBus session - can control other applications |
+| `gnupg/` | GPG agent - can sign/encrypt with user's keys |
+| `keyring/` | GNOME Keyring - SSH keys, secrets |
+| `pipewire-*` | Audio/video capture and playback |
+| `wayland-*` | Display access |
+| `systemd/` | User systemd session control |
+
+Use the `--allow-*` flags to selectively enable access when needed:
+
+```bash
+# Allow SSH agent for git push/pull with SSH keys
+claudebox --allow-ssh-agent
+
+# Allow GPG agent for commit signing
+claudebox --allow-gpg-agent
+
+# Allow full XDG runtime access (use with caution)
+claudebox --allow-xdg-runtime
+```
+
+### Note
 
 Not a security boundary - designed for transparency, not isolation.
 

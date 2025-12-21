@@ -145,6 +145,9 @@ class BubblewrapSandbox extends Sandbox {
       repoRoot,
       logfile,
       loadTmuxConfig,
+      allowSshAgent,
+      allowGpgAgent,
+      allowXdgRuntime,
     } = this.config;
 
     const home = process.env.HOME;
@@ -161,7 +164,15 @@ class BubblewrapSandbox extends Sandbox {
       "--ro-bind-try", "/lib", "/lib",
       "--ro-bind-try", "/lib64", "/lib64",
       "--ro-bind", "/etc", "/etc",
-      "--ro-bind", "/run", "/run",
+
+      // Selective /run mounts - avoid exposing /run/user/$UID (XDG runtime)
+      "--ro-bind-try", "/run/systemd/resolve", "/run/systemd/resolve", // DNS resolver (stub-resolv.conf)
+      "--ro-bind-try", "/run/current-system", "/run/current-system",
+      "--ro-bind-try", "/run/booted-system", "/run/booted-system",
+      "--ro-bind-try", "/run/opengl-driver", "/run/opengl-driver",
+      "--ro-bind-try", "/run/opengl-driver-32", "/run/opengl-driver-32",
+      "--ro-bind-try", "/run/nixos", "/run/nixos",
+      "--ro-bind-try", "/run/wrappers", "/run/wrappers",
 
       // Nix store (read-only) and daemon socket (read-write)
       "--ro-bind", "/nix", "/nix",
@@ -215,6 +226,33 @@ class BubblewrapSandbox extends Sandbox {
 
     // Mount logfile
     args.push("--bind", logfile, logfile);
+
+    // XDG runtime directory access (opt-in)
+    const xdgRuntimeDir = process.env.XDG_RUNTIME_DIR || `/run/user/${process.getuid()}`;
+
+    if (allowXdgRuntime) {
+      // Mount entire XDG runtime directory
+      if (isDirectory(xdgRuntimeDir)) {
+        args.push("--ro-bind", xdgRuntimeDir, xdgRuntimeDir);
+        args.push("--setenv", "XDG_RUNTIME_DIR", xdgRuntimeDir);
+      }
+    } else {
+      // Selective socket access
+      if (allowSshAgent && process.env.SSH_AUTH_SOCK) {
+        const sock = process.env.SSH_AUTH_SOCK;
+        if (pathExists(sock)) {
+          args.push("--ro-bind", sock, sock);
+          args.push("--setenv", "SSH_AUTH_SOCK", sock);
+        }
+      }
+
+      if (allowGpgAgent) {
+        const gpgDir = path.join(xdgRuntimeDir, "gnupg");
+        if (isDirectory(gpgDir)) {
+          args.push("--ro-bind", gpgDir, gpgDir);
+        }
+      }
+    }
 
     // Add the script to execute
     args.push("bash", "-c", script);
@@ -319,6 +357,9 @@ function parseArgs(args) {
     splitDirection: defaultSplit,
     loadTmuxConfig: true,
     enableMonitor: true,
+    allowSshAgent: false,
+    allowGpgAgent: false,
+    allowXdgRuntime: false,
   };
 
   let i = 0;
@@ -349,6 +390,21 @@ function parseArgs(args) {
         i++;
         break;
 
+      case "--allow-ssh-agent":
+        options.allowSshAgent = true;
+        i++;
+        break;
+
+      case "--allow-gpg-agent":
+        options.allowGpgAgent = true;
+        i++;
+        break;
+
+      case "--allow-xdg-runtime":
+        options.allowXdgRuntime = true;
+        i++;
+        break;
+
       case "-h":
       case "--help":
         showHelp();
@@ -372,14 +428,21 @@ Options:
   --no-monitor                            Skip tmux monitoring pane (run Claude directly)
   --split-direction horizontal|vertical   Set tmux split direction (default: based on terminal size)
   --no-tmux-config                        Don't load user tmux configuration
+  --allow-ssh-agent                       Allow access to SSH agent socket
+  --allow-gpg-agent                       Allow access to GPG agent socket
+  --allow-xdg-runtime                     Allow full XDG runtime directory access
   -h, --help                              Show this help message
+
+Security:
+  By default, claudebox blocks access to /run/user/$UID (XDG runtime directory)
+  which contains DBus, audio, display, and other sensitive sockets.
+  Use --allow-* flags to selectively enable access to specific services.
 
 Examples:
   claudebox                               # Run with default settings
   claudebox --no-monitor                  # Run without monitoring pane
-                                            Commands are still logged to /tmp/claudebox-commands-*.log
-  claudebox --split-direction vertical
-  claudebox --no-tmux-config              # Use default tmux settings`);
+  claudebox --allow-ssh-agent             # Allow SSH agent for git operations
+  claudebox --allow-xdg-runtime           # Allow full XDG runtime access`);
 }
 
 // =============================================================================
@@ -470,6 +533,9 @@ function main() {
       repoRoot,
       logfile,
       loadTmuxConfig: options.loadTmuxConfig,
+      allowSshAgent: options.allowSshAgent,
+      allowGpgAgent: options.allowGpgAgent,
+      allowXdgRuntime: options.allowXdgRuntime,
     });
   } catch (err) {
     console.error(`Error: ${err.message}`);
