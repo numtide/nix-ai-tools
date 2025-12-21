@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   unzip,
-  autoPatchelfHook,
+  wrapBuddy,
   libsecret,
 }:
 
@@ -30,9 +30,9 @@ stdenv.mkDerivation rec {
     hash = hashes.${platform};
   };
 
-  nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ wrapBuddy ];
 
-  runtimeDependencies = lib.optionals stdenv.isLinux [ libsecret ];
+  buildInputs = lib.optionals stdenv.isLinux [ libsecret ];
 
   unpackPhase = ''
     unzip $src

@@ -5,6 +5,7 @@ let
     runtimeInputs = [
       pkgs.mypy
       pkgs.findutils
+      pkgs.python3Packages.pyelftools
     ];
     text = builtins.readFile ./../../scripts/check.sh;
   };
