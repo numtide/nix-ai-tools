@@ -2,6 +2,8 @@
 
 Open your project in a lightweight sandbox, and avoid unwanted surprises.
 
+**Platforms:** Linux (stable), macOS (experimental)
+
 The project shadows your $HOME, so no credentials are accessible (except
 ~/.claude).
 The project parent folder is mounted read-only so it's possible to access
@@ -58,7 +60,7 @@ For narrower terminals, the layout adjusts accordingly (stacked panes).
 
 ## What it does
 
-- Lightweight sandbox using bubblewrap
+- Lightweight sandbox using bubblewrap (Linux) or sandbox-exec (macOS)
 - Intercepts all commands via Node.js instrumentation
 - Shows commands in real-time in tmux
 - Supports custom split direction (horizontal/vertical)

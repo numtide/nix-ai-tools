@@ -1,5 +1,7 @@
 { pkgs, perSystem }:
 let
+  inherit (pkgs.stdenv) isLinux isDarwin;
+
   # Bundle all the tools Claude needs into a single environment
   claudeTools = pkgs.buildEnv {
     name = "claude-tools";
@@ -25,6 +27,12 @@ let
       nix
     ];
   };
+
+  # Platform-specific sandbox tools
+  sandboxTools = if isLinux then [ pkgs.bubblewrap ] else [ ];
+
+  # Seatbelt profile for macOS (only installed on darwin)
+  seatbeltProfile = ./seatbelt.sbpl;
 in
 pkgs.runCommand "claudebox"
   {
@@ -34,7 +42,7 @@ pkgs.runCommand "claudebox"
       description = "Sandboxed environment for Claude Code";
       homepage = "https://github.com/numtide/llm-agents.nix/tree/main/packages/claudebox";
       sourceProvenance = with sourceTypes; [ fromSource ];
-      platforms = platforms.linux;
+      platforms = platforms.linux ++ platforms.darwin;
     };
   }
   ''
@@ -50,6 +58,9 @@ pkgs.runCommand "claudebox"
     cp ${./command-viewer-wrapper.sh} $out/libexec/claudebox/command-viewer-wrapper.sh
     chmod +x $out/libexec/claudebox/command-viewer-wrapper.sh
 
+    # Install seatbelt profile for macOS
+    cp ${seatbeltProfile} $out/share/claudebox/seatbelt.sbpl
+
     # Create the real command-viewer executable
     makeWrapper ${pkgs.nodejs}/bin/node $out/libexec/claudebox/command-viewer-real \
       --add-flags $out/libexec/claudebox/command-viewer.js
@@ -58,18 +69,21 @@ pkgs.runCommand "claudebox"
     makeWrapper $out/libexec/claudebox/command-viewer-wrapper.sh $out/libexec/claudebox/command-viewer \
       --set COMMAND_VIEWER_REAL $out/libexec/claudebox/command-viewer-real
 
-    # Create claudebox executable
+    # Create claudebox executable with platform-specific configuration
     makeWrapper ${pkgs.nodejs}/bin/node $out/bin/claudebox \
       --add-flags $out/libexec/claudebox/claudebox.js \
       --prefix PATH : ${
-        pkgs.lib.makeBinPath [
-          pkgs.bashInteractive
-          pkgs.bubblewrap
-          pkgs.tmux
-          claudeTools
-        ]
+        pkgs.lib.makeBinPath (
+          [
+            pkgs.bashInteractive
+            pkgs.tmux
+            claudeTools
+          ]
+          ++ sandboxTools
+        )
       } \
-      --prefix PATH : $out/libexec/claudebox
+      --prefix PATH : $out/libexec/claudebox \
+      ${if isDarwin then "--set CLAUDEBOX_SEATBELT_PROFILE $out/share/claudebox/seatbelt.sbpl" else ""}
 
     # Create claude wrapper that references the original
     makeWrapper ${perSystem.self.claude-code}/bin/claude $out/libexec/claudebox/claude \
