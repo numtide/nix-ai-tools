@@ -54,16 +54,44 @@ processes inherit a clean environment.
 ## Usage
 
 ```nix
-{ stdenv, wrapBuddy, ... }:
+{ stdenv, wrapBuddy, gcc-unwrapped, ... }:
 
 stdenv.mkDerivation {
   # ...
 
   nativeBuildInputs = [ wrapBuddy ];
 
+  # Runtime dependencies - wrapBuddy extracts library paths from these
+  # and configures DT_RUNPATH so the binary can find them at runtime
+  buildInputs = [
+    gcc-unwrapped.lib  # provides libgcc_s.so.1, libstdc++.so
+    # Add other runtime libraries as needed (e.g., libsecret, openssl)
+  ];
+
   # The hook runs in fixupPhase and patches all ELF binaries
   # that have a non-NixOS interpreter (e.g., /lib64/ld-linux-x86-64.so.2)
 }
+```
+
+## How Dependencies Work
+
+wrapBuddy scans each binary's `DT_NEEDED` entries (like `autoPatchelfHook`)
+and resolves them against `/lib` directories from `buildInputs`. If any
+dependency is missing, the build fails with an error listing what's needed.
+
+For libraries loaded via `dlopen()` at runtime (not linked at load time),
+use `runtimeDependencies` - these are added to RPATH unconditionally:
+
+```nix
+runtimeDependencies = [ libayatana-appindicator ];
+```
+
+You can also manually add library search paths:
+
+```nix
+postFixup = ''
+  addWrapBuddySearchPath /some/extra/lib/path
+'';
 ```
 
 ## Requirements
