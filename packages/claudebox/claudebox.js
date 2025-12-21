@@ -78,6 +78,41 @@ function isDirectory(p) {
 }
 
 // =============================================================================
+// Configuration
+// =============================================================================
+
+const CONFIG_DEFAULTS = {
+  monitor: true,
+  splitDirection: "auto",
+  loadTmuxConfig: true,
+  allowSshAgent: false,
+  allowGpgAgent: false,
+  allowXdgRuntime: false,
+  logFile: null,
+};
+
+function getConfigPath() {
+  const xdgConfig =
+    process.env.XDG_CONFIG_HOME || path.join(process.env.HOME, ".config");
+  return path.join(xdgConfig, "claudebox", "config.json");
+}
+
+function loadConfig() {
+  const configPath = getConfigPath();
+
+  try {
+    const content = fs.readFileSync(configPath, "utf8");
+    const userConfig = JSON.parse(content);
+    return { ...CONFIG_DEFAULTS, ...userConfig };
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      console.error(`Warning: Failed to load config from ${configPath}: ${err.message}`);
+    }
+    return { ...CONFIG_DEFAULTS };
+  }
+}
+
+// =============================================================================
 // Sandbox Interface
 // =============================================================================
 
@@ -349,17 +384,26 @@ class SeatbeltSandbox extends Sandbox {
 // CLI Argument Parsing
 // =============================================================================
 
-function parseArgs(args) {
-  const { rows, cols } = getTerminalSize();
-  const defaultSplit = cols >= rows * 3 ? "horizontal" : "vertical";
+function resolveSplitDirection(direction) {
+  if (direction === "auto") {
+    const { rows, cols } = getTerminalSize();
+    return cols >= rows * 3 ? "horizontal" : "vertical";
+  }
+  return direction;
+}
 
-  const options = {
-    splitDirection: defaultSplit,
-    loadTmuxConfig: true,
-    enableMonitor: true,
-    allowSshAgent: false,
-    allowGpgAgent: false,
-    allowXdgRuntime: false,
+function parseArgs(args) {
+  // Load config file first
+  const config = loadConfig();
+
+  // CLI overrides - undefined means "not specified"
+  const cliOverrides = {
+    enableMonitor: undefined,
+    splitDirection: undefined,
+    loadTmuxConfig: undefined,
+    allowSshAgent: undefined,
+    allowGpgAgent: undefined,
+    allowXdgRuntime: undefined,
   };
 
   let i = 0;
@@ -368,7 +412,7 @@ function parseArgs(args) {
 
     switch (arg) {
       case "--no-monitor":
-        options.enableMonitor = false;
+        cliOverrides.enableMonitor = false;
         i++;
         break;
 
@@ -377,31 +421,31 @@ function parseArgs(args) {
           console.error("Error: --split-direction requires a value");
           process.exit(1);
         }
-        options.splitDirection = args[i + 1];
-        if (!["horizontal", "vertical"].includes(options.splitDirection)) {
-          console.error("Error: --split-direction must be 'horizontal' or 'vertical'");
+        cliOverrides.splitDirection = args[i + 1];
+        if (!["horizontal", "vertical", "auto"].includes(cliOverrides.splitDirection)) {
+          console.error("Error: --split-direction must be 'horizontal', 'vertical', or 'auto'");
           process.exit(1);
         }
         i += 2;
         break;
 
       case "--no-tmux-config":
-        options.loadTmuxConfig = false;
+        cliOverrides.loadTmuxConfig = false;
         i++;
         break;
 
       case "--allow-ssh-agent":
-        options.allowSshAgent = true;
+        cliOverrides.allowSshAgent = true;
         i++;
         break;
 
       case "--allow-gpg-agent":
-        options.allowGpgAgent = true;
+        cliOverrides.allowGpgAgent = true;
         i++;
         break;
 
       case "--allow-xdg-runtime":
-        options.allowXdgRuntime = true;
+        cliOverrides.allowXdgRuntime = true;
         i++;
         break;
 
@@ -418,20 +462,65 @@ function parseArgs(args) {
     }
   }
 
+  // Merge: CLI overrides > config file > defaults
+  const options = {
+    enableMonitor:
+      cliOverrides.enableMonitor !== undefined
+        ? cliOverrides.enableMonitor
+        : config.monitor,
+    splitDirection: resolveSplitDirection(
+      cliOverrides.splitDirection !== undefined
+        ? cliOverrides.splitDirection
+        : config.splitDirection
+    ),
+    loadTmuxConfig:
+      cliOverrides.loadTmuxConfig !== undefined
+        ? cliOverrides.loadTmuxConfig
+        : config.loadTmuxConfig,
+    allowSshAgent:
+      cliOverrides.allowSshAgent !== undefined
+        ? cliOverrides.allowSshAgent
+        : config.allowSshAgent,
+    allowGpgAgent:
+      cliOverrides.allowGpgAgent !== undefined
+        ? cliOverrides.allowGpgAgent
+        : config.allowGpgAgent,
+    allowXdgRuntime:
+      cliOverrides.allowXdgRuntime !== undefined
+        ? cliOverrides.allowXdgRuntime
+        : config.allowXdgRuntime,
+    // This comes only from config file
+    logFile: config.logFile,
+  };
+
   return options;
 }
 
 function showHelp() {
+  const configPath = getConfigPath();
   console.log(`Usage: claudebox [OPTIONS]
 
 Options:
   --no-monitor                            Skip tmux monitoring pane (run Claude directly)
-  --split-direction horizontal|vertical   Set tmux split direction (default: based on terminal size)
+  --split-direction horizontal|vertical|auto
+                                          Set tmux split direction (default: auto)
   --no-tmux-config                        Don't load user tmux configuration
   --allow-ssh-agent                       Allow access to SSH agent socket
   --allow-gpg-agent                       Allow access to GPG agent socket
   --allow-xdg-runtime                     Allow full XDG runtime directory access
   -h, --help                              Show this help message
+
+Configuration:
+  Settings can be configured in ${configPath}
+  CLI arguments override config file settings.
+
+  Example config:
+    {
+      "monitor": true,
+      "splitDirection": "auto",
+      "allowSshAgent": false,
+      "logFile": "/tmp/my-claude.log"
+    }
 
 Security:
   By default, claudebox blocks access to /run/user/$UID (XDG runtime directory)
@@ -517,8 +606,10 @@ function main() {
     shareTree = realRepoRoot;
   }
 
-  // Log file setup
-  const logfile = `/tmp/claudebox-commands-${sessionName}.log`;
+  // Log file setup (use config value or generate default)
+  const logfile = options.logFile || `/tmp/claudebox-commands-${sessionName}.log`;
+  // Ensure log file directory exists and create the file
+  fs.mkdirSync(path.dirname(logfile), { recursive: true });
   fs.writeFileSync(logfile, "");
 
   // Create sandbox

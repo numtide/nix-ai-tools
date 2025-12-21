@@ -22,7 +22,7 @@ claudebox [OPTIONS]
 ### Options
 
 - `--no-monitor` - Skip tmux monitoring pane (run Claude directly in current terminal)
-- `--split-direction horizontal|vertical` - Set tmux split direction (default: `horizontal`)
+- `--split-direction horizontal|vertical|auto` - Set tmux split direction (default: `auto`)
 - `--no-tmux-config` - Don't load user tmux configuration (use default tmux settings)
 - `--allow-ssh-agent` - Allow access to SSH agent socket (for git operations)
 - `--allow-gpg-agent` - Allow access to GPG agent socket (for signing)
@@ -60,6 +60,37 @@ For narrower terminals, the layout adjusts accordingly (stacked panes).
 
 - **Default**: Opens tmux with two panels, once for Claude interface and one for live command log.
 - **With `--no-monitor`**: Runs Claude directly, without `tmux`
+
+## Configuration
+
+Settings can be stored in `~/.config/claudebox/config.json` (or `$XDG_CONFIG_HOME/claudebox/config.json`).
+CLI arguments override config file settings.
+
+### Config Schema
+
+```json
+{
+  "monitor": true,
+  "splitDirection": "auto",
+  "loadTmuxConfig": true,
+  "allowSshAgent": false,
+  "allowGpgAgent": false,
+  "allowXdgRuntime": false,
+  "logFile": null
+}
+```
+
+### Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `monitor` | boolean | `true` | Enable tmux monitoring pane |
+| `splitDirection` | string | `"auto"` | `"horizontal"`, `"vertical"`, or `"auto"` |
+| `loadTmuxConfig` | boolean | `true` | Load user's tmux configuration |
+| `allowSshAgent` | boolean | `false` | Mount SSH agent socket |
+| `allowGpgAgent` | boolean | `false` | Mount GPG agent socket |
+| `allowXdgRuntime` | boolean | `false` | Mount full XDG runtime dir |
+| `logFile` | string/null | `null` | Custom log file path (null = auto in /tmp) |
 
 ## What it does
 
