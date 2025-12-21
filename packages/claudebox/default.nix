@@ -40,9 +40,8 @@ pkgs.runCommand "claudebox"
   ''
     mkdir -p $out/bin $out/share/claudebox $out/libexec/claudebox
 
-    # Install helper scripts
-    cp ${./claudebox.sh} $out/bin/claudebox
-    chmod +x $out/bin/claudebox
+    # Install claudebox launcher script
+    cp ${./claudebox.js} $out/libexec/claudebox/claudebox.js
 
     # Install command-viewer script
     cp ${./command-viewer.js} $out/libexec/claudebox/command-viewer.js
@@ -59,16 +58,9 @@ pkgs.runCommand "claudebox"
     makeWrapper $out/libexec/claudebox/command-viewer-wrapper.sh $out/libexec/claudebox/command-viewer \
       --set COMMAND_VIEWER_REAL $out/libexec/claudebox/command-viewer-real
 
-    # Patch shebang
-    patchShebangs $out/bin/claudebox
-
-    # Create claude wrapper that references the original
-    makeWrapper ${perSystem.self.claude-code}/bin/claude $out/libexec/claudebox/claude \
-      --set NODE_OPTIONS "--require=${./command-logger.js}" \
-      --inherit-argv0
-
-    # Wrap claudebox start script
-    wrapProgram $out/bin/claudebox \
+    # Create claudebox executable
+    makeWrapper ${pkgs.nodejs}/bin/node $out/bin/claudebox \
+      --add-flags $out/libexec/claudebox/claudebox.js \
       --prefix PATH : ${
         pkgs.lib.makeBinPath [
           pkgs.bashInteractive
@@ -78,4 +70,9 @@ pkgs.runCommand "claudebox"
         ]
       } \
       --prefix PATH : $out/libexec/claudebox
+
+    # Create claude wrapper that references the original
+    makeWrapper ${perSystem.self.claude-code}/bin/claude $out/libexec/claudebox/claude \
+      --set NODE_OPTIONS "--require=${./command-logger.js}" \
+      --inherit-argv0
   ''
