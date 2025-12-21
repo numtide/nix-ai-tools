@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   makeWrapper,
-  autoPatchelfHook,
+  wrapBuddy,
 }:
 
 let
@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
     makeWrapper
   ]
   ++ lib.optionals stdenv.isLinux [
-    autoPatchelfHook
+    wrapBuddy
   ];
 
   buildInputs = lib.optionals stdenv.isLinux [

@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchurl,
-  autoPatchelfHook,
+  wrapBuddy,
   gcc-unwrapped,
 }:
 
@@ -29,7 +29,7 @@ stdenv.mkDerivation {
     hash = hashes.${platform};
   };
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = lib.optionals stdenv.isLinux [ wrapBuddy ];
 
   buildInputs = lib.optionals stdenv.isLinux [
     gcc-unwrapped.lib

@@ -3,7 +3,7 @@
   stdenv,
   fetchurl,
   makeWrapper,
-  autoPatchelfHook,
+  wrapBuddy,
   gcc-unwrapped,
 }:
 
@@ -38,7 +38,7 @@ stdenv.mkDerivation {
     makeWrapper
   ]
   ++ lib.optionals stdenv.isLinux [
-    autoPatchelfHook
+    wrapBuddy
   ];
 
   buildInputs = lib.optionals stdenv.isLinux [
