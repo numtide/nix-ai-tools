@@ -123,10 +123,9 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: source
 - **License**: Check package
-- **Homepage**: https://github.com/numtide/llm-agents.nix/tree/main/packages/claudebox
+- **Homepage**: https://github.com/numtide/claudebox
 - **Usage**: `nix run github:numtide/llm-agents.nix#claudebox -- --help`
 - **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
-- **Documentation**: See [packages/claudebox/README.md](packages/claudebox/README.md) for detailed usage
 
 </details>
 <details>
