@@ -2,6 +2,8 @@
 
 Open your project in a lightweight sandbox, and avoid unwanted surprises.
 
+**Platforms:** Linux (stable), macOS (experimental)
+
 The project shadows your $HOME, so no credentials are accessible (except
 ~/.claude).
 The project parent folder is mounted read-only so it's possible to access
@@ -20,8 +22,11 @@ claudebox [OPTIONS]
 ### Options
 
 - `--no-monitor` - Skip tmux monitoring pane (run Claude directly in current terminal)
-- `--split-direction horizontal|vertical` - Set tmux split direction (default: `horizontal`)
+- `--split-direction horizontal|vertical|auto` - Set tmux split direction (default: `auto`)
 - `--no-tmux-config` - Don't load user tmux configuration (use default tmux settings)
+- `--allow-ssh-agent` - Allow access to SSH agent socket (for git operations)
+- `--allow-gpg-agent` - Allow access to GPG agent socket (for signing)
+- `--allow-xdg-runtime` - Allow full XDG runtime directory access
 - `-h, --help` - Show help message
 
 ### Examples
@@ -56,9 +61,40 @@ For narrower terminals, the layout adjusts accordingly (stacked panes).
 - **Default**: Opens tmux with two panels, once for Claude interface and one for live command log.
 - **With `--no-monitor`**: Runs Claude directly, without `tmux`
 
+## Configuration
+
+Settings can be stored in `~/.config/claudebox/config.json` (or `$XDG_CONFIG_HOME/claudebox/config.json`).
+CLI arguments override config file settings.
+
+### Config Schema
+
+```json
+{
+  "monitor": true,
+  "splitDirection": "auto",
+  "loadTmuxConfig": true,
+  "allowSshAgent": false,
+  "allowGpgAgent": false,
+  "allowXdgRuntime": false,
+  "logFile": null
+}
+```
+
+### Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `monitor` | boolean | `true` | Enable tmux monitoring pane |
+| `splitDirection` | string | `"auto"` | `"horizontal"`, `"vertical"`, or `"auto"` |
+| `loadTmuxConfig` | boolean | `true` | Load user's tmux configuration |
+| `allowSshAgent` | boolean | `false` | Mount SSH agent socket |
+| `allowGpgAgent` | boolean | `false` | Mount GPG agent socket |
+| `allowXdgRuntime` | boolean | `false` | Mount full XDG runtime dir |
+| `logFile` | string/null | `null` | Custom log file path (null = auto in /tmp) |
+
 ## What it does
 
-- Lightweight sandbox using bubblewrap
+- Lightweight sandbox using bubblewrap (Linux) or sandbox-exec (macOS)
 - Intercepts all commands via Node.js instrumentation
 - Shows commands in real-time in tmux
 - Supports custom split direction (horizontal/vertical)
@@ -67,7 +103,36 @@ For narrower terminals, the layout adjusts accordingly (stacked panes).
 - Disables telemetry and auto-updates
 - Uses `--dangerously-skip-permissions` (safe in sandbox)
 
-## Note
+## Security
+
+### XDG Runtime Directory Isolation
+
+By default, claudebox blocks access to `/run/user/$UID` (the XDG runtime directory).
+This directory contains security-sensitive sockets:
+
+| Path | Risk |
+|------|------|
+| `bus` | DBus session - can control other applications |
+| `gnupg/` | GPG agent - can sign/encrypt with user's keys |
+| `keyring/` | GNOME Keyring - SSH keys, secrets |
+| `pipewire-*` | Audio/video capture and playback |
+| `wayland-*` | Display access |
+| `systemd/` | User systemd session control |
+
+Use the `--allow-*` flags to selectively enable access when needed:
+
+```bash
+# Allow SSH agent for git push/pull with SSH keys
+claudebox --allow-ssh-agent
+
+# Allow GPG agent for commit signing
+claudebox --allow-gpg-agent
+
+# Allow full XDG runtime access (use with caution)
+claudebox --allow-xdg-runtime
+```
+
+### Note
 
 Not a security boundary - designed for transparency, not isolation.
 
