@@ -281,6 +281,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>letta-code</strong> - Memory-first coding agent that learns and evolves across sessions</summary>
+
+- **Source**: bytecode
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/letta-ai/letta-code
+- **Usage**: `nix run github:numtide/llm-agents.nix#letta-code -- --help`
+- **Nix**: [packages/letta-code/package.nix](packages/letta-code/package.nix)
+
+</details>
+<details>
 <summary><strong>mistral-vibe</strong> - Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral</summary>
 
 - **Source**: source
