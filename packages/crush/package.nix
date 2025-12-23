@@ -39,6 +39,8 @@ in
 
   nativeBuildInputs = [ installShellFiles ];
 
+  subPackages = [ "." ];
+
   # Tests require config files that aren't available in the build environment
   doCheck = false;
 
