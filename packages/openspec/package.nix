@@ -5,11 +5,11 @@
 }:
 buildNpmPackage (finalAttrs: {
   pname = "openspec";
-  version = "0.17.0";
+  version = "0.17.2";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@fission-ai/openspec/-/openspec-${finalAttrs.version}.tgz";
-    hash = "sha256-bzB1c6d5JqTVM3/rlFT0eVEgCnESrnLlw0bgN/r9rgk=";
+    hash = "sha256-ZrG3/LNIhE2RUpYz6ZqHpVKHYZ5jLmKpiWcxIeYfQXE=";
   };
 
   npmDepsHash = "sha256-xG2GIzgzFKzZd0TxHI6FNGKEtQB1zIrregdXGZSMYyo=";
