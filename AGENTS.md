@@ -45,6 +45,8 @@ buildGoModule rec {
     hash = "sha256-...";  # nix-update updates this
   };
 
+  subPackages = [ "." ];  # for go find the relevant packages containing the binary
+
   vendorHash = "sha256-...";  # nix-update updates this too
 }
 ```
