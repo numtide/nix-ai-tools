@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for opencode package."""
+"""Update script for opencode package (binary releases)."""
 
 import sys
 from pathlib import Path
@@ -9,17 +9,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    calculate_dependency_hash,
-    calculate_url_hash,
+    calculate_platform_hashes,
     fetch_github_latest_release,
     load_hashes,
     save_hashes,
     should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH
-from updater.nix import NixCommandError
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
+
+# Map nix platforms to release asset names
+PLATFORMS = {
+    "x86_64-linux": "opencode-linux-x64.tar.gz",
+    "aarch64-linux": "opencode-linux-arm64.tar.gz",
+    "x86_64-darwin": "opencode-darwin-x64.zip",
+    "aarch64-darwin": "opencode-darwin-arm64.zip",
+}
 
 
 def main() -> None:
@@ -34,29 +39,12 @@ def main() -> None:
         print("Already up to date")
         return
 
-    tag = f"v{latest}"
-    url = f"https://github.com/sst/opencode/archive/refs/tags/{tag}.tar.gz"
+    url_template = (
+        f"https://github.com/sst/opencode/releases/download/v{latest}/{{platform}}"
+    )
+    hashes = calculate_platform_hashes(url_template, PLATFORMS)
 
-    print("Calculating source hash...")
-    source_hash = calculate_url_hash(url, unpack=True)
-
-    data = {
-        "version": latest,
-        "hash": source_hash,
-        "outputHash": DUMMY_SHA256_HASH,
-    }
-    save_hashes(HASHES_FILE, data)
-
-    try:
-        output_hash = calculate_dependency_hash(
-            ".#opencode", "outputHash", HASHES_FILE, data
-        )
-        data["outputHash"] = output_hash
-        save_hashes(HASHES_FILE, data)
-    except (ValueError, NixCommandError) as e:
-        print(f"Error: {e}")
-        return
-
+    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
     print(f"Updated to {latest}")
 
 
