@@ -7,7 +7,6 @@
   makeBinaryWrapper,
   models-dev,
   ripgrep,
-  writableTmpDirAsHomeHook,
 }:
 
 let
@@ -40,7 +39,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     nativeBuildInputs = [
       bun
-      writableTmpDirAsHomeHook
     ];
 
     dontConfigure = true;
@@ -48,17 +46,16 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     buildPhase = ''
       runHook preBuild
 
+      export HOME=$(mktemp -d)
       export BUN_INSTALL_CACHE_DIR=$(mktemp -d)
 
       bun install \
         --cpu="*" \
         --os="*" \
-        --filter=./packages/opencode \
         --frozen-lockfile \
         --ignore-scripts \
-        --linker=isolated \
         --no-progress \
-        --production
+        --linker=isolated
 
       # Use upstream scripts for reproducible node_modules
       bun --bun ./nix/scripts/canonicalize-node-modules.ts
