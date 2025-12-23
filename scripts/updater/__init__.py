@@ -23,6 +23,9 @@ from .nix import (
     nix_eval,
 )
 
+# NPM utilities
+from .npm import extract_or_generate_lockfile
+
 # Platform utilities
 from .platforms import calculate_platform_hashes
 
@@ -39,6 +42,7 @@ __all__ = [
     "calculate_dependency_hash",
     "calculate_platform_hashes",
     "calculate_url_hash",
+    "extract_or_generate_lockfile",
     "fetch_github_latest_release",
     "fetch_npm_version",
     "fetch_text",

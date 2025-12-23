@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 nixpkgs#nodejs --command python3
 
-"""Update script for claude-code package."""
+"""Update script for openspec package."""
 
 import sys
 from pathlib import Path
@@ -22,11 +22,11 @@ from updater.nix import NixCommandError
 
 SCRIPT_DIR = Path(__file__).parent
 HASHES_FILE = SCRIPT_DIR / "hashes.json"
-NPM_PACKAGE = "@anthropic-ai/claude-code"
+NPM_PACKAGE = "@fission-ai/openspec"
 
 
 def main() -> None:
-    """Update the claude-code package."""
+    """Update the openspec package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
     latest = fetch_npm_version(NPM_PACKAGE)
@@ -37,28 +37,29 @@ def main() -> None:
         print("Already up to date")
         return
 
-    tarball_url = f"https://registry.npmjs.org/{NPM_PACKAGE}/-/claude-code-{latest}.tgz"
+    tarball_url = f"https://registry.npmjs.org/{NPM_PACKAGE}/-/openspec-{latest}.tgz"
 
     print("Calculating source hash...")
-    source_hash = calculate_url_hash(tarball_url, unpack=True)
+    source_hash = calculate_url_hash(tarball_url)
 
     if not extract_or_generate_lockfile(tarball_url, SCRIPT_DIR / "package-lock.json"):
         return
 
-    # Prepare new data with dummy hash for dependency calculation
-    new_data = {
+    # Update hashes.json
+    data = {
         "version": latest,
-        "hash": source_hash,
+        "sourceHash": source_hash,
         "npmDepsHash": DUMMY_SHA256_HASH,
     }
+    save_hashes(HASHES_FILE, data)
 
-    # Calculate npmDepsHash - only save if successful
+    # Calculate npmDepsHash
     try:
         npm_deps_hash = calculate_dependency_hash(
-            ".#claude-code", "npmDepsHash", HASHES_FILE, new_data
+            ".#openspec", "npmDepsHash", HASHES_FILE, data
         )
-        new_data["npmDepsHash"] = npm_deps_hash
-        save_hashes(HASHES_FILE, new_data)
+        data["npmDepsHash"] = npm_deps_hash
+        save_hashes(HASHES_FILE, data)
     except (ValueError, NixCommandError) as e:
         print(f"Error: {e}")
         return
