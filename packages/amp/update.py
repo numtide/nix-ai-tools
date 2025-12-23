@@ -3,18 +3,15 @@
 
 """Update script for amp package."""
 
-import subprocess
 import sys
-import tarfile
-import tempfile
 from pathlib import Path
-from urllib.request import urlretrieve
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
     calculate_dependency_hash,
     calculate_url_hash,
+    extract_or_generate_lockfile,
     fetch_npm_version,
     load_hashes,
     save_hashes,
@@ -26,47 +23,6 @@ from updater.nix import NixCommandError
 SCRIPT_DIR = Path(__file__).parent
 HASHES_FILE = SCRIPT_DIR / "hashes.json"
 NPM_PACKAGE = "@sourcegraph/amp"
-
-
-def extract_package_lock(tarball_url: str) -> bool:
-    """Extract package-lock.json from tarball or generate it."""
-    print("Extracting package-lock.json from tarball...")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir_path = Path(tmpdir)
-        tarball_path = tmpdir_path / "amp.tgz"
-        urlretrieve(tarball_url, tarball_path)
-
-        with tarfile.open(tarball_path, "r:gz") as tar:
-            tar.extractall(tmpdir_path, filter="data")
-
-        package_dir = tmpdir_path / "package"
-        package_lock_src = package_dir / "package-lock.json"
-
-        if package_lock_src.exists():
-            (SCRIPT_DIR / "package-lock.json").write_text(package_lock_src.read_text())
-            print("Updated package-lock.json from tarball")
-            return True
-
-        # Generate if not in tarball
-        print("No package-lock.json in tarball, generating...")
-        if not (package_dir / "package.json").exists():
-            print("ERROR: No package.json found!")
-            return False
-
-        subprocess.run(
-            ["npm", "install", "--package-lock-only", "--ignore-scripts"],
-            cwd=package_dir,
-            check=True,
-        )
-
-        new_lock = package_dir / "package-lock.json"
-        if new_lock.exists():
-            (SCRIPT_DIR / "package-lock.json").write_text(new_lock.read_text())
-            print("Generated package-lock.json")
-            return True
-
-        print("ERROR: Failed to generate package-lock.json")
-        return False
 
 
 def main() -> None:
@@ -86,7 +42,7 @@ def main() -> None:
     print("Calculating source hash...")
     source_hash = calculate_url_hash(tarball_url)
 
-    if not extract_package_lock(tarball_url):
+    if not extract_or_generate_lockfile(tarball_url, SCRIPT_DIR / "package-lock.json"):
         return
 
     # Update hashes.json
