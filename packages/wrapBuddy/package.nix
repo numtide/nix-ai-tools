@@ -105,17 +105,16 @@ let
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/bin $out/share/wrap-buddy $out/lib/wrap-buddy
+      mkdir -p $out/bin $out/share/wrap-buddy
 
-      # Install the main script
-      install -Dm755 wrap-buddy.py $out/bin/wrap-buddy
+      # Install the main script with substituted loader path
+      substitute wrap-buddy.py $out/bin/wrap-buddy \
+        --replace-fail "@loader_path@" "${loaderBin}/loader.bin"
+      chmod +x $out/bin/wrap-buddy
 
       # Install source files for stub compilation
       cp -r ${cSources}/* $out/share/wrap-buddy/
       install -Dm644 stub.c $out/share/wrap-buddy/stub.c
-
-      # Install pre-compiled loader binary
-      install -Dm644 ${loaderBin}/loader.bin $out/lib/wrap-buddy/loader.bin
 
       runHook postInstall
     '';

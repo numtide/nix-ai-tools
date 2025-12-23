@@ -309,13 +309,8 @@ def get_source_dir() -> Path:
 
 def get_loader_path() -> Path:
     """Get path to pre-compiled loader binary."""
-    script_dir = Path(__file__).resolve().parent
-    if script_dir.name == "bin":
-        loader_path = script_dir.parent / "lib" / "wrap-buddy" / "loader.bin"
-        if loader_path.exists():
-            return loader_path
-    # Development fallback
-    return script_dir / "loader.bin"
+    # @loader_path@ is substituted at build time
+    return Path("@loader_path@")
 
 
 def c_escape(s: str) -> str:
