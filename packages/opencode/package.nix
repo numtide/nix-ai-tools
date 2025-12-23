@@ -45,6 +45,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
     dontConfigure = true;
 
+    patches = finalAttrs.patches;
+
     buildPhase = ''
       runHook preBuild
 
@@ -98,6 +100,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   patches = [
     # NOTE: Relax Bun version check to be a warning instead of an error
     ./relax-bun-version-check.patch
+    # NOTE: Add missing @ai-sdk dependencies for 1.0.191
+    ./add-ai-sdk-deps.patch
   ];
 
   dontConfigure = true;

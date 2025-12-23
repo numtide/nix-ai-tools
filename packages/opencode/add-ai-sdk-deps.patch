@@ -1,0 +1,17 @@
+--- a/packages/opencode/package.json
++++ b/packages/opencode/package.json
+@@ -107,6 +107,13 @@
+     "xdg-basedir": "5.1.0",
+     "yargs": "18.0.0",
+     "zod": "catalog:",
+-    "zod-to-json-schema": "3.24.5"
++    "zod-to-json-schema": "3.24.5",
++    "@ai-sdk/cerebras": "1.0.33",
++    "@ai-sdk/cohere": "2.0.21",
++    "@ai-sdk/deepinfra": "1.0.30",
++    "@ai-sdk/gateway": "2.0.23",
++    "@ai-sdk/groq": "2.0.33",
++    "@ai-sdk/perplexity": "2.0.22",
++    "@ai-sdk/togetherai": "1.0.30"
+   }
+ }
