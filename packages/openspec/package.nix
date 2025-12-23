@@ -1,22 +1,40 @@
 {
   buildNpmPackage,
-  fetchzip,
+  fetchurl,
   lib,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
+  runCommand,
 }:
-buildNpmPackage (finalAttrs: {
-  pname = "openspec";
-  version = "0.17.2";
 
-  src = fetchzip {
-    url = "https://registry.npmjs.org/@fission-ai/openspec/-/openspec-${finalAttrs.version}.tgz";
-    hash = "sha256-ZrG3/LNIhE2RUpYz6ZqHpVKHYZ5jLmKpiWcxIeYfQXE=";
-  };
-
-  npmDepsHash = "sha256-xG2GIzgzFKzZd0TxHI6FNGKEtQB1zIrregdXGZSMYyo=";
-
-  postPatch = ''
-    cp ${./package-lock.json} package-lock.json
+let
+  versionData = lib.importJSON ./hashes.json;
+  version = versionData.version;
+  # Create a source with the vendored package-lock.json included
+  srcWithLock = runCommand "openspec-src-with-lock" { } ''
+    mkdir -p $out
+    tar -xzf ${
+      fetchurl {
+        url = "https://registry.npmjs.org/@fission-ai/openspec/-/openspec-${version}.tgz";
+        hash = versionData.sourceHash;
+      }
+    } -C $out --strip-components=1
+    cp ${./package-lock.json} $out/package-lock.json
   '';
+in
+buildNpmPackage {
+  inherit npmConfigHook version;
+  pname = "openspec";
+
+  src = srcWithLock;
+
+  npmDeps = fetchNpmDepsWithPackuments {
+    src = srcWithLock;
+    name = "openspec-${version}-npm-deps";
+    hash = versionData.npmDepsHash;
+    cacheVersion = 2;
+  };
+  makeCacheWritable = true;
 
   dontNpmBuild = true;
 
@@ -28,4 +46,4 @@ buildNpmPackage (finalAttrs: {
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     mainProgram = "openspec";
   };
-})
+}
