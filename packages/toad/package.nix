@@ -36,9 +36,6 @@ python3.pkgs.buildPythonApplication rec {
     pathspec
   ];
 
-  # Relax version constraints for better maintainability
-  pythonRelaxDeps = true;
-
   # Remove optional dependencies not available in nixpkgs
   pythonRemoveDeps = [
     "textual-speedups"
