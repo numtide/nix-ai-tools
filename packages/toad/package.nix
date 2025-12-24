@@ -57,11 +57,8 @@ python.pkgs.buildPythonApplication rec {
     substituteInPlace pyproject.toml \
       --replace-fail 'requires = ["hatchling==1.28.0"]' 'requires = ["hatchling"]'
 
-    # Fix TYPE_CHECKING import issues in app.py - quote forward references
-    substituteInPlace src/toad/app.py \
-      --replace-fail "def get_settings_screen() -> SettingsScreen:" 'def get_settings_screen() -> "SettingsScreen":' \
-      --replace-fail "def get_store_screen() -> StoreScreen:" 'def get_store_screen() -> "StoreScreen":' \
-      --replace-fail "def get_default_screen(self) -> MainScreen:" 'def get_default_screen(self) -> "MainScreen":'
+    # Fix TYPE_CHECKING import issues - add future annotations import
+    sed -i '1i from __future__ import annotations' src/toad/app.py
   '';
 
   pythonImportsCheck = [ "toad" ];
