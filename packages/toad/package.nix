@@ -2,9 +2,19 @@
   lib,
   python3,
   fetchFromGitHub,
+  textual-speedups,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+let
+  python = python3.override {
+    self = python;
+    packageOverrides = _final: _prev: {
+      # Inject textual-speedups into the Python package set
+      inherit textual-speedups;
+    };
+  };
+in
+python.pkgs.buildPythonApplication rec {
   pname = "batrachian-toad";
   version = "0.5.5";
   pyproject = true;
@@ -16,11 +26,11 @@ python3.pkgs.buildPythonApplication rec {
     hash = "sha256-78QFeygtvOe52EJa08jsZ5pM48clOTwG/PmDYuYmzSQ=";
   };
 
-  build-system = with python3.pkgs; [
+  build-system = with python.pkgs; [
     hatchling
   ];
 
-  dependencies = with python3.pkgs; [
+  dependencies = with python.pkgs; [
     textual
     click
     gitpython
@@ -31,21 +41,21 @@ python3.pkgs.buildPythonApplication rec {
     typeguard
     xdg-base-dirs
     textual-serve
+    textual-speedups
     packaging
     bashlex
     pathspec
   ];
 
-  # Remove optional dependencies not available in nixpkgs
-  pythonRemoveDeps = [
-    "textual-speedups"
+  # Relax version constraint for hatchling in build-system
+  pythonRelaxDeps = [
+    "hatchling"
   ];
 
   # Remove exact version pinning from build-system
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace-fail 'requires = ["hatchling==1.28.0"]' 'requires = ["hatchling"]' \
-      --replace-fail '"textual-speedups==0.2.1",' ""
+      --replace-fail 'requires = ["hatchling==1.28.0"]' 'requires = ["hatchling"]'
 
     # Fix TYPE_CHECKING import issues in app.py - quote forward references
     substituteInPlace src/toad/app.py \
