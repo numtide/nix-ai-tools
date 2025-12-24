@@ -1,5 +1,9 @@
 {
   "version": "2.0.76",
-  "hash": "sha256-46IqiGJZrZM4vVcanZj/vY4uxFH3/4LxNA+Qb6iIHDk=",
-  "npmDepsHash": "sha256-mDErPWWqOe+3fKriTBLNCzXP48pmmlOMoB+kCP4FoT8="
+  "hashes": {
+    "x86_64-linux": "sha256-Xc20gPkboN8LyL1q/xSNPf04g/CJnutblCeosKvnpoc=",
+    "aarch64-linux": "sha256-9kqZTI5b+4TXJCzrvsddaRnbLuRtULj8eojVBm2xk/k=",
+    "x86_64-darwin": "sha256-nZRYLwr10iAfHJB78k/40hYQS4l+4LJHlabAgfQOCNc=",
+    "aarch64-darwin": "sha256-t29tTQkjPmcpWJewoe0uItevpAZDFSnYsbUytjuMvL0="
+  }
 }

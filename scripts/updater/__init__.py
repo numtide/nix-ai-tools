@@ -14,7 +14,7 @@ from .hash import calculate_url_hash
 from .hashes_file import load_hashes, save_hashes
 
 # HTTP utilities
-from .http import fetch_text
+from .http import fetch_json, fetch_text
 
 # Nix commands
 from .nix import (
@@ -44,6 +44,7 @@ __all__ = [
     "calculate_url_hash",
     "extract_or_generate_lockfile",
     "fetch_github_latest_release",
+    "fetch_json",
     "fetch_npm_version",
     "fetch_text",
     "fetch_version_from_text",
