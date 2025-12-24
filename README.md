@@ -313,7 +313,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>opencode</strong> - AI coding agent built for the terminal</summary>
 
-- **Source**: source
+- **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run github:numtide/llm-agents.nix#opencode -- --help`
@@ -358,6 +358,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/github/spec-kit
 - **Usage**: `nix run github:numtide/llm-agents.nix#spec-kit -- --help`
 - **Nix**: [packages/spec-kit/package.nix](packages/spec-kit/package.nix)
+
+</details>
+<details>
+<summary><strong>toad</strong> - A unified experience for AI in your terminal</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-only
+- **Homepage**: https://github.com/batrachianai/toad
+- **Usage**: `nix run github:numtide/llm-agents.nix#toad -- --help`
+- **Nix**: [packages/toad/package.nix](packages/toad/package.nix)
 
 </details>
 <!-- END GENERATED PACKAGE DOCS -->
