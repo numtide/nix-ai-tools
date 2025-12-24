@@ -313,7 +313,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>opencode</strong> - AI coding agent built for the terminal</summary>
 
-- **Source**: source
+- **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/sst/opencode
 - **Usage**: `nix run github:numtide/llm-agents.nix#opencode -- --help`
