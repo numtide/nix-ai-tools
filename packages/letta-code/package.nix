@@ -3,6 +3,7 @@
   stdenv,
   fetchzip,
   nodejs,
+  versionCheckHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -34,6 +35,10 @@ stdenv.mkDerivation rec {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  versionCheckProgramArg = [ "--version" ];
 
   meta = with lib; {
     description = "Memory-first coding agent that learns and evolves across sessions";

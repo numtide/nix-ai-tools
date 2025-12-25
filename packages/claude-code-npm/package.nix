@@ -3,6 +3,7 @@
   buildNpmPackage,
   fetchzip,
   makeWrapper,
+  versionCheckHook,
 }:
 
 let
@@ -37,6 +38,10 @@ buildNpmPackage {
       --set DISABLE_TELEMETRY 1 \
       --unset DEV
   '';
+
+  doInstallCheck = true;
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = with lib; {
     description = "Agentic coding tool (Node.js/npm build for claudebox compatibility)";

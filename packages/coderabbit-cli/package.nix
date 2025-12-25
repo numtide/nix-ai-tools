@@ -5,6 +5,8 @@
   unzip,
   wrapBuddy,
   libsecret,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -48,6 +50,13 @@ stdenv.mkDerivation rec {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+  versionCheckProgramArg = [ "--version" ];
 
   meta = with lib; {
     description = "AI-powered code review CLI tool";

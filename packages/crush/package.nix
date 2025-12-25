@@ -4,6 +4,8 @@
   fetchFromGitHub,
   installShellFiles,
   go_1_25,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -39,10 +41,17 @@ in
 
   nativeBuildInputs = [ installShellFiles ];
 
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+
   subPackages = [ "." ];
 
   # Tests require config files that aren't available in the build environment
   doCheck = false;
+
+  doInstallCheck = true;
 
   ldflags = [
     "-s"

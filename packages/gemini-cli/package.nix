@@ -9,6 +9,7 @@
   darwinOpenptyHook,
   clang_20,
   makeBinaryWrapper,
+  versionCheckHook,
   xsel,
 }:
 
@@ -76,6 +77,9 @@ buildNpmPackage (finalAttrs: {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru = {
     jsonschema = "${placeholder "out"}/share/gemini-cli/settings.schema.json";

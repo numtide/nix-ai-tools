@@ -4,6 +4,7 @@
   fetchurl,
   makeWrapper,
   wrapBuddy,
+  versionCheckHook,
   flake,
 }:
 
@@ -52,6 +53,9 @@ stdenv.mkDerivation {
       --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
       --set DISABLE_TELEMETRY 1
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = with lib; {
     description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";

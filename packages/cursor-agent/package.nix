@@ -5,6 +5,7 @@
   makeWrapper,
   coreutils,
   wrapBuddy,
+  versionCheckHook,
 }:
 
 let
@@ -36,6 +37,9 @@ stdenv.mkDerivation rec {
   ++ lib.optionals stdenv.isLinux [
     wrapBuddy
   ];
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   buildInputs = lib.optionals stdenv.isLinux [
     stdenv.cc.cc.lib

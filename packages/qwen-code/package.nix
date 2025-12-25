@@ -12,6 +12,7 @@
   clang_20,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
+  versionCheckHook,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -73,6 +74,9 @@ buildNpmPackage (finalAttrs: {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = {
     description = "Command-line AI workflow tool for Qwen3-Coder models";

@@ -6,6 +6,7 @@
   rustPlatform,
   pkg-config,
   openssl,
+  versionCheckHook,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -39,6 +40,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   buildInputs = [ openssl ];
 
+  env.CODE_VERSION = finalAttrs.version;
+
   preBuild = ''
     # Remove LTO to speed up builds
     substituteInPlace Cargo.toml \
@@ -59,6 +62,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   doInstallCheck = true;
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = {
     description = "Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.";

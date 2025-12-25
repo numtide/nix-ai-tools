@@ -8,6 +8,8 @@
   yarnInstallHook,
   nodejs,
   makeWrapper,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -32,6 +34,12 @@ stdenv.mkDerivation (finalAttrs: {
     yarnBuildHook
     yarnInstallHook
     makeWrapper
+  ];
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
   ];
 
   # Currently `happy` requires `node` to start its daemon
