@@ -108,7 +108,7 @@ struct stat {
   uint32_t st_mode;
   uint32_t st_uid;
   uint32_t st_gid;
-  uint32_t __pad0;
+  uint32_t pad0_;
   uint64_t st_rdev;
   int64_t st_size;
   int64_t st_blksize;
@@ -119,6 +119,5 @@ struct stat {
   uint64_t st_mtime_nsec;
   uint64_t st_ctime;
   uint64_t st_ctime_nsec;
-  int64_t __unused[3];
+  int64_t reserved_[3];
 };
-

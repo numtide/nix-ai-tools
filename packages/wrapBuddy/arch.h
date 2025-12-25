@@ -101,17 +101,17 @@ static inline int64_t syscall6(int64_t n, int64_t a1, int64_t a2, int64_t a3,
                    : "r"(sp), "r"(entry)                                       \
                    : "memory")
 
-/* Entry point wrapper */
+/* Entry point wrapper - use file-scope asm for clang compatibility */
 #define DEFINE_START(main_func)                                                \
-  __attribute__((naked, noreturn, section(".text._start"))) void _start(       \
-      void) {                                                                  \
-    __asm__ volatile("xor %%rbp, %%rbp\n"                                      \
-                     "mov %%rsp, %%rdi\n"                                      \
-                     "and $-16, %%rsp\n"                                       \
-                     "call " #main_func "\n" ::                                \
-                         : "memory");                                          \
-    __builtin_unreachable();                                                   \
-  }
+  __asm__(".section .text._start\n"                                            \
+          ".global _start\n"                                                   \
+          ".type _start, @function\n"                                          \
+          "_start:\n"                                                          \
+          "    xor %rbp, %rbp\n"                                               \
+          "    mov %rsp, %rdi\n"                                               \
+          "    and $-16, %rsp\n"                                               \
+          "    call " #main_func "\n"                                          \
+          ".size _start, .-_start\n");
 
 /* Portable syscall wrappers */
 #define sys_open(path, flags) syscall2(SYS_open, (int64_t)(path), flags)
@@ -264,4 +264,3 @@ static inline int64_t syscall6(int64_t n, int64_t a1, int64_t a2, int64_t a3,
 #define sys_munmap(addr, len) syscall2(SYS_munmap, (int64_t)(addr), len)
 #define sys_mprotect(addr, len, prot)                                          \
   syscall3(SYS_mprotect, (int64_t)(addr), len, prot)
-

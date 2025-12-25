@@ -13,6 +13,8 @@
   strace,
   pkg-config,
   patchelf,
+  clang-tools,
+  runCommand,
 }:
 
 let
@@ -129,6 +131,20 @@ let
 
   hookScript = writeText "wrap-buddy-hook.sh" (builtins.readFile ./wrap-buddy-hook.sh);
 
+  # Source files for clang-tidy
+  cSourceFiles = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions [
+      ./loader.c
+      ./stub.c
+      ./common.h
+      ./arch.h
+      ./types.h
+      ./preamble.ld
+      ./.clang-tidy
+    ];
+  };
+
   hook = makeSetupHook {
     name = "wrap-buddy-hook";
     propagatedBuildInputs = [ wrapBuddyScript ];
@@ -137,6 +153,21 @@ let
       license = lib.licenses.mit;
       platforms = lib.platforms.linux;
     };
+    passthru.tests.clang-tidy =
+      runCommand "wrap-buddy-clang-tidy"
+        {
+          nativeBuildInputs = [ clang-tools ];
+          src = cSourceFiles;
+        }
+        ''
+          cd $src
+          # Run clang-tidy on C source files
+          # -DLOADER_PATH required by stub.c
+          clang-tidy loader.c stub.c -- \
+            -DLOADER_PATH='"/nix/store/dummy/loader.bin"' \
+            -I.
+          touch $out
+        '';
     passthru.tests.default = stdenv.mkDerivation {
       name = "wrap-buddy-hook-test";
 
