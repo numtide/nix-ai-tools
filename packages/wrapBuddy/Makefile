@@ -1,26 +1,17 @@
-# wrapBuddy Makefile
-#
-# Builds loader.bin and stub.bin as flat binaries for freestanding execution.
-# On x86_64, also builds 32-bit variants (loader32.bin, stub32.bin).
-#
-# Variables:
-#   CC          - C compiler (default: cc)
-#   OBJCOPY     - Binary extraction tool (default: objcopy)
-#   PREFIX      - Installation prefix (default: /usr/local)
-#   LIBDIR      - Library directory (default: $(PREFIX)/lib/wrap-buddy)
-#   DESTDIR     - Staging directory for packaging (optional)
-#
-# Usage (Nix):
-#   make LIBDIR=$out && make install LIBDIR=$out
-#
-# Usage (traditional packaging):
-#   make
-#   make install DESTDIR=/tmp/staging
+# wrapBuddy Makefile - see README.md for documentation
 
 CC ?= cc
+CXX_FOR_BUILD ?= c++
 OBJCOPY ?= objcopy
+XXD ?= xxd
+CLANG_TIDY ?= clang-tidy
 PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
 LIBDIR ?= $(PREFIX)/lib/wrap-buddy
+
+# C++23 flags for wrap-buddy (runs on build machine)
+CXXFLAGS_FOR_BUILD ?= -std=c++23 -Wall -Wextra -O2 -Iinclude
+EXTRA_CXXFLAGS ?=
 
 # Auto-detect target architecture from compiler
 TARGET := $(shell $(CC) -dumpmachine 2>/dev/null)
@@ -59,13 +50,21 @@ HEADERS = include/wrap-buddy/*.h include/wrap-buddy/arch/*.h preamble.ld
 NATIVE_BINS = loader.bin stub.bin
 ifdef BUILD_32BIT
   ALL_BINS = $(NATIVE_BINS) loader32.bin stub32.bin
+  STUB_HEADERS = stub_64.h stub_32.h
+  STUB_32_DEF = -DHAVE_STUB_32
 else
   ALL_BINS = $(NATIVE_BINS)
+  STUB_HEADERS = stub_64.h
+  STUB_32_DEF =
 endif
 
-.PHONY: all clean install
+.PHONY: all clean install bins patcher clang-tidy
 
-all: $(ALL_BINS)
+all: bins patcher
+
+bins: $(ALL_BINS)
+
+patcher: wrap-buddy
 
 # Native loader
 loader.elf: loader.c $(HEADERS)
@@ -75,8 +74,9 @@ loader.bin: loader.elf
 	$(OBJCOPY) -O binary --only-section=.all $< $@
 
 # Native stub
+STUB_FLAGS = -DLOADER_PATH='"$(LIBDIR)/loader.bin"' -Iinclude
 stub.elf: stub.c $(HEADERS)
-	$(CC) $(CFLAGS_NATIVE) -DLOADER_PATH='"$(LIBDIR)/loader.bin"' -o $@ stub.c
+	$(CC) $(CFLAGS_NATIVE) $(STUB_FLAGS) -o $@ stub.c
 
 stub.bin: stub.elf
 	$(OBJCOPY) -O binary --only-section=.all $< $@
@@ -95,9 +95,42 @@ stub32.elf: stub.c $(HEADERS)
 stub32.bin: stub32.elf
 	$(OBJCOPY) -O binary --only-section=.all $< $@
 
-install: $(ALL_BINS)
+# Generate C headers from stub binaries for embedding
+stub_64.h: stub.bin
+	$(XXD) -i $< > $@
+
+stub_32.h: stub32.bin
+	$(XXD) -i $< > $@
+
+# Built-in interpreter defaults (optional)
+ifdef INTERP
+  INTERP_DEF = -DDEFAULT_INTERP='"$(INTERP)"'
+else
+  INTERP_DEF =
+endif
+ifdef LIBC_LIB
+  LIBC_DEF = -DDEFAULT_LIBC_LIB='"$(LIBC_LIB)"'
+else
+  LIBC_DEF =
+endif
+
+# Combined flags for wrap-buddy
+WRAP_BUDDY_FLAGS = $(CXXFLAGS_FOR_BUILD) $(EXTRA_CXXFLAGS) $(STUB_32_DEF) $(INTERP_DEF) $(LIBC_DEF)
+
+# C++ patcher with embedded stubs
+wrap-buddy: wrap-buddy.cc $(STUB_HEADERS) $(HEADERS)
+	$(CXX_FOR_BUILD) $(WRAP_BUDDY_FLAGS) -o $@ wrap-buddy.cc
+
+install: $(ALL_BINS) wrap-buddy
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 755 wrap-buddy $(DESTDIR)$(BINDIR)/
 	install -d $(DESTDIR)$(LIBDIR)
 	install -m 644 $(ALL_BINS) $(DESTDIR)$(LIBDIR)/
 
+# Static analysis
+clang-tidy: $(STUB_HEADERS)
+	$(CLANG_TIDY) loader.c stub.c -- $(STUB_FLAGS)
+	$(CLANG_TIDY) wrap-buddy.cc -- $(WRAP_BUDDY_FLAGS)
+
 clean:
-	rm -f *.elf *.bin
+	rm -f *.elf *.bin stub_64.h stub_32.h wrap-buddy

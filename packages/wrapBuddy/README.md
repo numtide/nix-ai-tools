@@ -127,3 +127,50 @@ If a patched binary fails to start, check:
 1. Run with strace: `strace -f <binary>`
 
 The loader prints debug info to stderr if it fails to load.
+
+## Building from source
+
+wrapBuddy builds two components:
+
+- `loader.bin`: Flat binary loaded at runtime by patched binaries
+- `wrap-buddy`: C++ patcher tool (with stub code embedded)
+
+On x86_64, a 32-bit loader variant (`loader32.bin`) is also built.
+
+### Make variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CC` | C compiler for target platform (stubs/loader) | `cc` |
+| `CXX_FOR_BUILD` | C++ compiler for build platform (wrap-buddy) | `c++` |
+| `OBJCOPY` | Binary extraction tool | `objcopy` |
+| `XXD` | Hexdump tool for embedding binaries | `xxd` |
+| `PREFIX` | Installation prefix | `/usr/local` |
+| `BINDIR` | Binary directory | `$(PREFIX)/bin` |
+| `LIBDIR` | Library directory | `$(PREFIX)/lib/wrap-buddy` |
+| `DESTDIR` | Staging directory for packaging | (none) |
+| `INTERP` | Default interpreter path (baked into binary) | (none) |
+| `LIBC_LIB` | Default libc library path (baked into binary) | (none) |
+
+### Cross-compilation
+
+For cross-compilation, `CC` builds stubs for the **target** platform (what gets
+patched), while `CXX_FOR_BUILD` builds wrap-buddy for the **build** platform
+(what runs the patcher).
+
+```bash
+# Cross-compile for aarch64 from x86_64
+make CC=aarch64-linux-gnu-gcc CXX_FOR_BUILD=g++
+```
+
+### Usage examples
+
+```bash
+# Traditional packaging
+make
+make install DESTDIR=/tmp/staging
+
+# Nix packaging
+make LIBDIR=$out/lib/wrap-buddy BINDIR=$out/bin
+make install LIBDIR=$out/lib/wrap-buddy BINDIR=$out/bin
+```

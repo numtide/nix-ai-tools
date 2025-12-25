@@ -1,18 +1,17 @@
 {
   lib,
   stdenv,
+  buildPackages,
   callPackage,
-  python3,
   makeSetupHook,
   writeText,
   binutils,
+  xxd,
 }:
 
 let
-  pythonEnv = python3.withPackages (ps: [ ps.pyelftools ]);
-
-  # Source files for loader/stub builds and linting
-  binarySources = lib.fileset.toSource {
+  # Source files for building everything
+  sources = lib.fileset.toSource {
     root = ./.;
     fileset = lib.fileset.unions [
       ./include/wrap-buddy
@@ -20,24 +19,58 @@ let
       ./Makefile
       ./loader.c
       ./stub.c
+      ./wrap-buddy.cc
       ./.clang-tidy
     ];
   };
 
-  # Build loader and stub binaries
-  # On x86_64, also builds 32-bit variants automatically
-  binaries = stdenv.mkDerivation {
-    pname = "wrap-buddy-binaries";
-    version = "0.3.0";
+  # Read interpreter info from bintools at build time
+  dynamicLinker = lib.strings.trim (
+    builtins.readFile "${stdenv.cc.bintools}/nix-support/dynamic-linker"
+  );
+  origLibc = "${stdenv.cc.bintools}/nix-support/orig-libc";
+  libcLib =
+    if builtins.pathExists origLibc then
+      "${lib.strings.trim (builtins.readFile origLibc)}/lib"
+    else
+      null;
 
-    src = binarySources;
+  # Cross-compilation support:
+  # - CC (from stdenv) builds stubs for TARGET platform (what gets patched)
+  # - CXX_FOR_BUILD builds wrap-buddy for BUILD platform (what runs the patcher)
+  # For native builds, these are the same compiler.
+  cxxForBuild = "${buildPackages.stdenv.cc}/bin/c++";
 
-    nativeBuildInputs = [ binutils ];
+  # Single derivation builds everything:
+  # - loader.bin, stub.bin (and 32-bit variants on x86_64)
+  # - wrap-buddy C++ patcher with embedded stubs
+  wrapBuddy = stdenv.mkDerivation {
+    pname = "wrap-buddy";
+    version = "0.4.0";
 
-    makeFlags = [ "LIBDIR=$(out)" ];
+    src = sources;
+
+    # depsBuildBuild: tools that run on BUILD and compile for BUILD
+    depsBuildBuild = [
+      buildPackages.stdenv.cc # C++ compiler for wrap-buddy
+    ];
+
+    nativeBuildInputs = [
+      binutils # objcopy (processes target ELF files)
+      xxd # for embedding stubs (platform-independent)
+    ];
+
+    makeFlags = [
+      "CXX_FOR_BUILD=${cxxForBuild}"
+      "BINDIR=$(out)/bin"
+      "LIBDIR=$(out)/lib/wrap-buddy"
+      "INTERP=${dynamicLinker}"
+    ]
+    ++ lib.optional (libcLib != null) "LIBC_LIB=${libcLib}";
 
     meta = {
-      description = "Loader and stub binaries for wrapBuddy";
+      description = "Patch ELF binaries with stub loader for NixOS compatibility";
+      mainProgram = "wrap-buddy";
       license = lib.licenses.mit;
       platforms = [
         "x86_64-linux"
@@ -47,61 +80,19 @@ let
     };
   };
 
-  wrapBuddyScript = stdenv.mkDerivation {
-    pname = "wrap-buddy";
-    version = "0.3.0";
-
-    src = lib.fileset.toSource {
-      root = ./.;
-      fileset = ./wrap-buddy.py;
-    };
-
-    buildInputs = [ pythonEnv ];
-
-    # On x86_64, the Makefile builds stub32.bin; on other platforms it doesn't exist
-    installPhase =
-      let
-        stub32Path =
-          if stdenv.hostPlatform.isx86_64 then
-            "${binaries}/stub32.bin"
-          else
-            "@stub_path_32@";
-      in
-      ''
-        runHook preInstall
-
-        mkdir -p $out/bin
-
-        # Install the main script with substituted binary paths
-        substitute wrap-buddy.py $out/bin/wrap-buddy \
-          --replace-fail "@stub_path_64@" "${binaries}/stub.bin" \
-          --replace-fail "@stub_path_32@" "${stub32Path}"
-        chmod +x $out/bin/wrap-buddy
-
-        runHook postInstall
-      '';
-
-    meta = {
-      description = "Patch ELF binaries with stub loader for NixOS compatibility";
-      mainProgram = "wrap-buddy";
-      license = lib.licenses.mit;
-      platforms = lib.platforms.linux;
-    };
-  };
-
   hookScript = writeText "wrap-buddy-hook.sh" (builtins.readFile ./wrap-buddy-hook.sh);
 
   hook = makeSetupHook {
     name = "wrap-buddy-hook";
-    propagatedBuildInputs = [ wrapBuddyScript ];
+    propagatedBuildInputs = [ wrapBuddy ];
     meta = {
       description = "Setup hook that patches ELF binaries with stub loader";
       license = lib.licenses.mit;
       platforms = lib.platforms.linux;
     };
     passthru.tests = {
-      clang-tidy = callPackage ./clang-tidy.nix { sourceFiles = binarySources; };
-      clang-format = callPackage ./clang-format.nix { sourceFiles = binarySources; };
+      clang-tidy = callPackage ./clang-tidy.nix { sourceFiles = sources; };
+      clang-format = callPackage ./clang-format.nix { sourceFiles = sources; };
       default = callPackage ./test.nix { inherit hook; };
     };
   } hookScript;

@@ -9,8 +9,3 @@ mypy scripts/updater
 
 echo "Typechecking update scripts..."
 find packages -type f -name 'update.py' -print0 | xargs -0 -n1 -P 0 mypy
-
-echo "Typechecking wrapBuddy..."
-mypy packages/wrapBuddy/wrap-buddy.py
-
-echo "All typechecks passed!"

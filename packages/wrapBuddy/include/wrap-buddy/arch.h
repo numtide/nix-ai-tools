@@ -31,8 +31,17 @@
 #define sys_close(fd) syscall1(SYS_close, fd)
 #define sys_read(fd, buf, n) syscall3(SYS_read, fd, (intptr_t)(buf), n)
 #define sys_write(fd, buf, n) syscall3(SYS_write, fd, (intptr_t)(buf), n)
-#define sys_lseek(fd, offset, whence) syscall3(SYS_lseek, fd, offset, whence)
 #define sys_munmap(addr, len) syscall2(SYS_munmap, (intptr_t)(addr), len)
+
+/*
+ * sys_lseek - 64-bit seek
+ *
+ * i386 defines sys_lseek as a function using _llseek for large file support.
+ * Other architectures use the regular lseek syscall which handles 64-bit.
+ */
+#if !defined(__i386__)
+#define sys_lseek(fd, offset, whence) syscall3(SYS_lseek, fd, offset, whence)
+#endif
 #define sys_mprotect(addr, len, prot)                                          \
   syscall3(SYS_mprotect, (intptr_t)(addr), len, prot)
 

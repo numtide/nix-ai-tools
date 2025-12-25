@@ -17,6 +17,7 @@
 #define SYS_open 5
 #define SYS_close 6
 #define SYS_lseek 19
+#define SYS__llseek 140
 #define SYS_mmap2 192
 #define SYS_mprotect 125
 #define SYS_munmap 91
@@ -144,6 +145,25 @@ static inline intptr_t syscall6(intptr_t n, intptr_t a1, intptr_t a2,
 #define sys_open(path, flags) syscall2(SYS_open, (intptr_t)(path), flags)
 #define sys_readlink(path, buf, size)                                          \
   syscall3(SYS_readlink, (intptr_t)(path), (intptr_t)(buf), size)
+
+/*
+ * sys_lseek - 64-bit lseek for i386 using _llseek
+ *
+ * The regular lseek syscall on i386 only supports 32-bit offsets.
+ * We use _llseek which takes the offset split into high/low parts
+ * and writes the 64-bit result to a pointer.
+ */
+static inline int64_t sys_lseek(int fd, int64_t offset, int whence) {
+  int64_t result;
+  uint32_t offset_high = (uint32_t)((uint64_t)offset >> 32);
+  uint32_t offset_low = (uint32_t)offset;
+  intptr_t ret = syscall5(SYS__llseek, fd, offset_high, offset_low,
+                          (intptr_t)&result, whence);
+  if (ret < 0) {
+    return ret;
+  }
+  return result;
+}
 
 /*
  * i386 uses fstat64 for proper large file support.
