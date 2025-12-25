@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../types.h"
+#include "../freestanding.h"
 
 /*
  * x86_64 syscall numbers

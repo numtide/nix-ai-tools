@@ -13,29 +13,29 @@
 let
   pythonEnv = python3.withPackages (ps: [ ps.pyelftools ]);
 
-  # Source files for C compilation (headers and linker script)
+  # Header files for C compilation
+  headers = [
+    ./arch.h
+    ./config.h
+    ./debug.h
+    ./elf_defs.h
+    ./elf_types.h
+    ./freestanding.h
+    ./mmap.h
+    ./preamble.ld
+    ./arch
+  ];
+
+  # Source files for stub compilation (used by wrap-buddy.py at runtime)
   cSources = lib.fileset.toSource {
     root = ./.;
-    fileset = lib.fileset.unions [
-      ./common.h
-      ./arch.h
-      ./types.h
-      ./preamble.ld
-      ./arch
-    ];
+    fileset = lib.fileset.unions (headers ++ [ ./stub.c ]);
   };
 
-  # Common source files for loader builds
+  # Source files for loader builds
   loaderSources = lib.fileset.toSource {
     root = ./.;
-    fileset = lib.fileset.unions [
-      ./loader.c
-      ./common.h
-      ./arch.h
-      ./types.h
-      ./preamble.ld
-      ./arch
-    ];
+    fileset = lib.fileset.unions (headers ++ [ ./loader.c ]);
   };
 
   # Function to build loader for a specific architecture
@@ -114,15 +114,13 @@ let
 
     src = lib.fileset.toSource {
       root = ./.;
-      fileset = lib.fileset.unions [
-        ./wrap-buddy.py
-        ./stub.c
-        ./common.h
-        ./arch.h
-        ./types.h
-        ./preamble.ld
-        ./arch
-      ];
+      fileset = lib.fileset.unions (
+        headers
+        ++ [
+          ./wrap-buddy.py
+          ./stub.c
+        ]
+      );
     };
 
     buildInputs = [ pythonEnv ];
@@ -159,19 +157,17 @@ let
 
   hookScript = writeText "wrap-buddy-hook.sh" (builtins.readFile ./wrap-buddy-hook.sh);
 
-  # Source files for clang-tidy
+  # Source files for clang-tidy/clang-format
   sourceFiles = lib.fileset.toSource {
     root = ./.;
-    fileset = lib.fileset.unions [
-      ./loader.c
-      ./stub.c
-      ./common.h
-      ./arch.h
-      ./types.h
-      ./preamble.ld
-      ./arch
-      ./.clang-tidy
-    ];
+    fileset = lib.fileset.unions (
+      headers
+      ++ [
+        ./loader.c
+        ./stub.c
+        ./.clang-tidy
+      ]
+    );
   };
 
   hook = makeSetupHook {

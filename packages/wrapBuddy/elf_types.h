@@ -1,41 +1,20 @@
 /*
- * types.h - Basic types and ELF structures for wrapBuddy
+ * elf_types.h - ELF structures for freestanding code
  *
- * Uses compiler builtins for fixed-width types to avoid any libc headers.
- * This allows cross-compilation with just -m32 without needing 32-bit stubs.
  * Provides both 32-bit and 64-bit ELF structures with ElfW() macros.
+ * Only used by the loader and stub, not by the C++ patcher (which uses <elf.h>).
  */
 
 #pragma once
 
-/* Fixed-width types using compiler builtins */
-typedef __INT8_TYPE__ int8_t;
-typedef __INT16_TYPE__ int16_t;
-typedef __INT32_TYPE__ int32_t;
-typedef __INT64_TYPE__ int64_t;
-typedef __UINT8_TYPE__ uint8_t;
-typedef __UINT16_TYPE__ uint16_t;
-typedef __UINT32_TYPE__ uint32_t;
-typedef __UINT64_TYPE__ uint64_t;
-
-/* Pointer-sized types */
-typedef __UINTPTR_TYPE__ uintptr_t;
-typedef __INTPTR_TYPE__ intptr_t;
-typedef __SIZE_TYPE__ size_t;
-typedef __INTPTR_TYPE__ ssize_t;
-
-/* NULL pointer */
-#define NULL ((void *)0)
+#include "freestanding.h"
 
 /*
- * ELF class detection and ElfW() macro
- * ElfW(type) expands to Elf32_type or Elf64_type based on pointer size
+ * ElfW() macro - selects Elf32 or Elf64 types based on pointer size
  */
 #if __SIZEOF_POINTER__ == 8
-#define ELFCLASS64 1
 #define ElfW(type) Elf64_##type
 #else
-#define ELFCLASS32 1
 #define ElfW(type) Elf32_##type
 #endif
 

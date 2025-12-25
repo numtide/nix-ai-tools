@@ -11,7 +11,10 @@
  *      -o stub.bin stub.c
  */
 
-#include "common.h"
+#include "arch.h"
+#include "debug.h"
+#include "freestanding.h"
+#include "mmap.h"
 
 #ifndef LOADER_PATH
 #error "LOADER_PATH must be defined"

@@ -92,13 +92,12 @@ class PatchConfig:
         """Get the appropriate loader binary for the given ELF class."""
         if elf_class == ELFCLASS64:
             return self.loader_bin_path_64
-        else:
-            if self.loader_bin_path_32 is None:
-                raise RuntimeError(
-                    "32-bit loader not available. "
-                    "Cannot patch 32-bit binaries on this platform."
-                )
-            return self.loader_bin_path_32
+        if self.loader_bin_path_32 is None:
+            raise RuntimeError(
+                "32-bit loader not available. "
+                "Cannot patch 32-bit binaries on this platform."
+            )
+        return self.loader_bin_path_32
 
 
 @dataclass
@@ -372,7 +371,7 @@ def iter_executables(paths: list[Path], *, recursive: bool = True) -> Iterator[P
 
 
 def get_source_dir() -> Path:
-    """Get path to source files (stub.c, common.h, etc.)."""
+    """Get path to source files for stub compilation."""
     script_dir = Path(__file__).resolve().parent
     if script_dir.name == "bin":
         share_path = script_dir.parent / "share" / "wrap-buddy"
@@ -498,23 +497,19 @@ def _extract_stub_binary(elf_file: Path, bin_file: Path) -> bytes:
     return bin_file.read_bytes()
 
 
-def _validate_stub_sources(source_dir: Path) -> tuple[Path, Path, Path]:
+def _validate_stub_sources(source_dir: Path) -> tuple[Path, Path]:
     """Validate and return paths to stub source files."""
     stub_c = source_dir / "stub.c"
-    common_h = source_dir / "common.h"
     linker_script = source_dir / "preamble.ld"
 
     if not stub_c.exists():
         msg = f"stub.c not found at {stub_c}"
         raise RuntimeError(msg)
-    if not common_h.exists():
-        msg = f"common.h not found at {common_h}"
-        raise RuntimeError(msg)
     if not linker_script.exists():
         msg = f"preamble.ld not found at {linker_script}"
         raise RuntimeError(msg)
 
-    return stub_c, common_h, linker_script
+    return stub_c, linker_script
 
 
 def compile_stub(
@@ -522,7 +517,7 @@ def compile_stub(
     loader_path: str,
 ) -> bytes:
     """Compile the stub as a flat binary."""
-    stub_c, _, linker_script = _validate_stub_sources(source_dir)
+    stub_c, linker_script = _validate_stub_sources(source_dir)
     cc = os.environ.get("CC", "cc")
 
     try:
@@ -577,6 +572,7 @@ def find_entry_segment_info(
 
     Returns (file_offset, available_bytes) or None.
     """
+    phdr_class: type[Elf64Phdr | Elf32Phdr]
     if elf_class == ELFCLASS64:
         e_phoff = struct.unpack("<Q", data[32:40])[0]
         e_phnum = struct.unpack("<H", data[56:58])[0]

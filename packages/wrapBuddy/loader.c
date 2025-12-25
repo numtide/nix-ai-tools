@@ -8,44 +8,21 @@
  * 4. Loads the dynamic linker (ld.so)
  * 5. Jumps to ld.so with original entry point
  *
- * Config file format (binary):
- *   uint64_t orig_entry     - original entry point (ELF vaddr)
- *   uint64_t stub_size      - size of stub that was overwritten
- *   uint16_t interp_len     - length of interpreter path (including null)
- *   uint16_t rpath_len      - length of RPATH string (including null)
- *   char interp_path[]      - interpreter path (null-terminated)
- *   char rpath[]            - colon-separated library paths (null-terminated)
- *   char orig_bytes[]       - original bytes that were overwritten
- *
  * Build as flat binary:
  *   cc -nostdlib -fPIC -fno-stack-protector -Os \
  *      -Wl,-T,loader.ld -Wl,--oformat=binary \
  *      -o loader.bin loader.c
  */
 
-#include "common.h"
+#include "arch.h"
+#include "config.h"
+#include "debug.h"
+#include "elf_defs.h"
+#include "elf_types.h"
+#include "freestanding.h"
+#include "mmap.h"
 
-/*
- * Config file header - architecture dependent
- *
- * 64-bit: orig_entry(8) + stub_size(8) + interp_len(2) + rpath_len(2) = 20 bytes
- * 32-bit: orig_entry(4) + stub_size(4) + interp_len(2) + rpath_len(2) = 12 bytes
- *
- * Must be packed to match the exact binary format from wrap-buddy.py
- */
-struct __attribute__((packed)) Config {
-  uintptr_t orig_entry;
-  uintptr_t stub_size;
-  uint16_t interp_len;
-  uint16_t rpath_len;
-  /* Followed by: interp_path, rpath, orig_bytes */
-};
-
-enum {
-  CONFIG_HEADER_SIZE = sizeof(struct Config),
-  MAX_PATH = 512,
-  WRAPBUDDY_SUFFIX_LEN = 11
-};
+enum { MAX_PATH = 512 };
 
 /*
  * Build config path from /proc/self/exe
@@ -479,7 +456,7 @@ __attribute__((noreturn)) void loader_main(intptr_t *stack_ptr) {
   }
 
   /* Parse config header */
-  struct Config *cfg = (struct Config *)config_buf;
+  Config *cfg = (Config *)config_buf;
 
   /* Validate config field sizes are sane (prevents overflow in sum) */
   // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
