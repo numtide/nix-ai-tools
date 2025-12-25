@@ -13,24 +13,27 @@
  * String functions
  */
 
-static inline size_t my_strlen(const char *s) {
-  const char *p = s;
-  while (*p)
-    p++;
-  return p - s;
+static inline size_t my_strlen(const char *str) {
+  const char *ptr = str;
+  while (*ptr) {
+    ptr++;
+  }
+  return ptr - str;
 }
 
-static inline void my_memcpy(void *dst, const void *src, size_t n) {
-  char *d = dst;
-  const char *s = src;
-  while (n--)
-    *d++ = *s++;
+static inline void my_memcpy(void *dst, const void *src, size_t len) {
+  char *dest = dst;
+  const char *source = src;
+  while (len--) {
+    *dest++ = *source++;
+  }
 }
 
-static inline void my_memset(void *dst, int c, size_t n) {
-  char *d = dst;
-  while (n--)
-    *d++ = c;
+static inline void my_memset(void *dst, int val, size_t len) {
+  char *dest = dst;
+  while (len--) {
+    *dest++ = val;
+  }
 }
 
 /*
@@ -51,12 +54,11 @@ static inline void print_hex(uint64_t val) {
   char buf[19];
   buf[0] = '0';
   buf[1] = 'x';
-  for (int i = 17; i >= 2; i--) {
-    int d = val & 0xf;
-    buf[i] = d < 10 ? '0' + d : 'a' + d - 10;
+  for (int idx = 17; idx >= 2; idx--) {
+    int digit = val & 0xf;
+    buf[idx] = digit < 10 ? '0' + digit : 'a' + digit - 10;
     val >>= 4;
   }
   buf[18] = '\0';
   print(buf);
 }
-

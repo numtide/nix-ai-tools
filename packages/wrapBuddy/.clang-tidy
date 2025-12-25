@@ -1,0 +1,13 @@
+Checks: >
+  *,
+  -altera-*,
+  -bugprone-easily-swappable-parameters,
+  -cppcoreguidelines-init-variables,
+  -hicpp-no-assembler,
+  -hicpp-signed-bitwise,
+  -llvm-header-guard,
+  -misc-include-cleaner,
+  -performance-no-int-to-ptr,
+  -portability-avoid-pragma-once
+
+WarningsAsErrors: '*'
