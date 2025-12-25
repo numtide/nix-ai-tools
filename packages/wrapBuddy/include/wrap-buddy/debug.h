@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "arch.h"
-#include "freestanding.h"
+#include <wrap-buddy/arch.h>
+#include <wrap-buddy/freestanding.h>
 
 static inline void print(const char *msg) { sys_write(2, msg, my_strlen(msg)); }
 

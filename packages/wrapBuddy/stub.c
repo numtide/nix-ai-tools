@@ -11,16 +11,17 @@
  *      -o stub.bin stub.c
  */
 
-#include "arch.h"
-#include "debug.h"
-#include "freestanding.h"
-#include "mmap.h"
+#include <wrap-buddy/arch.h>
+#include <wrap-buddy/debug.h>
+#include <wrap-buddy/freestanding.h>
+#include <wrap-buddy/mmap.h>
 
 #ifndef LOADER_PATH
 #error "LOADER_PATH must be defined"
 #endif
 
-static const char loader_path[] = LOADER_PATH;
+/* Mark as used to prevent optimization when referenced only via inline asm */
+static const char loader_path[] __attribute__((used)) = LOADER_PATH;
 
 __attribute__((noreturn)) void stub_main(const intptr_t *const stack_ptr) {
   /* Get loader path using PC-relative addressing */

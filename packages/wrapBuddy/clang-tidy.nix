@@ -17,6 +17,6 @@ runCommand "wrap-buddy-clang-tidy"
     # -DLOADER_PATH required by stub.c
     clang-tidy loader.c stub.c -- \
       -DLOADER_PATH='"/nix/store/dummy/loader.bin"' \
-      -I.
+      -Iinclude
     touch $out
   ''

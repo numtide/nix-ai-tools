@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../freestanding.h"
+#include <wrap-buddy/freestanding.h>
 
 /*
  * aarch64 syscall numbers

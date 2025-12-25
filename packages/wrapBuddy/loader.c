@@ -14,13 +14,13 @@
  *      -o loader.bin loader.c
  */
 
-#include "arch.h"
-#include "config.h"
-#include "debug.h"
-#include "elf_defs.h"
-#include "elf_types.h"
-#include "freestanding.h"
-#include "mmap.h"
+#include <wrap-buddy/arch.h>
+#include <wrap-buddy/config.h>
+#include <wrap-buddy/debug.h>
+#include <wrap-buddy/elf_defs.h>
+#include <wrap-buddy/elf_types.h>
+#include <wrap-buddy/freestanding.h>
+#include <wrap-buddy/mmap.h>
 
 enum { MAX_PATH = 512 };
 

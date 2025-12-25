@@ -11,7 +11,7 @@
 #ifdef __cplusplus
 #include <cstdint>
 #else
-#include "freestanding.h"
+#include <wrap-buddy/freestanding.h>
 #endif
 
 /*

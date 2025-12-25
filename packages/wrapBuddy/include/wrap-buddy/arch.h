@@ -12,14 +12,14 @@
 
 #pragma once
 
-#include "freestanding.h"
+#include <wrap-buddy/freestanding.h>
 
 #if defined(__x86_64__)
-#include "arch/x86_64.h"
+#include <wrap-buddy/arch/x86_64.h>
 #elif defined(__aarch64__)
-#include "arch/aarch64.h"
+#include <wrap-buddy/arch/aarch64.h>
 #elif defined(__i386__)
-#include "arch/i386.h"
+#include <wrap-buddy/arch/i386.h>
 #else
 #error "Unsupported architecture"
 #endif

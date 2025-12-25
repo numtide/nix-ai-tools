@@ -17,9 +17,7 @@ import argparse
 import fnmatch
 import os
 import struct
-import subprocess
 import sys
-import tempfile
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -43,10 +41,6 @@ PF_R = 4
 # ELF class constants
 ELFCLASS32 = 1
 ELFCLASS64 = 2
-
-# ASCII printable range (for C string escaping)
-ASCII_PRINTABLE_MIN = 32  # space character
-ASCII_PRINTABLE_MAX = 127  # DEL character (first non-printable)
 
 # Config file format - architecture dependent
 # 64-bit: orig_entry(8) + stub_size(8) + interp_len(2) + rpath_len(2) = 20 bytes
@@ -81,23 +75,22 @@ class InterpreterInfo:
 class PatchConfig:
     """Configuration for patching binaries."""
 
-    source_dir: Path
-    loader_bin_path_64: Path
-    loader_bin_path_32: Path | None  # May be None if 32-bit not supported
+    stub_bin_path_64: Path
+    stub_bin_path_32: Path | None  # May be None if 32-bit not supported
     runtime_deps: list[Path]
     # All library directories discovered during cache population (for transitive deps)
     all_lib_dirs: set[Path]
 
-    def get_loader_for_class(self, elf_class: int) -> Path:
-        """Get the appropriate loader binary for the given ELF class."""
+    def get_stub_for_class(self, elf_class: int) -> bytes:
+        """Get the appropriate pre-compiled stub binary for the given ELF class."""
         if elf_class == ELFCLASS64:
-            return self.loader_bin_path_64
-        if self.loader_bin_path_32 is None:
+            return self.stub_bin_path_64.read_bytes()
+        if self.stub_bin_path_32 is None:
             raise RuntimeError(
-                "32-bit loader not available. "
+                "32-bit stub not available. "
                 "Cannot patch 32-bit binaries on this platform."
             )
-        return self.loader_bin_path_32
+        return self.stub_bin_path_32.read_bytes()
 
 
 @dataclass
@@ -370,180 +363,28 @@ def iter_executables(paths: list[Path], *, recursive: bool = True) -> Iterator[P
                     yield child
 
 
-def get_source_dir() -> Path:
-    """Get path to source files for stub compilation."""
-    script_dir = Path(__file__).resolve().parent
-    if script_dir.name == "bin":
-        share_path = script_dir.parent / "share" / "wrap-buddy"
-        if share_path.exists():
-            return share_path
-    return script_dir
+def get_stub_path_64() -> Path:
+    """Get path to pre-compiled 64-bit stub binary.
 
-
-def get_loader_path_64() -> Path:
-    """Get path to pre-compiled 64-bit loader binary.
-
-    The path @loader_path_64@ is substituted at build time.
+    The path @stub_path_64@ is substituted at build time.
     """
-    return Path("@loader_path_64@")
+    return Path("@stub_path_64@")
 
 
-def get_loader_path_32() -> Path | None:
-    """Get path to pre-compiled 32-bit loader binary, or None if unavailable.
+def get_stub_path_32() -> Path | None:
+    """Get path to pre-compiled 32-bit stub binary, or None if unavailable.
 
-    The path @loader_path_32@ is substituted at build time.
+    The path @stub_path_32@ is substituted at build time.
     Returns None if the placeholder wasn't substituted or the file doesn't exist.
     """
-    path_str = "@loader_path_32@"
+    path_str = "@stub_path_32@"
     if path_str.startswith("@"):
-        # Placeholder wasn't substituted - 32-bit loader not built
+        # Placeholder wasn't substituted - 32-bit stub not built
         return None
     path = Path(path_str)
     if not path.exists():
         return None
     return path
-
-
-def c_escape(s: str) -> str:
-    """Escape a string for use in a C double-quoted literal."""
-    escape_map = {
-        "\\": "\\\\",
-        '"': '\\"',
-        "\n": "\\n",
-        "\r": "\\r",
-        "\t": "\\t",
-        "\0": "\\0",
-        "\f": "\\f",
-    }
-    result = []
-    for c in s:
-        if c in escape_map:
-            result.append(escape_map[c])
-        elif ord(c) < ASCII_PRINTABLE_MIN or ord(c) >= ASCII_PRINTABLE_MAX:
-            result.append(f"\\x{ord(c):02x}")
-        else:
-            result.append(c)
-    return "".join(result)
-
-
-def _get_compiler_target(cc: str) -> str:
-    """Detect compiler target architecture."""
-    result = subprocess.run(
-        [cc, "-dumpmachine"], check=True, capture_output=True, text=True
-    )
-    return result.stdout.strip()
-
-
-def _build_compile_command(
-    cc: str,
-    source_dir: Path,
-    loader_path: str,
-    linker_script: Path,
-    stub_c: Path,
-    elf_file: Path,
-    *,
-    is_aarch64: bool,
-) -> list[str]:
-    """Build the compiler command for the stub."""
-    compile_cmd = [
-        cc,
-        "-nostdlib",
-        "-fPIC",
-        "-fno-stack-protector",
-        "-fno-exceptions",
-        "-fno-unwind-tables",
-        "-fno-asynchronous-unwind-tables",
-        "-fno-builtin",
-        "-Os",
-        f"-I{source_dir}",
-        f'-DLOADER_PATH="{c_escape(loader_path)}"',
-        f"-Wl,-T,{linker_script}",
-        "-Wl,-e,_start",
-        "-Wl,-Ttext=0",
-        "-o",
-        str(elf_file),
-        str(stub_c),
-    ]
-    # aarch64: use tiny code model for truly PC-relative addressing (adr not adrp)
-    if is_aarch64:
-        compile_cmd.insert(1, "-mcmodel=tiny")
-    return compile_cmd
-
-
-def _compile_stub_elf(compile_cmd: list[str]) -> None:
-    """Compile stub to ELF format."""
-    result = subprocess.run(compile_cmd, check=False, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"Stub compile failed: {result.stderr}", file=sys.stderr)
-        msg = "Failed to compile stub"
-        raise RuntimeError(msg)
-
-
-def _extract_stub_binary(elf_file: Path, bin_file: Path) -> bytes:
-    """Convert ELF to flat binary and return contents."""
-    objcopy_cmd = [
-        "objcopy",
-        "-O",
-        "binary",
-        "--only-section=.all",
-        str(elf_file),
-        str(bin_file),
-    ]
-    result = subprocess.run(objcopy_cmd, check=False, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"objcopy failed: {result.stderr}", file=sys.stderr)
-        msg = "Failed to extract binary from stub ELF"
-        raise RuntimeError(msg)
-    return bin_file.read_bytes()
-
-
-def _validate_stub_sources(source_dir: Path) -> tuple[Path, Path]:
-    """Validate and return paths to stub source files."""
-    stub_c = source_dir / "stub.c"
-    linker_script = source_dir / "preamble.ld"
-
-    if not stub_c.exists():
-        msg = f"stub.c not found at {stub_c}"
-        raise RuntimeError(msg)
-    if not linker_script.exists():
-        msg = f"preamble.ld not found at {linker_script}"
-        raise RuntimeError(msg)
-
-    return stub_c, linker_script
-
-
-def compile_stub(
-    source_dir: Path,
-    loader_path: str,
-) -> bytes:
-    """Compile the stub as a flat binary."""
-    stub_c, linker_script = _validate_stub_sources(source_dir)
-    cc = os.environ.get("CC", "cc")
-
-    try:
-        target = _get_compiler_target(cc)
-    except subprocess.CalledProcessError as e:
-        msg = f"Failed to detect compiler target: {cc} -dumpmachine failed: {e}"
-        raise RuntimeError(msg) from e
-
-    is_aarch64 = target.startswith("aarch64")
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir_path = Path(tmpdir)
-        elf_file = tmpdir_path / "stub.elf"
-        bin_file = tmpdir_path / "stub.bin"
-
-        compile_cmd = _build_compile_command(
-            cc,
-            source_dir,
-            loader_path,
-            linker_script,
-            stub_c,
-            elf_file,
-            is_aarch64=is_aarch64,
-        )
-        _compile_stub_elf(compile_cmd)
-        return _extract_stub_binary(elf_file, bin_file)
 
 
 def find_interp_phdr_offset(data: bytes, elf_class: int) -> int | None:
@@ -637,7 +478,7 @@ def patch_binary(
     """Patch a binary with the stub loader.
 
     This approach:
-    1. Compiles stub with path to loader
+    1. Reads pre-compiled stub binary
     2. Saves original entry bytes + config to .wrapbuddy file
     3. Overwrites entry point with stub
     4. Converts PT_INTERP to PT_NULL
@@ -649,9 +490,9 @@ def patch_binary(
     # Detect ELF class (32-bit vs 64-bit)
     elf_class = get_elf_class(bytes(data))
 
-    # Get the appropriate loader for this ELF class
+    # Get the appropriate pre-compiled stub for this ELF class
     try:
-        loader_bin_path = patch_config.get_loader_for_class(elf_class)
+        stub_code = patch_config.get_stub_for_class(elf_class)
     except RuntimeError as e:
         print(f"  ERROR: {e}", file=sys.stderr)
         return False
@@ -670,25 +511,16 @@ def patch_binary(
 
     entry_file_offset, available_space = segment_info
 
+    stub_size = len(stub_code)
     elf_bits = "64-bit" if elf_class == ELFCLASS64 else "32-bit"
     print(f"  ELF class: {elf_bits}")
     print(f"  Original entry: {orig_entry:#x} (file offset: {entry_file_offset:#x})")
     print(f"  Available space at entry: {available_space} bytes")
-    print(f"  Loader: {loader_bin_path}")
+    print(f"  Stub size: {stub_size} bytes")
 
     if dry_run:
         print("  [dry-run] Would patch binary")
         return True
-
-    # Compile stub with loader path
-    try:
-        stub_code = compile_stub(patch_config.source_dir, str(loader_bin_path))
-    except RuntimeError as e:
-        print(f"  ERROR: {e}", file=sys.stderr)
-        return False
-
-    stub_size = len(stub_code)
-    print(f"  Stub compiled size: {stub_size} bytes")
 
     if stub_size > available_space:
         print(
@@ -984,21 +816,18 @@ def main() -> int:
 
     print(f"Using interpreter: {interp_info.path}")
 
-    source_dir = get_source_dir()
-    loader_bin_path_64 = get_loader_path_64()
-    loader_bin_path_32 = get_loader_path_32()
+    stub_bin_path_64 = get_stub_path_64()
+    stub_bin_path_32 = get_stub_path_32()
 
-    if not loader_bin_path_64.exists():
-        print(
-            f"Error: 64-bit loader not found at {loader_bin_path_64}", file=sys.stderr
-        )
+    if not stub_bin_path_64.exists():
+        print(f"Error: 64-bit stub not found at {stub_bin_path_64}", file=sys.stderr)
         return 1
 
-    print(f"Using 64-bit loader: {loader_bin_path_64}")
-    if loader_bin_path_32:
-        print(f"Using 32-bit loader: {loader_bin_path_32}")
+    print(f"Using 64-bit stub: {stub_bin_path_64}")
+    if stub_bin_path_32:
+        print(f"Using 32-bit stub: {stub_bin_path_32}")
     else:
-        print("32-bit loader: not available")
+        print("32-bit stub: not available")
 
     cache: SonameCache = defaultdict(list)
     discovered_lib_dirs: set[Path] = set()
@@ -1015,9 +844,8 @@ def main() -> int:
     success = True
 
     patch_config = PatchConfig(
-        source_dir=source_dir,
-        loader_bin_path_64=loader_bin_path_64,
-        loader_bin_path_32=loader_bin_path_32,
+        stub_bin_path_64=stub_bin_path_64,
+        stub_bin_path_32=stub_bin_path_32,
         runtime_deps=args.runtime_dependencies,
         all_lib_dirs=discovered_lib_dirs,
     )
