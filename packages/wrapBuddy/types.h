@@ -13,10 +13,6 @@
 /* ssize_t is not in freestanding headers */
 typedef long ssize_t;
 
-/* Memory constants */
-#define PAGE_SIZE 4096
-#define PAGE_MASK (~((uint64_t)PAGE_SIZE - 1))
-
 /* File constants */
 #define O_RDONLY 0
 #define SEEK_SET 0
@@ -50,6 +46,7 @@ typedef long ssize_t;
 #define AT_NULL 0
 #define AT_PHDR 3
 #define AT_PHNUM 5
+#define AT_PAGESZ 6
 #define AT_BASE 7
 #define AT_ENTRY 9
 

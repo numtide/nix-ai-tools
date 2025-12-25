@@ -39,7 +39,6 @@ PT_INTERP = 3
 PF_X = 1
 PF_W = 2
 PF_R = 4
-PAGE_SIZE = 4096
 
 # ASCII printable range (for C string escaping)
 ASCII_PRINTABLE_MIN = 32  # space character
