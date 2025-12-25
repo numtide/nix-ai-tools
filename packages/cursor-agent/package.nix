@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   makeWrapper,
+  coreutils,
   wrapBuddy,
 }:
 
@@ -61,7 +62,8 @@ stdenv.mkDerivation rec {
     # Create a wrapper in bin directory
     mkdir -p $out/bin
     makeWrapper $out/cursor-agent $out/bin/cursor-agent \
-      --prefix PATH : $out
+      --prefix PATH : $out \
+      --prefix PATH : ${coreutils}/bin
 
     runHook postInstall
   '';
