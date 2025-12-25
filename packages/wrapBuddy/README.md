@@ -1,5 +1,7 @@
 # wrapBuddy
 
+![wrapBuddy logo](https://github.com/numtide/llm-agents.nix/releases/download/assets/wrap-the-elf.png)
+
 *"The best way to spread Christmas cheer is wrapping ELFs for all to hear!"*
 — Buddy, probably
 
