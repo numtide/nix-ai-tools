@@ -1,7 +1,6 @@
 {
   lib,
   stdenv,
-  pkgsi686Linux,
   callPackage,
   python3,
   makeSetupHook,
@@ -40,12 +39,14 @@ let
   };
 
   # Function to build loader for a specific architecture
+  # Since the loader is freestanding (-nostdlib), we can cross-compile
+  # using just compiler flags instead of a full cross toolchain
   mkLoaderBin =
     {
-      targetStdenv,
       suffix,
+      archFlags ? "",
     }:
-    targetStdenv.mkDerivation {
+    stdenv.mkDerivation {
       pname = "wrap-buddy-loader-${suffix}";
       version = "0.3.0";
 
@@ -58,15 +59,11 @@ let
 
         # Compile loader to ELF, then extract flat binary with objcopy
         # Use -Ttext=0 to ensure code starts at address 0
-        # For aarch64: use -mcmodel=tiny to get truly PC-relative addressing (adr not adrp)
-        arch_flags=""
-        if [[ "$($CC -dumpmachine)" == aarch64* ]]; then
-          arch_flags="-mcmodel=tiny"
-        fi
-        $CC -nostdlib -fPIC -fno-stack-protector \
+        # Use -nostdinc to avoid pulling in system headers (enables -m32 cross-compile)
+        $CC -nostdlib -nostdinc -fPIC -fno-stack-protector \
           -fno-exceptions -fno-unwind-tables \
           -fno-asynchronous-unwind-tables -fno-builtin \
-          -Os -I. $arch_flags \
+          -Os -I. ${archFlags} \
           -Wl,-T,preamble.ld \
           -Wl,-e,_start \
           -Wl,-Ttext=0 \
@@ -94,18 +91,19 @@ let
       };
     };
 
-  # Native (64-bit or host arch) loader
+  # Native loader (64-bit on x86_64, 64-bit on aarch64)
+  # For aarch64: use -mcmodel=tiny to get truly PC-relative addressing (adr not adrp)
   loaderBin = mkLoaderBin {
-    targetStdenv = stdenv;
     suffix = "native";
+    archFlags = lib.optionalString stdenv.hostPlatform.isAarch64 "-mcmodel=tiny";
   };
 
-  # 32-bit loader (only on x86_64-linux)
+  # 32-bit loader (only on x86_64-linux, using -m32)
   loaderBin32 =
     if stdenv.hostPlatform.isx86_64 then
       mkLoaderBin {
-        targetStdenv = pkgsi686Linux.stdenv;
         suffix = "i686";
+        archFlags = "-m32";
       }
     else
       null;

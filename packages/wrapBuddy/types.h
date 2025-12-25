@@ -1,22 +1,31 @@
 /*
  * types.h - Basic types and ELF structures for wrapBuddy
  *
- * Uses freestanding C headers for basic types.
+ * Uses compiler builtins for fixed-width types to avoid any libc headers.
+ * This allows cross-compilation with just -m32 without needing 32-bit stubs.
  * Provides both 32-bit and 64-bit ELF structures with ElfW() macros.
  */
 
 #pragma once
 
-/* Freestanding headers - provided by compiler, not libc */
-#include <stddef.h>
-#include <stdint.h>
+/* Fixed-width types using compiler builtins */
+typedef __INT8_TYPE__ int8_t;
+typedef __INT16_TYPE__ int16_t;
+typedef __INT32_TYPE__ int32_t;
+typedef __INT64_TYPE__ int64_t;
+typedef __UINT8_TYPE__ uint8_t;
+typedef __UINT16_TYPE__ uint16_t;
+typedef __UINT32_TYPE__ uint32_t;
+typedef __UINT64_TYPE__ uint64_t;
 
-/* ssize_t is not in freestanding headers */
-typedef long ssize_t;
-
-/* Pointer-sized types for architecture independence */
+/* Pointer-sized types */
 typedef __UINTPTR_TYPE__ uintptr_t;
 typedef __INTPTR_TYPE__ intptr_t;
+typedef __SIZE_TYPE__ size_t;
+typedef __INTPTR_TYPE__ ssize_t;
+
+/* NULL pointer */
+#define NULL ((void *)0)
 
 /*
  * ELF class detection and ElfW() macro
