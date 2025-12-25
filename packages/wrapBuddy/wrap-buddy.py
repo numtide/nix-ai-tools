@@ -659,10 +659,12 @@ def _build_rpath(
     runtime_deps: list[Path],
     all_lib_dirs: set[Path],
     libc_lib: Path | None,
+    existing_rpath: list[str],
 ) -> str:
     """Build RPATH from library directories and runtime dependencies.
 
-    Includes all transitive library directories discovered during cache population.
+    Includes all transitive library directories discovered during cache population,
+    plus existing RUNPATH entries from the original binary.
     """
     # Start with all discovered library directories (includes transitive deps)
     combined_dirs = set(all_lib_dirs)
@@ -670,13 +672,20 @@ def _build_rpath(
     # Add directories where direct dependencies were found
     combined_dirs.update(library_dirs)
 
+    # Preserve existing RUNPATH entries that point to Nix store
+    for rpath_entry in existing_rpath:
+        if rpath_entry.startswith("/nix/store/"):
+            path = Path(rpath_entry)
+            if path.exists():
+                combined_dirs.add(path)
+
     # Add runtime dependencies unconditionally (for dlopen'd libraries)
     for runtime_dep in runtime_deps:
         if runtime_dep.exists():
             combined_dirs.add(runtime_dep)
 
-    # Build RPATH (colon-separated paths)
-    rpath = ":".join(str(d) for d in combined_dirs)
+    # Build RPATH (colon-separated paths, sorted for reproducibility)
+    rpath = ":".join(str(d) for d in sorted(combined_dirs))
     if libc_lib:
         if rpath:
             rpath += f":{libc_lib}"
@@ -738,6 +747,7 @@ def process_binary(
         patch_config.runtime_deps,
         patch_config.all_lib_dirs,
         interp_info.libc_lib,
+        existing_rpath,
     )
 
     print(f"Patching: {binary_path}")

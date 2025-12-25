@@ -34,22 +34,20 @@ struct Config {
   /* Followed by: interp_path, rpath, orig_bytes */
 };
 
-enum {
-  CONFIG_HEADER_SIZE = 20,
-  MAX_PATH = 512,
-  MAX_CONFIG_SIZE = 8192,
-  WRAPBUDDY_SUFFIX_LEN = 11,
-  MAX_INTERP_PHDRS = 256
-};
+enum { CONFIG_HEADER_SIZE = 20, MAX_PATH = 512, WRAPBUDDY_SUFFIX_LEN = 11 };
 
 /*
  * Build config path from /proc/self/exe
  * /path/to/binary -> /path/to/.binary.wrapbuddy
  */
 static int build_config_path(char *buf, size_t bufsize) {
-  int64_t path_len =
-      sys_readlink("/proc/self/exe", buf, bufsize - CONFIG_HEADER_SIZE);
-  if (path_len <= 0 || path_len >= (int64_t)(bufsize - CONFIG_HEADER_SIZE)) {
+  int64_t max_path_len = (int64_t)bufsize - (1 + WRAPBUDDY_SUFFIX_LEN);
+  if (max_path_len <= 0) {
+    return -1;
+  }
+
+  int64_t path_len = sys_readlink("/proc/self/exe", buf, max_path_len);
+  if (path_len <= 0 || path_len >= max_path_len) {
     return -1;
   }
 
@@ -75,34 +73,31 @@ static int build_config_path(char *buf, size_t bufsize) {
 }
 
 /*
- * Read entire config file into buffer
+ * Map config file into memory
  */
-static int read_config(const char *path, char *buf, size_t bufsize,
-                       size_t *out_size) {
-  int64_t file_desc = sys_open(path, O_RDONLY);
-  if (file_desc < 0) {
-    return -1;
+static void *map_config(const char *path, size_t *out_size) {
+  int64_t file_fd = sys_open(path, O_RDONLY);
+  if (file_fd < 0) {
+    return NULL;
   }
 
-  size_t total = 0;
-  while (total < bufsize) {
-    int64_t bytes_read = sys_read(file_desc, buf + total, bufsize - total);
-    if (bytes_read < 0) {
-      if (-bytes_read == EINTR) {
-        continue;
-      }
-      sys_close(file_desc);
-      return -1;
-    }
-    if (bytes_read == 0) {
-      break;
-    }
-    total += bytes_read;
+  struct stat statbuf;
+  my_memset(&statbuf, 0, sizeof(statbuf));
+  if (sys_fstat(file_fd, &statbuf) < 0) {
+    sys_close(file_fd);
+    return NULL;
   }
 
-  sys_close(file_desc);
-  *out_size = total;
-  return 0;
+  void *mapped =
+      (void *)sys_mmap(0, statbuf.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
+  sys_close(file_fd);
+
+  if ((int64_t)mapped < 0) {
+    return NULL;
+  }
+
+  *out_size = statbuf.st_size;
+  return mapped;
 }
 
 /*
@@ -160,43 +155,6 @@ static void validate_elf_magic(const Elf64_Ehdr *ehdr) {
 }
 
 /*
- * Read program headers from ELF file
- */
-static Elf64_Phdr *read_phdrs(const char *path, const Elf64_Ehdr *ehdr,
-                              size_t *out_phdr_bytes) {
-  int phnum = ehdr->e_phnum;
-  if (phnum == 0) {
-    die("interpreter has no program headers");
-  }
-  if (phnum > MAX_INTERP_PHDRS) {
-    die("interpreter has too many program headers");
-  }
-
-  size_t phdr_bytes = phnum * sizeof(Elf64_Phdr);
-  Elf64_Phdr *phdrs =
-      (Elf64_Phdr *)sys_mmap(0, phdr_bytes, PROT_READ | PROT_WRITE,
-                             MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if ((int64_t)phdrs < 0) {
-    die("cannot allocate program headers");
-  }
-
-  int64_t file_desc = sys_open(path, O_RDONLY);
-  if (file_desc < 0) {
-    die("cannot open interpreter for phdrs");
-  }
-  if (sys_lseek(file_desc, ehdr->e_phoff, SEEK_SET) < 0) {
-    die("cannot seek to program headers");
-  }
-  if (sys_read(file_desc, phdrs, phdr_bytes) != (ssize_t)phdr_bytes) {
-    die("cannot read program headers");
-  }
-  sys_close(file_desc);
-
-  *out_phdr_bytes = phdr_bytes;
-  return phdrs;
-}
-
-/*
  * Find PT_LOAD range and return total size needed
  */
 static size_t find_load_range(const Elf64_Phdr *phdrs, int phnum,
@@ -229,7 +187,7 @@ static size_t find_load_range(const Elf64_Phdr *phdrs, int phnum,
 }
 
 /*
- * Convert ELF p_flags to mprotect flags
+ * Convert ELF p_flags to mmap prot flags
  */
 static int prot_from_pflags(uint32_t pflags) {
   int prot = 0;
@@ -246,102 +204,126 @@ static int prot_from_pflags(uint32_t pflags) {
 }
 
 /*
- * Load a single PT_LOAD segment
+ * Load a PT_LOAD segment from file to memory
+ *
+ * Strategy: map file content directly, then handle BSS separately.
+ * For the BSS portion, we map anonymous memory since file-backed
+ * mappings only cover filesz bytes.
  */
-static void load_segment(const char *path, const Elf64_Phdr *phdr,
+static void load_segment(const Elf64_Phdr *phdr, int64_t file_fd,
                          uint64_t load_bias, uint64_t page_size) {
   uint64_t page_mask = ~(page_size - 1);
   uint64_t vaddr = phdr->p_vaddr + load_bias;
 
-  int64_t file_desc = sys_open(path, O_RDONLY);
-  if (file_desc < 0) {
-    die("cannot open interpreter for segment");
-  }
-  if (sys_lseek(file_desc, phdr->p_offset, SEEK_SET) < 0) {
-    die("cannot seek to segment");
+  /* Page-align the file offset for mmap */
+  uint64_t offset_align = phdr->p_offset & (page_size - 1);
+  uint64_t map_offset = phdr->p_offset - offset_align;
+  uint64_t map_addr = vaddr - offset_align;
+
+  /* Map file content */
+  if (phdr->p_filesz > 0) {
+    size_t map_size = phdr->p_filesz + offset_align;
+    void *mapped =
+        (void *)sys_mmap(map_addr, map_size, prot_from_pflags(phdr->p_flags),
+                         MAP_PRIVATE | MAP_FIXED, file_fd, map_offset);
+    if ((int64_t)mapped < 0) {
+      die("cannot map segment");
+    }
   }
 
-  /* Read segment data */
-  char *dest = (char *)vaddr;
-  size_t remaining = phdr->p_filesz;
-  while (remaining > 0) {
-    ssize_t bytes_read = sys_read(file_desc, dest, remaining);
-    if (bytes_read < 0) {
-      if (-bytes_read == EINTR) {
-        continue;
-      }
-      die("read error loading interpreter");
-    }
-    if (bytes_read == 0) {
-      die("unexpected EOF loading interpreter");
-    }
-    dest += bytes_read;
-    remaining -= bytes_read;
-  }
-  sys_close(file_desc);
-
-  /* Zero BSS */
+  /* Handle BSS: memory beyond file content.
+   * BSS segments are always writable (they hold uninitialized data) */
   if (phdr->p_memsz > phdr->p_filesz) {
-    my_memset((char *)vaddr + phdr->p_filesz, 0,
-              phdr->p_memsz - phdr->p_filesz);
-  }
+    if (!(phdr->p_flags & PF_W)) {
+      die("BSS segment not writable (malformed ELF)");
+    }
+    uint64_t bss_start = vaddr + phdr->p_filesz;
+    uint64_t bss_end = vaddr + phdr->p_memsz;
+    uint64_t file_map_end =
+        (vaddr + phdr->p_filesz + page_size - 1) & page_mask;
 
-  /* Set proper protections */
-  uint64_t aligned = vaddr & page_mask;
-  size_t maplen =
-      ((vaddr - aligned) + phdr->p_memsz + page_size - 1) & page_mask;
-  if (sys_mprotect(aligned, maplen, prot_from_pflags(phdr->p_flags)) < 0) {
-    die("mprotect failed for interpreter segment");
+    /* Zero BSS portion within the last page of file mapping */
+    if (bss_start < file_map_end) {
+      my_memset((void *)bss_start, 0, file_map_end - bss_start);
+    }
+
+    /* Map anonymous memory for BSS beyond file mapping */
+    if (file_map_end < bss_end) {
+      size_t anon_size = bss_end - file_map_end;
+      void *anon = (void *)sys_mmap(
+          file_map_end, anon_size, prot_from_pflags(phdr->p_flags),
+          MAP_PRIVATE | MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+      if ((int64_t)anon < 0) {
+        die("cannot map BSS");
+      }
+    }
   }
 }
 
 /*
- * Load ELF interpreter into memory
+ * Load ELF interpreter into memory using mmap
  *
- * Note: Error paths call die() which exits immediately. Open fds are
- * intentionally not closed before die() - the kernel cleans up on exit.
+ * Maps the file once, then maps segments directly to their destinations.
+ * No read() calls needed - the kernel handles page faults from file.
  */
 static void *load_interp(const char *path, void **out_base,
                          uint64_t page_size) {
-  int64_t file_desc = sys_open(path, O_RDONLY);
-  if (file_desc < 0) {
+  int64_t file_fd = sys_open(path, O_RDONLY);
+  if (file_fd < 0) {
     die("cannot open interpreter");
   }
 
-  Elf64_Ehdr ehdr;
-  my_memset(&ehdr, 0, sizeof(ehdr));
-  if (sys_read(file_desc, &ehdr, sizeof(ehdr)) != sizeof(ehdr)) {
-    die("cannot read ELF header");
+  /* Get file size */
+  struct stat statbuf;
+  my_memset(&statbuf, 0, sizeof(statbuf));
+  if (sys_fstat(file_fd, &statbuf) < 0) {
+    die("cannot stat interpreter");
   }
-  sys_close(file_desc);
 
-  validate_elf_magic(&ehdr);
+  /* Map entire file to read headers */
+  void *file =
+      (void *)sys_mmap(0, statbuf.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
+  if ((int64_t)file < 0) {
+    die("cannot mmap interpreter");
+  }
 
-  size_t phdr_bytes;
-  Elf64_Phdr *phdrs = read_phdrs(path, &ehdr, &phdr_bytes);
+  Elf64_Ehdr *ehdr = (Elf64_Ehdr *)file;
+  validate_elf_magic(ehdr);
 
+  if (ehdr->e_phnum == 0) {
+    die("interpreter has no program headers");
+  }
+
+  Elf64_Phdr *phdrs = (Elf64_Phdr *)((char *)file + ehdr->e_phoff);
+
+  /* Find address range needed */
   uint64_t min_vaddr;
   size_t total_size =
-      find_load_range(phdrs, ehdr.e_phnum, page_size, &min_vaddr);
+      find_load_range(phdrs, ehdr->e_phnum, page_size, &min_vaddr);
 
-  void *base = (void *)sys_mmap(0, total_size, PROT_READ | PROT_WRITE,
+  /* Reserve contiguous address space */
+  void *base = (void *)sys_mmap(0, total_size, PROT_NONE,
                                 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if ((int64_t)base < 0) {
-    die("mmap failed");
+    die("cannot reserve address space");
   }
 
   uint64_t load_bias = (uint64_t)base - min_vaddr;
 
-  for (int idx = 0; idx < ehdr.e_phnum; idx++) {
+  /* Load each PT_LOAD segment from file */
+  for (int idx = 0; idx < ehdr->e_phnum; idx++) {
     if (phdrs[idx].p_type == PT_LOAD) {
-      load_segment(path, &phdrs[idx], load_bias, page_size);
+      load_segment(&phdrs[idx], file_fd, load_bias, page_size);
     }
   }
 
-  sys_munmap(phdrs, phdr_bytes);
+  void *entry = (void *)(ehdr->e_entry + load_bias);
+
+  sys_munmap(file, statbuf.st_size);
+  sys_close(file_fd);
 
   *out_base = base;
-  return (void *)(ehdr.e_entry + load_bias);
+  return entry;
 }
 
 /*
@@ -383,11 +365,23 @@ static size_t count_dyn_entries(Elf64_Dyn *dyn) {
 /*
  * Set up RPATH by creating a new .dynamic section with DT_RUNPATH
  *
- * Strategy: DT_RUNPATH's d_val is an offset from DT_STRTAB.
- * We allocate our rpath string anywhere in memory and compute:
- *   d_val = our_string_addr - (DT_STRTAB + l_addr)
- * The dynamic linker adjusts DT_STRTAB by l_addr, then computes:
- *   (DT_STRTAB + l_addr) + d_val = our_string_addr
+ * DT_RUNPATH stores an offset from DT_STRTAB, not an absolute address.
+ * We point it to our rpath string in the mmap'd config file.
+ *
+ *   Main binary (loaded at l_addr)        Config file (mmap'd)
+ *   +-------------------------+           +---------------------+
+ *   | .strtab at vaddr V      |           | header              |
+ *   | (runtime: V + l_addr)   |           | interp_path         |
+ *   +-------------------------+           | rpath  <------------+--+
+ *                                         +---------------------+  |
+ *   New .dynamic (we create)                                       |
+ *   +-------------------------+                                    |
+ *   | DT_RUNPATH              |                                    |
+ *   |   d_val = offset -------+------------------------------------+
+ *   |         = rpath - (V + l_addr)
+ *   +-------------------------+
+ *
+ * ld.so computes: (V + l_addr) + offset = rpath
  */
 static Elf64_Dyn *setup_rpath(Elf64_Dyn *orig_dyn, const char *rpath,
                               uint64_t l_addr, size_t *out_dyn_count) {
@@ -405,25 +399,17 @@ static Elf64_Dyn *setup_rpath(Elf64_Dyn *orig_dyn, const char *rpath,
   Elf64_Dyn *runpath_entry = find_dyn_entry(orig_dyn, DT_RUNPATH);
   size_t new_count = runpath_entry ? orig_count : orig_count + 1;
 
-  /* Allocate memory for: new .dynamic + rpath string */
-  size_t rpath_len = my_strlen(rpath) + 1;
+  /* Allocate memory for new .dynamic section only (rpath is in config mmap) */
   size_t dyn_size = new_count * sizeof(Elf64_Dyn);
-  size_t alloc_size = dyn_size + rpath_len;
 
-  char *alloc = (char *)sys_mmap(0, alloc_size, PROT_READ | PROT_WRITE,
-                                 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if ((int64_t)alloc < 0) {
+  Elf64_Dyn *new_dyn = (Elf64_Dyn *)sys_mmap(
+      0, dyn_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if ((int64_t)new_dyn < 0) {
     die("dynamic mmap failed");
   }
 
-  Elf64_Dyn *new_dyn = (Elf64_Dyn *)alloc;
-  char *rpath_str = alloc + dyn_size;
-
-  /* Copy rpath string */
-  my_memcpy(rpath_str, rpath, rpath_len);
-
-  /* Compute offset relative to where ld.so will think strtab is */
-  uint64_t rpath_offset = (uint64_t)rpath_str - strtab_runtime;
+  /* Compute offset to rpath in config file (already mmap'd, never unmapped) */
+  uint64_t rpath_offset = (uint64_t)rpath - strtab_runtime;
 
   /* Copy original .dynamic entries */
   size_t idx = 0;
@@ -473,17 +459,16 @@ static uint64_t auxv_get(Elf64_auxv_t *auxv, uint64_t type) {
  * Called by stub with original stack pointer in first argument
  */
 __attribute__((noreturn)) void loader_main(int64_t *stack_ptr) {
-  /* Read config file */
+  /* Map config file */
   char config_path[MAX_PATH];
   if (build_config_path(config_path, sizeof(config_path)) < 0) {
     die("cannot build config path");
   }
 
-  char config_buf[MAX_CONFIG_SIZE];
   size_t config_size;
-  if (read_config(config_path, config_buf, sizeof(config_buf), &config_size) <
-      0) {
-    die("cannot read config");
+  void *config_buf = map_config(config_path, &config_size);
+  if (!config_buf) {
+    die("cannot map config");
   }
 
   if (config_size < CONFIG_HEADER_SIZE) {
@@ -508,7 +493,8 @@ __attribute__((noreturn)) void loader_main(int64_t *stack_ptr) {
   }
 
   /* Get pointers to config data */
-  char *interp_path = config_buf + CONFIG_HEADER_SIZE;
+  char *config_data = (char *)config_buf;
+  char *interp_path = config_data + CONFIG_HEADER_SIZE;
   char *rpath = interp_path + cfg->interp_len;
   char *orig_bytes = rpath + cfg->rpath_len;
 
