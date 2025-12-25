@@ -11,21 +11,25 @@
  *      -o stub.bin stub.c
  */
 
-#include "common.h"
+#include <wrap-buddy/arch.h>
+#include <wrap-buddy/debug.h>
+#include <wrap-buddy/freestanding.h>
+#include <wrap-buddy/mmap.h>
 
 #ifndef LOADER_PATH
 #error "LOADER_PATH must be defined"
 #endif
 
-static const char loader_path[] = LOADER_PATH;
+/* Mark as used to prevent optimization when referenced only via inline asm */
+static const char loader_path[] __attribute__((used)) = LOADER_PATH;
 
-__attribute__((noreturn)) void stub_main(const int64_t *const stack_ptr) {
+__attribute__((noreturn)) void stub_main(const intptr_t *const stack_ptr) {
   /* Get loader path using PC-relative addressing */
   const char *path;
   PC_RELATIVE_ADDR(path, loader_path);
 
   /* Open loader binary */
-  int64_t file_desc = sys_open(path, O_RDONLY);
+  intptr_t file_desc = sys_open(path, O_RDONLY);
   if (file_desc < 0) {
     die("open loader");
   }
@@ -48,7 +52,7 @@ __attribute__((noreturn)) void stub_main(const int64_t *const stack_ptr) {
                                   file_desc,             /* fd */
                                   0                      /* offset */
   );
-  if ((int64_t)loader < 0) {
+  if ((intptr_t)loader < 0) {
     die("mmap loader");
   }
 

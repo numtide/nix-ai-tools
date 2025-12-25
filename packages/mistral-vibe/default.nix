@@ -4,5 +4,5 @@
   ...
 }:
 pkgs.callPackage ./package.nix {
-  inherit (perSystem.self) mistralai agent-client-protocol;
+  inherit (perSystem.self) mistralai agent-client-protocol versionCheckHomeHook;
 }

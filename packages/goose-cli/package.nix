@@ -6,6 +6,7 @@
   openssl,
   libxcb,
   dbus,
+  versionCheckHook,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -48,6 +49,9 @@ rustPlatform.buildRustPackage rec {
     # Run tests for goose-cli package only
     cargo test --package goose-cli --release
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = with lib; {
     description = "CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks";

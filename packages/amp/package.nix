@@ -5,6 +5,8 @@
   fetchNpmDeps,
   ripgrep,
   runCommand,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -41,6 +43,12 @@ buildNpmPackage rec {
       --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
       --set AMP_SKIP_UPDATE_CHECK 1
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
 
   meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";

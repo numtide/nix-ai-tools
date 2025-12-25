@@ -3,6 +3,7 @@
   buildNpmPackage,
   fetchurl,
   nodejs,
+  versionCheckHook,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -44,6 +45,10 @@ buildNpmPackage (finalAttrs: {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  versionCheckProgramArg = [ "--version" ];
 
   meta = {
     description = "GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.";

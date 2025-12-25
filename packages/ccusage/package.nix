@@ -4,6 +4,8 @@
   fetchzip,
   bun,
   flake,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -32,6 +34,13 @@ stdenv.mkDerivation rec {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
 
   meta = with lib; {
     description = "Usage analysis tool for Claude Code";

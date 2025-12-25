@@ -5,6 +5,7 @@
   makeWrapper,
   wrapBuddy,
   gcc-unwrapped,
+  versionCheckHook,
 }:
 
 let
@@ -66,6 +67,9 @@ stdenv.mkDerivation {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = with lib; {
     description = "Factory AI's Droid - AI-powered development agent for your terminal";

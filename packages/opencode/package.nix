@@ -7,6 +7,8 @@
   wrapBuddy,
   fzf,
   ripgrep,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -53,6 +55,12 @@ stdenv.mkDerivation {
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     wrapBuddy
+  ];
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
   ];
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [

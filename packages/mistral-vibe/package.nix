@@ -9,6 +9,8 @@
   cargo,
   rustc,
   maturin,
+  versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -103,6 +105,13 @@ python.pkgs.buildPythonApplication rec {
   ];
 
   pythonImportsCheck = [ "vibe" ];
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+  versionCheckProgramArg = [ "--version" ];
 
   meta = with lib; {
     description = "Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral";

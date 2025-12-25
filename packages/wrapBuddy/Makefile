@@ -1,0 +1,136 @@
+# wrapBuddy Makefile - see README.md for documentation
+
+CC ?= cc
+CXX_FOR_BUILD ?= c++
+OBJCOPY ?= objcopy
+XXD ?= xxd
+CLANG_TIDY ?= clang-tidy
+PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
+LIBDIR ?= $(PREFIX)/lib/wrap-buddy
+
+# C++23 flags for wrap-buddy (runs on build machine)
+CXXFLAGS_FOR_BUILD ?= -std=c++23 -Wall -Wextra -O2 -Iinclude
+EXTRA_CXXFLAGS ?=
+
+# Auto-detect target architecture from compiler
+TARGET := $(shell $(CC) -dumpmachine 2>/dev/null)
+
+# Determine native arch flags
+ifneq (,$(findstring aarch64,$(TARGET)))
+  # aarch64: use tiny code model for truly PC-relative addressing (adr not adrp)
+  ARCH_FLAGS = -mcmodel=tiny
+  BUILD_32BIT =
+else ifneq (,$(findstring x86_64,$(TARGET)))
+  ARCH_FLAGS =
+  BUILD_32BIT = 1
+else
+  ARCH_FLAGS =
+  BUILD_32BIT =
+endif
+
+# Freestanding flags - no libc, no system headers
+CFLAGS_BASE = -Wall -nostdlib -nostdinc -fPIC -fno-stack-protector \
+              -fno-exceptions -fno-unwind-tables \
+              -fno-asynchronous-unwind-tables -fno-builtin -Os -Iinclude
+
+# Linker flags for flat binary output
+LDFLAGS = -Wl,-T,preamble.ld -Wl,-e,_start -Wl,-Ttext=0
+
+# Native flags
+CFLAGS_NATIVE = $(CFLAGS_BASE) $(ARCH_FLAGS) $(LDFLAGS)
+
+# 32-bit flags (only used on x86_64)
+CFLAGS_32 = $(CFLAGS_BASE) -m32 $(LDFLAGS)
+
+# Header dependencies
+HEADERS = include/wrap-buddy/*.h include/wrap-buddy/arch/*.h preamble.ld
+
+# Targets
+NATIVE_BINS = loader.bin stub.bin
+ifdef BUILD_32BIT
+  ALL_BINS = $(NATIVE_BINS) loader32.bin stub32.bin
+  STUB_HEADERS = stub_64.h stub_32.h
+  STUB_32_DEF = -DHAVE_STUB_32
+else
+  ALL_BINS = $(NATIVE_BINS)
+  STUB_HEADERS = stub_64.h
+  STUB_32_DEF =
+endif
+
+.PHONY: all clean install bins patcher clang-tidy
+
+all: bins patcher
+
+bins: $(ALL_BINS)
+
+patcher: wrap-buddy
+
+# Native loader
+loader.elf: loader.c $(HEADERS)
+	$(CC) $(CFLAGS_NATIVE) -o $@ loader.c
+
+loader.bin: loader.elf
+	$(OBJCOPY) -O binary --only-section=.all $< $@
+
+# Native stub
+STUB_FLAGS = -DLOADER_PATH='"$(LIBDIR)/loader.bin"' -Iinclude
+stub.elf: stub.c $(HEADERS)
+	$(CC) $(CFLAGS_NATIVE) $(STUB_FLAGS) -o $@ stub.c
+
+stub.bin: stub.elf
+	$(OBJCOPY) -O binary --only-section=.all $< $@
+
+# 32-bit loader (x86_64 only)
+loader32.elf: loader.c $(HEADERS)
+	$(CC) $(CFLAGS_32) -o $@ loader.c
+
+loader32.bin: loader32.elf
+	$(OBJCOPY) -O binary --only-section=.all $< $@
+
+# 32-bit stub (x86_64 only)
+stub32.elf: stub.c $(HEADERS)
+	$(CC) $(CFLAGS_32) -DLOADER_PATH='"$(LIBDIR)/loader32.bin"' -o $@ stub.c
+
+stub32.bin: stub32.elf
+	$(OBJCOPY) -O binary --only-section=.all $< $@
+
+# Generate C headers from stub binaries for embedding
+stub_64.h: stub.bin
+	$(XXD) -i $< > $@
+
+stub_32.h: stub32.bin
+	$(XXD) -i $< > $@
+
+# Built-in interpreter defaults (optional)
+ifdef INTERP
+  INTERP_DEF = -DDEFAULT_INTERP='"$(INTERP)"'
+else
+  INTERP_DEF =
+endif
+ifdef LIBC_LIB
+  LIBC_DEF = -DDEFAULT_LIBC_LIB='"$(LIBC_LIB)"'
+else
+  LIBC_DEF =
+endif
+
+# Combined flags for wrap-buddy
+WRAP_BUDDY_FLAGS = $(CXXFLAGS_FOR_BUILD) $(EXTRA_CXXFLAGS) $(STUB_32_DEF) $(INTERP_DEF) $(LIBC_DEF)
+
+# C++ patcher with embedded stubs
+wrap-buddy: wrap-buddy.cc $(STUB_HEADERS) $(HEADERS)
+	$(CXX_FOR_BUILD) $(WRAP_BUDDY_FLAGS) -o $@ wrap-buddy.cc
+
+install: $(ALL_BINS) wrap-buddy
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 755 wrap-buddy $(DESTDIR)$(BINDIR)/
+	install -d $(DESTDIR)$(LIBDIR)
+	install -m 644 $(ALL_BINS) $(DESTDIR)$(LIBDIR)/
+
+# Static analysis
+clang-tidy: $(STUB_HEADERS)
+	$(CLANG_TIDY) loader.c stub.c -- $(STUB_FLAGS)
+	$(CLANG_TIDY) wrap-buddy.cc -- $(WRAP_BUDDY_FLAGS)
+
+clean:
+	rm -f *.elf *.bin stub_64.h stub_32.h wrap-buddy

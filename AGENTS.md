@@ -124,6 +124,48 @@ stdenv.mkDerivation rec {
 }
 ```
 
+### Version Check Hooks
+
+Use `versionCheckHook` to verify packages report correct versions during build:
+
+```nix
+doInstallCheck = true;
+nativeInstallCheckInputs = [ versionCheckHook ];
+```
+
+**For tools that need a writable HOME directory** (many CLI tools try to create config/cache directories), use `versionCheckHomeHook`:
+
+1. In `packages/<package>/default.nix`, pass the hook:
+
+   ```nix
+   {
+     pkgs,
+     perSystem,
+     ...
+   }:
+   pkgs.callPackage ./package.nix {
+     inherit (perSystem.self) versionCheckHomeHook;
+   }
+   ```
+
+1. In `packages/<package>/package.nix`, add it to inputs and use it:
+
+   ```nix
+   {
+     versionCheckHook,
+     versionCheckHomeHook,
+     # ...
+   }:
+   stdenv.mkDerivation {
+     # ...
+     doInstallCheck = true;
+     nativeInstallCheckInputs = [
+       versionCheckHook
+       versionCheckHomeHook
+     ];
+   }
+   ```
+
 ## Testing Guidelines
 
 - Build locally: `nix build .#<package>`.

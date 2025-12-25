@@ -2,6 +2,7 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  versionCheckHook,
 }:
 
 buildGoModule rec {
@@ -20,6 +21,10 @@ buildGoModule rec {
   subPackages = [ "cmd/bd" ];
 
   doCheck = false;
+
+  doInstallCheck = true;
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = with lib; {
     description = "A distributed issue tracker designed for AI-supervised coding workflows";

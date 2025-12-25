@@ -146,6 +146,9 @@ stdenv.mkDerivation {
         runHook postInstall
       '';
 
+  # GUI-only Tauri app - no CLI version support, would block trying to start GUI
+  doInstallCheck = false;
+
   meta = with lib; {
     description = "Fast and accurate local transcription app using AI models";
     homepage = "https://handy.computer/";

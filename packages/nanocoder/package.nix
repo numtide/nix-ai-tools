@@ -5,6 +5,7 @@
   fetchPnpmDeps,
   pnpm,
   pnpmConfigHook,
+  versionCheckHook,
 }:
 
 buildNpmPackage rec {
@@ -31,6 +32,9 @@ buildNpmPackage rec {
 
   nativeBuildInputs = [ pnpm ];
   npmConfigHook = pnpmConfigHook;
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   dontNpmPrune = true; # hangs forever on both Linux/darwin
 

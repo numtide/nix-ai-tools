@@ -5,6 +5,7 @@
   makeWrapper,
   wrapBuddy,
   gcc-unwrapped,
+  versionCheckHook,
 }:
 
 let
@@ -40,6 +41,9 @@ stdenv.mkDerivation rec {
   buildInputs = lib.optionals stdenv.isLinux [
     gcc-unwrapped.lib
   ];
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   dontUnpack = true;
 

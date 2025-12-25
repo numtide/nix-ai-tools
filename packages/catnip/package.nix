@@ -4,6 +4,7 @@
   fetchurl,
   wrapBuddy,
   gcc-unwrapped,
+  versionCheckHook,
 }:
 
 let
@@ -56,6 +57,10 @@ stdenv.mkDerivation {
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = with lib; {
     description = "Developer environment that's like catnip for agentic programming";
