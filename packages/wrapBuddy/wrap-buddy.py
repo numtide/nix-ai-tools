@@ -675,8 +675,8 @@ def _build_rpath(
         if runtime_dep.exists():
             combined_dirs.add(runtime_dep)
 
-    # Build RPATH (colon-separated paths)
-    rpath = ":".join(str(d) for d in combined_dirs)
+    # Build RPATH (colon-separated paths, sorted for reproducibility)
+    rpath = ":".join(str(d) for d in sorted(combined_dirs))
     if libc_lib:
         if rpath:
             rpath += f":{libc_lib}"
