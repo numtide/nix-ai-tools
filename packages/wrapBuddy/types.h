@@ -1,7 +1,8 @@
 /*
- * types.h - Basic types and constants for wrapBuddy
+ * types.h - Basic types and ELF structures for wrapBuddy
  *
  * Uses freestanding C headers for basic types.
+ * Provides both 32-bit and 64-bit ELF structures with ElfW() macros.
  */
 
 #pragma once
@@ -13,47 +14,24 @@
 /* ssize_t is not in freestanding headers */
 typedef long ssize_t;
 
-/* File constants */
-#define O_RDONLY 0
-#define SEEK_SET 0
-
-/* Error numbers */
-#define EINTR 4
-
-/* mmap constants */
-#define PROT_NONE 0
-#define PROT_READ 1
-#define PROT_WRITE 2
-#define PROT_EXEC 4
-#define MAP_PRIVATE 2
-#define MAP_FIXED 0x10
-#define MAP_ANONYMOUS 0x20
-
-/* ELF constants */
-#define PT_NULL 0
-#define PT_LOAD 1
-#define PT_DYNAMIC 2
-#define PT_INTERP 3
-#define PT_PHDR 6
-#define PF_X 1
-#define PF_W 2
-#define PF_R 4
-
-/* Dynamic section tags */
-#define DT_NULL 0
-#define DT_STRTAB 5
-#define DT_RUNPATH 29
-
-/* Aux vector types */
-#define AT_NULL 0
-#define AT_PHDR 3
-#define AT_PHNUM 5
-#define AT_PAGESZ 6
-#define AT_BASE 7
-#define AT_ENTRY 9
+/* Pointer-sized types for architecture independence */
+typedef __UINTPTR_TYPE__ uintptr_t;
+typedef __INTPTR_TYPE__ intptr_t;
 
 /*
- * ELF structures
+ * ELF class detection and ElfW() macro
+ * ElfW(type) expands to Elf32_type or Elf64_type based on pointer size
+ */
+#if __SIZEOF_POINTER__ == 8
+#define ELFCLASS64 1
+#define ElfW(type) Elf64_##type
+#else
+#define ELFCLASS32 1
+#define ElfW(type) Elf32_##type
+#endif
+
+/*
+ * 64-bit ELF structures
  */
 
 typedef struct {
@@ -100,26 +78,48 @@ typedef struct {
 } Elf64_Dyn;
 
 /*
- * Full stat structure - kernel writes all 144 bytes
- * Layout matches Linux x86_64/aarch64 kernel struct stat
+ * 32-bit ELF structures
  */
-struct stat {
-  uint64_t st_dev;
-  uint64_t st_ino;
-  uint64_t st_nlink;
-  uint32_t st_mode;
-  uint32_t st_uid;
-  uint32_t st_gid;
-  uint32_t pad0_;
-  uint64_t st_rdev;
-  int64_t st_size;
-  int64_t st_blksize;
-  int64_t st_blocks;
-  uint64_t st_atime;
-  uint64_t st_atime_nsec;
-  uint64_t st_mtime;
-  uint64_t st_mtime_nsec;
-  uint64_t st_ctime;
-  uint64_t st_ctime_nsec;
-  int64_t reserved_[3];
-};
+
+typedef struct {
+  unsigned char e_ident[16];
+  uint16_t e_type;
+  uint16_t e_machine;
+  uint32_t e_version;
+  uint32_t e_entry;
+  uint32_t e_phoff;
+  uint32_t e_shoff;
+  uint32_t e_flags;
+  uint16_t e_ehsize;
+  uint16_t e_phentsize;
+  uint16_t e_phnum;
+  uint16_t e_shentsize;
+  uint16_t e_shnum;
+  uint16_t e_shstrndx;
+} Elf32_Ehdr;
+
+typedef struct {
+  uint32_t p_type;
+  uint32_t p_offset;
+  uint32_t p_vaddr;
+  uint32_t p_paddr;
+  uint32_t p_filesz;
+  uint32_t p_memsz;
+  uint32_t p_flags;
+  uint32_t p_align;
+} Elf32_Phdr;
+
+typedef struct {
+  uint32_t a_type;
+  union {
+    uint32_t a_val;
+  } a_un;
+} Elf32_auxv_t;
+
+typedef struct {
+  int32_t d_tag;
+  union {
+    uint32_t d_val;
+    uint32_t d_ptr;
+  } d_un;
+} Elf32_Dyn;

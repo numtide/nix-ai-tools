@@ -40,16 +40,31 @@ PF_X = 1
 PF_W = 2
 PF_R = 4
 
+# ELF class constants
+ELFCLASS32 = 1
+ELFCLASS64 = 2
+
 # ASCII printable range (for C string escaping)
 ASCII_PRINTABLE_MIN = 32  # space character
 ASCII_PRINTABLE_MAX = 127  # DEL character (first non-printable)
 
-# Config file format
-CONFIG_HEADER_FORMAT = "<QQHH"  # orig_entry, stub_size, interp_len, rpath_len
-CONFIG_HEADER_SIZE = struct.calcsize(CONFIG_HEADER_FORMAT)
+# Config file format - architecture dependent
+# 64-bit: orig_entry(8) + stub_size(8) + interp_len(2) + rpath_len(2) = 20 bytes
+# 32-bit: orig_entry(4) + stub_size(4) + interp_len(2) + rpath_len(2) = 12 bytes
+CONFIG_HEADER_FORMAT_64 = "<QQHH"
+CONFIG_HEADER_FORMAT_32 = "<IIHH"
+CONFIG_HEADER_SIZE_64 = struct.calcsize(CONFIG_HEADER_FORMAT_64)
+CONFIG_HEADER_SIZE_32 = struct.calcsize(CONFIG_HEADER_FORMAT_32)
 
 # Cache type
 SonameCache = defaultdict[tuple[str, str], list[tuple[Path, str]]]
+
+
+def get_elf_class(data: bytes) -> int:
+    """Get ELF class (32 or 64-bit) from ELF header."""
+    if len(data) < 5 or data[:4] != b"\x7fELF":
+        raise ValueError("Not a valid ELF file")
+    return data[4]  # EI_CLASS byte
 
 
 @dataclass
@@ -67,10 +82,23 @@ class PatchConfig:
     """Configuration for patching binaries."""
 
     source_dir: Path
-    loader_bin_path: Path
+    loader_bin_path_64: Path
+    loader_bin_path_32: Path | None  # May be None if 32-bit not supported
     runtime_deps: list[Path]
     # All library directories discovered during cache population (for transitive deps)
     all_lib_dirs: set[Path]
+
+    def get_loader_for_class(self, elf_class: int) -> Path:
+        """Get the appropriate loader binary for the given ELF class."""
+        if elf_class == ELFCLASS64:
+            return self.loader_bin_path_64
+        else:
+            if self.loader_bin_path_32 is None:
+                raise RuntimeError(
+                    "32-bit loader not available. "
+                    "Cannot patch 32-bit binaries on this platform."
+                )
+            return self.loader_bin_path_32
 
 
 @dataclass
@@ -116,6 +144,53 @@ class Elf64Phdr:
             self.p_paddr,
             self.p_filesz,
             self.p_memsz,
+            self.p_align,
+        )
+
+
+@dataclass
+class Elf32Phdr:
+    """ELF32 program header."""
+
+    p_type: int
+    p_offset: int
+    p_vaddr: int
+    p_paddr: int
+    p_filesz: int
+    p_memsz: int
+    p_flags: int
+    p_align: int
+
+    SIZE = 32
+
+    @classmethod
+    def unpack(cls, data: bytes) -> Elf32Phdr:
+        """Unpack a program header from raw bytes."""
+        (p_type, p_offset, p_vaddr, p_paddr, p_filesz, p_memsz, p_flags, p_align) = (
+            struct.unpack("<IIIIIIII", data[:32])
+        )
+        return cls(
+            p_type=p_type,
+            p_offset=p_offset,
+            p_vaddr=p_vaddr,
+            p_paddr=p_paddr,
+            p_filesz=p_filesz,
+            p_memsz=p_memsz,
+            p_flags=p_flags,
+            p_align=p_align,
+        )
+
+    def pack(self) -> bytes:
+        """Pack the program header into raw bytes."""
+        return struct.pack(
+            "<IIIIIIII",
+            self.p_type,
+            self.p_offset,
+            self.p_vaddr,
+            self.p_paddr,
+            self.p_filesz,
+            self.p_memsz,
+            self.p_flags,
             self.p_align,
         )
 
@@ -306,10 +381,28 @@ def get_source_dir() -> Path:
     return script_dir
 
 
-def get_loader_path() -> Path:
-    """Get path to pre-compiled loader binary."""
-    # @loader_path@ is substituted at build time
-    return Path("@loader_path@")
+def get_loader_path_64() -> Path:
+    """Get path to pre-compiled 64-bit loader binary.
+
+    The path @loader_path_64@ is substituted at build time.
+    """
+    return Path("@loader_path_64@")
+
+
+def get_loader_path_32() -> Path | None:
+    """Get path to pre-compiled 32-bit loader binary, or None if unavailable.
+
+    The path @loader_path_32@ is substituted at build time.
+    Returns None if the placeholder wasn't substituted or the file doesn't exist.
+    """
+    path_str = "@loader_path_32@"
+    if path_str.startswith("@"):
+        # Placeholder wasn't substituted - 32-bit loader not built
+        return None
+    path = Path(path_str)
+    if not path.exists():
+        return None
+    return path
 
 
 def c_escape(s: str) -> str:
@@ -458,11 +551,16 @@ def compile_stub(
         return _extract_stub_binary(elf_file, bin_file)
 
 
-def find_interp_phdr_offset(data: bytes) -> int | None:
+def find_interp_phdr_offset(data: bytes, elf_class: int) -> int | None:
     """Find offset of PT_INTERP program header."""
-    e_phoff = struct.unpack("<Q", data[32:40])[0]
-    e_phnum = struct.unpack("<H", data[56:58])[0]
-    e_phentsize = struct.unpack("<H", data[54:56])[0]
+    if elf_class == ELFCLASS64:
+        e_phoff = struct.unpack("<Q", data[32:40])[0]
+        e_phnum = struct.unpack("<H", data[56:58])[0]
+        e_phentsize = struct.unpack("<H", data[54:56])[0]
+    else:  # ELFCLASS32
+        e_phoff = struct.unpack("<I", data[28:32])[0]
+        e_phnum = struct.unpack("<H", data[44:46])[0]
+        e_phentsize = struct.unpack("<H", data[42:44])[0]
 
     for i in range(e_phnum):
         offset: int = e_phoff + i * e_phentsize
@@ -472,17 +570,27 @@ def find_interp_phdr_offset(data: bytes) -> int | None:
     return None
 
 
-def find_entry_segment_info(data: bytes, entry_vaddr: int) -> tuple[int, int] | None:
+def find_entry_segment_info(
+    data: bytes, entry_vaddr: int, elf_class: int
+) -> tuple[int, int] | None:
     """Find file offset and available space at entry point.
 
     Returns (file_offset, available_bytes) or None.
     """
-    e_phoff = struct.unpack("<Q", data[32:40])[0]
-    e_phnum = struct.unpack("<H", data[56:58])[0]
+    if elf_class == ELFCLASS64:
+        e_phoff = struct.unpack("<Q", data[32:40])[0]
+        e_phnum = struct.unpack("<H", data[56:58])[0]
+        phdr_size = Elf64Phdr.SIZE
+        phdr_class = Elf64Phdr
+    else:  # ELFCLASS32
+        e_phoff = struct.unpack("<I", data[28:32])[0]
+        e_phnum = struct.unpack("<H", data[44:46])[0]
+        phdr_size = Elf32Phdr.SIZE
+        phdr_class = Elf32Phdr
 
     for i in range(e_phnum):
-        offset = e_phoff + i * 56
-        phdr = Elf64Phdr.unpack(data[offset : offset + 56])
+        offset = e_phoff + i * phdr_size
+        phdr = phdr_class.unpack(data[offset : offset + phdr_size])
         if (
             phdr.p_type == PT_LOAD
             and phdr.p_vaddr <= entry_vaddr < phdr.p_vaddr + phdr.p_filesz
@@ -500,13 +608,19 @@ def write_config_file(
     interp_path: str,
     rpath: str,
     orig_bytes: bytes,
+    elf_class: int,
 ) -> None:
     """Write the config file for the loader."""
     interp_bytes = interp_path.encode() + b"\x00"
     rpath_bytes = rpath.encode() + b"\x00"
 
+    if elf_class == ELFCLASS64:
+        header_format = CONFIG_HEADER_FORMAT_64
+    else:
+        header_format = CONFIG_HEADER_FORMAT_32
+
     header = struct.pack(
-        CONFIG_HEADER_FORMAT,
+        header_format,
         orig_entry,
         stub_size,
         len(interp_bytes),
@@ -520,8 +634,7 @@ def patch_binary(
     binary_path: Path,
     interp_path: str,
     rpath: str,
-    source_dir: Path,
-    loader_bin_path: Path,
+    patch_config: PatchConfig,
     *,
     dry_run: bool = False,
 ) -> bool:
@@ -537,17 +650,32 @@ def patch_binary(
     """
     data = bytearray(binary_path.read_bytes())
 
-    # Get original entry point
-    orig_entry = struct.unpack("<Q", data[24:32])[0]
+    # Detect ELF class (32-bit vs 64-bit)
+    elf_class = get_elf_class(bytes(data))
+
+    # Get the appropriate loader for this ELF class
+    try:
+        loader_bin_path = patch_config.get_loader_for_class(elf_class)
+    except RuntimeError as e:
+        print(f"  ERROR: {e}", file=sys.stderr)
+        return False
+
+    # Get original entry point (different offset for 32-bit vs 64-bit)
+    if elf_class == ELFCLASS64:
+        orig_entry = struct.unpack("<Q", data[24:32])[0]
+    else:  # ELFCLASS32
+        orig_entry = struct.unpack("<I", data[24:28])[0]
 
     # Find file offset and available space at entry point
-    segment_info = find_entry_segment_info(bytes(data), orig_entry)
+    segment_info = find_entry_segment_info(bytes(data), orig_entry, elf_class)
     if segment_info is None:
         print("  ERROR: Cannot find entry point in PT_LOAD segment", file=sys.stderr)
         return False
 
     entry_file_offset, available_space = segment_info
 
+    elf_bits = "64-bit" if elf_class == ELFCLASS64 else "32-bit"
+    print(f"  ELF class: {elf_bits}")
     print(f"  Original entry: {orig_entry:#x} (file offset: {entry_file_offset:#x})")
     print(f"  Available space at entry: {available_space} bytes")
     print(f"  Loader: {loader_bin_path}")
@@ -558,7 +686,7 @@ def patch_binary(
 
     # Compile stub with loader path
     try:
-        stub_code = compile_stub(source_dir, str(loader_bin_path))
+        stub_code = compile_stub(patch_config.source_dir, str(loader_bin_path))
     except RuntimeError as e:
         print(f"  ERROR: {e}", file=sys.stderr)
         return False
@@ -589,6 +717,7 @@ def patch_binary(
         interp_path,
         rpath,
         original_bytes,
+        elf_class,
     )
     config_path.chmod(0o644)
     print(f"  Wrote config to {config_path}")
@@ -601,7 +730,7 @@ def patch_binary(
     print(f"  Overwrote {padded_size} bytes at entry point")
 
     # Convert PT_INTERP to PT_NULL
-    interp_offset = find_interp_phdr_offset(bytes(data))
+    interp_offset = find_interp_phdr_offset(bytes(data), elf_class)
     if interp_offset is not None:
         struct.pack_into("<I", data, interp_offset, PT_NULL)
         print("  Converted PT_INTERP to PT_NULL")
@@ -756,8 +885,7 @@ def process_binary(
         binary_path,
         interp_info.path,
         rpath,
-        patch_config.source_dir,
-        patch_config.loader_bin_path,
+        patch_config,
         dry_run=dry_run,
     )
 
@@ -861,13 +989,20 @@ def main() -> int:
     print(f"Using interpreter: {interp_info.path}")
 
     source_dir = get_source_dir()
-    loader_bin_path = get_loader_path()
+    loader_bin_path_64 = get_loader_path_64()
+    loader_bin_path_32 = get_loader_path_32()
 
-    if not loader_bin_path.exists():
-        print(f"Error: loader.bin not found at {loader_bin_path}", file=sys.stderr)
+    if not loader_bin_path_64.exists():
+        print(
+            f"Error: 64-bit loader not found at {loader_bin_path_64}", file=sys.stderr
+        )
         return 1
 
-    print(f"Using loader: {loader_bin_path}")
+    print(f"Using 64-bit loader: {loader_bin_path_64}")
+    if loader_bin_path_32:
+        print(f"Using 32-bit loader: {loader_bin_path_32}")
+    else:
+        print("32-bit loader: not available")
 
     cache: SonameCache = defaultdict(list)
     discovered_lib_dirs: set[Path] = set()
@@ -885,7 +1020,8 @@ def main() -> int:
 
     patch_config = PatchConfig(
         source_dir=source_dir,
-        loader_bin_path=loader_bin_path,
+        loader_bin_path_64=loader_bin_path_64,
+        loader_bin_path_32=loader_bin_path_32,
         runtime_deps=args.runtime_dependencies,
         all_lib_dirs=discovered_lib_dirs,
     )
