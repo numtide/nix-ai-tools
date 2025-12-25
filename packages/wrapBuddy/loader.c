@@ -231,8 +231,12 @@ static void load_segment(const Elf64_Phdr *phdr, int64_t file_fd,
     }
   }
 
-  /* Handle BSS: memory beyond file content */
+  /* Handle BSS: memory beyond file content.
+   * BSS segments are always writable (they hold uninitialized data) */
   if (phdr->p_memsz > phdr->p_filesz) {
+    if (!(phdr->p_flags & PF_W)) {
+      die("BSS segment not writable (malformed ELF)");
+    }
     uint64_t bss_start = vaddr + phdr->p_filesz;
     uint64_t bss_end = vaddr + phdr->p_memsz;
     uint64_t file_map_end =
