@@ -97,10 +97,12 @@ static int read_config(const char *path, char *buf, size_t bufsize,
  * Restore original bytes at entry point
  */
 static int restore_entry_bytes(uint64_t entry_vaddr, uint64_t l_addr,
-                               const char *orig_bytes, size_t size) {
+                               const char *orig_bytes, size_t size,
+                               uint64_t page_size) {
+  uint64_t page_mask = ~(page_size - 1);
   uint64_t entry_runtime = l_addr + entry_vaddr;
-  uint64_t page_start = entry_runtime & PAGE_MASK;
-  uint64_t page_end = (entry_runtime + size + PAGE_SIZE - 1) & PAGE_MASK;
+  uint64_t page_start = entry_runtime & page_mask;
+  uint64_t page_end = (entry_runtime + size + page_size - 1) & page_mask;
   size_t page_len = page_end - page_start;
 
   /* Make writable */
@@ -134,7 +136,8 @@ static int restore_entry_bytes(uint64_t entry_vaddr, uint64_t l_addr,
  * Note: Error paths call die() which exits immediately. Open fds are
  * intentionally not closed before die() - the kernel cleans up on exit.
  */
-static void *load_interp(const char *path, void **out_base) {
+static void *load_interp(const char *path, void **out_base, uint64_t page_size) {
+  uint64_t page_mask = ~(page_size - 1);
   int64_t fd = sys_open(path, O_RDONLY);
   if (fd < 0)
     die("cannot open interpreter");
@@ -189,8 +192,8 @@ static void *load_interp(const char *path, void **out_base) {
   if (max_vaddr == 0)
     die("interpreter has no PT_LOAD segments");
 
-  min_vaddr &= PAGE_MASK;
-  max_vaddr = (max_vaddr + PAGE_SIZE - 1) & PAGE_MASK;
+  min_vaddr &= page_mask;
+  max_vaddr = (max_vaddr + page_size - 1) & page_mask;
   size_t total_size = max_vaddr - min_vaddr;
 
   /* Allocate memory */
@@ -241,8 +244,8 @@ static void *load_interp(const char *path, void **out_base) {
     }
 
     /* Set proper protections */
-    uint64_t aligned = vaddr & PAGE_MASK;
-    size_t maplen = ((vaddr - aligned) + memsz + PAGE_SIZE - 1) & PAGE_MASK;
+    uint64_t aligned = vaddr & page_mask;
+    size_t maplen = ((vaddr - aligned) + memsz + page_size - 1) & page_mask;
 
     int prot = 0;
     if (phdrs[i].p_flags & PF_R)
@@ -436,6 +439,11 @@ __attribute__((noreturn)) void loader_main(int64_t *sp) {
     ep++;
   Elf64_auxv_t *auxv = (Elf64_auxv_t *)(ep + 1);
 
+  /* Get page size from auxv */
+  uint64_t page_size = auxv_get(auxv, AT_PAGESZ);
+  if (page_size == 0)
+    die("no AT_PAGESZ in auxv");
+
   /* Calculate runtime load address (l_addr) */
   Elf64_Phdr *orig_phdr = (Elf64_Phdr *)auxv_get(auxv, AT_PHDR);
   uint64_t orig_phnum = auxv_get(auxv, AT_PHNUM);
@@ -453,8 +461,8 @@ __attribute__((noreturn)) void loader_main(int64_t *sp) {
     die("no PT_PHDR found (required for PIE)");
 
   /* Restore original entry point bytes */
-  if (restore_entry_bytes(cfg->orig_entry, l_addr, orig_bytes, cfg->stub_size) <
-      0)
+  if (restore_entry_bytes(cfg->orig_entry, l_addr, orig_bytes, cfg->stub_size,
+                          page_size) < 0)
     die("cannot restore entry bytes");
 
   /* Find and set up .dynamic section with RPATH */
@@ -467,7 +475,7 @@ __attribute__((noreturn)) void loader_main(int64_t *sp) {
 
   /* Load interpreter */
   void *interp_base = NULL;
-  void *interp_entry = load_interp(interp_path, &interp_base);
+  void *interp_entry = load_interp(interp_path, &interp_base, page_size);
 
   /* Calculate real entry point */
   uint64_t real_entry = l_addr + cfg->orig_entry;
