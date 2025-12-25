@@ -1,4 +1,5 @@
 {
+  lib,
   runCommand,
   clang-tools,
   sourceFiles,
@@ -8,6 +9,7 @@ runCommand "wrap-buddy-clang-tidy"
   {
     nativeBuildInputs = [ clang-tools ];
     src = sourceFiles;
+    meta.platforms = lib.platforms.linux;
   }
   ''
     cd $src

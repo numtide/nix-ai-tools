@@ -13,6 +13,26 @@
   patchelf,
 }:
 
+let
+  # FHS-style interpreter paths for non-NixOS systems
+  fhsInterpreter =
+    if stdenv.hostPlatform.isx86_64 then
+      "/lib64/ld-linux-x86-64.so.2"
+    else if stdenv.hostPlatform.isAarch64 then
+      "/lib/ld-linux-aarch64.so.1"
+    else
+      throw "Unsupported platform for wrapBuddy test";
+
+  # NOP instruction for reserving space in .text section
+  # x86: 0x90 (NOP), aarch64: 0x1f (part of NOP encoding d503201f)
+  nopByte =
+    if stdenv.hostPlatform.isx86_64 then
+      "0x90"
+    else if stdenv.hostPlatform.isAarch64 then
+      "0x1f"
+    else
+      throw "Unsupported platform for wrapBuddy test";
+in
 stdenv.mkDerivation {
   name = "wrap-buddy-hook-test";
 
@@ -88,13 +108,13 @@ stdenv.mkDerivation {
     }
 
     // Reserve space in .text section for the stub
-    __asm__(".section .text\n.space 4096, 0x90\n");
+    __asm__(".section .text\n.space 4096, ${nopByte}\n");
     EOF
 
     # Compile with FHS-style interpreter path
     # Use pkg-config for glib flags
     $CC -o test test.c -lz -ldl $(pkg-config --cflags --libs glib-2.0) \
-      -Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2
+      -Wl,--dynamic-linker=${fhsInterpreter}
 
     # Strip RPATH to ensure wrapBuddy is providing library paths, not the linker
     echo "Stripping RPATH from test binary..."
@@ -187,5 +207,8 @@ stdenv.mkDerivation {
     fi
   '';
 
-  meta.platforms = lib.platforms.linux;
+  meta.platforms = [
+    "x86_64-linux"
+    "aarch64-linux"
+  ];
 }

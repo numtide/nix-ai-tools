@@ -86,7 +86,11 @@ let
       meta = {
         description = "Loader binary for wrapBuddy (${suffix})";
         license = lib.licenses.mit;
-        platforms = lib.platforms.linux;
+        platforms = [
+          "x86_64-linux"
+          "i686-linux"
+          "aarch64-linux"
+        ];
       };
     };
 
