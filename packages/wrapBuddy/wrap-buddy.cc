@@ -758,10 +758,21 @@ auto find_dependency(const SonameCache &cache, const std::string &soname,
 
 auto get_stub(bool is_64bit) -> std::span<const uint8_t> {
   if (is_64bit) {
+#if defined(__x86_64__) || defined(__aarch64__)
+    // On 64-bit platforms, stub_bin is 64-bit
     return std::span<const uint8_t>{stub_bin};
+#else
+    // On 32-bit platforms, we can't patch 64-bit binaries
+    return {};
+#endif
   }
+  // Requesting 32-bit stub
 #ifdef HAVE_STUB_32
+  // On x86_64 with multilib support, use the separate 32-bit stub
   return std::span<const uint8_t>{stub32_bin};
+#elifdef __i386__
+  // On native i386, stub_bin IS the 32-bit stub
+  return std::span<const uint8_t>{stub_bin};
 #else
   return {};
 #endif
@@ -1433,14 +1444,18 @@ auto main(int argc, char *argv[]) -> int {
     std::println("Using interpreter: {}", interp_info.path);
 
     auto stub_64 = get_stub(true);
-    std::println("64-bit stub: {} bytes", stub_64.size());
+    if (!stub_64.empty()) {
+      std::println("64-bit stub: {} bytes", stub_64.size());
+    } else {
+      std::println("64-bit stub: not available");
+    }
 
-#ifdef HAVE_STUB_32
     auto stub_32 = get_stub(false);
-    std::println("32-bit stub: {} bytes", stub_32.size());
-#else
-    std::println("32-bit stub: not available");
-#endif
+    if (!stub_32.empty()) {
+      std::println("32-bit stub: {} bytes", stub_32.size());
+    } else {
+      std::println("32-bit stub: not available");
+    }
 
     return run_patcher(args, interp_info);
   } catch (const std::exception &ex) {

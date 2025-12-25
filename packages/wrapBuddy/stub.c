@@ -52,7 +52,7 @@ __attribute__((noreturn)) void stub_main(const intptr_t *const stack_ptr) {
                                   file_desc,             /* fd */
                                   0                      /* offset */
   );
-  if ((intptr_t)loader < 0) {
+  if (IS_SYSCALL_ERR((intptr_t)loader)) {
     die("mmap loader");
   }
 

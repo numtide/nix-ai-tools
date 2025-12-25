@@ -58,7 +58,7 @@ else
   STUB_32_DEF =
 endif
 
-.PHONY: all clean install bins patcher clang-tidy
+.PHONY: all clean install bins patcher clang-tidy check
 
 all: bins patcher
 
@@ -134,3 +134,6 @@ clang-tidy: $(STUB_HEADERS)
 
 clean:
 	rm -f *.elf *.bin stub_64.h stub_32.h wrap-buddy
+
+check: wrap-buddy $(ALL_BINS)
+	bash test.sh --interp $(INTERP) --libs $(LIBC_LIB)
