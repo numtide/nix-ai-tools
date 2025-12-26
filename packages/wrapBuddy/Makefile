@@ -136,4 +136,4 @@ clean:
 	rm -f *.elf *.bin stub_64.h stub_32.h wrap-buddy
 
 check: wrap-buddy $(ALL_BINS)
-	bash test.sh --interp $(INTERP) --libs $(LIBC_LIB)
+	bash tests/test.sh --interp $(INTERP) --libs $(LIBC_LIB)

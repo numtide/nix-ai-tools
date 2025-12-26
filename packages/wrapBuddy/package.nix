@@ -23,8 +23,7 @@ let
       ./stub.c
       ./wrap-buddy.cc
       ./.clang-tidy
-      ./test.sh
-      ./test_program.c
+      ./tests
     ];
   };
 
