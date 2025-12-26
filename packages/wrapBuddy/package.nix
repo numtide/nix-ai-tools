@@ -17,11 +17,8 @@ let
     root = ./.;
     fileset = lib.fileset.unions [
       ./include/wrap-buddy
-      ./preamble.ld
       ./Makefile
-      ./loader.c
-      ./stub.c
-      ./wrap-buddy.cc
+      ./src
       ./.clang-tidy
       ./tests
     ];

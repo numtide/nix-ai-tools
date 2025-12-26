@@ -7,11 +7,6 @@
  * 3. Sets DT_RUNPATH in a new .dynamic section (no LD_LIBRARY_PATH!)
  * 4. Loads the dynamic linker (ld.so)
  * 5. Jumps to ld.so with original entry point
- *
- * Build as flat binary:
- *   cc -nostdlib -fPIC -fno-stack-protector -Os \
- *      -Wl,-T,loader.ld -Wl,--oformat=binary \
- *      -o loader.bin loader.c
  */
 
 #include <wrap-buddy/arch.h>
