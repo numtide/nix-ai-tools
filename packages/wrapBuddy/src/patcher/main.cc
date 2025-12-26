@@ -30,6 +30,8 @@
 #include <variant>
 #include <vector>
 
+#include <wrap-buddy/checked.h>
+
 // Built-in defaults (set via -D flags in Makefile)
 #ifdef DEFAULT_INTERP
 constexpr bool kHasDefaultInterp = true;
@@ -170,7 +172,9 @@ auto main(int argc, char *argv[]) -> int {
 
   try {
     const std::span<char *> argv_span(argv, static_cast<size_t>(argc));
-    const std::string_view progname = argc > 0 ? argv_span[0] : "wrap-buddy";
+    const auto progname_ptr = wrap_buddy::get_at(argv_span, 0);
+    const std::string_view progname =
+        progname_ptr ? *progname_ptr : "wrap-buddy";
 
     auto args_result = parse_args(argv_span);
     if (!args_result) {

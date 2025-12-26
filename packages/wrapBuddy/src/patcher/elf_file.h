@@ -20,6 +20,8 @@
 #include <string_view>
 #include <vector>
 
+#include <wrap-buddy/checked.h>
+
 namespace wrap_buddy {
 
 namespace fs = std::filesystem;
@@ -40,14 +42,24 @@ public:
     }
 
     const auto bytes = mem.data();
-    if (bytes[EI_MAG0] != ELFMAG0 || bytes[EI_MAG1] != ELFMAG1 ||
-        bytes[EI_MAG2] != ELFMAG2 || bytes[EI_MAG3] != ELFMAG3) {
+    // Use checked access for ELF magic validation
+    const auto mag0 = get_at(bytes, EI_MAG0);
+    const auto mag1 = get_at(bytes, EI_MAG1);
+    const auto mag2 = get_at(bytes, EI_MAG2);
+    const auto mag3 = get_at(bytes, EI_MAG3);
+    if (!mag0 || !mag1 || !mag2 || !mag3 || *mag0 != ELFMAG0 ||
+        *mag1 != ELFMAG1 || *mag2 != ELFMAG2 || *mag3 != ELFMAG3) {
       return std::unexpected(
           std::format("'{}' is not an ELF file", path.string()));
     }
 
     // Validate ELF header and program header table bounds
-    const bool is_64bit = bytes[EI_CLASS] == ELFCLASS64;
+    const auto elf_class = get_at(bytes, EI_CLASS);
+    if (!elf_class) {
+      return std::unexpected(
+          std::format("'{}' is too small to read ELF class", path.string()));
+    }
+    const bool is_64bit = *elf_class == ELFCLASS64;
     if (is_64bit) {
       if (mem.size() < sizeof(Elf64_Ehdr)) {
         return std::unexpected(
@@ -98,8 +110,14 @@ public:
     return mapped_.data();
   }
 
-  [[nodiscard]] auto elf_class() const -> uint8_t { return data()[EI_CLASS]; }
-  [[nodiscard]] auto osabi() const -> uint8_t { return data()[EI_OSABI]; }
+  // Safe accessors - return 0 on invalid access (should never happen after
+  // successful open(), but provides defense in depth)
+  [[nodiscard]] auto elf_class() const -> uint8_t {
+    return get_at(data(), EI_CLASS).value_or(0);
+  }
+  [[nodiscard]] auto osabi() const -> uint8_t {
+    return get_at(data(), EI_OSABI).value_or(0);
+  }
   [[nodiscard]] auto is_64bit() const -> bool {
     return elf_class() == ELFCLASS64;
   }
@@ -174,22 +192,25 @@ private:
   template <typename Ehdr, typename Phdr>
   [[nodiscard]] auto find_interp() const -> std::optional<std::string> {
     const auto *ehdr = start_lifetime_as<Ehdr>(data().data());
-    const std::span<const Phdr> phdrs(
-        start_lifetime_as<Phdr>(data().subspan(ehdr->e_phoff).data()),
-        ehdr->e_phnum);
+    const auto phdr_table_size = ehdr->e_phnum * sizeof(Phdr);
+    const auto phdr_span =
+        subspan_checked(data(), ehdr->e_phoff, phdr_table_size);
+    if (phdr_span.size() < phdr_table_size) {
+      return std::nullopt;
+    }
+    const std::span<const Phdr> phdrs(start_lifetime_as<Phdr>(phdr_span.data()),
+                                      ehdr->e_phnum);
 
     for (const auto &phdr : phdrs) {
       if (phdr.p_type == PT_INTERP) {
-        // Validate segment bounds
-        if (phdr.p_offset > data().size() ||
-            phdr.p_filesz > data().size() - phdr.p_offset) {
-          return std::nullopt;
-        }
         if (phdr.p_filesz == 0) {
           return std::nullopt;
         }
-        // Read string within segment bounds only
-        auto segment = data().subspan(phdr.p_offset, phdr.p_filesz);
+        // Read string within segment bounds using checked access
+        auto segment = subspan_checked(data(), phdr.p_offset, phdr.p_filesz);
+        if (segment.size() < phdr.p_filesz) {
+          return std::nullopt;
+        }
         auto nul_pos = std::ranges::find(segment, uint8_t{0});
         if (nul_pos == segment.end()) {
           // No null terminator - use full segment (common for ELF)
@@ -219,11 +240,12 @@ private:
   // Get string from string table with bounds checking
   static auto get_string_at(std::string_view strtab, size_t offset)
       -> std::string_view {
-    if (offset >= strtab.size()) {
+    // Use checked substr for bounds safety
+    const auto remaining = substr_checked(strtab, offset);
+    if (remaining.empty() && offset > 0) {
       return {};
     }
     // Find null terminator - string_view::substr does NOT stop at null
-    const auto remaining = strtab.substr(offset);
     const auto null_pos = remaining.find('\0');
     if (null_pos == std::string_view::npos) {
       return remaining;
@@ -241,9 +263,14 @@ private:
   [[nodiscard]] auto get_dynamic_section() const
       -> std::optional<DynSection<Dyn>> {
     const auto *ehdr = start_lifetime_as<Ehdr>(data().data());
-    const std::span<const Phdr> phdrs(
-        start_lifetime_as<Phdr>(data().subspan(ehdr->e_phoff).data()),
-        ehdr->e_phnum);
+    const auto phdr_table_size = ehdr->e_phnum * sizeof(Phdr);
+    const auto phdr_span =
+        subspan_checked(data(), ehdr->e_phoff, phdr_table_size);
+    if (phdr_span.size() < phdr_table_size) {
+      return std::nullopt;
+    }
+    const std::span<const Phdr> phdrs(start_lifetime_as<Phdr>(phdr_span.data()),
+                                      ehdr->e_phnum);
 
     // Find PT_DYNAMIC
     const auto dyn_phdr =
@@ -256,9 +283,13 @@ private:
 
     // Use p_filesz to bound the dynamic section iteration
     const auto max_entries = dyn_phdr->p_filesz / sizeof(Dyn);
-    const std::span<const Dyn> entries(
-        start_lifetime_as<Dyn>(data().subspan(dyn_phdr->p_offset).data()),
-        max_entries);
+    const auto dyn_size = max_entries * sizeof(Dyn);
+    const auto dyn_span = subspan_checked(data(), dyn_phdr->p_offset, dyn_size);
+    if (dyn_span.size() < dyn_size) {
+      return std::nullopt;
+    }
+    const std::span<const Dyn> entries(start_lifetime_as<Dyn>(dyn_span.data()),
+                                       max_entries);
 
     // Find DT_STRTAB and DT_STRSZ
     std::optional<uint64_t> strtab_vaddr;
@@ -336,16 +367,25 @@ private:
   [[nodiscard]] auto find_string_table(uint64_t vaddr, size_t size) const
       -> std::optional<std::string_view> {
     const auto *ehdr = start_lifetime_as<Ehdr>(data().data());
-    const std::span<const Phdr> phdrs(
-        start_lifetime_as<Phdr>(data().subspan(ehdr->e_phoff).data()),
-        ehdr->e_phnum);
+    const auto phdr_table_size = ehdr->e_phnum * sizeof(Phdr);
+    const auto phdr_span =
+        subspan_checked(data(), ehdr->e_phoff, phdr_table_size);
+    if (phdr_span.size() < phdr_table_size) {
+      return std::nullopt;
+    }
+    const std::span<const Phdr> phdrs(start_lifetime_as<Phdr>(phdr_span.data()),
+                                      ehdr->e_phnum);
 
     for (const auto &phdr : phdrs) {
       if (phdr.p_type == PT_LOAD) {
         if (vaddr >= phdr.p_vaddr && vaddr < phdr.p_vaddr + phdr.p_filesz) {
           const auto offset = phdr.p_offset + (vaddr - phdr.p_vaddr);
-          return std::string_view(
-              start_lifetime_as<char>(data().subspan(offset).data()), size);
+          const auto strtab_span = subspan_checked(data(), offset, size);
+          if (strtab_span.size() < size) {
+            return std::nullopt;
+          }
+          return std::string_view(start_lifetime_as<char>(strtab_span.data()),
+                                  size);
         }
       }
     }
