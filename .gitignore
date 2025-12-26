@@ -13,3 +13,4 @@ result-*
 Thumbs.db
 __pycache__
 packages/wrapBuddy/compile_commands.json
+packages/wrapBuddy/.cache/clangd
