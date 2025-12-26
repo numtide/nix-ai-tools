@@ -1,14 +1,8 @@
 /*
  * stub.c - Minimal entry stub for wrapBuddy
  *
- * This tiny stub (~200 bytes) is written to the binary's entry point.
+ * This tiny stub is written to the binary's entry point.
  * It loads the external loader and jumps to it.
- *
- * Build as flat binary:
- *   cc -nostdlib -fPIC -fno-stack-protector -Os \
- *      -DLOADER_PATH='"/nix/store/.../loader"' \
- *      -Wl,-T,stub.ld -Wl,--oformat=binary \
- *      -o stub.bin stub.c
  */
 
 #include <wrap-buddy/freestanding.h>

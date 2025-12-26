@@ -98,14 +98,7 @@ postFixup = ''
 
 ## Requirements
 
-The binary must have sufficient space at the entry point for the stub
-(~350 bytes). Most binaries have enough padding, but if not, you can add
-space during compilation:
-
-```c
-// Add padding in .text section for the stub
-__asm__(".section .text\n.space 4096, 0x90\n");
-```
+The binary must have sufficient space at the entry point for the stub (~350 bytes).
 
 ## Files created
 
