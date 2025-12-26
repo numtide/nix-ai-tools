@@ -12,14 +12,14 @@
 
 #pragma once
 
-#include <wrap-buddy/freestanding.h>
+#include <wrap-buddy/freestanding.h> // IWYU pragma: export
 
 #if defined(__x86_64__)
-#include <wrap-buddy/arch/x86_64.h>
+#include <wrap-buddy/arch/x86_64.h> // IWYU pragma: export
 #elif defined(__aarch64__)
-#include <wrap-buddy/arch/aarch64.h>
+#include <wrap-buddy/arch/aarch64.h> // IWYU pragma: export
 #elif defined(__i386__)
-#include <wrap-buddy/arch/i386.h>
+#include <wrap-buddy/arch/i386.h> // IWYU pragma: export
 #else
 #error "Unsupported architecture"
 #endif

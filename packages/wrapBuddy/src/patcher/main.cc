@@ -17,10 +17,15 @@
 
 #include <cstdio>
 #include <exception>
+#include <expected>
 #include <filesystem>
+#include <optional>
 #include <print>
+#include <set>
 #include <span>
+#include <string>
 #include <string_view>
+#include <system_error>
 #include <type_traits>
 #include <variant>
 #include <vector>
@@ -147,7 +152,15 @@ auto run_patcher(const Args &args, const InterpreterInfo &interp_info) -> int {
 } // namespace wrap_buddy
 
 auto main(int argc, char *argv[]) -> int {
-  using namespace wrap_buddy;
+  using wrap_buddy::Args;
+  using wrap_buddy::get_interpreter_info;
+  using wrap_buddy::get_stub;
+  using wrap_buddy::HelpRequested;
+  using wrap_buddy::InterpreterInfo;
+  using wrap_buddy::parse_args;
+  using wrap_buddy::run_patcher;
+  using wrap_buddy::usage;
+  namespace fs = std::filesystem;
 
   try {
     const std::span<char *> argv_span(argv, static_cast<size_t>(argc));

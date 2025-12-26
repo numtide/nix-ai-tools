@@ -129,8 +129,11 @@ install: $(ALL_BINS) wrap-buddy
 	install -m 644 $(ALL_BINS) $(DESTDIR)$(LIBDIR)/
 
 # Static analysis
+# Note: misc-include-cleaner disabled for C files because freestanding code
+# uses compiler builtins (__SIZE_TYPE__ etc.) that the checker doesn't recognize
 clang-tidy: $(STUB_HEADERS)
-	$(CLANG_TIDY) src/loader/loader.c src/stub/stub.c -- $(STUB_FLAGS)
+	$(CLANG_TIDY) --checks='-misc-include-cleaner' \
+		src/loader/loader.c src/stub/stub.c -- $(STUB_FLAGS)
 	$(CLANG_TIDY) src/patcher/main.cc -- $(WRAP_BUDDY_FLAGS)
 
 clean:

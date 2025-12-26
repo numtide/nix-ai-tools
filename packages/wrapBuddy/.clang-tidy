@@ -13,7 +13,6 @@ Checks: >
   -llvm-header-guard,
   -llvm-prefer-static-over-anonymous-namespace,
   -llvmlibc-*,
-  -misc-include-cleaner,
   -modernize-use-trailing-return-type,
   -performance-no-int-to-ptr,
   -portability-avoid-pragma-once

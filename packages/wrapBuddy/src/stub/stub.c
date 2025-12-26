@@ -11,9 +11,10 @@
  *      -o stub.bin stub.c
  */
 
+#include <wrap-buddy/freestanding.h>
+
 #include <wrap-buddy/arch.h>
 #include <wrap-buddy/debug.h>
-#include <wrap-buddy/freestanding.h>
 #include <wrap-buddy/mmap.h>
 
 #ifndef LOADER_PATH
