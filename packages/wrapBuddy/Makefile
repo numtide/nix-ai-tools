@@ -45,16 +45,17 @@ CFLAGS_32 = $(CFLAGS_BASE) -m32 $(LDFLAGS)
 
 # Header dependencies
 HEADERS = include/wrap-buddy/*.h include/wrap-buddy/arch/*.h src/preamble.ld
+PATCHER_HEADERS = src/patcher/*.h
 
 # Targets
 NATIVE_BINS = loader.bin stub.bin
 ifdef BUILD_32BIT
   ALL_BINS = $(NATIVE_BINS) loader32.bin stub32.bin
-  STUB_HEADERS = stub_64.h stub_32.h
+  STUB_HEADERS = src/patcher/stub_64.h src/patcher/stub_32.h
   STUB_32_DEF = -DHAVE_STUB_32
 else
   ALL_BINS = $(NATIVE_BINS)
-  STUB_HEADERS = stub_64.h
+  STUB_HEADERS = src/patcher/stub_64.h
   STUB_32_DEF =
 endif
 
@@ -96,10 +97,10 @@ stub32.bin: stub32.elf
 	$(OBJCOPY) -O binary --only-section=.all $< $@
 
 # Generate C headers from stub binaries for embedding
-stub_64.h: stub.bin
+src/patcher/stub_64.h: stub.bin
 	$(XXD) -i $< > $@
 
-stub_32.h: stub32.bin
+src/patcher/stub_32.h: stub32.bin
 	$(XXD) -i $< > $@
 
 # Built-in interpreter defaults (optional)
@@ -115,11 +116,11 @@ else
 endif
 
 # Combined flags for wrap-buddy
-WRAP_BUDDY_FLAGS = $(CXXFLAGS_FOR_BUILD) $(EXTRA_CXXFLAGS) $(STUB_32_DEF) $(INTERP_DEF) $(LIBC_DEF)
+WRAP_BUDDY_FLAGS = $(CXXFLAGS_FOR_BUILD) $(EXTRA_CXXFLAGS) $(STUB_32_DEF) $(INTERP_DEF) $(LIBC_DEF) -Isrc/patcher
 
 # C++ patcher with embedded stubs
-wrap-buddy: src/patcher/wrap-buddy.cc $(STUB_HEADERS) $(HEADERS)
-	$(CXX_FOR_BUILD) $(WRAP_BUDDY_FLAGS) -o $@ src/patcher/wrap-buddy.cc
+wrap-buddy: src/patcher/main.cc $(STUB_HEADERS) $(HEADERS) $(PATCHER_HEADERS)
+	$(CXX_FOR_BUILD) $(WRAP_BUDDY_FLAGS) -o $@ src/patcher/main.cc
 
 install: $(ALL_BINS) wrap-buddy
 	install -d $(DESTDIR)$(BINDIR)
@@ -130,10 +131,10 @@ install: $(ALL_BINS) wrap-buddy
 # Static analysis
 clang-tidy: $(STUB_HEADERS)
 	$(CLANG_TIDY) src/loader/loader.c src/stub/stub.c -- $(STUB_FLAGS)
-	$(CLANG_TIDY) src/patcher/wrap-buddy.cc -- $(WRAP_BUDDY_FLAGS)
+	$(CLANG_TIDY) src/patcher/main.cc -- $(WRAP_BUDDY_FLAGS)
 
 clean:
-	rm -f *.elf *.bin stub_64.h stub_32.h wrap-buddy
+	rm -f *.elf *.bin src/patcher/stub_64.h src/patcher/stub_32.h wrap-buddy
 
 check: wrap-buddy $(ALL_BINS)
 	bash tests/test.sh --interp $(INTERP) --libs $(LIBC_LIB)
