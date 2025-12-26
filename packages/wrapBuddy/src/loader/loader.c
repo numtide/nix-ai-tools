@@ -305,8 +305,8 @@ static void *load_interp(const char *path, void **out_base,
 /*
  * Find PT_DYNAMIC program header and return pointer to .dynamic section
  */
-static ElfW(Dyn) * find_dynamic_section(ElfW(Phdr) * phdr, uintptr_t phnum,
-                                        uintptr_t l_addr) {
+static ElfW(Dyn) *
+    find_dynamic_section(ElfW(Phdr) * phdr, uintptr_t phnum, uintptr_t l_addr) {
   for (uintptr_t idx = 0; idx < phnum; idx++) {
     if (phdr[idx].p_type == PT_DYNAMIC) {
       return (ElfW(Dyn) *)(l_addr + phdr[idx].p_vaddr);

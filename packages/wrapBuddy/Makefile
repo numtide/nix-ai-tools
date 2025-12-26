@@ -5,6 +5,7 @@ CXX_FOR_BUILD ?= c++
 OBJCOPY ?= objcopy
 XXD ?= xxd
 CLANG_TIDY ?= clang-tidy
+CLANG_FORMAT ?= clang-format
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
 LIBDIR ?= $(PREFIX)/lib/wrap-buddy
@@ -59,7 +60,7 @@ else
   STUB_32_DEF =
 endif
 
-.PHONY: all clean install bins patcher clang-tidy check
+.PHONY: all clean install bins patcher clang-tidy format check
 
 all: bins patcher
 
@@ -135,6 +136,10 @@ clang-tidy: $(STUB_HEADERS)
 	$(CLANG_TIDY) --checks='-misc-include-cleaner' \
 		src/loader/loader.c src/stub/stub.c -- $(STUB_FLAGS)
 	$(CLANG_TIDY) src/patcher/main.cc -- $(WRAP_BUDDY_FLAGS)
+
+# Format source files
+format:
+	find src -name '*.c' -o -name '*.cc' -o -name '*.h' | xargs $(CLANG_FORMAT) -i
 
 clean:
 	rm -f *.elf *.bin src/patcher/stub_64.h src/patcher/stub_32.h wrap-buddy
