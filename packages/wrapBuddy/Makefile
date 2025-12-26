@@ -123,26 +123,35 @@ WRAP_BUDDY_FLAGS = $(CXXFLAGS_FOR_BUILD) $(EXTRA_CXXFLAGS) $(STUB_32_DEF) $(INTE
 wrap-buddy: src/patcher/main.cc $(STUB_HEADERS) $(HEADERS) $(PATCHER_HEADERS)
 	$(CXX_FOR_BUILD) $(WRAP_BUDDY_FLAGS) -o $@ src/patcher/main.cc
 
-install: $(ALL_BINS) wrap-buddy
-	install -d $(DESTDIR)$(BINDIR)
-	install -m 755 wrap-buddy $(DESTDIR)$(BINDIR)/
-	install -d $(DESTDIR)$(LIBDIR)
-	install -m 644 $(ALL_BINS) $(DESTDIR)$(LIBDIR)/
+# Generate compilation database for clang-tidy/LSP
+JQ_ENTRY = jq -n --arg d "$(CURDIR)" --arg f
+JQ_ARGS = '{directory: $$d, file: $$f, arguments: $$ARGS.positional + [$$f]}' --args --
 
-# Static analysis
-# Note: misc-include-cleaner disabled for C files because freestanding code
-# uses compiler builtins (__SIZE_TYPE__ etc.) that the checker doesn't recognize
-clang-tidy: $(STUB_HEADERS)
-	$(CLANG_TIDY) --checks='-misc-include-cleaner' \
-		src/loader/loader.c src/stub/stub.c -- $(STUB_FLAGS)
-	$(CLANG_TIDY) src/patcher/main.cc -- $(WRAP_BUDDY_FLAGS)
+compile_commands.json:
+	{ $(JQ_ENTRY) src/patcher/main.cc $(JQ_ARGS) $(CXX_FOR_BUILD) $(CXXFLAGS_FOR_BUILD) $(EXTRA_CXXFLAGS) \
+	    $(STUB_32_DEF) $(if $(INTERP),'-DDEFAULT_INTERP="$(INTERP)"') \
+	    $(if $(LIBC_LIB),'-DDEFAULT_LIBC_LIB="$(LIBC_LIB)"') -Isrc/patcher; \
+	  $(JQ_ENTRY) src/loader/loader.c $(JQ_ARGS) $(CC) $(CFLAGS_BASE) $(ARCH_FLAGS) -Iinclude; \
+	  $(JQ_ENTRY) src/stub/stub.c $(JQ_ARGS) $(CC) $(CFLAGS_BASE) $(ARCH_FLAGS) \
+	    '-DLOADER_PATH="$(LIBDIR)/loader.bin"' -Iinclude; \
+	} | jq -s . > $@
+
+# Static analysis (configuration in .clang-tidy)
+clang-tidy: compile_commands.json $(STUB_HEADERS)
+	$(CLANG_TIDY) -p . src/loader/loader.c src/stub/stub.c src/patcher/main.cc
 
 # Format source files
 format:
 	find src -name '*.c' -o -name '*.cc' -o -name '*.h' | xargs $(CLANG_FORMAT) -i
 
 clean:
-	rm -f *.elf *.bin src/patcher/stub_64.h src/patcher/stub_32.h wrap-buddy
+	rm -f *.elf *.bin src/patcher/stub_64.h src/patcher/stub_32.h wrap-buddy compile_commands.json
 
 check: wrap-buddy $(ALL_BINS)
 	bash tests/test.sh --interp $(INTERP) --libs $(LIBC_LIB)
+
+install: $(ALL_BINS) wrap-buddy
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 755 wrap-buddy $(DESTDIR)$(BINDIR)/
+	install -d $(DESTDIR)$(LIBDIR)
+	install -m 644 $(ALL_BINS) $(DESTDIR)$(LIBDIR)/

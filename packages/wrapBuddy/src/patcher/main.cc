@@ -30,18 +30,24 @@
 #include <variant>
 #include <vector>
 
+// Built-in defaults (set via -D flags in Makefile)
+#ifdef DEFAULT_INTERP
+constexpr bool kHasDefaultInterp = true;
+#else
+#define DEFAULT_INTERP nullptr
+constexpr bool kHasDefaultInterp = false;
+#endif
+
+#ifdef DEFAULT_LIBC_LIB
+constexpr bool kHasDefaultLibcLib = true;
+#else
+#define DEFAULT_LIBC_LIB nullptr
+constexpr bool kHasDefaultLibcLib = false;
+#endif
+
 namespace wrap_buddy {
 
 namespace fs = std::filesystem;
-
-// Built-in defaults (set via -D flags in Makefile)
-#ifndef DEFAULT_INTERP
-#define DEFAULT_INTERP nullptr
-#endif
-
-#ifndef DEFAULT_LIBC_LIB
-#define DEFAULT_LIBC_LIB nullptr
-#endif
 
 namespace {
 
@@ -187,9 +193,9 @@ auto main(int argc, char *argv[]) -> int {
     std::expected<InterpreterInfo, std::string> interp_result;
     if (args.interpreter) {
       interp_result = get_interpreter_info(*args.interpreter);
-    } else if constexpr (DEFAULT_INTERP != nullptr) {
+    } else if constexpr (kHasDefaultInterp) {
       std::optional<fs::path> libc_lib;
-      if constexpr (DEFAULT_LIBC_LIB != nullptr) {
+      if constexpr (kHasDefaultLibcLib) {
         libc_lib = DEFAULT_LIBC_LIB;
       }
       interp_result = get_interpreter_info(DEFAULT_INTERP, libc_lib);

@@ -176,3 +176,17 @@ make install DESTDIR=/tmp/staging
 make LIBDIR=$out/lib/wrap-buddy BINDIR=$out/bin
 make install LIBDIR=$out/lib/wrap-buddy BINDIR=$out/bin
 ```
+
+### Development
+
+Generate a compilation database for IDE/LSP support:
+
+```bash
+make compile_commands.json
+```
+
+Run static analysis:
+
+```bash
+make clang-tidy
+```

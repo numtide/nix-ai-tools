@@ -18,7 +18,6 @@ let
     fileset = lib.fileset.unions [
       ./../include/wrap-buddy
       ./../Makefile
-      ./../scripts
       ./../src
       ./../.clang-tidy
       ./../tests
