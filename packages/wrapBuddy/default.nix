@@ -1,1 +1,1 @@
-{ pkgs }: pkgs.callPackage ./package.nix { }
+{ pkgs }: pkgs.callPackage ./nix/package.nix { }

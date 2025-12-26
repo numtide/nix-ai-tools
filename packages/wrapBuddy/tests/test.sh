@@ -45,7 +45,7 @@ ${CC:-cc} -o "$TMPDIR/test" "$SCRIPT_DIR/test_program.c" \
   -Wl,--dynamic-linker="$FHS_INTERP"
 
 echo "=== Patching with wrap-buddy ==="
-"$SCRIPT_DIR/wrap-buddy" --paths "$TMPDIR/test" --interpreter "$INTERP" --libs "$LIBS"
+"$SCRIPT_DIR/../wrap-buddy" --paths "$TMPDIR/test" --interpreter "$INTERP" --libs "$LIBS"
 
 echo "=== Config file contents ==="
 xxd "$TMPDIR/.test.wrapbuddy"

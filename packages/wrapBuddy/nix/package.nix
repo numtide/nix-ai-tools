@@ -14,17 +14,13 @@
 let
   # Source files for building everything
   sources = lib.fileset.toSource {
-    root = ./.;
+    root = ./..;
     fileset = lib.fileset.unions [
-      ./include/wrap-buddy
-      ./preamble.ld
-      ./Makefile
-      ./loader.c
-      ./stub.c
-      ./wrap-buddy.cc
-      ./.clang-tidy
-      ./test.sh
-      ./test_program.c
+      ./../include/wrap-buddy
+      ./../Makefile
+      ./../src
+      ./../.clang-tidy
+      ./../tests
     ];
   };
 

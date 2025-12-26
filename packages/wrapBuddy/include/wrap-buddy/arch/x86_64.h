@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <wrap-buddy/freestanding.h>
+#include <wrap-buddy/freestanding.h> // IWYU pragma: export
 
 /*
  * x86_64 syscall numbers

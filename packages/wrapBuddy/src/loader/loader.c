@@ -7,19 +7,15 @@
  * 3. Sets DT_RUNPATH in a new .dynamic section (no LD_LIBRARY_PATH!)
  * 4. Loads the dynamic linker (ld.so)
  * 5. Jumps to ld.so with original entry point
- *
- * Build as flat binary:
- *   cc -nostdlib -fPIC -fno-stack-protector -Os \
- *      -Wl,-T,loader.ld -Wl,--oformat=binary \
- *      -o loader.bin loader.c
  */
+
+#include <wrap-buddy/freestanding.h>
 
 #include <wrap-buddy/arch.h>
 #include <wrap-buddy/config.h>
 #include <wrap-buddy/debug.h>
 #include <wrap-buddy/elf_defs.h>
 #include <wrap-buddy/elf_types.h>
-#include <wrap-buddy/freestanding.h>
 #include <wrap-buddy/mmap.h>
 
 enum { MAX_PATH = 512 };
@@ -309,8 +305,8 @@ static void *load_interp(const char *path, void **out_base,
 /*
  * Find PT_DYNAMIC program header and return pointer to .dynamic section
  */
-static ElfW(Dyn) * find_dynamic_section(ElfW(Phdr) * phdr, uintptr_t phnum,
-                                        uintptr_t l_addr) {
+static ElfW(Dyn) *
+    find_dynamic_section(ElfW(Phdr) * phdr, uintptr_t phnum, uintptr_t l_addr) {
   for (uintptr_t idx = 0; idx < phnum; idx++) {
     if (phdr[idx].p_type == PT_DYNAMIC) {
       return (ElfW(Dyn) *)(l_addr + phdr[idx].p_vaddr);

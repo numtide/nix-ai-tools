@@ -12,3 +12,4 @@ result-*
 .DS_Store
 Thumbs.db
 __pycache__
+packages/wrapBuddy/compile_commands.json

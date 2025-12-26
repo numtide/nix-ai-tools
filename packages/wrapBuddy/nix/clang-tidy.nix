@@ -4,6 +4,7 @@
   llvmPackages_latest,
   binutils,
   xxd,
+  jq,
   sourceFiles,
 }:
 
@@ -17,6 +18,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     llvmPackages_latest.clang-tools
     binutils
+    jq
     xxd
   ];
 

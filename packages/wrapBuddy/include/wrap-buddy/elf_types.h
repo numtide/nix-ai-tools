@@ -2,7 +2,8 @@
  * elf_types.h - ELF structures for freestanding code
  *
  * Provides both 32-bit and 64-bit ELF structures with ElfW() macros.
- * Only used by the loader and stub, not by the C++ patcher (which uses <elf.h>).
+ * Only used by the loader and stub, not by the C++ patcher (which uses
+ * <elf.h>).
  */
 
 #pragma once
