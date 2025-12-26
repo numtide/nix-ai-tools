@@ -29,8 +29,9 @@ typedef __INTPTR_TYPE__ ssize_t;
 #define NULL ((void *)0)
 
 /* Check if syscall result is an error (kernel returns -1 to -4095 for errors)
- * This works correctly on both 32-bit and 64-bit systems, unlike simple < 0 checks
- * which fail on 32-bit when mmap returns high addresses like 0xf7ff1000 */
+ * This works correctly on both 32-bit and 64-bit systems, unlike simple < 0
+ * checks which fail on 32-bit when mmap returns high addresses like 0xf7ff1000
+ */
 #define MAX_ERRNO 4095
 #define IS_SYSCALL_ERR(x) ((uintptr_t)(x) >= (uintptr_t)(-MAX_ERRNO))
 

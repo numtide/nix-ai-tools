@@ -32,8 +32,13 @@
  *   [rpath]         - null-terminated colon-separated library paths
  *   [orig_bytes]    - original bytes from entry point (to restore)
  *
- * 64-bit header: orig_entry(8) + stub_size(8) + interp_len(2) + rpath_len(2) = 20 bytes
- * 32-bit header: orig_entry(4) + stub_size(4) + interp_len(2) + rpath_len(2) = 12 bytes
+ * 64-bit header:
+ * orig_entry(8) + stub_size(8) + interp_len(2) + rpath_len(2)
+ * = 20 bytes
+ *
+ * 32-bit header:
+ * orig_entry(4) + stub_size(4) + interp_len(2) + rpath_len(2)
+ * = 12 bytes
  */
 
 #ifdef __GNUC__
