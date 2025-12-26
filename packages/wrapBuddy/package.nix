@@ -7,6 +7,8 @@
   writeText,
   binutils,
   xxd,
+  strace,
+  pkgsi686Linux,
 }:
 
 let
@@ -21,6 +23,8 @@ let
       ./stub.c
       ./wrap-buddy.cc
       ./.clang-tidy
+      ./test.sh
+      ./test_program.c
     ];
   };
 
@@ -28,7 +32,9 @@ let
   dynamicLinker = lib.strings.trim (
     builtins.readFile "${stdenv.cc.bintools}/nix-support/dynamic-linker"
   );
+
   origLibc = "${stdenv.cc.bintools}/nix-support/orig-libc";
+
   libcLib =
     if builtins.pathExists origLibc then
       "${lib.strings.trim (builtins.readFile origLibc)}/lib"
@@ -66,7 +72,13 @@ let
       "LIBDIR=$(out)/lib/wrap-buddy"
       "INTERP=${dynamicLinker}"
     ]
-    ++ lib.optional (libcLib != null) "LIBC_LIB=${libcLib}";
+    ++ lib.optional (libcLib != null) "LIBC_LIB=${libcLib}"
+    ++ lib.optional stdenv.hostPlatform.isx86_64 "BUILD_32BIT=1";
+
+    nativeInstallCheckInputs = [ strace ];
+    doInstallCheck = true;
+    installCheckTarget = "check";
+    enableParallelBuilding = true;
 
     meta = {
       description = "Patch ELF binaries with stub loader for NixOS compatibility";
@@ -93,7 +105,10 @@ let
     passthru.tests = {
       clang-tidy = callPackage ./clang-tidy.nix { sourceFiles = sources; };
       clang-format = callPackage ./clang-format.nix { sourceFiles = sources; };
-      default = callPackage ./test.nix { inherit hook; };
+    }
+    // lib.optionalAttrs stdenv.hostPlatform.isx86_64 {
+      # Test 32-bit patching by building wrapBuddy with i686 stdenv
+      test-32bit = pkgsi686Linux.callPackage ./package.nix { };
     };
   } hookScript;
 in

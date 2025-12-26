@@ -80,7 +80,7 @@ static void *map_config(const char *path, size_t *out_size) {
       (void *)sys_mmap(0, statbuf.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
   sys_close(file_fd);
 
-  if ((intptr_t)mapped < 0) {
+  if (IS_SYSCALL_ERR((intptr_t)mapped)) {
     return NULL;
   }
 
@@ -206,7 +206,7 @@ static void load_segment(const ElfW(Phdr) * phdr, intptr_t file_fd,
     void *mapped =
         (void *)sys_mmap(map_addr, map_size, prot_from_pflags(phdr->p_flags),
                          MAP_PRIVATE | MAP_FIXED, file_fd, map_offset);
-    if ((intptr_t)mapped < 0) {
+    if (IS_SYSCALL_ERR((intptr_t)mapped)) {
       die("cannot map segment");
     }
   }
@@ -233,7 +233,7 @@ static void load_segment(const ElfW(Phdr) * phdr, intptr_t file_fd,
       void *anon = (void *)sys_mmap(
           file_map_end, anon_size, prot_from_pflags(phdr->p_flags),
           MAP_PRIVATE | MAP_FIXED | MAP_ANONYMOUS, -1, 0);
-      if ((intptr_t)anon < 0) {
+      if (IS_SYSCALL_ERR((intptr_t)anon)) {
         die("cannot map BSS");
       }
     }
@@ -263,7 +263,7 @@ static void *load_interp(const char *path, void **out_base,
   /* Map entire file to read headers */
   void *file =
       (void *)sys_mmap(0, statbuf.st_size, PROT_READ, MAP_PRIVATE, file_fd, 0);
-  if ((intptr_t)file < 0) {
+  if (IS_SYSCALL_ERR((intptr_t)file)) {
     die("cannot mmap interpreter");
   }
 
@@ -284,7 +284,7 @@ static void *load_interp(const char *path, void **out_base,
   /* Reserve contiguous address space */
   void *base = (void *)sys_mmap(0, total_size, PROT_NONE,
                                 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if ((intptr_t)base < 0) {
+  if (IS_SYSCALL_ERR((intptr_t)base)) {
     die("cannot reserve address space");
   }
 
@@ -384,7 +384,7 @@ static ElfW(Dyn) * setup_rpath(ElfW(Dyn) * orig_dyn, const char *rpath,
 
   ElfW(Dyn) *new_dyn = (ElfW(Dyn) *)sys_mmap(
       0, dyn_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if ((intptr_t)new_dyn < 0) {
+  if (IS_SYSCALL_ERR((intptr_t)new_dyn)) {
     die("dynamic mmap failed");
   }
 
@@ -552,7 +552,7 @@ __attribute__((noreturn)) void loader_main(intptr_t *stack_ptr) {
   size_t alloc_size = ((orig_phnum + 1) * sizeof(ElfW(Phdr))) + interp_len;
   char *alloc = (char *)sys_mmap(0, alloc_size, PROT_READ | PROT_WRITE,
                                  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if ((intptr_t)alloc < 0) {
+  if (IS_SYSCALL_ERR((intptr_t)alloc)) {
     die("phdr mmap failed");
   }
 
