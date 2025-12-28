@@ -6,13 +6,13 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "agent-client-protocol";
-  version = "0.7.0";
+  version = "0.7.1";
   pyproject = true;
 
   src = fetchPypi {
     pname = "agent_client_protocol";
     inherit version;
-    hash = "sha256-xmgRu4BIaMTncosYtnN5vLAzWvujscL/D839DEjZMCk=";
+    hash = "sha256-jXAxIJ4Uw/L5h+O5Xn2cMoYVjnsq8b9D1qrluKQpJJ8=";
   };
 
   build-system = with python3.pkgs; [ pdm-backend ];
