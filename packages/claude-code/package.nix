@@ -45,13 +45,15 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  # Disable auto-updates and telemetry by wrapping the binary
+  # Disable auto-updates, telemetry, and installation method warnings
+  # See: https://github.com/anthropics/claude-code/issues/15592
   postFixup = ''
     wrapProgram $out/bin/claude \
       --set DISABLE_AUTOUPDATER 1 \
       --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
       --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
-      --set DISABLE_TELEMETRY 1
+      --set DISABLE_TELEMETRY 1 \
+      --set DISABLE_INSTALLATION_CHECKS 1
   '';
 
   doInstallCheck = true;
