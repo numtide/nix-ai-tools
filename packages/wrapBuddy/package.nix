@@ -1,27 +1,22 @@
 {
   lib,
   stdenv,
+  fetchFromGitHub,
   buildPackages,
-  callPackage,
   makeSetupHook,
-  writeText,
   binutils,
   xxd,
   strace,
-  pkgsi686Linux,
 }:
 
 let
-  # Source files for building everything
-  sources = lib.fileset.toSource {
-    root = ./..;
-    fileset = lib.fileset.unions [
-      ./../include/wrap-buddy
-      ./../Makefile
-      ./../src
-      ./../.clang-tidy
-      ./../tests
-    ];
+  version = "1.0.0";
+
+  src = fetchFromGitHub {
+    owner = "Mic92";
+    repo = "wrap-buddy";
+    rev = "v${version}";
+    hash = "sha256-kZfaqMDKV0zyw8OP2HWJgGEHnbIXPUz2yI6Yl9MlilU=";
   };
 
   # Read interpreter info from bintools at build time
@@ -48,9 +43,7 @@ let
   # - wrap-buddy C++ patcher with embedded stubs
   wrapBuddy = stdenv.mkDerivation {
     pname = "wrap-buddy";
-    version = "0.4.0";
-
-    src = sources;
+    inherit version src;
 
     # depsBuildBuild: tools that run on BUILD and compile for BUILD
     depsBuildBuild = [
@@ -78,6 +71,7 @@ let
 
     meta = {
       description = "Patch ELF binaries with stub loader for NixOS compatibility";
+      homepage = "https://github.com/Mic92/wrap-buddy";
       mainProgram = "wrap-buddy";
       license = lib.licenses.mit;
       platforms = [
@@ -88,8 +82,6 @@ let
     };
   };
 
-  hookScript = writeText "wrap-buddy-hook.sh" (builtins.readFile ./wrap-buddy-hook.sh);
-
   hook = makeSetupHook {
     name = "wrap-buddy-hook";
     propagatedBuildInputs = [ wrapBuddy ];
@@ -98,14 +90,6 @@ let
       license = lib.licenses.mit;
       platforms = lib.platforms.linux;
     };
-    passthru.tests = {
-      clang-tidy = callPackage ./clang-tidy.nix { sourceFiles = sources; };
-      clang-format = callPackage ./clang-format.nix { sourceFiles = sources; };
-    }
-    // lib.optionalAttrs stdenv.hostPlatform.isx86_64 {
-      # Test 32-bit patching by building wrapBuddy with i686 stdenv
-      test-32bit = pkgsi686Linux.callPackage ./package.nix { };
-    };
-  } hookScript;
+  } "${src}/nix/wrap-buddy-hook.sh";
 in
 hook
