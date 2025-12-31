@@ -26,12 +26,10 @@ stdenv.mkDerivation rec {
 
     cp -r scripts skills vendor $out/lib/letta-code/
 
-    mkdir -p $out/bin
-    cp letta.js $out/bin/letta
-    chmod +x $out/bin/letta
+    install -m755 -D letta.js $out/bin/letta
 
-    substituteInPlace $out/bin/letta \
-      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
+    # Replace the shebang that tries to use bun or node with a direct node shebang
+    sed -i '1,2c #!${nodejs}/bin/node' $out/bin/letta
 
     runHook postInstall
   '';
