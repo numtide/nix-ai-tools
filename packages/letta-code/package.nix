@@ -8,11 +8,11 @@
 
 stdenv.mkDerivation rec {
   pname = "letta-code";
-  version = "0.10.3";
+  version = "0.10.4";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
-    hash = "sha256-3O0ZvE0JgE3Qu+DoEFI2q41EFcGT76/Kbr4rO2yOo5k=";
+    hash = "sha256-Nt021AbUSnJPcsMUxYBWIcJrvtvO8UaraEdqOe76u88=";
   };
 
   nativeBuildInputs = [ nodejs ];
@@ -26,12 +26,10 @@ stdenv.mkDerivation rec {
 
     cp -r scripts skills vendor $out/lib/letta-code/
 
-    mkdir -p $out/bin
-    cp letta.js $out/bin/letta
-    chmod +x $out/bin/letta
+    install -m755 -D letta.js $out/bin/letta
 
-    substituteInPlace $out/bin/letta \
-      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
+    # Replace the shebang that tries to use bun or node with a direct node shebang
+    sed -i '1,2c #!${nodejs}/bin/node' $out/bin/letta
 
     runHook postInstall
   '';
