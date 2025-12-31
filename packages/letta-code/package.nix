@@ -4,6 +4,7 @@
   fetchzip,
   nodejs,
   versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 stdenv.mkDerivation rec {
@@ -35,7 +36,10 @@ stdenv.mkDerivation rec {
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
   versionCheckProgramArg = [ "--version" ];
 
   meta = with lib; {
