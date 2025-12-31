@@ -1,0 +1,79 @@
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  pkg-config,
+  openssl,
+  sqlite,
+  installShellFiles,
+  versionCheckHook,
+  onnxruntime,
+}:
+
+rustPlatform.buildRustPackage rec {
+  pname = "coding-agent-search";
+  version = "0.1.48";
+
+  src = fetchFromGitHub {
+    owner = "Dicklesworthstone";
+    repo = "coding_agent_session_search";
+    rev = "v${version}";
+    hash = "sha256-qL6eZfv4jHzgq4rf77m2N63Nc/qkFHRhMXUNzwrh0zI=";
+  };
+
+  cargoHash = "sha256-v5NNHrQvXG9lfXBK3K2xAtFqjX2RfQ81iP1jPQz19bs=";
+
+  nativeBuildInputs = [
+    pkg-config
+    installShellFiles
+  ];
+
+  buildInputs = [
+    openssl
+    sqlite
+    onnxruntime
+  ];
+
+  # Point ort-sys to nixpkgs onnxruntime
+  preBuild = ''
+    export ORT_SKIP_DOWNLOAD=1
+    export ORT_LIB_LOCATION=${onnxruntime}/lib
+  '';
+
+  # The main binary is cass
+  cargoBuildFlags = [
+    "--bin"
+    "cass"
+  ];
+
+  # Tests require a writable HOME directory
+  doCheck = false;
+
+  postInstall = ''
+    # Generate shell completions
+    $out/bin/cass completions bash > cass.bash && installShellCompletion --bash cass.bash
+    $out/bin/cass completions fish > cass.fish && installShellCompletion --fish cass.fish
+    $out/bin/cass completions zsh > cass.zsh && installShellCompletion --zsh cass.zsh
+  '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
+
+  meta = with lib; {
+    description = "Unified, high-performance TUI to index and search your local coding agent history";
+    longDescription = ''
+      coding-agent-search (cass) aggregates sessions from Codex, Claude Code,
+      Gemini CLI, Cline, OpenCode, Amp, Cursor, ChatGPT, Aider, and Pi-Agent
+      into a single, searchable timeline with instant full-text search.
+
+      This build includes ONNX Runtime for optional semantic search functionality.
+    '';
+    homepage = "https://github.com/Dicklesworthstone/coding_agent_session_search";
+    changelog = "https://github.com/Dicklesworthstone/coding_agent_session_search/blob/main/CHANGELOG.md";
+    downloadPage = "https://github.com/Dicklesworthstone/coding_agent_session_search/releases";
+    license = licenses.mit;
+    platforms = platforms.unix;
+    sourceProvenance = with sourceTypes; [ fromSource ];
+    mainProgram = "cass";
+  };
+}
