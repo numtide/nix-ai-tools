@@ -8,6 +8,7 @@
   installShellFiles,
   versionCheckHook,
   onnxruntime,
+  stdenv,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -49,11 +50,15 @@ rustPlatform.buildRustPackage rec {
   # Tests require a writable HOME directory
   doCheck = false;
 
-  postInstall = ''
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     # Generate shell completions
     $out/bin/cass completions bash > cass.bash && installShellCompletion --bash cass.bash
     $out/bin/cass completions fish > cass.fish && installShellCompletion --fish cass.fish
     $out/bin/cass completions zsh > cass.zsh && installShellCompletion --zsh cass.zsh
+
+    # Generate man page
+    $out/bin/cass man > cass.1
+    installManPage cass.1
   '';
 
   doInstallCheck = true;
