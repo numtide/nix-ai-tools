@@ -32,7 +32,7 @@ buildNpmPackage {
     src = srcWithLock;
     name = "openspec-${version}-npm-deps";
     hash = versionData.npmDepsHash;
-    cacheVersion = 2;
+    fetcherVersion = 2;
   };
   makeCacheWritable = true;
 
