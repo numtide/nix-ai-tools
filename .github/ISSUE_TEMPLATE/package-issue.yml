@@ -1,0 +1,49 @@
+name: Package Issue
+description: Report a bug, build failure, or other issue with an existing package
+title: ""
+labels: ["bug"]
+body:
+  - type: input
+    id: package
+    attributes:
+      label: Package
+      placeholder: e.g., claude-code
+    validations:
+      required: true
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue type
+      options:
+        - Build failure
+        - Runtime error
+        - Outdated version
+        - Missing dependency
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - x86_64-linux
+        - aarch64-linux
+        - x86_64-darwin
+        - aarch64-darwin
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: What's the issue?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output / logs
+      render: text
+    validations:
+      required: false

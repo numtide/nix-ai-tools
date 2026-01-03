@@ -1,0 +1,63 @@
+name: Package Request
+description: Request a new LLM tool to be packaged
+title: "package request: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **We only add packages that we personally use.** For other tools, we welcome contributions
+        where you package and maintain it yourself.
+
+        See existing packages in `packages/` for examples, and `AGENTS.md` for guidelines.
+        Add yourself to `lib/default.nix` if you're not in nixpkgs maintainers.
+  - type: input
+    id: tool-name
+    attributes:
+      label: Tool name
+      placeholder: e.g., my-llm-tool
+    validations:
+      required: true
+  - type: input
+    id: tool-url
+    attributes:
+      label: Project URL
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Will you package and maintain this?
+      options:
+        - "Yes, I'll submit a PR and maintain it"
+        - "Yes, but I need help with Nix"
+        - "No"
+    validations:
+      required: true
+  - type: dropdown
+    id: tested
+    attributes:
+      label: Have you tested this tool?
+      options:
+        - "Yes, I use it regularly"
+        - "Yes, I tried it"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: why-valuable
+    attributes:
+      label: Why is this tool worth packaging?
+      placeholder: |
+        I use this for...
+        It's better than X because...
+    validations:
+      required: true
+  - type: input
+    id: install-method
+    attributes:
+      label: Current installation method
+      placeholder: "npm install -g foo / cargo install foo / go install ..."
+    validations:
+      required: true
