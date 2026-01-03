@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   python3,
   fetchFromGitHub,
   fetchPypi,
@@ -55,6 +56,22 @@ let
     packageOverrides = _final: _prev: {
       # Inject local packages into the Python package set
       inherit mistralai agent-client-protocol textual-speedups;
+      mcp = _prev.mcp.overrideAttrs (old: rec {
+        version = "1.25.0";
+        name = "${old.pname}-${version}";
+        src = fetchFromGitHub {
+          owner = "modelcontextprotocol";
+          repo = "python-sdk";
+          tag = "v${version}";
+          hash = "sha256-fSQCvKaNMeCzguM2tcTJJlAeZQmzSJmbfEK35D8pQcs=";
+        };
+        postPatch = lib.optionalString stdenv.buildPlatform.isDarwin ''
+          # time.sleep(0.1) feels a bit optimistic and it has been flaky whilst
+          # testing this on macOS under load.
+          substituteInPlace tests/client/test_stdio.py \
+            --replace-fail "time.sleep(0.1)" "time.sleep(1)"
+        '';
+      });
     };
   };
 in
