@@ -1,6 +1,5 @@
 name: Package Issue
 description: Report a bug, build failure, or other issue with an existing package
-title: ""
 labels: ["bug"]
 body:
   - type: input
