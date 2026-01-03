@@ -293,7 +293,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>jules</strong> - Jules, the asynchronous coding agent from Google, in the terminal</summary>
 
-- **Source**: bytecode
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://jules.google
 - **Usage**: `nix run github:numtide/llm-agents.nix#jules -- --help`
