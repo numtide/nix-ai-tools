@@ -2,9 +2,12 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
 }:
 
 buildNpmPackage rec {
+  inherit npmConfigHook;
   pname = "claude-code-acp";
   version = "0.12.6";
 
@@ -15,7 +18,13 @@ buildNpmPackage rec {
     hash = "sha256-RJ3nl86fGEEh4RgZoLiyz9XOC4wlP7WxuJzavZLsjMI=";
   };
 
-  npmDepsHash = "sha256-3JLqokF1nk41S198NzYDT6xH8QiRm1yPBotyBnXu3E0=";
+  npmDeps = fetchNpmDepsWithPackuments {
+    inherit src;
+    name = "${pname}-${version}-npm-deps";
+    hash = "sha256-hhPp/1bk9iYHw1EnmMkCyuOaIvina0XRG76WBafLtDw=";
+    cacheVersion = 2;
+  };
+  makeCacheWritable = true;
 
   # Disable install scripts to avoid platform-specific dependency fetching issues
   npmFlags = [ "--ignore-scripts" ];

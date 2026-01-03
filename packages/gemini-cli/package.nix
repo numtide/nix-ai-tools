@@ -11,9 +11,12 @@
   makeBinaryWrapper,
   versionCheckHook,
   xsel,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
 }:
 
 buildNpmPackage (finalAttrs: {
+  inherit npmConfigHook;
   pname = "gemini-cli";
   version = "0.22.5";
 
@@ -24,7 +27,13 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-3d9Lq3IulIgp4QGNtSvkwz10kfygX6vsmVdlU3lE6Gw=";
   };
 
-  npmDepsHash = "sha256-6NqpkUgez7CqQAMDQW3Zdi86sF5qXseKXMw1Vw/5zWU=";
+  npmDeps = fetchNpmDepsWithPackuments {
+    inherit (finalAttrs) src;
+    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
+    hash = "sha256-TFQJ0mLlYQAlDSOuabli9B1nwTyUaIY/jHxT5QFYd4w=";
+    cacheVersion = 2;
+  };
+  makeCacheWritable = true;
 
   nativeBuildInputs = [
     pkg-config

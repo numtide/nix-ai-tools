@@ -1,12 +1,14 @@
 {
   lib,
-  buildNpmPackage,
+  stdenv,
   fetchurl,
-  nodejs,
+  makeWrapper,
+  wrapBuddy,
+  nodejs_24,
   versionCheckHook,
 }:
 
-buildNpmPackage (finalAttrs: {
+stdenv.mkDerivation (finalAttrs: {
   pname = "copilot-cli";
   version = "0.0.374";
 
@@ -15,23 +17,9 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-6z19v3fj1BlpFXvqv+jarvWJjBMSPpazsqLutk+WHyI=";
   };
 
-  # Dependencies are bundled in the tarball
-  npmDepsHash = "sha256-JhXoiLrG/CDNlgwSnhUG1wgLjnVmBKgz0twMx5wVbEE=";
-  forceEmptyCache = true;
+  nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
-  dontNpmBuild = true;
-
-  postPatch = ''
-    # Create minimal package-lock.json for buildNpmPackage
-    cat > package-lock.json << 'EOF'
-    {
-      "name": "@github/copilot",
-      "lockfileVersion": 3,
-      "requires": true,
-      "packages": {}
-    }
-    EOF
-  '';
+  dontBuild = true;
 
   installPhase = ''
     runHook preInstall
@@ -40,7 +28,7 @@ buildNpmPackage (finalAttrs: {
     cp -r . $out/lib/${finalAttrs.pname}
 
     mkdir -p $out/bin
-    makeWrapper ${nodejs}/bin/node $out/bin/copilot \
+    makeWrapper ${nodejs_24}/bin/node $out/bin/copilot \
       --add-flags "$out/lib/${finalAttrs.pname}/index.js"
 
     runHook postInstall
