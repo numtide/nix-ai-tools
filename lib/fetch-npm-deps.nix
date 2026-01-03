@@ -2,6 +2,9 @@
 # This builds a vendored prefetch-npm-deps with packument fetching support,
 # which is needed for npm workspace support.
 # TODO: Remove this once the upstream PR is merged into nixpkgs.
+#
+# Pin to nodejs_24 to ensure consistent npmDepsHash across nixpkgs versions.
+# See: https://github.com/numtide/llm-agents.nix/issues/1644
 {
   lib,
   stdenv,
@@ -15,12 +18,14 @@
   gzip,
   cacert,
   config,
-  nodejs,
+  nodejs_24,
   srcOnly,
   diffutils,
   jq,
 }:
 let
+  nodejs = nodejs_24;
+
   # Build prefetch-npm-deps from vendored source with packument support
   prefetch-npm-deps = rustPlatform.buildRustPackage {
     pname = "prefetch-npm-deps";

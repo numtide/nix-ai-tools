@@ -3,9 +3,12 @@
   buildNpmPackage,
   fetchFromGitHub,
   flake,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
 }:
 
 buildNpmPackage (finalAttrs: {
+  inherit npmConfigHook;
   pname = "openskills";
   version = "1.3.0";
 
@@ -16,7 +19,13 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-JLPxG8PbCSRLm6DFxSSbE94pf+Ur1ME5uF5f1z2Jhjw=";
   };
 
-  npmDepsHash = "sha256-unmxbQHOHsKF0mGCPP1eSe2H1cm7nMsTwObkF9MN2yQ=";
+  npmDeps = fetchNpmDepsWithPackuments {
+    inherit (finalAttrs) src;
+    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
+    hash = "sha256-JA9YH3Qro36ooKJz6H1N3DLQJdbmjFquY2zPKbdc2h8=";
+    cacheVersion = 2;
+  };
+  makeCacheWritable = true;
 
   meta = {
     description = "Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent";

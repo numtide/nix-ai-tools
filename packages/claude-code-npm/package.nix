@@ -4,26 +4,42 @@
   fetchzip,
   makeWrapper,
   versionCheckHook,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
+  nodejs,
+  runCommand,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash npmDepsHash;
+
+  # Create a source with the vendored package-lock.json included
+  src = runCommand "claude-code-npm-src-with-lock" { } ''
+    mkdir -p $out
+    cp -r ${
+      fetchzip {
+        url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
+        inherit hash;
+      }
+    }/* $out/
+    cp ${./package-lock.json} $out/package-lock.json
+  '';
 in
 buildNpmPackage {
+  inherit npmConfigHook nodejs;
   pname = "claude-code-npm";
-  inherit version npmDepsHash;
+  inherit version src;
 
-  src = fetchzip {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${version}.tgz";
-    inherit hash;
+  npmDeps = fetchNpmDepsWithPackuments {
+    inherit src;
+    name = "claude-code-npm-${version}-npm-deps";
+    hash = npmDepsHash;
+    cacheVersion = 2;
   };
+  makeCacheWritable = true;
 
   nativeBuildInputs = [ makeWrapper ];
-
-  postPatch = ''
-    cp ${./package-lock.json} package-lock.json
-  '';
 
   dontNpmBuild = true;
 

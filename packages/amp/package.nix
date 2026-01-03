@@ -2,7 +2,8 @@
   lib,
   buildNpmPackage,
   fetchurl,
-  fetchNpmDeps,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
   ripgrep,
   runCommand,
   versionCheckHook,
@@ -25,15 +26,19 @@ let
   '';
 in
 buildNpmPackage rec {
+  inherit npmConfigHook;
   pname = "amp";
   inherit version;
 
   src = srcWithLock;
 
-  npmDeps = fetchNpmDeps {
+  npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
+    name = "${pname}-${version}-npm-deps";
     hash = versionData.npmDepsHash;
+    cacheVersion = 2;
   };
+  makeCacheWritable = true;
 
   # The package from npm is already built
   dontNpmBuild = true;
