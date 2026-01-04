@@ -35,7 +35,7 @@ buildNpmPackage {
     inherit src;
     name = "claude-code-npm-${version}-npm-deps";
     hash = npmDepsHash;
-    cacheVersion = 2;
+    fetcherVersion = 2;
   };
   makeCacheWritable = true;
 

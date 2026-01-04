@@ -21,8 +21,8 @@ buildNpmPackage rec {
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-hhPp/1bk9iYHw1EnmMkCyuOaIvina0XRG76WBafLtDw=";
-    cacheVersion = 2;
+    hash = "sha256-S8gNJNWvHhpJYESwq0tjXdDkroG9P4VssJp0LKpPUfA=";
+    fetcherVersion = 2;
   };
   makeCacheWritable = true;
 

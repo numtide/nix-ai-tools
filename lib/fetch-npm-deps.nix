@@ -1,4 +1,4 @@
-# Custom fetchNpmDeps with packument caching support (cacheVersion = 2)
+# Custom fetchNpmDeps with packument caching support (fetcherVersion = 2)
 # This builds a vendored prefetch-npm-deps with packument fetching support,
 # which is needed for npm workspace support.
 # TODO: Remove this once the upstream PR is merged into nixpkgs.
@@ -81,8 +81,8 @@ let
       forceEmptyCache ? false,
       nativeBuildInputs ? [ ],
       npmRegistryOverridesString ? config.npmRegistryOverridesString or "{}",
-      # Cache format version. Set to 2 to enable packument caching for workspace support.
-      cacheVersion ? 1,
+      # Fetcher format version. Set to 2 to enable packument caching for workspace support.
+      fetcherVersion ? 1,
       ...
     }@args:
     let
@@ -136,9 +136,9 @@ let
 
         NIX_NPM_REGISTRY_OVERRIDES = npmRegistryOverridesString;
 
-        # Cache version controls which features are enabled in prefetch-npm-deps
+        # Fetcher version controls which features are enabled in prefetch-npm-deps
         # Version 2+ enables packument fetching for workspace support
-        NPM_CACHE_VERSION = toString cacheVersion;
+        NPM_FETCHER_VERSION = toString fetcherVersion;
 
         SSL_CERT_FILE =
           if
