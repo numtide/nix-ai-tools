@@ -103,6 +103,7 @@ pub fn lockfile(
 #[derive(Debug)]
 pub struct Package {
     pub name: String,
+    pub version: Option<String>,
     pub url: Url,
     specifics: Specifics,
 }
@@ -122,6 +123,8 @@ impl Package {
             UrlOrString::Url(u) => u,
             UrlOrString::String(_) => panic!("at this point, all packages should have URLs"),
         };
+
+        let version = pkg.version.map(|v| v.to_string());
 
         let specifics = match get_hosted_git_url(&resolved)? {
             Some(hosted) => {
@@ -166,6 +169,7 @@ impl Package {
 
         Ok(Package {
             name: pkg.name.unwrap(),
+            version,
             url: resolved,
             specifics,
         })
