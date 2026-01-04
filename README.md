@@ -371,6 +371,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>pi</strong> - A terminal-based coding agent with multi-model support, mid-session model switching, and a simple CLI for headless coding tasks.</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://github.com/badlogic/pi-mono
+- **Usage**: `nix run github:numtide/llm-agents.nix#pi -- --help`
+- **Nix**: [packages/pi/package.nix](packages/pi/package.nix)
+
+</details>
+<details>
 <summary><strong>qwen-code</strong> - Command-line AI workflow tool for Qwen3-Coder models</summary>
 
 - **Source**: source
