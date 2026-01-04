@@ -20,7 +20,7 @@ buildNpmPackage (finalAttrs: {
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-g3UDuBJfealNQdnsfu8SuMT2DPBwiFQPLcRJJTwQjjM=";
+    hash = "sha256-S4cVPG5fpHMvvml85Odd82LpcaurWPl4cmraTZRlEQQ=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
