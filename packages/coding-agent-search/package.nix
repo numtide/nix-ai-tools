@@ -13,16 +13,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "coding-agent-search";
-  version = "0.1.49";
+  version = "0.1.50";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "coding_agent_session_search";
     rev = "v${version}";
-    hash = "sha256-ZQ9lTL5qOz++nVtrEY6kFw730hcC6anTBPy8EnOCCco=";
+    hash = "sha256-DngmbzOz240viKq1Z25bwFi8b97bCC7TBVpVJ/jpgXc=";
   };
 
-  cargoHash = "sha256-R9WOo7nMZPnZWr8S6gR6+Xk+xIvVY5Fl9Yqa/wuy0is=";
+  cargoHash = "sha256-3+InfCsnEe7q7JStzd8ip2B7Da2RCj3fDaqxvX0T2vo=";
 
   nativeBuildInputs = [
     pkg-config
