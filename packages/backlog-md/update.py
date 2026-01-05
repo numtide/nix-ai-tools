@@ -6,62 +6,43 @@
 import sys
 from pathlib import Path
 
-# Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    calculate_dependency_hash,
-    calculate_url_hash,
+    calculate_platform_hashes,
     fetch_github_latest_release,
-    nix_eval,
+    load_hashes,
     save_hashes,
+    should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH
-from updater.nix import NixCommandError
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
+
+PLATFORMS = {
+    "x86_64-linux": "linux-x64-baseline",
+    "aarch64-linux": "linux-arm64",
+    "x86_64-darwin": "darwin-x64",
+    "aarch64-darwin": "darwin-arm64",
+}
 
 
 def main() -> None:
     """Update the backlog-md package."""
-    # Get current version (backlog-md is x86_64-linux only)
-    current = nix_eval(".#packages.x86_64-linux.backlog-md.version")
+    data = load_hashes(HASHES_FILE)
+    current = data["version"]
     latest = fetch_github_latest_release("MrLesk", "Backlog.md")
 
-    if current == latest:
-        print("backlog-md is already up-to-date!")
+    print(f"Current: {current}, Latest: {latest}")
+
+    if not should_update(current, latest):
+        print("Already up to date")
         return
 
     print(f"Updating backlog-md from {current} to {latest}")
 
-    # Calculate source hash for fetchFromGitHub
-    tag = f"v{latest}"
-    url = f"https://github.com/MrLesk/Backlog.md/archive/{tag}.tar.gz"
-    print("Fetching source hash...")
-    source_hash = calculate_url_hash(url, unpack=True)
-
-    # Write temporary hashes.json with dummy node_modules hash
-    data = {
-        "version": latest,
-        "src_hash": source_hash,
-        "node_modules_hash": DUMMY_SHA256_HASH,
-    }
-    save_hashes(HASHES_FILE, data)
-
-    # Calculate correct node_modules hash by building (backlog-md is x86_64-linux only)
-    try:
-        node_modules_hash = calculate_dependency_hash(
-            ".#packages.x86_64-linux.backlog-md",
-            "node_modules_hash",
-            HASHES_FILE,
-            data,
-        )
-        data["node_modules_hash"] = node_modules_hash
-        save_hashes(HASHES_FILE, data)
-    except (ValueError, NixCommandError) as e:
-        print(f"Error: {e}")
-        return
-
+    url = "https://github.com/MrLesk/Backlog.md/releases/download/v{version}/backlog-bun-{platform}"
+    hashes = calculate_platform_hashes(url, PLATFORMS, version=latest)
+    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
     print(f"Updated to {latest}")
 
 
