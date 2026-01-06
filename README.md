@@ -371,9 +371,9 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>pi</strong> - A terminal-based coding agent with multi-model support, mid-session model switching, and a simple CLI for headless coding tasks.</summary>
+<summary><strong>pi</strong> - A terminal-based coding agent with multi-model support</summary>
 
-- **Source**: binary
+- **Source**: bytecode
 - **License**: MIT
 - **Homepage**: https://github.com/badlogic/pi-mono
 - **Usage**: `nix run github:numtide/llm-agents.nix#pi -- --help`
