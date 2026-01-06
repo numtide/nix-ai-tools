@@ -13,16 +13,25 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "coding-agent-search";
-  version = "0.1.50";
+  version = "0.1.51";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "coding_agent_session_search";
     rev = "v${version}";
-    hash = "sha256-DngmbzOz240viKq1Z25bwFi8b97bCC7TBVpVJ/jpgXc=";
+    hash = "sha256-K5x9naT82H5N3Q/4wyIVUxOQ09tgrH6L2l0kVgqrFew=";
   };
 
-  cargoHash = "sha256-3+InfCsnEe7q7JStzd8ip2B7Da2RCj3fDaqxvX0T2vo=";
+  cargoHash = "sha256-N2Kj+YW+Nb3jOP9M8Hcaru25UpMu0Rlfq4pBmwxrq2Y=";
+
+  # Disable slow LTO settings for faster builds
+  # Remove lld linker override - it breaks rpath setting in Nix
+  postPatch = ''
+    substituteInPlace Cargo.toml \
+      --replace-fail 'lto = true' 'lto = false' \
+      --replace-fail 'codegen-units = 1' ""
+    rm -f .cargo/config.toml
+  '';
 
   nativeBuildInputs = [
     pkg-config
