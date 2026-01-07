@@ -18,19 +18,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "gemini-cli";
-  version = "0.22.5";
+  version = "0.23.0";
 
   src = fetchFromGitHub {
     owner = "google-gemini";
     repo = "gemini-cli";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-3d9Lq3IulIgp4QGNtSvkwz10kfygX6vsmVdlU3lE6Gw=";
+    hash = "sha256-tl9Iy1M0YxPvUpbIQRl7/P2iRIb5n1cvHEqK2k3OR5I=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-ciOSSqsCOp4FF0hKPHYdjQAGQG9jXGCKkJM5qVdlP90=";
+    hash = "sha256-DFpwBE0znnafUBEaiNYRl2jQfE4X006vnuYYyZ/Bvmg=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
