@@ -35,6 +35,61 @@ fn get_packument_url(registry: &str, package_name: &str) -> anyhow::Result<Url> 
 ///
 /// Strips volatile fields like `_rev`, `time`, and `modified`.
 /// Filters the `versions` map to only include versions requested in the lockfile.
+/// Allowed top-level fields in normalized packuments.
+/// Using a whitelist ensures we don't include volatile fields that could cause hash inconsistency.
+const ALLOWED_TOP_LEVEL_FIELDS: &[&str] = &[
+    "name",
+    "versions",
+    // Note: dist-tags deliberately excluded - volatile and not needed for locked versions
+];
+
+/// Allowed fields in version objects.
+/// These are the fields npm needs for dependency resolution and installation.
+const ALLOWED_VERSION_FIELDS: &[&str] = &[
+    // Package identity
+    "name",
+    "version",
+    // Dependencies (all types)
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "peerDependenciesMeta",
+    "optionalDependencies",
+    "bundleDependencies",
+    "bundledDependencies",
+    // Distribution info (critical for installation)
+    "dist",
+    // Entry points and exports
+    "main",
+    "module",
+    "browser",
+    "types",
+    "typings",
+    "exports",
+    "imports",
+    "bin",
+    // Platform constraints
+    "engines",
+    "os",
+    "cpu",
+    // Lifecycle scripts (needed for install)
+    "scripts",
+    // Workspaces support
+    "workspaces",
+    // Other install-relevant fields
+    "directories",
+    "files",
+    "type",
+    "sideEffects",
+    "publishConfig",
+    // Package manager hints
+    "packageManager",
+    "volta",
+    // Resolution hints
+    "resolutions",
+    "overrides",
+];
+
 fn normalize_packument(
     package_name: &str,
     data: &[u8],
@@ -47,35 +102,20 @@ fn normalize_packument(
         .as_object_mut()
         .ok_or_else(|| anyhow!("packument for {package_name} is not a JSON object"))?;
 
-    // Strip volatile top-level fields
-    obj.remove("_rev");
-    obj.remove("time");
-    obj.remove("modified");
+    // Keep only whitelisted top-level fields to ensure determinism
+    obj.retain(|key, _| ALLOWED_TOP_LEVEL_FIELDS.contains(&key.as_str()));
 
-    // Filter versions
+    // Filter and normalize versions
     if let Some(Value::Object(versions)) = obj.get_mut("versions") {
+        // Only keep versions that are in the lockfile
         versions.retain(|version, _| requested_versions.contains(version));
 
-        // Normalize each version object
+        // Normalize each version object to only include necessary fields
         for version_val in versions.values_mut() {
             if let Some(version_obj) = version_val.as_object_mut() {
-                // Strip fields starting with underscore (volatile/internal)
-                version_obj.retain(|key, _| !key.starts_with('_'));
-                // Strip other often-volatile fields
-                version_obj.remove("gitHead");
+                version_obj.retain(|key, _| ALLOWED_VERSION_FIELDS.contains(&key.as_str()));
             }
         }
-    }
-
-    // Filter dist-tags to only point to versions we kept
-    if let Some(Value::Object(tags)) = obj.get_mut("dist-tags") {
-        tags.retain(|_, version_val| {
-            if let Some(version) = version_val.as_str() {
-                requested_versions.contains(version)
-            } else {
-                false
-            }
-        });
     }
 
     serde_json::to_vec(&json).map_err(|e| anyhow!("failed to re-serialize packument for {package_name}: {e}"))
