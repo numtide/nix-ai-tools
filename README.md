@@ -21,7 +21,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
 
-- **Source**: source
+- **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run github:numtide/llm-agents.nix#backlog-md -- --help`
