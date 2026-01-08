@@ -51,7 +51,8 @@ buildNpmPackage {
           fd
           ripgrep
         ]
-      }
+      } \
+      --set PI_SKIP_VERSION_CHECK 1
   '';
 
   doInstallCheck = true;
