@@ -4,6 +4,7 @@
   fetchurl,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
+  makeWrapper,
   fd,
   ripgrep,
   runCommand,
@@ -40,6 +41,8 @@ buildNpmPackage {
     cacheVersion = 2;
   };
   makeCacheWritable = true;
+
+  nativeBuildInputs = [ makeWrapper ];
 
   # The package from npm is already built
   dontNpmBuild = true;
