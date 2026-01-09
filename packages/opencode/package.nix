@@ -40,7 +40,7 @@ let
   platformInfo = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 
   src = fetchurl {
-    url = "https://github.com/sst/opencode/releases/download/v${version}/${platformInfo.asset}";
+    url = "https://github.com/anomalyco/opencode/releases/download/v${version}/${platformInfo.asset}";
     hash = hashes.${platform};
   };
 in
@@ -109,7 +109,7 @@ stdenv.mkDerivation {
       OpenCode is a terminal-based agent that can build anything.
       It provides an interactive AI coding experience directly in your terminal.
     '';
-    homepage = "https://github.com/sst/opencode";
+    homepage = "https://github.com/anomalyco/opencode";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [
