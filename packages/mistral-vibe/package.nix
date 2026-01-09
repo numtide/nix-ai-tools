@@ -51,11 +51,42 @@ let
     };
   };
 
+  tree-sitter-bash = python3.pkgs.buildPythonPackage rec {
+    pname = "tree-sitter-bash";
+    version = "0.25.1";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "tree_sitter_bash";
+      inherit version;
+      hash = "sha256-v8C9qne8HobjxmUuWm4UDEDAoWuEGFwrY6182Am4jxQ=";
+    };
+
+    build-system = with python3.pkgs; [
+      setuptools
+    ];
+
+    pythonImportsCheck = [ "tree_sitter_bash" ];
+
+    meta = with lib; {
+      description = "Bash grammar for tree-sitter";
+      homepage = "https://github.com/tree-sitter/tree-sitter-bash";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
+    };
+  };
+
   python = python3.override {
     self = python;
     packageOverrides = _final: _prev: {
       # Inject local packages into the Python package set
-      inherit mistralai agent-client-protocol textual-speedups;
+      inherit
+        mistralai
+        agent-client-protocol
+        textual-speedups
+        tree-sitter-bash
+        ;
       mcp = _prev.mcp.overrideAttrs (old: rec {
         version = "1.25.0";
         name = "${old.pname}-${version}";
@@ -77,14 +108,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "1.3.3";
+  version = "1.3.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-nW7pRSyv+t/7yatx84PMgxsHRTfRqqpy6rz+dQfLluU=";
+    hash = "sha256-74sMmlhEgRHHwuBF6P57rfVuDQIRCngP3y1SNv/wZJQ=";
   };
 
   build-system = with python.pkgs; [
@@ -109,6 +140,8 @@ python.pkgs.buildPythonApplication rec {
     textual
     textual-speedups
     tomli-w
+    tree-sitter
+    tree-sitter-bash
     watchfiles
   ];
 
