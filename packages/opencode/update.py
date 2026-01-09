@@ -31,7 +31,7 @@ def main() -> None:
     """Update the opencode package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_github_latest_release("sst", "opencode")
+    latest = fetch_github_latest_release("anomalyco", "opencode")
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -39,9 +39,7 @@ def main() -> None:
         print("Already up to date")
         return
 
-    url_template = (
-        f"https://github.com/sst/opencode/releases/download/v{latest}/{{platform}}"
-    )
+    url_template = f"https://github.com/anomalyco/opencode/releases/download/v{latest}/{{platform}}"
     hashes = calculate_platform_hashes(url_template, PLATFORMS)
 
     save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
