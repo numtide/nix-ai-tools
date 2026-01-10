@@ -26,6 +26,8 @@ buildGoModule rec {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "Workflow & Project Management";
+
   meta = with lib; {
     description = "A distributed issue tracker designed for AI-supervised coding workflows";
     homepage = "https://github.com/steveyegge/beads";

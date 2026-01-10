@@ -38,6 +38,8 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru.category = "Claude Code Ecosystem";
+
   meta = with lib; {
     description = "Use Claude Code without an Anthropics account and route it to another LLM provider";
     homepage = "https://github.com/musistudio/claude-code-router";

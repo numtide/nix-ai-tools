@@ -146,6 +146,8 @@ python.pkgs.buildPythonApplication rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral";
     homepage = "https://github.com/mistralai/mistral-vibe";

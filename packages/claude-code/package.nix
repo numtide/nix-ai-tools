@@ -59,6 +59,8 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";
     homepage = "https://claude.ai/code";

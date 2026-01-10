@@ -55,6 +55,8 @@ buildNpmPackage rec {
     versionCheckHomeHook
   ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";
     homepage = "https://ampcode.com/";

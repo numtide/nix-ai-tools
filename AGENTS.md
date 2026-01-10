@@ -81,6 +81,25 @@ meta = with lib; {
 };
 ```
 
+### Package Categories
+
+Every package should have a category in `passthru` for README organization:
+
+```nix
+passthru.category = "AI Coding Agents";
+
+meta = { ... };
+```
+
+Available categories (in display order):
+
+- **AI Coding Agents** - Main AI coding assistants (claude-code, codex, gemini-cli, etc.)
+- **Claude Code Ecosystem** - Tools specifically for Claude Code (claudebox, ccusage, catnip, etc.)
+- **Codex Ecosystem** - Tools specifically for OpenAI Codex (codex-acp, ccusage-codex)
+- **Workflow & Project Management** - Project/spec management tools (backlog-md, beads, openspec, spec-kit)
+- **Code Review** - Code review tools (coderabbit-cli, tuicr)
+- **Utilities** - Other useful tools (coding-agent-search, handy, happy-coder, openskills)
+
 #### Custom Maintainers
 
 For maintainers not yet in nixpkgs, define them in `lib/default.nix`:

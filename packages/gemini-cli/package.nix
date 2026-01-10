@@ -94,6 +94,7 @@ buildNpmPackage (finalAttrs: {
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru = {
+    category = "AI Coding Agents";
     jsonschema = "${placeholder "out"}/share/gemini-cli/settings.schema.json";
   };
 

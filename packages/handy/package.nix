@@ -149,6 +149,8 @@ stdenv.mkDerivation {
   # GUI-only Tauri app - no CLI version support, would block trying to start GUI
   doInstallCheck = false;
 
+  passthru.category = "Utilities";
+
   meta = with lib; {
     description = "Fast and accurate local transcription app using AI models";
     homepage = "https://handy.computer/";

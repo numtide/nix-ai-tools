@@ -65,6 +65,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = {
     description = "Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.";
     homepage = "https://github.com/just-every/code/";

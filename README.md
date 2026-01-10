@@ -8,6 +8,8 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 <!-- BEGIN GENERATED PACKAGE DOCS -->
 
+### AI Coding Agents
+
 <details>
 <summary><strong>amp</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph</summary>
 
@@ -16,66 +18,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://ampcode.com/
 - **Usage**: `nix run github:numtide/llm-agents.nix#amp -- --help`
 - **Nix**: [packages/amp/package.nix](packages/amp/package.nix)
-
-</details>
-<details>
-<summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
-
-- **Source**: binary
-- **License**: MIT
-- **Homepage**: https://github.com/MrLesk/Backlog.md
-- **Usage**: `nix run github:numtide/llm-agents.nix#backlog-md -- --help`
-- **Nix**: [packages/backlog-md/package.nix](packages/backlog-md/package.nix)
-
-</details>
-<details>
-<summary><strong>beads</strong> - A distributed issue tracker designed for AI-supervised coding workflows</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/steveyegge/beads
-- **Usage**: `nix run github:numtide/llm-agents.nix#beads -- --help`
-- **Nix**: [packages/beads/package.nix](packages/beads/package.nix)
-
-</details>
-<details>
-<summary><strong>catnip</strong> - Developer environment that's like catnip for agentic programming</summary>
-
-- **Source**: binary
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/wandb/catnip
-- **Usage**: `nix run github:numtide/llm-agents.nix#catnip -- --help`
-- **Nix**: [packages/catnip/package.nix](packages/catnip/package.nix)
-
-</details>
-<details>
-<summary><strong>ccstatusline</strong> - A highly customizable status line formatter for Claude Code CLI</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/sirmalloc/ccstatusline
-- **Usage**: `nix run github:numtide/llm-agents.nix#ccstatusline -- --help`
-- **Nix**: [packages/ccstatusline/package.nix](packages/ccstatusline/package.nix)
-
-</details>
-<details>
-<summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/ryoppippi/ccusage
-- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
-- **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
-
-</details>
-<details>
-<summary><strong>ccusage-codex</strong> - Usage analysis tool for OpenAI Codex sessions</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/ryoppippi/ccusage
-- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-codex -- --help`
-- **Nix**: [packages/ccusage-codex/package.nix](packages/ccusage-codex/package.nix)
 
 </details>
 <details>
@@ -89,56 +31,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/zed-industries/claude-code-acp
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-acp -- --help`
-- **Nix**: [packages/claude-code-acp/package.nix](packages/claude-code-acp/package.nix)
-
-</details>
-<details>
-<summary><strong>claude-code-npm</strong> - Agentic coding tool (Node.js/npm build for claudebox compatibility)</summary>
-
-- **Source**: source
-- **License**: unfree
-- **Homepage**: https://github.com/anthropics/claude-code
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-npm -- --help`
-- **Nix**: [packages/claude-code-npm/package.nix](packages/claude-code-npm/package.nix)
-
-</details>
-<details>
-<summary><strong>claude-code-router</strong> - Use Claude Code without an Anthropics account and route it to another LLM provider</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/musistudio/claude-code-router
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-router -- --help`
-- **Nix**: [packages/claude-code-router/package.nix](packages/claude-code-router/package.nix)
-
-</details>
-<details>
-<summary><strong>claude-plugins</strong> - CLI tool for managing Claude Code plugins</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/Kamalnrf/claude-plugins
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-plugins -- --help`
-- **Nix**: [packages/claude-plugins/package.nix](packages/claude-plugins/package.nix)
-
-</details>
-<details>
-<summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
-
-- **Source**: source
-- **License**: Check package
-- **Homepage**: https://github.com/numtide/claudebox
-- **Usage**: `nix run github:numtide/llm-agents.nix#claudebox -- --help`
-- **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
-
-</details>
-<details>
 <summary><strong>code</strong> - Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.</summary>
 
 - **Source**: source
@@ -149,16 +41,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>coderabbit-cli</strong> - AI-powered code review CLI tool</summary>
-
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://coderabbit.ai
-- **Usage**: `nix run github:numtide/llm-agents.nix#coderabbit-cli -- --help`
-- **Nix**: [packages/coderabbit-cli/package.nix](packages/coderabbit-cli/package.nix)
-
-</details>
-<details>
 <summary><strong>codex</strong> - OpenAI Codex CLI - a coding agent that runs locally on your computer</summary>
 
 - **Source**: source
@@ -166,27 +48,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run github:numtide/llm-agents.nix#codex -- --help`
 - **Nix**: [packages/codex/package.nix](packages/codex/package.nix)
-
-</details>
-<details>
-<summary><strong>codex-acp</strong> - An ACP-compatible coding agent powered by Codex</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/zed-industries/codex-acp
-- **Usage**: `nix run github:numtide/llm-agents.nix#codex-acp -- --help`
-- **Nix**: [packages/codex-acp/package.nix](packages/codex-acp/package.nix)
-- **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
-
-</details>
-<details>
-<summary><strong>coding-agent-search</strong> - Unified, high-performance TUI to index and search your local coding agent history</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/Dicklesworthstone/coding_agent_session_search
-- **Usage**: `nix run github:numtide/llm-agents.nix#coding-agent-search -- --help`
-- **Nix**: [packages/coding-agent-search/package.nix](packages/coding-agent-search/package.nix)
 
 </details>
 <details>
@@ -271,26 +132,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
-
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://handy.computer/
-- **Usage**: `nix run github:numtide/llm-agents.nix#handy -- --help`
-- **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
-
-</details>
-<details>
-<summary><strong>happy-coder</strong> - Happy Coder CLI to connect your local Claude Code to mobile device</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/slopus/happy-cli
-- **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
-- **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
-
-</details>
-<details>
 <summary><strong>jules</strong> - Jules, the asynchronous coding agent from Google, in the terminal</summary>
 
 - **Source**: binary
@@ -351,26 +192,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/numman-ali/openskills
-- **Usage**: `nix run github:numtide/llm-agents.nix#openskills -- --help`
-- **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
-
-</details>
-<details>
-<summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/Fission-AI/OpenSpec
-- **Usage**: `nix run github:numtide/llm-agents.nix#openspec -- --help`
-- **Nix**: [packages/openspec/package.nix](packages/openspec/package.nix)
-
-</details>
-<details>
 <summary><strong>pi</strong> - A terminal-based coding agent with multi-model support</summary>
 
 - **Source**: bytecode
@@ -400,6 +221,146 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/qwen-code/package.nix](packages/qwen-code/package.nix)
 
 </details>
+
+### Claude Code Ecosystem
+
+<details>
+<summary><strong>catnip</strong> - Developer environment that's like catnip for agentic programming</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/wandb/catnip
+- **Usage**: `nix run github:numtide/llm-agents.nix#catnip -- --help`
+- **Nix**: [packages/catnip/package.nix](packages/catnip/package.nix)
+
+</details>
+<details>
+<summary><strong>ccstatusline</strong> - A highly customizable status line formatter for Claude Code CLI</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/sirmalloc/ccstatusline
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccstatusline -- --help`
+- **Nix**: [packages/ccstatusline/package.nix](packages/ccstatusline/package.nix)
+
+</details>
+<details>
+<summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
+- **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
+
+</details>
+<details>
+<summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/zed-industries/claude-code-acp
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-acp -- --help`
+- **Nix**: [packages/claude-code-acp/package.nix](packages/claude-code-acp/package.nix)
+
+</details>
+<details>
+<summary><strong>claude-code-npm</strong> - Agentic coding tool (Node.js/npm build for claudebox compatibility)</summary>
+
+- **Source**: source
+- **License**: unfree
+- **Homepage**: https://github.com/anthropics/claude-code
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-npm -- --help`
+- **Nix**: [packages/claude-code-npm/package.nix](packages/claude-code-npm/package.nix)
+
+</details>
+<details>
+<summary><strong>claude-code-router</strong> - Use Claude Code without an Anthropics account and route it to another LLM provider</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/musistudio/claude-code-router
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-router -- --help`
+- **Nix**: [packages/claude-code-router/package.nix](packages/claude-code-router/package.nix)
+
+</details>
+<details>
+<summary><strong>claude-plugins</strong> - CLI tool for managing Claude Code plugins</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/Kamalnrf/claude-plugins
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-plugins -- --help`
+- **Nix**: [packages/claude-plugins/package.nix](packages/claude-plugins/package.nix)
+
+</details>
+<details>
+<summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
+
+- **Source**: source
+- **License**: Check package
+- **Homepage**: https://github.com/numtide/claudebox
+- **Usage**: `nix run github:numtide/llm-agents.nix#claudebox -- --help`
+- **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
+
+</details>
+
+### Codex Ecosystem
+
+<details>
+<summary><strong>ccusage-codex</strong> - Usage analysis tool for OpenAI Codex sessions</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-codex -- --help`
+- **Nix**: [packages/ccusage-codex/package.nix](packages/ccusage-codex/package.nix)
+
+</details>
+<details>
+<summary><strong>codex-acp</strong> - An ACP-compatible coding agent powered by Codex</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/zed-industries/codex-acp
+- **Usage**: `nix run github:numtide/llm-agents.nix#codex-acp -- --help`
+- **Nix**: [packages/codex-acp/package.nix](packages/codex-acp/package.nix)
+- **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
+
+</details>
+
+### Workflow & Project Management
+
+<details>
+<summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://github.com/MrLesk/Backlog.md
+- **Usage**: `nix run github:numtide/llm-agents.nix#backlog-md -- --help`
+- **Nix**: [packages/backlog-md/package.nix](packages/backlog-md/package.nix)
+
+</details>
+<details>
+<summary><strong>beads</strong> - A distributed issue tracker designed for AI-supervised coding workflows</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/steveyegge/beads
+- **Usage**: `nix run github:numtide/llm-agents.nix#beads -- --help`
+- **Nix**: [packages/beads/package.nix](packages/beads/package.nix)
+
+</details>
+<details>
+<summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/Fission-AI/OpenSpec
+- **Usage**: `nix run github:numtide/llm-agents.nix#openspec -- --help`
+- **Nix**: [packages/openspec/package.nix](packages/openspec/package.nix)
+
+</details>
 <details>
 <summary><strong>spec-kit</strong> - Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)</summary>
 
@@ -410,6 +371,19 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/spec-kit/package.nix](packages/spec-kit/package.nix)
 
 </details>
+
+### Code Review
+
+<details>
+<summary><strong>coderabbit-cli</strong> - AI-powered code review CLI tool</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://coderabbit.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#coderabbit-cli -- --help`
+- **Nix**: [packages/coderabbit-cli/package.nix](packages/coderabbit-cli/package.nix)
+
+</details>
 <details>
 <summary><strong>tuicr</strong> - Review AI-generated diffs like a GitHub pull request, right from your terminal</summary>
 
@@ -418,6 +392,49 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/agavra/tuicr
 - **Usage**: `nix run github:numtide/llm-agents.nix#tuicr -- --help`
 - **Nix**: [packages/tuicr/package.nix](packages/tuicr/package.nix)
+
+</details>
+
+### Utilities
+
+<details>
+<summary><strong>coding-agent-search</strong> - Unified, high-performance TUI to index and search your local coding agent history</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/Dicklesworthstone/coding_agent_session_search
+- **Usage**: `nix run github:numtide/llm-agents.nix#coding-agent-search -- --help`
+- **Nix**: [packages/coding-agent-search/package.nix](packages/coding-agent-search/package.nix)
+
+</details>
+<details>
+<summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://handy.computer/
+- **Usage**: `nix run github:numtide/llm-agents.nix#handy -- --help`
+- **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
+
+</details>
+<details>
+<summary><strong>happy-coder</strong> - Happy Coder CLI to connect your local Claude Code to mobile device</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/slopus/happy-cli
+- **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
+- **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
+
+</details>
+<details>
+<summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/numman-ali/openskills
+- **Usage**: `nix run github:numtide/llm-agents.nix#openskills -- --help`
+- **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
 
 </details>
 <!-- END GENERATED PACKAGE DOCS -->

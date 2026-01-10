@@ -58,6 +58,8 @@ stdenv.mkDerivation (finalAttrs: {
       }
   '';
 
+  passthru.category = "Utilities";
+
   meta = {
     description = "Happy Coder CLI to connect your local Claude Code to mobile device";
     homepage = "https://github.com/slopus/happy-cli";

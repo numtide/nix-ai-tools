@@ -38,6 +38,8 @@ buildNpmPackage rec {
 
   dontNpmPrune = true; # hangs forever on both Linux/darwin
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒";
     homepage = "https://github.com/Mote-Software/nanocoder";

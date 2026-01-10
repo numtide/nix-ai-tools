@@ -62,6 +62,8 @@ stdenv.mkDerivation {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "Claude Code Ecosystem";
+
   meta = with lib; {
     description = "Developer environment that's like catnip for agentic programming";
     homepage = "https://github.com/wandb/catnip";

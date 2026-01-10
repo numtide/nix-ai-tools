@@ -57,6 +57,8 @@ rustPlatform.buildRustPackage {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = {
     description = "OpenAI Codex CLI - a coding agent that runs locally on your computer";
     homepage = "https://github.com/openai/codex";

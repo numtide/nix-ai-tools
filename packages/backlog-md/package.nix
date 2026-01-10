@@ -46,6 +46,8 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru.category = "Workflow & Project Management";
+
   meta = with lib; {
     description = "Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem";
     homepage = "https://github.com/MrLesk/Backlog.md";

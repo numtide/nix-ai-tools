@@ -42,6 +42,8 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
+  passthru.category = "Codex Ecosystem";
+
   meta = with lib; {
     description = "Usage analysis tool for OpenAI Codex sessions";
     homepage = "https://github.com/ryoppippi/ccusage";

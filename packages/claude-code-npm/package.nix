@@ -59,6 +59,8 @@ buildNpmPackage {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "Claude Code Ecosystem";
+
   meta = with lib; {
     description = "Agentic coding tool (Node.js/npm build for claudebox compatibility)";
     homepage = "https://github.com/anthropics/claude-code";

@@ -53,6 +53,7 @@ buildNpmPackage (finalAttrs: {
   '';
 
   passthru = {
+    category = "AI Coding Agents";
     jsonschema = "${placeholder "out"}/share/kilocode-cli/schema.json";
   };
 

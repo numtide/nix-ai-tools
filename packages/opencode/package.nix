@@ -103,6 +103,8 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru.category = "AI Coding Agents";
+
   meta = {
     description = "AI coding agent built for the terminal";
     longDescription = ''

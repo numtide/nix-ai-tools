@@ -73,6 +73,8 @@ rustPlatform.buildRustPackage rec {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "Utilities";
+
   meta = with lib; {
     description = "Unified, high-performance TUI to index and search your local coding agent history";
     longDescription = ''

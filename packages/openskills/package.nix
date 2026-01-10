@@ -27,6 +27,8 @@ buildNpmPackage (finalAttrs: {
   };
   makeCacheWritable = true;
 
+  passthru.category = "Utilities";
+
   meta = {
     description = "Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent";
     homepage = "https://github.com/numman-ali/openskills";

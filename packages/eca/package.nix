@@ -66,6 +66,8 @@ let
         runHook postInstall
       '';
 
+      passthru.category = "AI Coding Agents";
+
       meta = with pkgs.lib; {
         description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
         homepage = "https://github.com/editor-code-assistant/eca";
@@ -151,6 +153,8 @@ else
       chmod +x $out/bin/eca
       runHook postInstall
     '';
+
+    passthru.category = "AI Coding Agents";
 
     meta = with pkgs.lib; {
       description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";

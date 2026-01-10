@@ -53,6 +53,8 @@ rustPlatform.buildRustPackage rec {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks";
     homepage = "https://github.com/block/goose";

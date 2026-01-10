@@ -72,6 +72,8 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Cursor Agent - CLI tool for Cursor AI code editor";
     homepage = "https://cursor.com/";

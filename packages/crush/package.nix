@@ -70,6 +70,7 @@ in
   '';
 
   passthru = {
+    category = "AI Coding Agents";
     jsonschema = "${placeholder "out"}/share/crush/schema.json";
   };
 
