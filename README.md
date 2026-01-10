@@ -410,6 +410,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/spec-kit/package.nix](packages/spec-kit/package.nix)
 
 </details>
+<details>
+<summary><strong>tuicr</strong> - Review AI-generated diffs like a GitHub pull request, right from your terminal</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/agavra/tuicr
+- **Usage**: `nix run github:numtide/llm-agents.nix#tuicr -- --help`
+- **Nix**: [packages/tuicr/package.nix](packages/tuicr/package.nix)
+
+</details>
 <!-- END GENERATED PACKAGE DOCS -->
 
 ## Installation
