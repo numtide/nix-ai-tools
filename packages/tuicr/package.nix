@@ -43,6 +43,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     runHook postInstallCheck
   '';
 
+  passthru.category = "Code Review";
+
   meta = {
     description = "Review AI-generated diffs like a GitHub pull request, right from your terminal";
     homepage = "https://github.com/agavra/tuicr";

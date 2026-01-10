@@ -38,6 +38,8 @@ stdenv.mkDerivation (finalAttrs: {
   nativeInstallCheckInputs = [ versionCheckHook ];
   versionCheckProgramArg = [ "--version" ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = {
     description = "GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.";
     homepage = "https://github.com/github/copilot-cli";

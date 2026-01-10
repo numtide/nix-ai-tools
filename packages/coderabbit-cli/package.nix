@@ -58,6 +58,8 @@ stdenv.mkDerivation rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
+  passthru.category = "Code Review";
+
   meta = with lib; {
     description = "AI-powered code review CLI tool";
     homepage = "https://coderabbit.ai";

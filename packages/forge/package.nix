@@ -55,6 +55,8 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment";
     homepage = "https://github.com/antinomyhq/forge";

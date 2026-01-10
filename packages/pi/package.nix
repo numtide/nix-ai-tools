@@ -61,6 +61,8 @@ buildNpmPackage {
     versionCheckHomeHook
   ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = {
     description = "A terminal-based coding agent with multi-model support";
     homepage = "https://github.com/badlogic/pi-mono";

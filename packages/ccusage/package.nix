@@ -42,6 +42,8 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
+  passthru.category = "Claude Code Ecosystem";
+
   meta = with lib; {
     description = "Usage analysis tool for Claude Code";
     homepage = "https://github.com/ryoppippi/ccusage";

@@ -42,6 +42,8 @@ stdenv.mkDerivation rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Memory-first coding agent that learns and evolves across sessions";
     homepage = "https://github.com/letta-ai/letta-code";

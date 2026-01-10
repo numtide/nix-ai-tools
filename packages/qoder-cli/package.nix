@@ -54,6 +54,8 @@ stdenv.mkDerivation {
     versionCheckHomeHook
   ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Qoder AI CLI tool - Terminal-based AI assistant for code development";
     homepage = "https://qoder.com";

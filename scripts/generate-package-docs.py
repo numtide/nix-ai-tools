@@ -73,14 +73,52 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
     return "\n".join(lines)
 
 
+# Define category order for display
+CATEGORY_ORDER = [
+    "AI Coding Agents",
+    "Claude Code Ecosystem",
+    "Codex Ecosystem",
+    "Workflow & Project Management",
+    "Code Review",
+    "Utilities",
+    "Uncategorized",
+]
+
+
 def generate_all_docs() -> str:
-    """Generate documentation for all packages."""
+    """Generate documentation for all packages, grouped by category."""
     all_metadata = get_all_packages_metadata()
-    docs = []
+
+    # Group packages by category
+    by_category: dict[str, list[tuple[str, dict]]] = {}
     for package in sorted(all_metadata.keys()):
         metadata = all_metadata[package]
-        docs.append(generate_package_doc(package, metadata))
-    return "\n".join(docs)
+        category = metadata.get("category", "Uncategorized")
+        if category not in by_category:
+            by_category[category] = []
+        by_category[category].append((package, metadata))
+
+    docs = []
+
+    # Output categories in defined order, then any remaining
+    seen_categories: set[str] = set()
+    for category in CATEGORY_ORDER:
+        if category in by_category:
+            seen_categories.add(category)
+            docs.append(f"### {category}\n")
+            for package, metadata in by_category[category]:
+                docs.append(generate_package_doc(package, metadata))
+            docs.append("")  # Add spacing between categories
+
+    # Handle any categories not in CATEGORY_ORDER
+    for category in sorted(by_category.keys()):
+        if category not in seen_categories:
+            docs.append(f"### {category}\n")
+            for package, metadata in by_category[category]:
+                docs.append(generate_package_doc(package, metadata))
+            docs.append("")
+
+    return "\n".join(docs).rstrip()
 
 
 def update_readme(readme_path: Path) -> bool:

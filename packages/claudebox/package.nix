@@ -43,6 +43,7 @@ in
 pkgs.runCommand "claudebox"
   {
     buildInputs = [ pkgs.makeWrapper ];
+    passthru.category = "Claude Code Ecosystem";
     meta = with pkgs.lib; {
       mainProgram = "claudebox";
       description = "Sandboxed environment for Claude Code";

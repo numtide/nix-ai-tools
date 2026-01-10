@@ -32,6 +32,8 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  passthru.category = "Claude Code Ecosystem";
+
   meta = with lib; {
     description = "A highly customizable status line formatter for Claude Code CLI";
     homepage = "https://github.com/sirmalloc/ccstatusline";

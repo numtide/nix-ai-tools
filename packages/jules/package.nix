@@ -49,6 +49,8 @@ stdenv.mkDerivation {
   # Jules uses "version" subcommand, not --version flag
   versionCheckProgramArg = [ "version" ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Jules, the asynchronous coding agent from Google, in the terminal";
     homepage = "https://jules.google";

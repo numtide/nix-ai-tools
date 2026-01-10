@@ -38,6 +38,8 @@ buildNpmPackage {
 
   dontNpmBuild = true;
 
+  passthru.category = "Workflow & Project Management";
+
   meta = {
     description = "Spec-driven development for AI coding assistants";
     homepage = "https://github.com/Fission-AI/OpenSpec";

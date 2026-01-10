@@ -44,6 +44,7 @@ let
       sourceType = sourceType;
       hideFromDocs = pkg.passthru.hideFromDocs or false;
       hasMainProgram = builtins.hasAttr "mainProgram" pkg.meta;
+      category = pkg.passthru.category or "Uncategorized";
     };
 
   results = builtins.listToAttrs (

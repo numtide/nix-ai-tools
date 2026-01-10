@@ -71,6 +71,8 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
+  passthru.category = "AI Coding Agents";
+
   meta = with lib; {
     description = "Factory AI's Droid - AI-powered development agent for your terminal";
     homepage = "https://factory.ai";
