@@ -19,18 +19,10 @@ let
     hash = "sha256-kZfaqMDKV0zyw8OP2HWJgGEHnbIXPUz2yI6Yl9MlilU=";
   };
 
-  # Read interpreter info from bintools at build time
-  dynamicLinker = lib.strings.trim (
-    builtins.readFile "${stdenv.cc.bintools}/nix-support/dynamic-linker"
-  );
+  # Get interpreter info from stdenv attributes (avoids IFD)
+  dynamicLinker = stdenv.cc.bintools.dynamicLinker;
 
-  origLibc = "${stdenv.cc.bintools}/nix-support/orig-libc";
-
-  libcLib =
-    if builtins.pathExists origLibc then
-      "${lib.strings.trim (builtins.readFile origLibc)}/lib"
-    else
-      null;
+  libcLib = "${stdenv.cc.libc}/lib";
 
   # Cross-compilation support:
   # - CC (from stdenv) builds stubs for TARGET platform (what gets patched)
@@ -60,8 +52,8 @@ let
       "BINDIR=$(out)/bin"
       "LIBDIR=$(out)/lib/wrap-buddy"
       "INTERP=${dynamicLinker}"
+      "LIBC_LIB=${libcLib}"
     ]
-    ++ lib.optional (libcLib != null) "LIBC_LIB=${libcLib}"
     ++ lib.optional stdenv.hostPlatform.isx86_64 "BUILD_32BIT=1";
 
     nativeInstallCheckInputs = [ strace ];
