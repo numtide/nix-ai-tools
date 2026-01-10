@@ -345,7 +345,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: binary
 - **License**: MIT
-- **Homepage**: https://github.com/sst/opencode
+- **Homepage**: https://github.com/anomalyco/opencode
 - **Usage**: `nix run github:numtide/llm-agents.nix#opencode -- --help`
 - **Nix**: [packages/opencode/package.nix](packages/opencode/package.nix)
 
