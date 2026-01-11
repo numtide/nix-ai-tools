@@ -42,7 +42,7 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
-  passthru.category = "Codex Ecosystem";
+  passthru.category = "Usage Analytics";
 
   meta = with lib; {
     description = "Usage analysis tool for OpenAI Codex sessions";

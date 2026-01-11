@@ -245,26 +245,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/ryoppippi/ccusage
-- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
-- **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
-
-</details>
-<details>
-<summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/zed-industries/claude-code-acp
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-acp -- --help`
-- **Nix**: [packages/claude-code-acp/package.nix](packages/claude-code-acp/package.nix)
-
-</details>
-<details>
 <summary><strong>claude-code-npm</strong> - Agentic coding tool (Node.js/npm build for claudebox compatibility)</summary>
 
 - **Source**: source
@@ -305,16 +285,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 
-### Codex Ecosystem
+### ACP Ecosystem
 
 <details>
-<summary><strong>ccusage-codex</strong> - Usage analysis tool for OpenAI Codex sessions</summary>
+<summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
 
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/ryoppippi/ccusage
-- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-codex -- --help`
-- **Nix**: [packages/ccusage-codex/package.nix](packages/ccusage-codex/package.nix)
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/zed-industries/claude-code-acp
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-acp -- --help`
+- **Nix**: [packages/claude-code-acp/package.nix](packages/claude-code-acp/package.nix)
 
 </details>
 <details>
@@ -326,6 +306,59 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Usage**: `nix run github:numtide/llm-agents.nix#codex-acp -- --help`
 - **Nix**: [packages/codex-acp/package.nix](packages/codex-acp/package.nix)
 - **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
+
+</details>
+
+### Usage Analytics
+
+<details>
+<summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
+- **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
+
+</details>
+<details>
+<summary><strong>ccusage-amp</strong> - Usage analysis tool for Amp CLI sessions</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-amp -- --help`
+- **Nix**: [packages/ccusage-amp/package.nix](packages/ccusage-amp/package.nix)
+
+</details>
+<details>
+<summary><strong>ccusage-codex</strong> - Usage analysis tool for OpenAI Codex sessions</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-codex -- --help`
+- **Nix**: [packages/ccusage-codex/package.nix](packages/ccusage-codex/package.nix)
+
+</details>
+<details>
+<summary><strong>ccusage-opencode</strong> - Usage analysis tool for OpenCode sessions</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-opencode -- --help`
+- **Nix**: [packages/ccusage-opencode/package.nix](packages/ccusage-opencode/package.nix)
+
+</details>
+<details>
+<summary><strong>ccusage-pi</strong> - Pi-agent usage tracking for Claude Max</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Usage**: `nix run github:numtide/llm-agents.nix#ccusage-pi -- --help`
+- **Nix**: [packages/ccusage-pi/package.nix](packages/ccusage-pi/package.nix)
 
 </details>
 
@@ -349,6 +382,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/steveyegge/beads
 - **Usage**: `nix run github:numtide/llm-agents.nix#beads -- --help`
 - **Nix**: [packages/beads/package.nix](packages/beads/package.nix)
+
+</details>
+<details>
+<summary><strong>cc-sdd</strong> - Spec-driven development framework for AI coding agents</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/gotalab/cc-sdd
+- **Usage**: `nix run github:numtide/llm-agents.nix#cc-sdd -- --help`
+- **Nix**: [packages/cc-sdd/package.nix](packages/cc-sdd/package.nix)
 
 </details>
 <details>
@@ -405,6 +448,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/Dicklesworthstone/coding_agent_session_search
 - **Usage**: `nix run github:numtide/llm-agents.nix#coding-agent-search -- --help`
 - **Nix**: [packages/coding-agent-search/package.nix](packages/coding-agent-search/package.nix)
+
+</details>
+<details>
+<summary><strong>copilot-language-server</strong> - GitHub Copilot Language Server - AI pair programmer LSP</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/github/copilot-language-server-release
+- **Usage**: `nix run github:numtide/llm-agents.nix#copilot-language-server -- --help`
+- **Nix**: [packages/copilot-language-server/package.nix](packages/copilot-language-server/package.nix)
 
 </details>
 <details>

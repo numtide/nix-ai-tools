@@ -28,7 +28,7 @@ rustPlatform.buildRustPackage rec {
 
   doCheck = false;
 
-  passthru.category = "Codex Ecosystem";
+  passthru.category = "ACP Ecosystem";
 
   meta = with lib; {
     description = "An ACP-compatible coding agent powered by Codex";

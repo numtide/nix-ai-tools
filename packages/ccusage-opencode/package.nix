@@ -42,6 +42,8 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
+  passthru.category = "Usage Analytics";
+
   meta = with lib; {
     description = "Usage analysis tool for OpenCode sessions";
     homepage = "https://github.com/ryoppippi/ccusage";

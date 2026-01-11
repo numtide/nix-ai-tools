@@ -42,7 +42,7 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
-  passthru.category = "Claude Code Ecosystem";
+  passthru.category = "Usage Analytics";
 
   meta = with lib; {
     description = "Usage analysis tool for Claude Code";

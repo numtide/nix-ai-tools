@@ -42,6 +42,8 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
+  passthru.category = "Usage Analytics";
+
   meta = with lib; {
     description = "Pi-agent usage tracking for Claude Max";
     homepage = "https://github.com/ryoppippi/ccusage";
