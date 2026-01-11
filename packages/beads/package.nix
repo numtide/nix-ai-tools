@@ -35,6 +35,8 @@ buildGoModule rec {
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ zimbatm ];
     mainProgram = "bd";
-    platforms = platforms.unix;
+    # aarch64-linux fails with "go: no such tool 'link'" error
+    # See: https://github.com/numtide/llm-agents.nix/issues/XXX
+    platforms = lib.subtractLists [ "aarch64-linux" ] platforms.unix;
   };
 }
