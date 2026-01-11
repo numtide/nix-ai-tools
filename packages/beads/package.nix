@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   buildGoModule,
   fetchFromGitHub,
   versionCheckHook,
@@ -35,8 +36,11 @@ buildGoModule rec {
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ zimbatm ];
     mainProgram = "bd";
-    # aarch64-linux fails with "go: no such tool 'link'" error
-    # See: https://github.com/numtide/llm-agents.nix/issues/XXX
-    platforms = lib.subtractLists [ "aarch64-linux" ] platforms.unix;
+    # TODO: aarch64-linux fails with "go: no such tool 'link'" error during build
+    # This appears to be a Go 1.24 toolchain issue on aarch64-linux in nixpkgs.
+    # Need to investigate if using a different Go version or build flags can fix this.
+    # Upstream provides pre-built ARM64 binaries, so platform support exists.
+    # See: https://github.com/numtide/llm-agents.nix/pull/XXX
+    broken = lib.elem stdenv.hostPlatform.system [ "aarch64-linux" ];
   };
 }
