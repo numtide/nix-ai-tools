@@ -77,7 +77,8 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
 CATEGORY_ORDER = [
     "AI Coding Agents",
     "Claude Code Ecosystem",
-    "Codex Ecosystem",
+    "ACP Ecosystem",
+    "Usage Analytics",
     "Workflow & Project Management",
     "Code Review",
     "Utilities",

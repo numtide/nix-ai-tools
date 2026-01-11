@@ -23,6 +23,8 @@ python3.pkgs.buildPythonPackage rec {
 
   pythonImportsCheck = [ "acp" ];
 
+  passthru.category = "ACP Ecosystem";
+
   meta = with lib; {
     description = "Agent Client Protocol - A protocol for AI agent communication";
     homepage = "https://github.com/anthropics/agent-client-protocol";

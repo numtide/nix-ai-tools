@@ -45,6 +45,8 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
+  passthru.category = "Workflow & Project Management";
+
   meta = with lib; {
     description = "Spec-driven development framework for AI coding agents";
     homepage = "https://github.com/gotalab/cc-sdd";

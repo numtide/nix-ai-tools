@@ -94,8 +94,9 @@ meta = { ... };
 Available categories (in display order):
 
 - **AI Coding Agents** - Main AI coding assistants (claude-code, codex, gemini-cli, etc.)
-- **Claude Code Ecosystem** - Tools specifically for Claude Code (claudebox, ccusage, catnip, etc.)
-- **Codex Ecosystem** - Tools specifically for OpenAI Codex (codex-acp, ccusage-codex)
+- **Claude Code Ecosystem** - Tools specifically for Claude Code (claudebox, catnip, etc.)
+- **ACP Ecosystem** - Agent Control Protocol implementations (claude-code-acp, codex-acp, agent-client-protocol)
+- **Usage Analytics** - Usage tracking and analysis tools (ccusage and variants)
 - **Workflow & Project Management** - Project/spec management tools (backlog-md, beads, openspec, spec-kit)
 - **Code Review** - Code review tools (coderabbit-cli, tuicr)
 - **Utilities** - Other useful tools (coding-agent-search, handy, happy-coder, openskills)

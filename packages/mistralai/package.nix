@@ -40,6 +40,8 @@ python3.pkgs.buildPythonPackage rec {
 
   pythonImportsCheck = [ "mistralai" ];
 
+  passthru.hideFromDocs = true;
+
   meta = with lib; {
     description = "Python Client SDK for the Mistral AI API";
     homepage = "https://github.com/mistralai/client-python";

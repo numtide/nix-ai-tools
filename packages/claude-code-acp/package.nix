@@ -29,7 +29,7 @@ buildNpmPackage rec {
   # Disable install scripts to avoid platform-specific dependency fetching issues
   npmFlags = [ "--ignore-scripts" ];
 
-  passthru.category = "Claude Code Ecosystem";
+  passthru.category = "ACP Ecosystem";
 
   meta = with lib; {
     description = "An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)";
