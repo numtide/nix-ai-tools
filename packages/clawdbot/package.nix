@@ -1,8 +1,10 @@
 {
   lib,
   buildNpmPackage,
+  cmake,
   fetchurl,
   fetchNpmDepsWithPackuments,
+  git,
   npmConfigHook,
   nodejs_22,
   runCommand,
@@ -40,6 +42,16 @@ buildNpmPackage {
     cacheVersion = 2;
   };
   makeCacheWritable = true;
+
+  # node-llama-cpp needs cmake and git during postinstall
+  nativeBuildInputs = [
+    cmake
+    git
+  ];
+
+  # Prevent cmake from automatically running in configure phase
+  # (it's only needed for npm postinstall scripts)
+  dontUseCmakeConfigure = true;
 
   # The package from npm is already built
   dontNpmBuild = true;
