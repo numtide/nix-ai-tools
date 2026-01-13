@@ -19,7 +19,7 @@ nix build github:numtide/llm-agents.nix#codex-acp
   inputs.llm-agents.url = "github:numtide/llm-agents.nix";
   
   environment.systemPackages = [
-    inputs.llm-agents.packages.${pkgs.system}.codex-acp
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.codex-acp
   ];
 }
 ```
