@@ -284,6 +284,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
 
 </details>
+<details>
+<summary><strong>sandbox-runtime</strong> - Lightweight sandboxing tool for enforcing filesystem and network restrictions</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/anthropic-experimental/sandbox-runtime
+- **Usage**: `nix run github:numtide/llm-agents.nix#sandbox-runtime -- --help`
+- **Nix**: [packages/sandbox-runtime/package.nix](packages/sandbox-runtime/package.nix)
+
+</details>
 
 ### ACP Ecosystem
 
@@ -448,6 +458,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/vercel-labs/agent-browser
 - **Usage**: `nix run github:numtide/llm-agents.nix#agent-browser -- --help`
 - **Nix**: [packages/agent-browser/package.nix](packages/agent-browser/package.nix)
+
+</details>
+<details>
+<summary><strong>clawdbot</strong> - Personal AI assistant with WhatsApp, Telegram, Discord integration</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://clawd.bot
+- **Usage**: `nix run github:numtide/llm-agents.nix#clawdbot -- --help`
+- **Nix**: [packages/clawdbot/package.nix](packages/clawdbot/package.nix)
 
 </details>
 <details>
