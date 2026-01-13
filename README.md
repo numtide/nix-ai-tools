@@ -441,6 +441,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Utilities
 
 <details>
+<summary><strong>agent-browser</strong> - Headless browser automation CLI for AI agents</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/vercel-labs/agent-browser
+- **Usage**: `nix run github:numtide/llm-agents.nix#agent-browser -- --help`
+- **Nix**: [packages/agent-browser/package.nix](packages/agent-browser/package.nix)
+
+</details>
+<details>
 <summary><strong>coding-agent-search</strong> - Unified, high-performance TUI to index and search your local coding agent history</summary>
 
 - **Source**: source
