@@ -1,7 +1,5 @@
 <img alt="llm-agents.nix" src="https://banner.numtide.com/banner/numtide/llm-agents.nix.svg">
 
-[![Mentioned in Awesome Gemini CLI](https://awesome.re/mentioned-badge.svg)](https://github.com/Piebald-AI/awesome-gemini-cli)
-
 Nix packages for AI coding agents and development tools. Automatically updated daily.
 
 ## Available Tools
