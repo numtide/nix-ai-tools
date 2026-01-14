@@ -1,30 +1,43 @@
 {
   lib,
-  stdenv,
-  fetchzip,
+  buildNpmPackage,
+  fetchFromGitHub,
   bun,
   flake,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-stdenv.mkDerivation rec {
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash npmDepsHash;
+in
+buildNpmPackage {
   pname = "cc-sdd";
-  version = "2.0.5";
+  inherit version npmDepsHash;
 
-  src = fetchzip {
-    url = "https://registry.npmjs.org/cc-sdd/-/cc-sdd-${version}.tgz";
-    hash = "sha256-4wQVFEWh7TIXnQDxd/2RFLqxRJ1QsG0n9LrUkczMy58=";
+  src = fetchFromGitHub {
+    owner = "gotalab";
+    repo = "cc-sdd";
+    rev = "v${version}";
+    inherit hash;
   };
 
-  nativeBuildInputs = [ bun ];
+  sourceRoot = "source/tools/cc-sdd";
+
+  # Build with tsc
+  buildPhase = ''
+    runHook preBuild
+    npm run build
+    runHook postBuild
+  '';
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/bin $out/lib/cc-sdd/dist
+    mkdir -p $out/bin $out/lib/cc-sdd
 
-    cp -r dist/* $out/lib/cc-sdd/dist/
+    cp -r dist $out/lib/cc-sdd/
     cp -r templates $out/lib/cc-sdd/
     cp package.json $out/lib/cc-sdd/
 
@@ -37,6 +50,8 @@ stdenv.mkDerivation rec {
 
     runHook postInstall
   '';
+
+  dontNpmBuild = false;
 
   doInstallCheck = true;
 
@@ -51,7 +66,7 @@ stdenv.mkDerivation rec {
     description = "Spec-driven development framework for AI coding agents";
     homepage = "https://github.com/gotalab/cc-sdd";
     license = licenses.mit;
-    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ ryoppippi ];
     mainProgram = "cc-sdd";
     platforms = platforms.all;
