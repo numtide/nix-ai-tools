@@ -403,6 +403,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>chainlink</strong> - Simple, lean issue tracker CLI designed for AI-assisted development</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/dollspace-gay/chainlink
+- **Usage**: `nix run github:numtide/llm-agents.nix#chainlink -- --help`
+- **Nix**: [packages/chainlink/package.nix](packages/chainlink/package.nix)
+
+</details>
+<details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
 - **Source**: bytecode
