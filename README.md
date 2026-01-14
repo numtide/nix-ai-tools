@@ -395,7 +395,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>cc-sdd</strong> - Spec-driven development framework for AI coding agents</summary>
 
-- **Source**: bytecode
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/gotalab/cc-sdd
 - **Usage**: `nix run github:numtide/llm-agents.nix#cc-sdd -- --help`
