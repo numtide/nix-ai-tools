@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   fetchFromGitHub,
   rustPlatform,
   versionCheckHook,
@@ -41,6 +42,7 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://github.com/dollspace-gay/chainlink";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
+    maintainers = with flake.lib.maintainers; [ Chickensoupwithrice ];
     mainProgram = "chainlink";
     platforms = platforms.all;
   };
