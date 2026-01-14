@@ -1,60 +1,72 @@
 {
   lib,
-  buildNpmPackage,
+  stdenv,
+  fetchFromGitHub,
+  fetchPnpmDeps,
   cmake,
-  fetchurl,
-  fetchNpmDepsWithPackuments,
   git,
-  npmConfigHook,
-  nodejs_22,
-  runCommand,
+  makeWrapper,
+  nodejs-slim,
+  pnpm,
+  pnpmConfigHook,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-let
-  versionData = lib.importJSON ./hashes.json;
-  version = versionData.version;
-
-  # Create a source with package-lock.json included
-  srcWithLock = runCommand "clawdbot-src-with-lock" { } ''
-    mkdir -p $out
-    tar -xzf ${
-      fetchurl {
-        url = "https://registry.npmjs.org/clawdbot/-/clawdbot-${version}.tgz";
-        hash = versionData.sourceHash;
-      }
-    } -C $out --strip-components=1
-    cp ${./package-lock.json} $out/package-lock.json
-  '';
-in
-buildNpmPackage {
-  inherit npmConfigHook version;
+stdenv.mkDerivation (finalAttrs: {
   pname = "clawdbot";
-  nodejs = nodejs_22;
+  version = "2026.1.13";
 
-  src = srcWithLock;
-
-  npmDeps = fetchNpmDepsWithPackuments {
-    src = srcWithLock;
-    name = "clawdbot-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    cacheVersion = 2;
+  src = fetchFromGitHub {
+    owner = "clawdbot";
+    repo = "clawdbot";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-wQlahXWOKL9w3v2QACd/HnmPCc98jbASybwkhRnJZoc=";
   };
-  makeCacheWritable = true;
 
-  # node-llama-cpp needs cmake and git during postinstall
+  pnpmDeps = fetchPnpmDeps {
+    inherit (finalAttrs) pname version src;
+    hash = "sha256-IrI6ylJD/SPase23soGg6XeUdCV3cWtPPdtImBkYN+Y=";
+    fetcherVersion = 2;
+  };
+
   nativeBuildInputs = [
     cmake
     git
+    makeWrapper
+    nodejs-slim
+    pnpm
+    pnpmConfigHook
   ];
 
   # Prevent cmake from automatically running in configure phase
   # (it's only needed for npm postinstall scripts)
   dontUseCmakeConfigure = true;
 
-  # The package from npm is already built
-  dontNpmBuild = true;
+  buildPhase = ''
+    runHook preBuild
+
+    pnpm build
+
+    runHook postBuild
+  '';
+
+  installPhase = ''
+    runHook preInstall
+
+    mkdir -p $out/{bin,lib/clawdbot}
+    cp -r dist $out/lib/clawdbot/
+    cp -r node_modules $out/lib/clawdbot/
+    cp -r skills $out/lib/clawdbot/
+    cp -r patches $out/lib/clawdbot/
+    cp -r ui $out/lib/clawdbot/
+    cp package.json $out/lib/clawdbot/
+
+    makeWrapper ${nodejs-slim}/bin/node $out/bin/clawdbot \
+      --add-flags "$out/lib/clawdbot/dist/entry.js"
+
+    runHook postInstall
+  '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
@@ -69,9 +81,9 @@ buildNpmPackage {
     homepage = "https://clawd.bot";
     changelog = "https://github.com/clawdbot/clawdbot/releases";
     license = lib.licenses.mit;
-    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.all;
     mainProgram = "clawdbot";
   };
-}
+})
