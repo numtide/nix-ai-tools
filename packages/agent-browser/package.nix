@@ -5,6 +5,7 @@
   chromium,
   makeBinaryWrapper,
   fetchNpmDepsWithPackuments,
+  nodejs-slim,
   npmConfigHook,
   rustPlatform,
   stdenv,
@@ -57,6 +58,7 @@ buildNpmPackage {
 
   nativeBuildInputs = [ makeBinaryWrapper ];
 
+  # On Linux, bundle chromium; on macOS, use system-installed Chrome
   buildInputs = [ agent-browser-native-binary ] ++ lib.optional stdenv.isLinux chromium;
 
   postPatch = ''
@@ -83,15 +85,23 @@ buildNpmPackage {
     cp -r skills $out/etc/agent-browser/
 
     mkdir -p $out/bin
-    makeWrapper ${agent-browser-native-binary}/bin/agent-browser $out/bin/agent-browser \
+    # Copy the native binary to our bin directory
+    cp ${agent-browser-native-binary}/bin/agent-browser $out/bin/.agent-browser-unwrapped
+
+    # Create symlinks so the Rust CLI can find daemon.js
+    # The CLI searches for: exe_dir/../dist/daemon.js
+    ln -s $out/share/agent-browser/dist $out/dist
+    ln -s $out/share/agent-browser/node_modules $out/node_modules
+
+    # Create wrapper that sets up PATH and environment
+    makeWrapper $out/bin/.agent-browser-unwrapped $out/bin/agent-browser \
+      --prefix PATH : ${lib.makeBinPath [ nodejs-slim ]} \
       ${lib.optionalString stdenv.isLinux "--set AGENT_BROWSER_EXECUTABLE_PATH ${chromium}/bin/chromium"}
 
     runHook postInstall
   '';
 
   doInstallCheck = false;
-  # agent-browser does not support --version flag
-  # nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Utilities";
 
