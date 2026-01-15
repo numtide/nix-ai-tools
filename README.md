@@ -432,6 +432,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/spec-kit/package.nix](packages/spec-kit/package.nix)
 
 </details>
+<details>
+<summary><strong>vibe-kanban</strong> - Kanban board to orchestrate AI coding agents like Claude Code, Codex, and Gemini CLI</summary>
+
+- **Source**: bytecode
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/BloopAI/vibe-kanban
+- **Usage**: `nix run github:numtide/llm-agents.nix#vibe-kanban -- --help`
+- **Nix**: [packages/vibe-kanban/package.nix](packages/vibe-kanban/package.nix)
+
+</details>
 
 ### Code Review
 
