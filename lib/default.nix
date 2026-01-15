@@ -12,6 +12,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 22575913;
         name = "Anish Lakhwara";
       };
+      ryoppippi = {
+        github = "ryoppippi";
+        githubId = 1560508;
+        name = "ryoppippi";
+      };
     };
   }
 )

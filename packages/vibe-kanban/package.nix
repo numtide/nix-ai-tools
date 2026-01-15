@@ -12,6 +12,7 @@
   libgit2,
   sqlite,
   llvmPackages,
+  flake,
 }:
 
 let
@@ -116,6 +117,7 @@ rustPlatform.buildRustPackage {
     homepage = "https://github.com/BloopAI/vibe-kanban";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    maintainers = with flake.lib.maintainers; [ ryoppippi ];
     mainProgram = "vibe-kanban";
     platforms = lib.platforms.unix;
   };
