@@ -10,6 +10,8 @@
   pkg-config,
   openssl,
   libgit2,
+  sqlite,
+  llvmPackages,
 }:
 
 let
@@ -76,10 +78,14 @@ rustPlatform.buildRustPackage {
     "review"
   ];
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    pkg-config
+    llvmPackages.libclang
+  ];
   buildInputs = [
     openssl
     libgit2
+    sqlite
   ];
 
   # Copy frontend assets before Rust build
@@ -90,6 +96,7 @@ rustPlatform.buildRustPackage {
 
   env = {
     SQLX_OFFLINE = "true";
+    LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
   };
 
   doCheck = false;
