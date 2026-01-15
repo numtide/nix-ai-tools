@@ -48,6 +48,7 @@ rustPlatform.buildRustPackage rec {
   preBuild = ''
     export ORT_SKIP_DOWNLOAD=1
     export ORT_LIB_LOCATION=${onnxruntime}/lib
+    export ORT_PREFER_DYNAMIC_LINK=1
   '';
 
   # The main binary is cass
