@@ -471,7 +471,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>clawdbot</strong> - Personal AI assistant with WhatsApp, Telegram, Discord integration</summary>
 
-- **Source**: bytecode
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://clawd.bot
 - **Usage**: `nix run github:numtide/llm-agents.nix#clawdbot -- --help`
