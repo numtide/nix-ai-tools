@@ -1,0 +1,10 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -44,7 +44,7 @@ dirs = "*"
+ walkdir = "*"
+ glob = "*"
+-base64 = "*"
++base64 = ">=0.21"
+ chrono = { version = "*", features = ["serde"] }
+ semver = "*"
+ tracing-appender = "*"
