@@ -13,16 +13,23 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "coding-agent-search";
-  version = "0.1.55";
+  version = "0.1.57";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "coding_agent_session_search";
     rev = "v${version}";
-    hash = "sha256-T7UjwSetD8PgmSOUII9+gE0JQBJnH6PC2ay+2LoXzNQ=";
+    hash = "sha256-ozFxitoMdPO+xpS38kWkEz6qPKY/lahJfAGV/fLVefs=";
   };
 
-  cargoHash = "sha256-d+KR0IA1Yca0XPorf8B4QWmesmChCJ55aQny7JDc6XM=";
+  cargoHash = "sha256-Zg3unOegYwRPf5blc3HcS5AHvAkjtQM+MGYCXcNqVpg=";
+
+  patches = [
+    # Fix base64 version conflict - force use of v0.21+ API
+    # The code uses base64::Engine which is only available in 0.21+,
+    # but Cargo.toml uses "*" which can resolve to 0.13.1 from dependencies
+    ./fix-base64-version.patch
+  ];
 
   # Disable slow LTO settings for faster builds
   # Remove lld linker override - it breaks rpath setting in Nix
@@ -48,6 +55,7 @@ rustPlatform.buildRustPackage rec {
   preBuild = ''
     export ORT_SKIP_DOWNLOAD=1
     export ORT_LIB_LOCATION=${onnxruntime}/lib
+    export ORT_PREFER_DYNAMIC_LINK=1
   '';
 
   # The main binary is cass
