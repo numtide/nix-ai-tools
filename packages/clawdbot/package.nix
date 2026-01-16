@@ -15,18 +15,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "clawdbot";
-  version = "2026.1.13";
+  version = "2026.1.14-1";
 
   src = fetchFromGitHub {
     owner = "clawdbot";
     repo = "clawdbot";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-wQlahXWOKL9w3v2QACd/HnmPCc98jbASybwkhRnJZoc=";
+    hash = "sha256-UuzOkJUbmgcjj6ba+uIhmZdDMNs9NRyyTPEEf+3cFSg=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-IrI6ylJD/SPase23soGg6XeUdCV3cWtPPdtImBkYN+Y=";
+    hash = "sha256-hqujaLScFYdVnN4D8x35cKgCLqG2f9WTPFNC2ikBd7o=";
     fetcherVersion = 2;
   };
 
