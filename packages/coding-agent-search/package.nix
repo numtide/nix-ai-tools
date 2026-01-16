@@ -22,7 +22,14 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-ozFxitoMdPO+xpS38kWkEz6qPKY/lahJfAGV/fLVefs=";
   };
 
-  cargoHash = "sha256-Zg3unOegYwRPf5blc3HcS5AHvAkjtQM+MGYCXcNqVpg=";
+  cargoHash = lib.fakeHash;
+
+  patches = [
+    # Fix base64 version conflict - force use of v0.21+ API
+    # The code uses base64::Engine which is only available in 0.21+,
+    # but Cargo.toml uses "*" which can resolve to 0.13.1 from dependencies
+    ./fix-base64-version.patch
+  ];
 
   # Disable slow LTO settings for faster builds
   # Remove lld linker override - it breaks rpath setting in Nix
