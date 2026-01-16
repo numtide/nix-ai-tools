@@ -56,7 +56,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     mkdir -p $out/{bin,lib/clawdbot}
     
-    # Copy all runtime-required directories
+    # Copy required runtime directories
     cp -r dist $out/lib/clawdbot/
     cp -r node_modules $out/lib/clawdbot/
     cp -r extensions $out/lib/clawdbot/
@@ -64,11 +64,11 @@ stdenv.mkDerivation (finalAttrs: {
     cp -r patches $out/lib/clawdbot/
     cp -r ui $out/lib/clawdbot/
     
-    # Copy additional directories that may be referenced
-    cp -r assets $out/lib/clawdbot/ || true
-    cp -r docs $out/lib/clawdbot/ || true
+    # Copy additional directories from package.json "files" field
+    cp -r assets $out/lib/clawdbot/
+    cp -r docs $out/lib/clawdbot/
     
-    # Copy configuration and metadata files
+    # Copy package metadata
     cp package.json $out/lib/clawdbot/
 
     makeWrapper ${nodejs-slim}/bin/node $out/bin/clawdbot \
