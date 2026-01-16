@@ -22,7 +22,7 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-ozFxitoMdPO+xpS38kWkEz6qPKY/lahJfAGV/fLVefs=";
   };
 
-  cargoHash = lib.fakeHash;
+  cargoHash = "sha256-Zg3unOegYwRPf5blc3HcS5AHvAkjtQM+MGYCXcNqVpg=";
 
   patches = [
     # Fix base64 version conflict - force use of v0.21+ API
