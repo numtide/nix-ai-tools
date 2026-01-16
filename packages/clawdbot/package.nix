@@ -15,18 +15,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "clawdbot";
-  version = "2026.1.13";
+  version = "2026.1.15";
 
   src = fetchFromGitHub {
     owner = "clawdbot";
     repo = "clawdbot";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-wQlahXWOKL9w3v2QACd/HnmPCc98jbASybwkhRnJZoc=";
+    hash = "sha256-QN9ffRChZqU4yde9aaRJu2yJEBmu3hJk20tlMkvhNag=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-IrI6ylJD/SPase23soGg6XeUdCV3cWtPPdtImBkYN+Y=";
+    hash = "sha256-VfOoHBhpDZxs5dugyOGpBWaqlc4nMqpuJgb2XtvtcFM=";
     fetcherVersion = 2;
   };
 
@@ -55,12 +55,8 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
 
     mkdir -p $out/{bin,lib/clawdbot}
-    cp -r dist $out/lib/clawdbot/
-    cp -r node_modules $out/lib/clawdbot/
-    cp -r skills $out/lib/clawdbot/
-    cp -r patches $out/lib/clawdbot/
-    cp -r ui $out/lib/clawdbot/
-    cp package.json $out/lib/clawdbot/
+
+    cp -r * $out/lib/clawdbot/
 
     makeWrapper ${nodejs-slim}/bin/node $out/bin/clawdbot \
       --add-flags "$out/lib/clawdbot/dist/entry.js"
