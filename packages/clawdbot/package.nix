@@ -55,11 +55,20 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
 
     mkdir -p $out/{bin,lib/clawdbot}
+    
+    # Copy all runtime-required directories
     cp -r dist $out/lib/clawdbot/
     cp -r node_modules $out/lib/clawdbot/
+    cp -r extensions $out/lib/clawdbot/
     cp -r skills $out/lib/clawdbot/
     cp -r patches $out/lib/clawdbot/
     cp -r ui $out/lib/clawdbot/
+    
+    # Copy additional directories that may be referenced
+    cp -r assets $out/lib/clawdbot/ || true
+    cp -r docs $out/lib/clawdbot/ || true
+    
+    # Copy configuration and metadata files
     cp package.json $out/lib/clawdbot/
 
     makeWrapper ${nodejs-slim}/bin/node $out/bin/clawdbot \
