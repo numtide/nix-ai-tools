@@ -55,12 +55,8 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
 
     mkdir -p $out/{bin,lib/clawdbot}
-    cp -r dist $out/lib/clawdbot/
-    cp -r node_modules $out/lib/clawdbot/
-    cp -r skills $out/lib/clawdbot/
-    cp -r patches $out/lib/clawdbot/
-    cp -r ui $out/lib/clawdbot/
-    cp package.json $out/lib/clawdbot/
+
+    cp -r * $out/lib/clawdbot/
 
     makeWrapper ${nodejs-slim}/bin/node $out/bin/clawdbot \
       --add-flags "$out/lib/clawdbot/dist/entry.js"
