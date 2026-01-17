@@ -19,8 +19,26 @@
 
   outputs =
     inputs:
-    inputs.blueprint {
-      inherit inputs;
-      nixpkgs.config.allowUnfree = true;
+    let
+      blueprintOutputs = inputs.blueprint {
+        inherit inputs;
+        nixpkgs.config.allowUnfree = true;
+      };
+
+      # Utility packages to exclude from the overlay
+      excludedPackages = [
+        "formatter"
+        "flake-inputs"
+        "versionCheckHomeHook"
+        "darwinOpenptyHook"
+        "wrapBuddy"
+      ];
+    in
+    blueprintOutputs
+    // {
+      overlays.default = import ./overlays {
+        packages = blueprintOutputs.packages;
+        inherit excludedPackages;
+      };
     };
 }
