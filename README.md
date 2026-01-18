@@ -542,7 +542,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 ## Installation
 
-### Using Nix Flakes
+### Using Nix Flakes (Recommended)
 
 Add to your system configuration:
 
