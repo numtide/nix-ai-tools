@@ -9,11 +9,11 @@
 
 stdenv.mkDerivation rec {
   pname = "letta-code";
-  version = "0.13.0";
+  version = "0.13.1";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
-    hash = "sha256-hjmR6e40t4L7AUHmfmhZjdfoKpIH8f3mEBJd+7Htp48=";
+    hash = "sha256-4IhKMNcNpJqAdyCUkiOBR8tLKMNJXp7hTpi6Fy8EXpg=";
   };
 
   nativeBuildInputs = [ nodejs ];
