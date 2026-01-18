@@ -10,19 +10,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "openskills";
-  version = "1.3.0";
+  version = "1.5.0";
 
   src = fetchFromGitHub {
     owner = "numman-ali";
     repo = "openskills";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-JLPxG8PbCSRLm6DFxSSbE94pf+Ur1ME5uF5f1z2Jhjw=";
+    hash = "sha256-rOrLi43J+w6XBRZYYwlDPl8RqU7Zhr45B9UyP6Xarj0=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-53FSjHKL/DNua/otGoV1boSrqYMAQ91CrUjnGlAAiT8=";
+    hash = "sha256-8cj+2mE4ycXgSNSAMaOJgeBhwTTzJrNi2hzwaMKKHF8=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
