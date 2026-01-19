@@ -19,8 +19,17 @@
 
   outputs =
     inputs:
-    inputs.blueprint {
-      inherit inputs;
-      nixpkgs.config.allowUnfree = true;
+    let
+      blueprintOutputs = inputs.blueprint {
+        inherit inputs;
+        nixpkgs.config.allowUnfree = true;
+      };
+
+    in
+    blueprintOutputs
+    // {
+      overlays.default = import ./overlays {
+        packages = blueprintOutputs.packages;
+      };
     };
 }

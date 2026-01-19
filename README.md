@@ -542,7 +542,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 ## Installation
 
-### Using Nix Flakes
+### Using Nix Flakes (Recommended)
 
 Add to your system configuration:
 
@@ -560,6 +560,34 @@ Add to your system configuration:
     qwen-code
     # ... other tools
   ];
+}
+```
+
+### Using Overlay
+
+Alternatively, use the overlay to access packages under the `llm-agents` namespace:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    llm-agents.url = "github:numtide/llm-agents.nix";
+  };
+
+  outputs = { nixpkgs, llm-agents, ... }: {
+    # NixOS / nix-darwin configuration
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [{
+        nixpkgs.overlays = [ llm-agents.overlays.default ];
+        environment.systemPackages = [
+          pkgs.llm-agents.claude-code
+          pkgs.llm-agents.codex
+          pkgs.llm-agents.gemini-cli
+        ];
+      }];
+    };
+  };
 }
 ```
 
