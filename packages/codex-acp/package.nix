@@ -4,6 +4,8 @@
   rustPlatform,
   pkg-config,
   openssl,
+  makeWrapper,
+  skills-ref,
 }:
 rustPlatform.buildRustPackage rec {
   pname = "codex-acp";
@@ -20,6 +22,7 @@ rustPlatform.buildRustPackage rec {
 
   nativeBuildInputs = [
     pkg-config
+    makeWrapper
   ];
 
   buildInputs = [
@@ -27,6 +30,11 @@ rustPlatform.buildRustPackage rec {
   ];
 
   doCheck = false;
+
+  postInstall = ''
+    wrapProgram $out/bin/codex-acp \
+      --prefix PATH : ${lib.makeBinPath [ skills-ref ]}
+  '';
 
   passthru.category = "ACP Ecosystem";
 
