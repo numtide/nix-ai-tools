@@ -60,24 +60,55 @@ if [ "$type" = "package" ]; then
   # Verify the package actually builds with the new hashes
   # This catches npm registry non-determinism issues where hashes become stale
   echo "Verifying package builds..."
-  if ! nix build .#"$name" --no-link 2>&1; then
-    echo "::error::Package $name failed to build after update"
-    echo "This may be due to npm registry non-determinism. Retrying hash computation..."
+  max_retries=3
+  retry_count=0
 
-    # Retry nix-update to recompute hashes
-    if output=$(nix-update --flake "$name" "${nix_update_args[@]}" 2>&1); then
-      echo "$output"
-      # Try building again
-      if ! nix build .#"$name" --no-link 2>&1; then
-        echo "::error::Package $name still fails to build after retry"
-        exit 1
-      fi
-    else
-      echo "::error::nix-update retry failed for package $name"
-      echo "$output"
+  while ! build_output=$(nix build .#"$name" --no-link 2>&1); do
+    retry_count=$((retry_count + 1))
+    echo "Build attempt $retry_count failed"
+
+    if [ "$retry_count" -ge "$max_retries" ]; then
+      echo "::error::Package $name failed to build after $max_retries attempts"
+      echo "$build_output"
       exit 1
     fi
-  fi
+
+    # Check if it's a hash mismatch error and extract the correct hash
+    if echo "$build_output" | grep -q "hash mismatch in fixed-output derivation"; then
+      echo "Hash mismatch detected, extracting correct hash..."
+
+      # Extract the "got:" hash from the error message
+      correct_hash=$(echo "$build_output" | grep -A1 "hash mismatch" | grep "got:" | awk '{print $2}')
+
+      if [ -n "$correct_hash" ]; then
+        echo "Correct hash: $correct_hash"
+
+        # Find the specified (wrong) hash
+        wrong_hash=$(echo "$build_output" | grep -A1 "hash mismatch" | grep "specified:" | awk '{print $2}')
+
+        if [ -n "$wrong_hash" ]; then
+          echo "Replacing $wrong_hash with $correct_hash"
+
+          # Update the hash in package.nix
+          package_file="packages/$name/package.nix"
+          if [ -f "$package_file" ]; then
+            sed -i "s|$wrong_hash|$correct_hash|g" "$package_file"
+            echo "Updated hash in $package_file"
+          else
+            echo "::warning::Could not find $package_file to update hash"
+          fi
+        fi
+      else
+        echo "::warning::Could not extract correct hash from error message"
+        echo "$build_output"
+      fi
+    else
+      # Not a hash mismatch, some other build error
+      echo "::error::Build failed with non-hash-mismatch error:"
+      echo "$build_output"
+      exit 1
+    fi
+  done
   echo "Build verification passed"
 
   echo "updated=true" >>"$output_var"
