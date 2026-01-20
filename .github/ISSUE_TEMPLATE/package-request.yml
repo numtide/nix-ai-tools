@@ -9,6 +9,10 @@ body:
         **We only add packages that we personally use.** For other tools, we welcome contributions
         where you package and maintain it yourself.
 
+        **🔌 MCP Servers:** Please submit MCP server packages to
+        [natsukium/mcp-servers-nix](https://github.com/natsukium/mcp-servers-nix) instead.
+        That project has the infrastructure to integrate MCP servers into various agents.
+
         See existing packages in `packages/` for examples, and `AGENTS.md` for guidelines.
         Add yourself to `lib/default.nix` if you're not in nixpkgs maintainers.
   - type: input
