@@ -96,7 +96,9 @@ rustPlatform.buildRustPackage rec {
     changelog = "https://github.com/Dicklesworthstone/coding_agent_session_search/blob/main/CHANGELOG.md";
     downloadPage = "https://github.com/Dicklesworthstone/coding_agent_session_search/releases";
     license = licenses.mit;
-    platforms = platforms.unix;
+    # onnxruntime rpath linking is broken on Darwin - dyld fails to find libonnxruntime
+    # https://github.com/numtide/llm-agents.nix/pull/1976
+    platforms = platforms.linux;
     sourceProvenance = with sourceTypes; [ fromSource ];
     mainProgram = "cass";
   };
