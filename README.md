@@ -529,6 +529,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>kiri</strong> - Intelligent code context extraction for LLMs via Model Context Protocol</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/CAPHTECH/kiri
+- **Usage**: `nix run github:numtide/llm-agents.nix#kiri -- --help`
+- **Nix**: [packages/kiri/package.nix](packages/kiri/package.nix)
+
+</details>
+<details>
 <summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
 
 - **Source**: source
