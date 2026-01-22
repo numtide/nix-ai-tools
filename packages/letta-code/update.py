@@ -42,13 +42,23 @@ def main() -> None:
     print("Calculating source hash...")
     source_hash = calculate_url_hash(tarball_url)
 
-    if not extract_or_generate_lockfile(
-        tarball_url,
-        SCRIPT_DIR / "package-lock.json",
-        # Use legacy-peer-deps to resolve ink version conflicts (ink-link requires >=6, but package uses ^5)
-        env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
-    ):
-        return
+    # Fetch package-lock.json from GitHub repository (main branch)
+    print("Fetching package-lock.json from GitHub...")
+    lockfile_url = "https://raw.githubusercontent.com/letta-ai/letta-code/main/package-lock.json"
+    try:
+        from urllib.request import urlretrieve
+        urlretrieve(lockfile_url, SCRIPT_DIR / "package-lock.json")
+        print("Downloaded package-lock.json from repository")
+    except Exception as e:
+        print(f"Failed to fetch lockfile from GitHub: {e}")
+        print("Falling back to generating lockfile...")
+        if not extract_or_generate_lockfile(
+            tarball_url,
+            SCRIPT_DIR / "package-lock.json",
+            # Use legacy-peer-deps to resolve ink version conflicts (ink-link requires >=6, but package uses ^5)
+            env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
+        ):
+            return
 
     # Update hashes.json
     data = {
