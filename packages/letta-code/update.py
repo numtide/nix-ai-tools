@@ -45,6 +45,7 @@ def main() -> None:
     if not extract_or_generate_lockfile(
         tarball_url,
         SCRIPT_DIR / "package-lock.json",
+        # Use legacy-peer-deps to resolve ink version conflicts (ink-link requires >=6, but package uses ^5)
         env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
     ):
         return
