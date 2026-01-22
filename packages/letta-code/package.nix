@@ -1,41 +1,30 @@
 {
   lib,
   buildNpmPackage,
-  fetchurl,
+  fetchFromGitHub,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   nodejs,
-  runCommand,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-let
-  versionData = lib.importJSON ./hashes.json;
-  version = versionData.version;
-  # Create a source with package-lock.json included
-  srcWithLock = runCommand "letta-code-src-with-lock" { } ''
-    mkdir -p $out
-    tar -xzf ${
-      fetchurl {
-        url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
-        hash = versionData.sourceHash;
-      }
-    } -C $out --strip-components=1
-    cp ${./package-lock.json} $out/package-lock.json
-  '';
-in
 buildNpmPackage rec {
   inherit npmConfigHook nodejs;
   pname = "letta-code";
-  inherit version;
+  version = "0.13.6-unstable-2026-01-22";
 
-  src = srcWithLock;
+  src = fetchFromGitHub {
+    owner = "letta-ai";
+    repo = "letta-code";
+    rev = "bf18792c9c6c35df78e978c1a21b0dd95b41fbb7";
+    hash = "sha256-MuK3X5QkAjIVRXfSbifzdi1z8Y4HFs+REbTHXoitz4E=";
+  };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
+    hash = "sha256-MogODpIvfjfvHJOkciCeWBlGNg06B2vW2wnKTkEv7Tc=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
@@ -43,8 +32,8 @@ buildNpmPackage rec {
   npmInstallFlags = [ "--ignore-scripts" ];
   npmRebuildFlags = [ "--ignore-scripts" ];
 
-  # The package from npm is already built
-  dontNpmBuild = true;
+  # Need to build from source since GitHub doesn't include pre-built letta.js
+  dontNpmBuild = false;
 
   # Use environment variables to forcefully disable all scripts
   NPM_CONFIG_IGNORE_SCRIPTS = "true";
