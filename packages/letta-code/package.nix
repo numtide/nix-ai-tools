@@ -1,46 +1,62 @@
 {
   lib,
-  stdenv,
-  fetchzip,
+  buildNpmPackage,
+  fetchurl,
+  fetchNpmDepsWithPackuments,
+  npmConfigHook,
   nodejs,
+  runCommand,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-stdenv.mkDerivation rec {
+let
+  versionData = lib.importJSON ./hashes.json;
+  version = versionData.version;
+  # Create a source with package-lock.json included
+  srcWithLock = runCommand "letta-code-src-with-lock" { } ''
+    mkdir -p $out
+    tar -xzf ${
+      fetchurl {
+        url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
+        hash = versionData.sourceHash;
+      }
+    } -C $out --strip-components=1
+    cp ${./package-lock.json} $out/package-lock.json
+  '';
+in
+buildNpmPackage rec {
+  inherit npmConfigHook nodejs;
   pname = "letta-code";
-  version = "0.13.6";
+  inherit version;
 
-  src = fetchzip {
-    url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
-    hash = "sha256-XA8Iy/wlQ6CKrEvGbFwLiAivSvpSMmH91taU3VdPfm8=";
+  src = srcWithLock;
+
+  npmDeps = fetchNpmDepsWithPackuments {
+    inherit src;
+    name = "${pname}-${version}-npm-deps";
+    hash = versionData.npmDepsHash;
+    fetcherVersion = 2;
   };
 
-  nativeBuildInputs = [ nodejs ];
+  npmInstallFlags = [ "--ignore-scripts" ];
+  npmRebuildFlags = [ "--ignore-scripts" ];
 
-  dontBuild = true;
+  # The package from npm is already built
+  dontNpmBuild = true;
 
-  installPhase = ''
-    runHook preInstall
+  # Use environment variables to forcefully disable all scripts
+  NPM_CONFIG_IGNORE_SCRIPTS = "true";
+  NPM_CONFIG_LEGACY_PEER_DEPS = "true";
 
-    mkdir -p $out/lib/letta-code
-
-    cp -r scripts skills vendor $out/lib/letta-code/
-
-    install -m755 -D letta.js $out/bin/letta
-
-    # Replace the shebang that tries to use bun or node with a direct node shebang
-    sed -i '1,2c #!${nodejs}/bin/node' $out/bin/letta
-
-    runHook postInstall
-  '';
+  # patchShebangs will automatically fix the shebang in the installed binary
+  # No need for manual postInstall sed commands
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
   ];
-  versionCheckProgramArg = [ "--version" ];
 
   passthru.category = "AI Coding Agents";
 
