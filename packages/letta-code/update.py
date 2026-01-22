@@ -43,7 +43,9 @@ def main() -> None:
     source_hash = calculate_url_hash(tarball_url)
 
     if not extract_or_generate_lockfile(
-        tarball_url, SCRIPT_DIR / "package-lock.json", env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"}
+        tarball_url,
+        SCRIPT_DIR / "package-lock.json",
+        env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
     ):
         return
 

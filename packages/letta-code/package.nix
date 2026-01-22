@@ -8,7 +8,6 @@
   runCommand,
   versionCheckHook,
   versionCheckHomeHook,
-  jq,
 }:
 
 let
@@ -40,45 +39,25 @@ buildNpmPackage rec {
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
-  
-  # npm ci supports legacy-peer-deps via environment variable
-  NPM_CONFIG_LEGACY_PEER_DEPS = "true";
-  
+
   npmInstallFlags = [ "--ignore-scripts" ];
   npmRebuildFlags = [ "--ignore-scripts" ];
-  
-  # Debug: show what npm commands will be run
-  preInstall = ''
-    echo "=== DEBUG: About to run npm install ==="
-    echo "npmInstallFlags: $npmInstallFlags"
-    echo "npmRebuildFlags: $npmRebuildFlags"
-    echo "NPM_CONFIG_LEGACY_PEER_DEPS: $NPM_CONFIG_LEGACY_PEER_DEPS"
-  '';
-  
-  # Debug: show what's in the package files
-  postPatch = ''
-    echo "=== DEBUG: Checking package.json optional dependencies ==="
-    ${lib.getExe jq} '.optionalDependencies' package.json || true
-    echo "=== DEBUG: Checking package-lock.json for ripgrep ==="
-    ${lib.getExe jq} '.packages | keys | .[] | select(contains("ripgrep"))' package-lock.json || true
-    echo "=== DEBUG: NPM version ==="
-    npm --version
-    echo "=== DEBUG: Environment variables ==="
-    env | grep -i npm || true
-  '';
 
   # The package from npm is already built
   dontNpmBuild = true;
 
+  # Use environment variables to forcefully disable all scripts
+  NPM_CONFIG_IGNORE_SCRIPTS = "true";
+  NPM_CONFIG_LEGACY_PEER_DEPS = "true";
+
   # patchShebangs will automatically fix the shebang in the installed binary
   # No need for manual postInstall sed commands
 
-  # Temporarily disable version check to test build
-  doInstallCheck = false;
-  # nativeInstallCheckInputs = [
-  #   versionCheckHook
-  #   versionCheckHomeHook
-  # ];
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
 
   passthru.category = "AI Coding Agents";
 
