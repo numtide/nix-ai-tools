@@ -10,17 +10,17 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "kilocode-cli";
-  version = "0.25.0";
+  version = "0.25.1";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@kilocode/cli/-/cli-${finalAttrs.version}.tgz";
-    hash = "sha256-YLyvAhAstro7Bhk0PeUk+DJT5XFWrXOJz6sUI6rEUKk=";
+    hash = "sha256-LKqeGk/mIvMFhDvNu86ZrZtaHuQWGS7eK1oPNVNnYNE=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-4szVl0c5EzXFq3UkAbt0xcQesG0lnG3QBQNySoz8TRI=";
+    hash = "sha256-H7kUUgBI/QdFQw9+hMHWvAp/2rjr52ymNqmnsyqir1E=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
