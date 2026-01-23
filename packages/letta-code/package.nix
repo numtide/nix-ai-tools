@@ -1,35 +1,50 @@
 {
   lib,
   buildNpmPackage,
-  fetchFromGitHub,
+  fetchurl,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   nodejs,
+  runCommand,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
+let
+  version = "0.13.8";
+  # The npm tarball doesn't include package-lock.json, so we maintain our own
+  # The upstream package-lock.json (added in commit 19680594) is out of date and not usable
+  srcWithLock = runCommand "letta-code-src-with-lock" { } ''
+    mkdir -p $out
+    tar -xzf ${
+      fetchurl {
+        url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
+        hash = "sha256-GK6a5To4tjg2mzbaMFdxFr0tyDUmgF6w3g/x/zM8GV8=";
+      }
+    } -C $out --strip-components=1
+    cp ${./package-lock.json} $out/package-lock.json
+  '';
+in
 buildNpmPackage rec {
   inherit npmConfigHook nodejs;
   pname = "letta-code";
-  version = "0.13.8";
+  inherit version;
 
-  src = fetchFromGitHub {
-    owner = "letta-ai";
-    repo = "letta-code";
-    rev = "v${version}";
-    hash = "sha256-oYZPbxws5ayYVxrA8XtR+KMpGeVuq5icoB66NlcRu/I=";
-  };
+  src = srcWithLock;
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-ZNkCkIYtOvK3xmnp6PTTpahIlPmLSzdcyCjcc1E6pzU=";
     fetcherVersion = 2;
   };
+  makeCacheWritable = true;
 
   npmInstallFlags = [ "--ignore-scripts" ];
   npmRebuildFlags = [ "--ignore-scripts" ];
+
+  # The package from npm is already built
+  dontNpmBuild = true;
 
   # Use environment variables to forcefully disable all scripts
   NPM_CONFIG_IGNORE_SCRIPTS = "true";
@@ -52,7 +67,7 @@ buildNpmPackage rec {
     downloadPage = "https://www.npmjs.com/package/@letta-ai/letta-code";
     changelog = "https://github.com/letta-ai/letta-code/releases";
     license = licenses.asl20;
-    sourceProvenance = with sourceTypes; [ fromSource ];
+    sourceProvenance = with sourceTypes; [ binaryBytecode ];
     maintainers = with maintainers; [ vizid ];
     mainProgram = "letta";
     platforms = platforms.all;
