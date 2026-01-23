@@ -1,49 +1,35 @@
 {
   lib,
   buildNpmPackage,
-  fetchurl,
+  fetchFromGitHub,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   nodejs,
-  runCommand,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-let
-  versionData = lib.importJSON ./hashes.json;
-  version = versionData.version;
-  # Create a source with package-lock.json included
-  srcWithLock = runCommand "letta-code-src-with-lock" { } ''
-    mkdir -p $out
-    tar -xzf ${
-      fetchurl {
-        url = "https://registry.npmjs.org/@letta-ai/letta-code/-/letta-code-${version}.tgz";
-        hash = versionData.sourceHash;
-      }
-    } -C $out --strip-components=1
-    cp ${./package-lock.json} $out/package-lock.json
-  '';
-in
 buildNpmPackage rec {
   inherit npmConfigHook nodejs;
   pname = "letta-code";
-  inherit version;
+  version = "0.13.8";
 
-  src = srcWithLock;
+  src = fetchFromGitHub {
+    owner = "letta-ai";
+    repo = "letta-code";
+    rev = "v${version}";
+    hash = "sha256-oYZPbxws5ayYVxrA8XtR+KMpGeVuq5icoB66NlcRu/I=";
+  };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     fetcherVersion = 2;
   };
 
   npmInstallFlags = [ "--ignore-scripts" ];
   npmRebuildFlags = [ "--ignore-scripts" ];
-
-  # The package from npm is already built
-  dontNpmBuild = true;
 
   # Use environment variables to forcefully disable all scripts
   NPM_CONFIG_IGNORE_SCRIPTS = "true";
@@ -66,7 +52,7 @@ buildNpmPackage rec {
     downloadPage = "https://www.npmjs.com/package/@letta-ai/letta-code";
     changelog = "https://github.com/letta-ai/letta-code/releases";
     license = licenses.asl20;
-    sourceProvenance = with sourceTypes; [ binaryBytecode ];
+    sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ vizid ];
     mainProgram = "letta";
     platforms = platforms.all;
