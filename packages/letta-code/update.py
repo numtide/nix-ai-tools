@@ -28,7 +28,8 @@ def get_current_version() -> str:
     content = PACKAGE_FILE.read_text()
     match = re.search(r'version = "([\d.]+)"', content)
     if not match:
-        raise ValueError("Could not find version in package.nix")
+        msg = "Could not find version in package.nix"
+        raise ValueError(msg)
     return match.group(1)
 
 
@@ -94,7 +95,8 @@ def main() -> None:
         npm_deps_hash = extract_hash_from_build_error(result.stderr or "")
 
         if not npm_deps_hash:
-            raise ValueError("Could not extract npmDepsHash from build error")
+            msg = "Could not extract npmDepsHash from build error"
+            raise ValueError(msg)
 
         update_package_nix(latest, source_hash, npm_deps_hash)
     except (ValueError, NixCommandError) as e:
