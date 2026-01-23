@@ -13,23 +13,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "coding-agent-search";
-  version = "0.1.57";
+  version = "0.1.61";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "coding_agent_session_search";
     rev = "v${version}";
-    hash = "sha256-ozFxitoMdPO+xpS38kWkEz6qPKY/lahJfAGV/fLVefs=";
+    hash = "sha256-ybyLnUCzpq0aZyHNt464iWdGhz4Wkliy0DlQyh17Jis=";
   };
 
-  cargoHash = "sha256-Zg3unOegYwRPf5blc3HcS5AHvAkjtQM+MGYCXcNqVpg=";
-
-  patches = [
-    # Fix base64 version conflict - force use of v0.21+ API
-    # The code uses base64::Engine which is only available in 0.21+,
-    # but Cargo.toml uses "*" which can resolve to 0.13.1 from dependencies
-    ./fix-base64-version.patch
-  ];
+  cargoHash = "sha256-xE63D6NzehIens0P+yUAeEjldPMhVb9FsDBCSyLToY4=";
 
   # Disable slow LTO settings for faster builds
   # Remove lld linker override - it breaks rpath setting in Nix
