@@ -6,6 +6,7 @@
   coreutils,
   wrapBuddy,
   versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -39,7 +40,10 @@ stdenv.mkDerivation rec {
   ];
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
 
   buildInputs = lib.optionals stdenv.isLinux [
     stdenv.cc.cc.lib
