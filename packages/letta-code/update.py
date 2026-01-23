@@ -48,10 +48,13 @@ def update_package_nix(version: str, source_hash: str, npm_deps_hash: str) -> No
     )
 
     # Update npm deps hash
+    # Pattern matches: fetchNpmDepsWithPackuments { ... hash = "sha256-..." }
+    # with flexible whitespace and line breaks
     content = re.sub(
-        r'(fetchNpmDepsWithPackuments \{[^}]+hash = )"sha256-[A-Za-z0-9+/=]+"',
+        r'(fetchNpmDepsWithPackuments\s*\{[^}]*hash\s*=\s*)"sha256-[A-Za-z0-9+/=]+"',
         f'\\1"{npm_deps_hash}"',
         content,
+        flags=re.DOTALL,
     )
 
     PACKAGE_FILE.write_text(content)

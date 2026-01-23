@@ -38,6 +38,7 @@ buildNpmPackage rec {
     hash = "sha256-ZNkCkIYtOvK3xmnp6PTTpahIlPmLSzdcyCjcc1E6pzU=";
     fetcherVersion = 2;
   };
+  # Required to write logs during npm install
   makeCacheWritable = true;
 
   npmInstallFlags = [ "--ignore-scripts" ];
