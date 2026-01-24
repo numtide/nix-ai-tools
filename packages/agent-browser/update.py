@@ -48,7 +48,7 @@ def main() -> None:
         return
 
     # Calculate new src hash from GitHub
-    url = f"https://github.com/vercel-labs/agent-browser/archive/refs/heads/ctate/{latest}.tar.gz"
+    url = f"https://github.com/vercel-labs/agent-browser/archive/refs/tags/v{latest}.tar.gz"
     print("Calculating source hash...")
     src_hash = calculate_url_hash(url, unpack=True)
 

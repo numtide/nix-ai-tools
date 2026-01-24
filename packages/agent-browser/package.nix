@@ -23,7 +23,7 @@ let
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
-    rev = "ctate/${version}";
+    rev = "v${version}";
     inherit hash;
   };
 
