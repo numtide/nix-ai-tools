@@ -13,16 +13,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "coding-agent-search";
-  version = "0.1.57";
+  version = "0.1.61";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "coding_agent_session_search";
     rev = "v${version}";
-    hash = "sha256-ozFxitoMdPO+xpS38kWkEz6qPKY/lahJfAGV/fLVefs=";
+    hash = "sha256-ybyLnUCzpq0aZyHNt464iWdGhz4Wkliy0DlQyh17Jis=";
   };
 
-  cargoHash = "sha256-Zg3unOegYwRPf5blc3HcS5AHvAkjtQM+MGYCXcNqVpg=";
+  cargoHash = "sha256-xE63D6NzehIens0P+yUAeEjldPMhVb9FsDBCSyLToY4=";
 
   patches = [
     # Fix base64 version conflict - force use of v0.21+ API
