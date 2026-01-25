@@ -1,8 +1,2 @@
-{ pkgs, ... }:
-let
-  npmPackumentSupport = pkgs.callPackage ../../lib/fetch-npm-deps.nix { };
-in
-pkgs.callPackage ./package.nix {
-  inherit (npmPackumentSupport) fetchNpmDepsWithPackuments npmConfigHook;
-  nodejs = pkgs.nodejs_24;
-}
+{ pkgs, perSystem, ... }:
+pkgs.lib.warn "claude-code-npm is deprecated, use claude-code instead" perSystem.self.claude-code
