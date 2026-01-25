@@ -5,6 +5,6 @@
 fetchFromGitHub {
   owner = "numtide";
   repo = "claudebox";
-  rev = "v0.1.2";
-  hash = "sha256-OxJ5Mr/pfhZDimRTth9gZd6+bitdVBbp24mX8zxedvA=";
+  rev = "v0.2.0";
+  hash = "sha256-4C+e9K0Mq+OfBIH9u/EdzrtXLXVqWBfndAC2BHU+JhE=";
 }

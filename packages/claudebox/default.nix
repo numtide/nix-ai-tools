@@ -4,6 +4,6 @@ let
 in
 import ./package.nix {
   inherit pkgs;
-  claude-code = perSystem.self.claude-code-npm;
+  claude-code = perSystem.self.claude-code;
   sourceDir = "${src}/src";
 }
