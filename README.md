@@ -19,6 +19,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/BeaconBay/ck
+- **Usage**: `nix run github:numtide/llm-agents.nix#ck -- --help`
+- **Nix**: [packages/ck/package.nix](packages/ck/package.nix)
+
+</details>
+<details>
 <summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
 - **Source**: binary
@@ -26,16 +36,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://claude.ai/code
 - **Usage**: `nix run github:numtide/llm-agents.nix#claude-code -- --help`
 - **Nix**: [packages/claude-code/package.nix](packages/claude-code/package.nix)
-
-</details>
-<details>
-<summary><strong>claude-code-npm</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
-
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://claude.ai/code
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-npm -- --help`
-- **Nix**: [packages/claude-code-npm/package.nix](packages/claude-code-npm/package.nix)
 
 </details>
 <details>
