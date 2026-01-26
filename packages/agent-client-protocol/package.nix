@@ -27,7 +27,7 @@ python3.pkgs.buildPythonPackage rec {
 
   meta = with lib; {
     description = "Agent Client Protocol - A protocol for AI agent communication";
-    homepage = "https://github.com/anthropics/agent-client-protocol";
+    homepage = "https://github.com/agentclientprotocol/agent-client-protocol";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     platforms = platforms.all;
