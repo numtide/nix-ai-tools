@@ -29,6 +29,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>claude-code-npm</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://claude.ai/code
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-npm -- --help`
+- **Nix**: [packages/claude-code-npm/package.nix](packages/claude-code-npm/package.nix)
+
+</details>
+<details>
 <summary><strong>code</strong> - Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.</summary>
 
 - **Source**: source
@@ -240,16 +250,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/sirmalloc/ccstatusline
 - **Usage**: `nix run github:numtide/llm-agents.nix#ccstatusline -- --help`
 - **Nix**: [packages/ccstatusline/package.nix](packages/ccstatusline/package.nix)
-
-</details>
-<details>
-<summary><strong>claude-code-npm</strong> - Agentic coding tool (Node.js/npm build for claudebox compatibility)</summary>
-
-- **Source**: source
-- **License**: unfree
-- **Homepage**: https://github.com/anthropics/claude-code
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-npm -- --help`
-- **Nix**: [packages/claude-code-npm/package.nix](packages/claude-code-npm/package.nix)
 
 </details>
 <details>
