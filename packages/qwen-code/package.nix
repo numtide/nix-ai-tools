@@ -18,19 +18,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "qwen-code";
-  version = "0.7.2";
+  version = "0.8.1";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-HVvygqOJLyevLCc9otaL8oO7/JTfxWJaq1QsbS1B+y0=";
+    hash = "sha256-mHx/VvU1l65e++flqB1cckncsqd506Z71zPJ9jI1dBE=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-2PdrIc23tA8ZjyjxnXtPu0GiTm895+nRwPfLGdeer9g=";
+    hash = "sha256-xhZxorIAXtledtUmG5GSJdbpXvSkm6ZDJQr00N8j/cI=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
