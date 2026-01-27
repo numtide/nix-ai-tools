@@ -1,0 +1,10 @@
+{
+  "rev": "ba7391832dd6458aa1c027ab9402533ed56b5dd5",
+  "srcHash": "sha256-YoScForDogfm3y1iDAHwv/eL3TCYpoSKQri1hY76Izw=",
+  "bunDepsHash": {
+    "x86_64-linux": "sha256-nkFzT3IH3fr5p5Q8FRPGtYzUkwxoM2rx95RT7nvuHd0=",
+    "aarch64-linux": "sha256-NekMOHckkdlcTxX4pXg2aQ+Zo3uTvBnA/RkwnjTXABg=",
+    "x86_64-darwin": "sha256-haJ5HP9p8hP9XcsyQXyngssn0K9W7MiWHn+ir8F2d6U=",
+    "aarch64-darwin": "sha256-6k2hfzTqbqqfq/9dBCb+LdP7qRRjKKyUeq43SCeQJ14="
+  }
+}
