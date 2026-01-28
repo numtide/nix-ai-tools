@@ -46,7 +46,7 @@ rustPlatform.buildRustPackage {
     install_name_tool -add_rpath "${lib.getLib onnxruntime}/lib" $out/bin/ck
   '';
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "Utilities";
 
   meta = with lib; {
     description = "Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!";

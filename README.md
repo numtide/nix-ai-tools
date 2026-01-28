@@ -19,16 +19,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/BeaconBay/ck
-- **Usage**: `nix run github:numtide/llm-agents.nix#ck -- --help`
-- **Nix**: [packages/ck/package.nix](packages/ck/package.nix)
-
-</details>
-<details>
 <summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
 - **Source**: binary
@@ -489,6 +479,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/BeaconBay/ck
+- **Usage**: `nix run github:numtide/llm-agents.nix#ck -- --help`
+- **Nix**: [packages/ck/package.nix](packages/ck/package.nix)
+
+</details>
+<details>
 <summary><strong>clawdbot</strong> - Personal AI assistant with WhatsApp, Telegram, Discord integration</summary>
 
 - **Source**: source
@@ -546,6 +546,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/numman-ali/openskills
 - **Usage**: `nix run github:numtide/llm-agents.nix#openskills -- --help`
 - **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
+
+</details>
+<details>
+<summary><strong>qmd</strong> - mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/tobi/qmd
+- **Usage**: `nix run github:numtide/llm-agents.nix#qmd -- --help`
+- **Nix**: [packages/qmd/package.nix](packages/qmd/package.nix)
 
 </details>
 <!-- END GENERATED PACKAGE DOCS -->
