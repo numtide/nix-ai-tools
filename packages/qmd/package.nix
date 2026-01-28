@@ -10,8 +10,22 @@
   npmConfigHook,
   jq,
   autoPatchelfHook,
+  flake,
+
+  # GPU support
+  config,
+  cudaSupport ? config.cudaSupport or false,
+  cudaPackages ? { },
+  vulkanSupport ? stdenv.isLinux,
+  vulkan-loader,
+  autoAddDriverRunpath,
 }:
 let
+  # CUDA only supported on x86_64-linux
+  effectiveCudaSupport = cudaSupport && stdenv.isLinux && stdenv.hostPlatform.isx86_64;
+  # Vulkan supported on all Linux
+  effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
+
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) rev srcHash npmDepsHash;
 
@@ -52,26 +66,50 @@ buildNpmPackage {
   nativeBuildInputs = [
     makeWrapper
   ]
-  ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+  ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+  ++ lib.optionals effectiveCudaSupport [ autoAddDriverRunpath ];
 
   buildInputs = [
     sqlite
   ]
   ++ lib.optionals stdenv.isLinux [
     stdenv.cc.cc.lib # For libgcc_s.so.1 and libstdc++.so.6
+  ]
+  ++ lib.optionals effectiveCudaSupport [
+    cudaPackages.cuda_cudart
+    cudaPackages.libcublas
+  ]
+  ++ lib.optionals effectiveVulkanSupport [
+    vulkan-loader
   ];
 
-  # Ignore missing optional dependencies for CUDA, Vulkan, and musl
-  autoPatchelfIgnoreMissingDeps = [
-    "libcudart.so.13"
-    "libcublas.so.13"
-    "libcuda.so.1"
-    "libcudart.so.12"
-    "libcublas.so.12"
-    "libvulkan.so.1"
-    "libc.musl-x86_64.so.1"
-    "libc.musl-aarch64.so.1"
-  ];
+  # Ignore missing optional dependencies based on enabled GPU backends
+  autoPatchelfIgnoreMissingDeps =
+    # Always ignore musl (we use glibc)
+    [
+      "libc.musl-x86_64.so.1"
+      "libc.musl-aarch64.so.1"
+    ]
+    # Ignore CUDA libs - they're loaded at runtime via LD_LIBRARY_PATH
+    # libcuda.so.1 comes from nvidia driver (autoAddDriverRunpath)
+    # Prebuilt binaries want CUDA 13 but we provide CUDA 12 (ABI compatible)
+    ++ lib.optionals (!effectiveCudaSupport) [
+      "libcudart.so.12"
+      "libcudart.so.13"
+      "libcublas.so.12"
+      "libcublas.so.13"
+      "libcuda.so.1"
+    ]
+    ++ lib.optionals effectiveCudaSupport [
+      # Always ignore these - loaded at runtime
+      "libcudart.so.13"
+      "libcublas.so.13"
+      "libcuda.so.1" # from nvidia driver
+    ]
+    # Ignore Vulkan libs if Vulkan support is disabled
+    ++ lib.optionals (!effectiveVulkanSupport) [
+      "libvulkan.so.1"
+    ];
 
   # Skip any build scripts since this is a TypeScript project run with bun
   npmFlags = [ "--ignore-scripts" ];
@@ -79,25 +117,39 @@ buildNpmPackage {
   # No build step needed - we'll run directly with bun
   dontNpmBuild = true;
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    let
+      # Build LD_LIBRARY_PATH with all required libraries
+      ldLibraryPath = lib.makeLibraryPath (
+        [ sqlite.out ]
+        ++ lib.optionals effectiveCudaSupport [
+          cudaPackages.cuda_cudart
+          cudaPackages.libcublas
+        ]
+        ++ lib.optionals effectiveVulkanSupport [
+          vulkan-loader
+        ]
+      );
+    in
+    ''
+      runHook preInstall
 
-    mkdir -p $out/lib/qmd $out/bin
+      mkdir -p $out/lib/qmd $out/bin
 
-    cp -r node_modules src package.json $out/lib/qmd/
+      cp -r node_modules src package.json $out/lib/qmd/
 
-    # Patch detectGlibc.js to always return true on Linux
-    # node-llama-cpp checks FHS paths (/lib, /usr/lib) for glibc which don't exist on NixOS
-    # Without this patch, it falls back to building llama.cpp which fails in read-only store
-    patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-detectGlibc.patch}
+      # Patch detectGlibc.js to always return true on Linux
+      # node-llama-cpp checks FHS paths (/lib, /usr/lib) for glibc which don't exist on NixOS
+      # Without this patch, it falls back to building llama.cpp which fails in read-only store
+      patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-detectGlibc.patch}
 
-    makeWrapper ${bun}/bin/bun $out/bin/qmd \
-      --add-flags "$out/lib/qmd/src/qmd.ts" \
-      --set DYLD_LIBRARY_PATH "${sqlite.out}/lib" \
-      --set LD_LIBRARY_PATH "${sqlite.out}/lib"
+      makeWrapper ${bun}/bin/bun $out/bin/qmd \
+        --add-flags "$out/lib/qmd/src/qmd.ts" \
+        --set DYLD_LIBRARY_PATH "${sqlite.out}/lib" \
+        --set LD_LIBRARY_PATH "${ldLibraryPath}"
 
-    runHook postInstall
-  '';
+      runHook postInstall
+    '';
 
   doInstallCheck = true;
   installCheckPhase = ''
@@ -116,6 +168,7 @@ buildNpmPackage {
     homepage = "https://github.com/tobi/qmd";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    maintainers = with flake.lib.maintainers; [ mulatta ];
     platforms = lib.platforms.unix;
     mainProgram = "qmd";
   };
