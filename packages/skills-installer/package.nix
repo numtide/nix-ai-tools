@@ -6,16 +6,13 @@
   flake,
 }:
 
-let
-  versionData = lib.importJSON ./hashes.json;
-in
 stdenv.mkDerivation rec {
   pname = "skills-installer";
-  inherit (versionData) version;
+  version = "0.2.0";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/${pname}/-/${pname}-${version}.tgz";
-    inherit (versionData) hash;
+    hash = "sha256-UWddwsNoULVCOVeXHr+WEeWnouc4/AplqYfBWd0oTRg=";
   };
 
   nativeBuildInputs = [ nodejs ];
@@ -23,14 +20,19 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/bin
-    cp $src/dist/cli.js $out/bin/skills-installer
-    chmod +x $out/bin/skills-installer
+    install -Dm755 dist/cli.js $out/bin/skills-installer
 
     substituteInPlace $out/bin/skills-installer \
-      --replace-quiet "#!/usr/bin/env node" "#!${nodejs}/bin/node"
+      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
 
     runHook postInstall
+  '';
+
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+    $out/bin/skills-installer --help > /dev/null
+    runHook postInstallCheck
   '';
 
   passthru.category = "Claude Code Ecosystem";
@@ -41,7 +43,7 @@ stdenv.mkDerivation rec {
     changelog = "https://github.com/Kamalnrf/claude-plugins/releases";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
-    maintainers = with flake.lib.maintainers; [ ypares ];
+    maintainers = with flake.lib.maintainers; [ Bad3r ];
     mainProgram = "skills-installer";
     platforms = platforms.all;
   };
