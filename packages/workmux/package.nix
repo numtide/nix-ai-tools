@@ -1,7 +1,9 @@
 {
   lib,
+  stdenv,
   rustPlatform,
   fetchFromGitHub,
+  installShellFiles,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -19,8 +21,18 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-KnDMLpq7MOPcTAM+Nb0HrGd7oPpHhbrFEXwCg7bmGDQ=";
 
+  nativeBuildInputs = [ installShellFiles ];
+
   # Some tests require filesystem access outside the sandbox
   doCheck = false;
+
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    export HOME=$(mktemp -d)
+    installShellCompletion --cmd workmux \
+      --bash <($out/bin/workmux completions bash) \
+      --fish <($out/bin/workmux completions fish) \
+      --zsh <($out/bin/workmux completions zsh)
+  '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
