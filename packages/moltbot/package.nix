@@ -6,7 +6,7 @@
   cmake,
   git,
   makeWrapper,
-  nodejs-slim,
+  nodejs,
   pnpm,
   pnpmConfigHook,
   versionCheckHook,
@@ -14,19 +14,19 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "clawdbot";
-  version = "2026.1.24-1";
+  pname = "moltbot";
+  version = "2026.1.24";
 
   src = fetchFromGitHub {
-    owner = "clawdbot";
-    repo = "clawdbot";
+    owner = "moltbot";
+    repo = "moltbot";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-8QLTbahTtyynoZX9y/+JyM/clRrtxppnnpH0XhhlczQ=";
+    hash = "sha256-eqTWNR8UWLSI7lDHhxJnXZjXBRvLhLoUqGxs7YGz6iw=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-N37lLjZ3mtXW69FZH4A/kXxDx0xYVWxsKvM0k75d7Ow=";
+    hash = "sha256-N0rAUNutQ/zox1ZL6Lt/lwvXoPc5mbmW5mw3f0fSuKw=";
     fetcherVersion = 2;
   };
 
@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     git
     makeWrapper
-    nodejs-slim
+    nodejs
     pnpm
     pnpmConfigHook
   ];
@@ -54,12 +54,12 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/{bin,lib/clawdbot}
+    mkdir -p $out/{bin,lib/moltbot}
 
-    cp -r * $out/lib/clawdbot/
+    cp -r * $out/lib/moltbot/
 
     # Remove development/build files not needed at runtime
-    pushd $out/lib/clawdbot
+    pushd $out/lib/moltbot
     rm -rf \
       src \
       test \
@@ -90,8 +90,8 @@ stdenv.mkDerivation (finalAttrs: {
     find . -name "*.test.ts" -delete
     popd
 
-    makeWrapper ${nodejs-slim}/bin/node $out/bin/clawdbot \
-      --add-flags "$out/lib/clawdbot/dist/entry.js"
+    makeWrapper ${nodejs}/bin/node $out/bin/moltbot \
+      --add-flags "$out/lib/moltbot/dist/entry.js"
 
     runHook postInstall
   '';
@@ -106,12 +106,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "Personal AI assistant with WhatsApp, Telegram, Discord integration";
-    homepage = "https://clawd.bot";
-    changelog = "https://github.com/clawdbot/clawdbot/releases";
+    homepage = "https://molt.bot";
+    changelog = "https://github.com/moltbot/moltbot/releases";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with lib.maintainers; [ ];
     platforms = lib.platforms.all;
-    mainProgram = "clawdbot";
+    mainProgram = "moltbot";
   };
 })
