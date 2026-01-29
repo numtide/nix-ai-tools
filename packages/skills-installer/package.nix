@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   doInstallCheck = true;
   installCheckPhase = ''
     runHook preInstallCheck
-    $out/bin/skills-installer --help > /dev/null
+    $out/bin/skills-installer --help | grep -q "Install agent skills"
     runHook postInstallCheck
   '';
 
