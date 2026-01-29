@@ -15,15 +15,12 @@ stdenv.mkDerivation rec {
     hash = "sha256-UWddwsNoULVCOVeXHr+WEeWnouc4/AplqYfBWd0oTRg=";
   };
 
-  nativeBuildInputs = [ nodejs ];
+  buildInputs = [ nodejs ];
 
   installPhase = ''
     runHook preInstall
 
     install -Dm755 dist/cli.js $out/bin/skills-installer
-
-    substituteInPlace $out/bin/skills-installer \
-      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
 
     runHook postInstall
   '';
