@@ -499,16 +499,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>clawdbot</strong> - Personal AI assistant with WhatsApp, Telegram, Discord integration</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://clawd.bot
-- **Usage**: `nix run github:numtide/llm-agents.nix#clawdbot -- --help`
-- **Nix**: [packages/clawdbot/package.nix](packages/clawdbot/package.nix)
-
-</details>
-<details>
 <summary><strong>coding-agent-search</strong> - Unified, high-performance TUI to index and search your local coding agent history</summary>
 
 - **Source**: source
@@ -546,6 +536,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/slopus/happy-cli
 - **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
 - **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
+
+</details>
+<details>
+<summary><strong>moltbot</strong> - Personal AI assistant with WhatsApp, Telegram, Discord integration</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://molt.bot
+- **Usage**: `nix run github:numtide/llm-agents.nix#moltbot -- --help`
+- **Nix**: [packages/moltbot/package.nix](packages/moltbot/package.nix)
 
 </details>
 <details>
