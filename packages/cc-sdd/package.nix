@@ -3,7 +3,6 @@
   buildNpmPackage,
   fetchFromGitHub,
   bun,
-  flake,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -67,7 +66,7 @@ buildNpmPackage {
     homepage = "https://github.com/gotalab/cc-sdd";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with flake.lib.maintainers; [ ryoppippi ];
+    maintainers = with maintainers; [ ryoppippi ];
     mainProgram = "cc-sdd";
     platforms = platforms.all;
   };

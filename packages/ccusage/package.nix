@@ -3,7 +3,6 @@
   stdenv,
   fetchzip,
   bun,
-  flake,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -49,7 +48,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/ryoppippi/ccusage";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
-    maintainers = with flake.lib.maintainers; [ ryoppippi ];
+    maintainers = with maintainers; [ ryoppippi ];
     mainProgram = "ccusage";
     platforms = platforms.all;
   };
