@@ -539,13 +539,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>moltbot</strong> - Personal AI assistant with WhatsApp, Telegram, Discord integration</summary>
+<summary><strong>openclaw</strong> - Your own personal AI assistant. Any OS. Any Platform. The lobster way</summary>
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://molt.bot
-- **Usage**: `nix run github:numtide/llm-agents.nix#moltbot -- --help`
-- **Nix**: [packages/moltbot/package.nix](packages/moltbot/package.nix)
+- **Homepage**: https://openclaw.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#openclaw -- --help`
+- **Nix**: [packages/openclaw/package.nix](packages/openclaw/package.nix)
 
 </details>
 <details>
