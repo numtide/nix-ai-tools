@@ -8,20 +8,18 @@
   git,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash vendorHash;
+buildGoModule rec {
+  pname = "agent-deck";
+  version = "0.8.97";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     rev = "v${version}";
-    inherit hash;
+    hash = "sha256-IRT0mFk5rm6+T7v8arhwcn7E8P82CQ2de+MwD8k0mdA=";
   };
-in
-buildGoModule {
-  pname = "agent-deck";
-  inherit version vendorHash src;
+
+  vendorHash = "sha256-r//Rgm41hwJHZ7T5mkOKB+xEsTOqMkI3iY0iOUDnjTM=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -43,7 +41,7 @@ buildGoModule {
     "-s"
     "-w"
     "-X=main.version=${version}"
-    "-X=main.commit=${src.rev}"
+    "-X=main.commit=v${version}"
     "-X=main.date=1970-01-01T00:00:00Z"
   ];
 
