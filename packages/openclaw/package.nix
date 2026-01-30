@@ -48,6 +48,9 @@ stdenv.mkDerivation (finalAttrs: {
 
     pnpm build
 
+    # Build the UI
+    pnpm ui:build
+
     runHook postBuild
   '';
 
