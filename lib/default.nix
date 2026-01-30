@@ -22,6 +22,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 67085791;
         name = "Seungwon Lee";
       };
+      garbas = {
+        github = "garbas";
+        githubId = 20208;
+        name = "Rok Garbas";
+      };
     };
   }
 )

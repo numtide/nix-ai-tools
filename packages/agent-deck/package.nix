@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   buildGoModule,
   fetchFromGitHub,
   versionCheckHook,
@@ -53,7 +54,7 @@ buildGoModule {
     homepage = "https://github.com/asheshgoplani/agent-deck";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with lib.maintainers; [ garbas ];
+    maintainers = with flake.lib.maintainers; [ garbas ];
     mainProgram = "agent-deck";
   };
 }
