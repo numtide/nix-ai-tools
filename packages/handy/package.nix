@@ -155,7 +155,7 @@ stdenv.mkDerivation {
     description = "Fast and accurate local transcription app using AI models";
     homepage = "https://handy.computer/";
     changelog = "https://github.com/cjpais/Handy/releases/tag/v${version}";
-    license = licenses.unfree;
+    license = licenses.mit;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     platforms = [
