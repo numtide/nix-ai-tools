@@ -14,19 +14,19 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "moltbot";
-  version = "2026.1.24-1";
+  pname = "openclaw";
+  version = "2026.1.29";
 
   src = fetchFromGitHub {
-    owner = "moltbot";
-    repo = "moltbot";
+    owner = "openclaw";
+    repo = "openclaw";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-8QLTbahTtyynoZX9y/+JyM/clRrtxppnnpH0XhhlczQ=";
+    hash = "sha256-ZH3j3Sz0uZ8ofbGOj7ANgIW9j+lhknnAsa7ZI0wWo1o=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-N37lLjZ3mtXW69FZH4A/kXxDx0xYVWxsKvM0k75d7Ow=";
+    hash = "sha256-7627rdKZopr2oStPDYNhkKCKySx2rf9v5rcauJ4DhWw=";
     fetcherVersion = 2;
   };
 
@@ -54,12 +54,12 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/{bin,lib/moltbot}
+    mkdir -p $out/{bin,lib/openclaw}
 
-    cp -r * $out/lib/moltbot/
+    cp -r * $out/lib/openclaw/
 
     # Remove development/build files not needed at runtime
-    pushd $out/lib/moltbot
+    pushd $out/lib/openclaw
     rm -rf \
       src \
       test \
@@ -90,8 +90,8 @@ stdenv.mkDerivation (finalAttrs: {
     find . -name "*.test.ts" -delete
     popd
 
-    makeWrapper ${nodejs}/bin/node $out/bin/moltbot \
-      --add-flags "$out/lib/moltbot/dist/entry.js"
+    makeWrapper ${nodejs}/bin/node $out/bin/openclaw \
+      --add-flags "$out/lib/openclaw/dist/entry.js"
 
     runHook postInstall
   '';
@@ -105,12 +105,12 @@ stdenv.mkDerivation (finalAttrs: {
   passthru.category = "Utilities";
 
   meta = {
-    description = "Personal AI assistant with WhatsApp, Telegram, Discord integration";
-    homepage = "https://molt.bot";
-    changelog = "https://github.com/moltbot/moltbot/releases";
+    description = "Your own personal AI assistant. Any OS. Any Platform. The lobster way";
+    homepage = "https://openclaw.ai";
+    changelog = "https://github.com/openclaw/openclaw/releases";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.all;
-    mainProgram = "moltbot";
+    mainProgram = "openclaw";
   };
 })
