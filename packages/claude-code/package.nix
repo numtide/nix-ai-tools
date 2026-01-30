@@ -5,7 +5,6 @@
   makeWrapper,
   wrapBuddy,
   versionCheckHook,
-  flake,
 }:
 
 let
@@ -67,12 +66,11 @@ stdenv.mkDerivation {
     changelog = "https://github.com/anthropics/claude-code/releases";
     license = licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    maintainers =
-      (with maintainers; [
-        malo
-        omarjatoi
-      ])
-      ++ (with flake.lib.maintainers; [ ryoppippi ]);
+    maintainers = with maintainers; [
+      malo
+      omarjatoi
+      ryoppippi
+    ];
     mainProgram = "claude";
     platforms = [
       "x86_64-linux"
