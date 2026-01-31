@@ -373,6 +373,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Workflow & Project Management
 
 <details>
+<summary><strong>agent-deck</strong> - Your AI agent command center</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/asheshgoplani/agent-deck
+- **Usage**: `nix run github:numtide/llm-agents.nix#agent-deck -- --help`
+- **Nix**: [packages/agent-deck/package.nix](packages/agent-deck/package.nix)
+
+</details>
+<details>
 <summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
 
 - **Source**: binary
@@ -522,7 +532,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
 
 - **Source**: binary
-- **License**: unfree
+- **License**: MIT
 - **Homepage**: https://handy.computer/
 - **Usage**: `nix run github:numtide/llm-agents.nix#handy -- --help`
 - **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
