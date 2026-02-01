@@ -27,6 +27,19 @@ rustPlatform.buildRustPackage {
 
   sourceRoot = "source/codex-rs";
 
+  # Override cargoDeps to patch git dependencies before vendoring
+  cargoDeps = rustPlatform.fetchCargoTarball {
+    inherit src sourceRoot;
+    name = "codex-${version}-cargo-deps";
+    hash = cargoHash;
+    
+    postPatch = ''
+      # Remove problematic example from rules_rust git dependency
+      # The cargo_bindeps example uses artifact = "bin" which requires unstable cargo features
+      find . -path "*/examples/crate_universe/cargo_bindeps" -type d -exec rm -rf {} + 2>/dev/null || true
+    '';
+  };
+
   cargoBuildFlags = [
     "--package"
     "codex-cli"
