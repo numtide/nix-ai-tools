@@ -13,19 +13,19 @@
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash cargoHash;
-in
-rustPlatform.buildRustPackage {
-  pname = "codex";
-  inherit version cargoHash;
-
+  
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
     tag = "rust-v${version}";
     inherit hash;
   };
-
+  
   sourceRoot = "source/codex-rs";
+in
+rustPlatform.buildRustPackage {
+  pname = "codex";
+  inherit version cargoHash src sourceRoot;
 
   cargoBuildFlags = [
     "--package"
