@@ -13,32 +13,19 @@
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash cargoHash;
-in
-rustPlatform.buildRustPackage {
-  pname = "codex";
-  inherit version cargoHash;
-
+  
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
     tag = "rust-v${version}";
     inherit hash;
   };
-
+  
   sourceRoot = "source/codex-rs";
-
-  # Override cargoDeps to patch git dependencies before vendoring
-  cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src sourceRoot;
-    name = "codex-${version}-cargo-deps";
-    hash = cargoHash;
-    
-    postPatch = ''
-      # Remove problematic example from rules_rust git dependency
-      # The cargo_bindeps example uses artifact = "bin" which requires unstable cargo features
-      find . -path "*/examples/crate_universe/cargo_bindeps" -type d -exec rm -rf {} + 2>/dev/null || true
-    '';
-  };
+in
+rustPlatform.buildRustPackage {
+  pname = "codex";
+  inherit version cargoHash src sourceRoot;
 
   cargoBuildFlags = [
     "--package"
