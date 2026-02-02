@@ -28,6 +28,22 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-DlUUAj5b47KFhUBsftLjxYJJxyCxW9/xfp3WUCCClDY=";
   };
 
+  # Fix Claude detection to check PATH first (supports Nix installations)
+  postPatch = ''
+        sed -i '/^function findGlobalClaudeCliPath() {$/,/Check npm global/{
+          /Check npm global/i\
+        // Check PATH first (supports Nix and other package managers)\
+        try {\
+            const claudePath = require("child_process").execSync("which claude 2>/dev/null", { encoding: "utf8" }).trim();\
+            if (claudePath && require("fs").existsSync(claudePath)) {\
+                return { path: claudePath, source: "PATH" };\
+            }\
+        } catch (e) {}\
+    \
+
+        }' scripts/claude_version_utils.cjs
+  '';
+
   nativeBuildInputs = [
     nodejs
     yarnConfigHook
