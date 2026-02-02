@@ -5,6 +5,8 @@
   makeWrapper,
   wrapBuddy,
   versionCheckHook,
+  bubblewrap,
+  socat,
 }:
 
 let
@@ -53,6 +55,15 @@ stdenv.mkDerivation {
       --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
       --set DISABLE_TELEMETRY 1 \
       --set DISABLE_INSTALLATION_CHECKS 1
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    wrapProgram $out/bin/claude \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          bubblewrap
+          socat
+        ]
+      }
   '';
 
   doInstallCheck = true;
