@@ -42,13 +42,16 @@ in
 
   settings.formatter.ruff-check.pipeline = "python";
   settings.formatter.ruff-check.priority = 1;
+  settings.formatter.ruff-check.excludes = [ "lib/fetch-cargo-vendor/*.py" ];
   settings.formatter.ruff-format.pipeline = "python";
   settings.formatter.ruff-format.priority = 2;
+  settings.formatter.ruff-format.excludes = [ "lib/fetch-cargo-vendor/*.py" ];
 
   # Custom mypy check that handles our update.py scripts correctly
   settings.formatter.mypy-check = {
     command = "${mypy-check}/bin/mypy-check";
     includes = [ "*.py" ];
+    excludes = [ "lib/fetch-cargo-vendor/*.py" ];
     pipeline = "python";
     priority = 3;
   };
