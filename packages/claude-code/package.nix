@@ -66,6 +66,12 @@ stdenv.mkDerivation {
       }
   '';
 
+  # Bun links against /usr/lib/libicucore.A.dylib which needs ICU data from
+  # /usr/share/icu/ at runtime for Intl.Segmenter. The Nix macOS sandbox
+  # blocks access to /usr/share/icu/, causing "failed to initialize Segmenter".
+  # Disable the sandbox for this derivation on macOS (requires sandbox=relaxed).
+  __noChroot = stdenv.hostPlatform.isDarwin;
+
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
