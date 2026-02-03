@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchCargoVendor,
   installShellFiles,
   rustPlatform,
   pkg-config,
@@ -13,16 +14,22 @@
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash cargoHash;
-in
-rustPlatform.buildRustPackage {
-  pname = "codex";
-  inherit version cargoHash;
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = "codex";
     tag = "rust-v${version}";
     inherit hash;
+  };
+in
+rustPlatform.buildRustPackage {
+  pname = "codex";
+  inherit version src;
+
+  cargoDeps = fetchCargoVendor {
+    inherit src;
+    sourceRoot = "source/codex-rs";
+    hash = cargoHash;
   };
 
   sourceRoot = "source/codex-rs";
