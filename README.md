@@ -142,7 +142,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>kilocode-cli</strong> - The open-source AI coding agent. Now available in your terminal.</summary>
 
-- **Source**: bytecode
+- **Source**: binary
 - **License**: Apache-2.0
 - **Homepage**: https://kilocode.ai/cli
 - **Usage**: `nix run github:numtide/llm-agents.nix#kilocode-cli -- --help`
