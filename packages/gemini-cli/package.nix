@@ -13,6 +13,7 @@
   xsel,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
+  nodejs,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -44,6 +45,8 @@ buildNpmPackage (finalAttrs: {
     darwinOpenptyHook # Fixes node-pty openpty/forkpty build issue
   ];
 
+  dontPatchElf = stdenv.hostPlatform.isDarwin;
+
   buildInputs = [
     libsecret
   ];
@@ -53,9 +56,31 @@ buildNpmPackage (finalAttrs: {
     echo "export const GIT_COMMIT_INFO = { commitHash: '${finalAttrs.src.rev}' };" > packages/generated/git-commit.ts
   '';
 
+  postPatch = ''
+    # Hardcode ripgrep path so ensureRgPath() returns our Nix-provided binary
+    # instead of downloading or finding a dynamically-linked one
+    substituteInPlace packages/core/src/tools/ripGrep.ts \
+      --replace-fail "await ensureRgPath();" "'${lib.getExe ripgrep}';"
+
+    # Disable auto-update and update nag: Nix manages updates, not the tool itself.
+    # v0.27.0 reads these defaults cleanly from the schema (unlike v0.25.2 / nixpkgs#13569).
+    sed -i "/enableAutoUpdate: {/,/}/ s/default: true/default: false/" \
+      packages/cli/src/config/settingsSchema.ts
+    sed -i "/enableAutoUpdateNotification: {/,/}/ s/default: true/default: false/" \
+      packages/cli/src/config/settingsSchema.ts
+  '';
+
+  # Prevent build-only deps from leaking into the runtime closure
+  disallowedReferences = [
+    finalAttrs.npmDeps
+    nodejs.python
+  ];
+
   installPhase = ''
     runHook preInstall
     mkdir -p $out/{bin,share/gemini-cli}
+
+    npm prune --omit=dev
 
     cp -r node_modules $out/share/gemini-cli/
 
@@ -76,18 +101,30 @@ buildNpmPackage (finalAttrs: {
 
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
       wrapProgram $out/bin/gemini \
-        --prefix PATH : ${
-          lib.makeBinPath [
-            xsel
-            ripgrep
-          ]
-        }
+        --prefix PATH : ${lib.makeBinPath [ xsel ]}
     ''}
 
     # Install JSON schema
     install -Dm644 schemas/settings.schema.json $out/share/gemini-cli/settings.schema.json
 
     runHook postInstall
+  '';
+
+  # Clean up files that would create closure references to build-only deps.
+  # Must run in preFixup (before patchShebangs patches shebangs to Nix store paths).
+  preFixup = ''
+    # Remove python files and gyp-mac-tool scripts that have python shebangs
+    find $out/share/gemini-cli/node_modules -name "*.py" -delete
+    find $out/share/gemini-cli/node_modules -name "gyp-mac-tool" -delete
+    # Remove native module build artifacts that reference python/build-time deps.
+    # Only the compiled .node files in build/Release/ are needed at runtime.
+    rm -rf $out/share/gemini-cli/node_modules/keytar/build
+    find $out/share/gemini-cli/node_modules -path '*/build/*.mk' -delete
+    find $out/share/gemini-cli/node_modules -path '*/build/Makefile' -delete
+    # Remove metadata files that embed build-time store paths
+    find $out/share/gemini-cli/node_modules -name "package-lock.json" -delete
+    find $out/share/gemini-cli/node_modules -name ".package-lock.json" -delete
+    find $out/share/gemini-cli/node_modules -name "config.gypi" -delete
   '';
 
   doInstallCheck = true;
