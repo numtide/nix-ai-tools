@@ -1,76 +1,72 @@
 {
-  buildNpmPackage,
-  fetchzip,
   lib,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
-  ripgrep,
+  stdenv,
+  fetchurl,
+  makeWrapper,
+  wrapBuddy,
   versionCheckHook,
+  versionCheckHomeHook,
 }:
-buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hashes;
+
+  platformMap = {
+    x86_64-linux = "linux-x64";
+    aarch64-linux = "linux-arm64";
+    x86_64-darwin = "darwin-x64";
+    aarch64-darwin = "darwin-arm64";
+  };
+
+  platform = stdenv.hostPlatform.system;
+  npmPlatform = platformMap.${platform} or (throw "Unsupported system: ${platform}");
+in
+stdenv.mkDerivation {
   pname = "kilocode-cli";
-  version = "0.26.1";
+  inherit version;
 
-  src = fetchzip {
-    url = "https://registry.npmjs.org/@kilocode/cli/-/cli-${finalAttrs.version}.tgz";
-    hash = "sha256-KZ6EMKLoORKoMAGDKvGfDSeHhRBYFtlnHkl7c1uNssQ=";
+  src = fetchurl {
+    url = "https://registry.npmjs.org/@kilocode/cli-${npmPlatform}/-/cli-${npmPlatform}-${version}.tgz";
+    hash = hashes.${platform};
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-I3sXuLQvnkPZAef6L+MR0Z7UbOhYxIP5qkpIEuUvHWs=";
-    fetcherVersion = 2;
-  };
-  makeCacheWritable = true;
+  sourceRoot = "package";
 
-  buildInputs = [
-    ripgrep
-  ];
+  nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
-  postPatch = ''
-    # npm-shrinkwrap.json is functionally equivalent to package-lock.json
-    ln -s npm-shrinkwrap.json package-lock.json
+  dontBuild = true;
+  dontStrip = true;
+
+  installPhase = ''
+    runHook preInstall
+
+    install -Dm755 bin/kilo $out/bin/kilocode
+
+    runHook postInstall
   '';
 
-  # Disable the problematic postinstall script
-  npmFlags = [ "--ignore-scripts" ];
-
-  # After npm install, we need to handle the ripgrep dependency
-  postInstall = ''
-    # Make ripgrep available by creating a symlink or setting environment variable
-    mkdir -p node_modules/@vscode/ripgrep/bin
-    ln -s ${ripgrep}/bin/rg node_modules/@vscode/ripgrep/bin/rg
-
-    # Run the postinstall script manually if needed
-    if [ -f node_modules/@vscode/ripgrep/lib/postinstall.js ]; then
-      HOME=$TMPDIR node node_modules/@vscode/ripgrep/lib/postinstall.js || true
-    fi
-
-    # Install JSON schema
-    install -Dm644 config/schema.json $out/share/kilocode-cli/schema.json
-  '';
-
-  passthru = {
-    category = "AI Coding Agents";
-    jsonschema = "${placeholder "out"}/share/kilocode-cli/schema.json";
-  };
-
-  dontNpmBuild = true;
-
-  nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
   versionCheckProgramArg = "--version";
 
-  doCheck = false; # there are no unit tests in the package release
+  passthru.category = "AI Coding Agents";
 
   meta = {
     description = "The open-source AI coding agent. Now available in your terminal.";
     homepage = "https://kilocode.ai/cli";
     downloadPage = "https://www.npmjs.com/package/@kilocode/cli";
     license = lib.licenses.asl20;
-    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     mainProgram = "kilocode";
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
   };
-})
+}
