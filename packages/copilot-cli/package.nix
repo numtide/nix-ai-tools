@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  cacert,
   fetchurl,
   makeWrapper,
   wrapBuddy,
@@ -29,7 +30,9 @@ stdenv.mkDerivation (finalAttrs: {
 
     mkdir -p $out/bin
     makeWrapper ${nodejs_24}/bin/node $out/bin/copilot \
-      --add-flags "$out/lib/${finalAttrs.pname}/index.js"
+      --add-flags "$out/lib/${finalAttrs.pname}/index.js" \
+      --set NIX_SSL_CERT_FILE "${cacert}/etc/ssl/certs/ca-bundle.crt" \
+      --set SSL_CERT_FILE "${cacert}/etc/ssl/certs/ca-bundle.crt"
 
     runHook postInstall
   '';
