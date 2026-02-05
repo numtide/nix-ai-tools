@@ -15,18 +15,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.2.2";
+  version = "2026.2.3";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-b4n/ZIXNMqrR7wIipHgvKX+gWAdj6kCq4wEMcgsVILc=";
+    hash = "sha256-gQwwra9c9ID3O+W/fRNgSXHvjTASYV/lng7d+f1+XT4=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-wHcrYDb0Wn73uf5XvFJCmqR3xPSBL1s+sI/BFqWN51I=";
+    hash = "sha256-wxO+ADH4SBIek6LxMCXPa9SeG0pujx7Q4Omvonie7Ec=";
     fetcherVersion = 2;
   };
 
