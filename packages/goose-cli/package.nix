@@ -17,7 +17,7 @@ rustPlatform.buildRustPackage rec {
     owner = "block";
     repo = "goose";
     rev = "v${version}";
-    hash = "sha256-CGHMf/2tN5lifaINCCSXlwsZZa2nXwoESMEGtUJ2qM4=";
+    hash = "sha256-dlyCEljwKFpekx01hk1bB3b9olPZ933tDUMGWAoYkPQ=";
   };
 
   cargoHash = "sha256-VYDgJ4UZWoGFTYdmeq4/mRoHIXTi+Dzt/rBY7uwvuNA=";
