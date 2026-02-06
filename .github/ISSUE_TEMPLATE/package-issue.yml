@@ -32,6 +32,16 @@ body:
         - aarch64-darwin
     validations:
       required: true
+  - type: dropdown
+    id: sandbox
+    attributes:
+      label: Nix sandbox enabled?
+      options:
+        - "Yes"
+        - "No"
+        - Unknown
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:

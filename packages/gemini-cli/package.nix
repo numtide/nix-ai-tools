@@ -10,6 +10,7 @@
   clang_20,
   makeBinaryWrapper,
   versionCheckHook,
+  versionCheckHomeHook,
   xsel,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
@@ -128,7 +129,10 @@ buildNpmPackage (finalAttrs: {
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
 
   passthru = {
     category = "AI Coding Agents";
