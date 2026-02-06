@@ -2,6 +2,8 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchurl,
+  unzip,
   rustPlatform,
   pnpm_10,
   fetchPnpmDeps,
@@ -22,6 +24,7 @@ let
     hash
     cargoHash
     npmDepsHash
+    releaseZipHash
     ;
 
   src = fetchFromGitHub {
@@ -29,6 +32,15 @@ let
     repo = "vibe-kanban";
     rev = tag;
     inherit hash;
+  };
+
+  # Upstream's release zip contains pre-built frontend assets with the
+  # react-virtuoso commercial license key already baked in by their CI.
+  # We extract just the key and inject it into our own source build so
+  # we don't have to store it in the repository.
+  releaseZip = fetchurl {
+    url = "https://github.com/BloopAI/vibe-kanban/releases/download/${tag}/vibe-kanban-${tag}.zip";
+    hash = releaseZipHash;
   };
 
   # Phase 1: Build frontend
@@ -40,6 +52,7 @@ let
       nodejs-slim
       pnpm_10
       pnpmConfigHook
+      unzip
     ];
 
     pnpmDeps = fetchPnpmDeps {
@@ -52,6 +65,16 @@ let
 
     buildPhase = ''
       runHook preBuild
+
+      # Extract the react-virtuoso license key from upstream's pre-built
+      # release assets rather than storing it in our repository.
+      export VITE_PUBLIC_REACT_VIRTUOSO_LICENSE_KEY=$(
+        unzip -p ${releaseZip} '*/assets/index-*.js' \
+          | grep -o 'licenseKey:"[^"]*"' \
+          | head -1 \
+          | cut -d'"' -f2
+      )
+
       cd frontend
       pnpm build
       runHook postBuild
