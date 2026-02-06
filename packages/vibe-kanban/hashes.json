@@ -3,5 +3,6 @@
   "tag": "v0.1.2-20260203101746",
   "hash": "sha256-rC9r9UPkI75vf4Fk1snBz5KDf/U8lw6XrO2nF8gplpo=",
   "cargoHash": "sha256-IIpLTlHfDhMTwaUwNEGECQXnsWmPpibt6FkO8smrnBA=",
-  "npmDepsHash": "sha256-wY/ATOO3OcUc72ScmHradTnwBG7PZOqIFrTdHSAAY+8="
+  "npmDepsHash": "sha256-wY/ATOO3OcUc72ScmHradTnwBG7PZOqIFrTdHSAAY+8=",
+  "releaseZipHash": "sha256-dDoRqox1WQF6zqUJg859/1USpEEQ/uLlPO5Q6DQmfyg="
 }
