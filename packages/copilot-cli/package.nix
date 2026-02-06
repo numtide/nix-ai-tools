@@ -4,6 +4,7 @@
   fetchurl,
   makeWrapper,
   wrapBuddy,
+  cacert,
   nodejs_24,
   versionCheckHook,
 }:
@@ -29,7 +30,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     mkdir -p $out/bin
     makeWrapper ${nodejs_24}/bin/node $out/bin/copilot \
-      --add-flags "$out/lib/${finalAttrs.pname}/index.js"
+      --add-flags "$out/lib/${finalAttrs.pname}/index.js" \
+      --set SSL_CERT_DIR "${cacert}/etc/ssl/certs"
 
     runHook postInstall
   '';
