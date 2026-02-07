@@ -1,4 +1,4 @@
-{ pkgs, perSystem }:
+{ pkgs }:
 pkgs.mkShellNoCC {
   packages = [
     # Tools needed for update scripts
@@ -14,7 +14,7 @@ pkgs.mkShellNoCC {
     pkgs.nodejs
 
     # Formatter
-    perSystem.self.formatter
+    pkgs.treefmt
   ];
 
   shellHook = ''

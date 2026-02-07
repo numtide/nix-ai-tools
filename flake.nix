@@ -7,10 +7,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -29,9 +25,13 @@
         "x86_64-linux"
       ];
 
-      packageNames = builtins.filter (name: builtins.pathExists (./packages + "/${name}/default.nix")) (
+      packageNames = builtins.filter (name: builtins.pathExists (./packages + "/${name}/package.nix")) (
         builtins.attrNames (builtins.readDir ./packages)
       );
+
+      overlays.default = import ./overlays {
+        flake = self;
+      };
 
       mkPerSystem =
         system:
@@ -39,31 +39,10 @@
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
+            overlays = [ overlays.default ];
           };
 
-          callDefault =
-            perSystem: name:
-            let
-              packageFn = import (./packages + "/${name}/default.nix");
-              availableArgs = builtins.functionArgs packageFn;
-              providedArgs = {
-                inherit pkgs perSystem;
-                inherit inputs;
-                flake = self;
-              };
-            in
-            packageFn (builtins.intersectAttrs availableArgs providedArgs);
-
-          perSystem = {
-            self = rawPackages;
-          };
-
-          rawPackages = builtins.listToAttrs (
-            map (name: {
-              inherit name;
-              value = callDefault perSystem name;
-            }) packageNames
-          );
+          rawPackages = lib.genAttrs packageNames (name: pkgs.${name});
 
           packages = lib.filterAttrs (_: pkg: (builtins.tryEval pkg.drvPath).success) rawPackages;
 
@@ -84,13 +63,11 @@
             }) tests
           ) { } (builtins.attrNames packages);
 
-          devShell = import ./devshell.nix {
-            inherit pkgs perSystem;
-          };
+          devShell = import ./devshell.nix { inherit pkgs; };
         in
         {
           inherit packages;
-          formatter = packages.formatter;
+          formatter = pkgs.treefmt;
           devShells.default = devShell;
           checks = packageChecks // packageTestChecks // { devshell-default = devShell; };
         };
@@ -109,9 +86,6 @@
       checks = builtins.mapAttrs (_: output: output.checks) perSystemOutputs;
       devShells = builtins.mapAttrs (_: output: output.devShells) perSystemOutputs;
       formatter = builtins.mapAttrs (_: output: output.formatter) perSystemOutputs;
-
-      overlays.default = import ./overlays {
-        packages = self.packages;
-      };
+      inherit overlays;
     };
 }
