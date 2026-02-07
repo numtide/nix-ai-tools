@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 
 - Root: `flake.nix`, `flake.lock`, `devshell.nix`, `README.md`.
-- Packages live under `packages/<tool>/` with `package.nix`, `default.nix`, optional `update.py`, and lockfiles when needed.
+- Packages live under `packages/<tool>/` with `package.nix`, optional `update.py`, and lockfiles when needed.
 - Formatting is provided by nixpkgs `treefmt` via `flake.nix`.
 - Utilities and docs: `scripts/`, `docs/`, `.github/`.
 
@@ -20,7 +20,7 @@
 
 - Indentation: 2 spaces; avoid tabs.
 - Nix: small, composable derivations; prefer `buildNpmPackage`/`rustPlatform.buildRustPackage`/`stdenv.mkDerivation` as in existing packages.
-- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional custom updater), `nix-update-args` (optional nix-update flags).
+- File layout per package: `package.nix` (definition), `update.py` (optional custom updater), `nix-update-args` (optional nix-update flags).
 - Tools via treefmt: nixfmt, deadnix, shfmt, shellcheck, mdformat, yamlfmt, taplo. Always run `nix fmt` before committing.
 
 ### Updating Packages
@@ -120,10 +120,11 @@ inputs.nixpkgs.lib.extend (
 )
 ```
 
-Then in `packages/<package>/default.nix`, pass `flake` to the package:
+Then in `packages/<package>/package.nix`, accept `flake` when needed:
 
 ```nix
-{ pkgs, flake }: pkgs.callPackage ./package.nix { inherit flake; }
+{ flake, ... }:
+# ...
 ```
 
 And in `packages/<package>/package.nix`, reference custom maintainers:
@@ -155,17 +156,13 @@ nativeInstallCheckInputs = [ versionCheckHook ];
 
 **For tools that need a writable HOME directory** (many CLI tools try to create config/cache directories), use `versionCheckHomeHook`:
 
-1. In `packages/<package>/default.nix`, pass the hook:
+1. In `packages/<package>/package.nix`, accept the hook argument:
 
    ```nix
    {
-     pkgs,
-     perSystem,
+     versionCheckHomeHook,
      ...
    }:
-   pkgs.callPackage ./package.nix {
-     inherit (perSystem.self) versionCheckHomeHook;
-   }
    ```
 
 1. In `packages/<package>/package.nix`, add it to inputs and use it:

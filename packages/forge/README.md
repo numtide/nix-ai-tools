@@ -20,7 +20,6 @@ This issue exists in the specific git revision used by forge (3a97917cd7584c4220
 
 - `package.nix`: Main package definition (uses pre-built binaries)
 - `update.sh`: Update script for new versions
-- `default.nix`: Standard wrapper
 
 ## Building
 
