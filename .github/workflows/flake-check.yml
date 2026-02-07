@@ -1,0 +1,36 @@
+name: Flake Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      NIXBUILD_TOKEN: ${{ secrets.NIXBUILD_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Nix (local runner)
+        if: ${{ env.NIXBUILD_TOKEN == '' }}
+        uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
+
+      - name: Setup Nix (nixbuild)
+        if: ${{ env.NIXBUILD_TOKEN != '' }}
+        uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
+
+      - name: Enable nixbuild remote builders
+        if: ${{ env.NIXBUILD_TOKEN != '' }}
+        uses: nixbuild/nixbuild-action@449fa4b22e69f407614a9f448584f7ae8801334c # v24
+        with:
+          nixbuild_token: ${{ env.NIXBUILD_TOKEN }}
+
+      - name: Run flake check
+        run: nix flake check --accept-flake-config
