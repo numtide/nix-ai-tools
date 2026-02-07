@@ -1,0 +1,93 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: "Force a sync PR even when branches match"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream and origin
+        run: |
+          git remote add upstream https://github.com/numtide/nix-ai-tools.git || true
+          git fetch upstream main
+          git fetch origin main
+
+      - name: Build filtered sync branch
+        id: sync
+        env:
+          FORCE_SYNC: ${{ github.event.inputs.force_sync || 'false' }}
+        run: |
+          git checkout -B upstream-sync origin/main
+          git checkout upstream/main -- .
+
+          if [ -f .github/upstream-sync-ignore.txt ]; then
+            while IFS= read -r path; do
+              if [ -z "$path" ] || [[ "$path" == \#* ]]; then
+                continue
+              fi
+              git restore --source=origin/main --staged --worktree -- "$path" || true
+            done < .github/upstream-sync-ignore.txt
+          fi
+
+          if git diff --quiet && [ "$FORCE_SYNC" != "true" ]; then
+            echo "needs_sync=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git add -A
+          if [ "$FORCE_SYNC" = "true" ]; then
+            git commit --allow-empty -m "Sync upstream main (filtered)"
+          else
+            git commit -m "Sync upstream main (filtered)"
+          fi
+          git push --force origin upstream-sync
+          echo "needs_sync=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update pull request
+        if: steps.sync.outputs.needs_sync == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr_number=$(gh pr list --head upstream-sync --base main --json number --jq '.[0].number // empty')
+
+          if [ -n "$pr_number" ]; then
+            gh pr edit "$pr_number" \
+              --title "Sync upstream main" \
+              --body "Automated sync from upstream/main."
+          else
+            gh pr create \
+              --title "Sync upstream main" \
+              --body "Automated sync from upstream/main." \
+              --base main \
+              --head upstream-sync
+            pr_number=$(gh pr list --head upstream-sync --base main --json number --jq '.[0].number')
+          fi
+
+          gh pr merge "$pr_number" --auto --squash || echo "Auto-merge could not be enabled. Check repository settings."

@@ -1,0 +1,10 @@
+# Paths to keep from origin/main during upstream sync.
+# One pathspec per line.
+# Supports git pathspec magic, e.g. :(glob)...
+
+# Keep fork-specific wrapper removals
+:(glob)packages/*/default.nix
+packages/flake-inputs/default.nix
+packages/formatter/default.nix
+packages/formatter/treefmt.nix
+:(glob).github/**/*
