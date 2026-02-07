@@ -1,0 +1,21 @@
+name: Build with nixpkgs 25.11
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    uses: nixbuild/nixbuild-action/.github/workflows/ci-workflow.yml@449fa4b22e69f407614a9f448584f7ae8801334c # v24
+    with:
+      filter_builds: '.top_attr == "checks" and .system == "x86_64-linux"'
+      nix_args: |
+        --accept-flake-config
+        --override-input nixpkgs github:NixOS/nixpkgs/nixos-25.11
+    secrets:
+      nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
+      github_access_token: ${{ github.token }}
