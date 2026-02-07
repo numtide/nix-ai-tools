@@ -11,16 +11,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "goose-cli";
-  version = "1.23.1";
+  version = "1.23.2";
 
   src = fetchFromGitHub {
     owner = "block";
     repo = "goose";
     rev = "v${version}";
-    hash = "sha256-dlyCEljwKFpekx01hk1bB3b9olPZ933tDUMGWAoYkPQ=";
+    hash = "sha256-Zwb3y9XhtmKxJG6XOIHl49YVZMBsYtOPePM7heJfEvE=";
   };
 
-  cargoHash = "sha256-VYDgJ4UZWoGFTYdmeq4/mRoHIXTi+Dzt/rBY7uwvuNA=";
+  cargoHash = "sha256-G6Jok2OfSlOVlkF62gxivrKM0VlGqWFNdR0pQh79A0Q=";
 
   nativeBuildInputs = [ pkg-config ];
 
