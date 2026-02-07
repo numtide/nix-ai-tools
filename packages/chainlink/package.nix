@@ -8,13 +8,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "chainlink";
-  version = "1.4";
+  version = "1.5";
 
   src = fetchFromGitHub {
     owner = "dollspace-gay";
     repo = "chainlink";
     rev = "chainlink-${version}";
-    hash = "sha256-dm9Ck2poEDOpX8WEH3cVwiNsepXFGWFyGOfqZsN72+E=";
+    hash = "sha256-K9YUTrMUwEm3q0OsH4tDqdFr39vepLQnu9vDxRX9hGY=";
   };
 
   # The Rust crate is in the chainlink subdirectory
