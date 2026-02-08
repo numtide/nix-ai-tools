@@ -7,4 +7,10 @@
 packages/flake-inputs/default.nix
 packages/formatter/default.nix
 packages/formatter/treefmt.nix
+# modified README
+README.md
+# we update our own flake.lock
+# this needs to be synchronized with upstream for cache usage
+flake.lock
+# we have our own actions
 :(glob).github/**/*

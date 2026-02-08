@@ -10,14 +10,11 @@
   };
 
   outputs =
-    inputs@{
-      self,
+    {
       nixpkgs,
       ...
     }:
     let
-      lib = import ./lib { inherit inputs; };
-
       systems = [
         "aarch64-darwin"
         "aarch64-linux"
@@ -29,13 +26,13 @@
         builtins.attrNames (builtins.readDir ./packages)
       );
 
-      overlays.default = import ./overlays {
-        inherit lib;
-      };
+      overlays.default = import ./overlays;
 
       mkPerSystem =
         system:
         let
+          inherit (nixpkgs) lib;
+
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
@@ -80,8 +77,6 @@
       );
     in
     {
-      inherit lib;
-
       packages = builtins.mapAttrs (_: output: output.packages) perSystemOutputs;
       checks = builtins.mapAttrs (_: output: output.checks) perSystemOutputs;
       devShells = builtins.mapAttrs (_: output: output.devShells) perSystemOutputs;

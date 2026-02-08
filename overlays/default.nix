@@ -1,6 +1,10 @@
-{ lib }:
-final: _prev:
+final: prev:
 let
+  lib = import ../lib {
+    # tell sweet little lies to the lib file to avoid touching its contents
+    inputs.nixpkgs.lib = prev.lib;
+  };
+  
   packageNames = builtins.filter (name: builtins.pathExists (../packages + "/${name}/package.nix")) (
     builtins.attrNames (builtins.readDir ../packages)
   );
