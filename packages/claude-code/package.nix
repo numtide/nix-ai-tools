@@ -59,8 +59,7 @@ stdenv.mkDerivation {
       --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
       --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
       --set DISABLE_TELEMETRY 1 \
-      --set DISABLE_INSTALLATION_CHECKS 1 \
-      ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${
+      --set DISABLE_INSTALLATION_CHECKS 1 ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${
         lib.makeBinPath [
           bubblewrap
           socat
