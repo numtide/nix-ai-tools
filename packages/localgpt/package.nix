@@ -8,25 +8,32 @@
   libGL,
   libxkbcommon,
   wayland,
-  xorg,
+  libx11,
+  libxcursor,
+  libxi,
+  libxrandr,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-rustPlatform.buildRustPackage rec {
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash cargoHash;
+in
+rustPlatform.buildRustPackage {
   pname = "localgpt";
-  version = "0.1.1";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "localgpt-app";
     repo = "localgpt";
     tag = "v${version}";
-    hash = "sha256-qn/DZQ5Frww2k29Ntb5zk8S6ZTIr6m2xQN7JogD4CL4=";
+    inherit hash;
   };
 
   cargoPatches = [ ./update-lockfile.patch ];
 
-  cargoHash = "sha256-bomXXvyCV6ak0CSiqi90rSzFhO/23MrY+/Hf6IOG/nQ=";
+  inherit cargoHash;
 
   # Disable slow LTO and single codegen-unit for faster Nix builds.
   # Enable x11 and wayland features for eframe (upstream disables defaults).
@@ -46,10 +53,10 @@ rustPlatform.buildRustPackage rec {
     libGL
     libxkbcommon
     wayland
-    xorg.libX11
-    xorg.libXcursor
-    xorg.libXi
-    xorg.libXrandr
+    libx11
+    libxcursor
+    libxi
+    libxrandr
   ];
 
   env = {
