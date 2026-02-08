@@ -112,4 +112,4 @@ jobs:
             pr_number="$create_output"
           fi
 
-          gh pr merge "$pr_number" --auto --squash || echo "Auto-merge could not be enabled. Check repository settings."
+          gh pr merge "$pr_number" --auto --rebase || echo "Auto-merge could not be enabled. Check repository settings."

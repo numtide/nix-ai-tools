@@ -1,9 +1,6 @@
 name: Build with nixpkgs 25.11
 
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:

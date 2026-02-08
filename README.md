@@ -2,7 +2,7 @@
 
 A port of numtide's llm-agents.nix repository for users who prefer overlays. Synced daily.
 
-Please check upstream's [README.md](github.com/numtide/llm-agents.nix) for contents and more information.
+Please check upstream's [README.md](https://github.com/numtide/llm-agents.nix) for contents and more information.
 
 ## Installation
 
@@ -35,14 +35,16 @@ How to use:
     # NixOS / nix-darwin configuration
     nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      modules = [ ({ pkgs, ...}: {
-        nixpkgs.overlays = [ agents-overlay.overlays.default ];
-        environment.systemPackages = [
-          pkgs.llm-agents.claude-code
-          pkgs.llm-agents.codex
-          pkgs.llm-agents.gemini-cli
-        ];
-      }) ];
+      modules = [
+        ({ pkgs, ...}: {
+          nixpkgs.overlays = [ agents-overlay.overlays.default ];
+          environment.systemPackages = [
+            pkgs.llm-agents.claude-code
+            pkgs.llm-agents.codex
+            pkgs.llm-agents.gemini-cli
+          ];
+        })
+      ];
     };
   };
 }
