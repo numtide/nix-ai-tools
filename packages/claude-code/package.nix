@@ -48,22 +48,23 @@ stdenv.mkDerivation {
 
   # Disable auto-updates, telemetry, and installation method warnings
   # See: https://github.com/anthropics/claude-code/issues/15592
+  #
+  # Uses a single wrapProgram call to avoid double-wrapping which causes the
+  # process to show as ".claude-wrapped_" instead of "claude" in ps/htop.
+  # --argv0 ensures the process name is preserved through the wrapper.
   postFixup = ''
     wrapProgram $out/bin/claude \
+      --argv0 claude \
       --set DISABLE_AUTOUPDATER 1 \
       --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
       --set DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
       --set DISABLE_TELEMETRY 1 \
-      --set DISABLE_INSTALLATION_CHECKS 1
-  ''
-  + lib.optionalString stdenv.hostPlatform.isLinux ''
-    wrapProgram $out/bin/claude \
-      --prefix PATH : ${
+      --set DISABLE_INSTALLATION_CHECKS 1 ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${
         lib.makeBinPath [
           bubblewrap
           socat
         ]
-      }
+      }"}
   '';
 
   # Bun links against /usr/lib/libicucore.A.dylib which needs ICU data from
