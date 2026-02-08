@@ -5,6 +5,26 @@ on:
     - cron: "0 */6 * * *"
   workflow_dispatch:
     inputs:
+      upstream_repo:
+        description: "Upstream owner/repo"
+        required: false
+        default: "numtide/nix-ai-tools"
+        type: string
+      upstream_branch:
+        description: "Upstream branch to sync"
+        required: false
+        default: "main"
+        type: string
+      base_branch:
+        description: "Fork base branch"
+        required: false
+        default: "main"
+        type: string
+      dry_run:
+        description: "Run sync without pushing"
+        required: false
+        default: false
+        type: boolean
       force_sync:
         description: "Force a sync PR even when branches match"
         required: false
@@ -23,71 +43,73 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Create GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+        with:
+          app-id: ${{ secrets.SYNC_UPSTREAM_APP_ID }}
+          private-key: ${{ secrets.SYNC_UPSTREAM_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: nix-ai-tools
+
       - name: Checkout fork
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch upstream and origin
-        run: |
-          git remote add upstream https://github.com/numtide/nix-ai-tools.git || true
-          git fetch upstream main
-          git fetch origin main
-
-      - name: Build filtered sync branch
+      - name: Build filtered sync branch from upstream commits
         id: sync
         env:
+          UPSTREAM_REMOTE_URL: https://github.com/${{ github.event.inputs.upstream_repo || 'numtide/nix-ai-tools' }}.git
+          UPSTREAM_BRANCH: ${{ github.event.inputs.upstream_branch || 'main' }}
+          BASE_BRANCH: ${{ github.event.inputs.base_branch || 'main' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
           FORCE_SYNC: ${{ github.event.inputs.force_sync || 'false' }}
         run: |
-          git checkout -B upstream-sync origin/main
-          git checkout upstream/main -- .
-
-          if [ -f .github/upstream-sync-ignore.txt ]; then
-            while IFS= read -r path; do
-              if [ -z "$path" ] || [[ "$path" == \#* ]]; then
-                continue
-              fi
-              git restore --source=origin/main --staged --worktree -- "$path" || true
-            done < .github/upstream-sync-ignore.txt
-          fi
-
-          if git diff --quiet && [ "$FORCE_SYNC" != "true" ]; then
-            echo "needs_sync=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          git add -A
-          if [ "$FORCE_SYNC" = "true" ]; then
-            git commit --allow-empty -m "Sync upstream main (filtered)"
-          else
-            git commit -m "Sync upstream main (filtered)"
-          fi
-          git push --force origin upstream-sync
-          echo "needs_sync=true" >> "$GITHUB_OUTPUT"
+          bash ./scripts/sync-upstream.sh
 
       - name: Create or update pull request
-        if: steps.sync.outputs.needs_sync == 'true'
+        if: steps.sync.outputs.needs_sync == 'true' && (github.event.inputs.dry_run || 'false') != 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+          REPO_OWNER: ${{ github.repository_owner }}
         run: |
-          pr_number=$(gh pr list --head upstream-sync --base main --json number --jq '.[0].number // empty')
+          base_branch=${{ github.event.inputs.base_branch || 'main' }}
+          upstream_branch=${{ github.event.inputs.upstream_branch || 'main' }}
+          title="Sync upstream ${upstream_branch}"
+          body="Automated sync from upstream/${upstream_branch} using filtered cherry-picked commits."
+
+          pr_number=$(gh api "repos/${REPO}/pulls?state=open&head=${REPO_OWNER}:upstream-sync&base=${base_branch}" --jq '.[0].number // empty')
 
           if [ -n "$pr_number" ]; then
-            gh pr edit "$pr_number" \
-              --title "Sync upstream main" \
-              --body "Automated sync from upstream/main."
+            gh api "repos/${REPO}/pulls/${pr_number}" \
+              --method PATCH \
+              --field title="$title" \
+              --field body="$body" >/dev/null
           else
-            gh pr create \
-              --title "Sync upstream main" \
-              --body "Automated sync from upstream/main." \
-              --base main \
-              --head upstream-sync
-            pr_number=$(gh pr list --head upstream-sync --base main --json number --jq '.[0].number')
+            if ! create_output=$(gh api "repos/${REPO}/pulls" \
+              --method POST \
+              --field title="$title" \
+              --field body="$body" \
+              --field base="$base_branch" \
+              --field head="upstream-sync" \
+              --jq '.number' 2>&1); then
+              printf "%s\n" "$create_output"
+
+              echo "Token diagnostics (repo, installation, app permissions):"
+              gh api "repos/${REPO}" --jq '{full_name, default_branch, permissions}' || true
+              gh api "repos/${REPO}/installation" --jq '{id, app_slug, permissions, repositories_url}' || true
+
+              exit 1
+            fi
+            pr_number="$create_output"
           fi
 
           gh pr merge "$pr_number" --auto --squash || echo "Auto-merge could not be enabled. Check repository settings."
