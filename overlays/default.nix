@@ -1,8 +1,6 @@
-{ flake }:
+{ lib }:
 final: _prev:
 let
-  lib = flake.lib;
-
   packageNames = builtins.filter (name: builtins.pathExists (../packages + "/${name}/package.nix")) (
     builtins.attrNames (builtins.readDir ../packages)
   );
@@ -13,7 +11,8 @@ let
   callPackage = lib.callPackageWith (
     final
     // {
-      inherit lib flake;
+      inherit lib;
+      flake = { inherit lib; }; # keep the shape of packages.nix, but fail if they try to access unsavory things through flake
       pkgs = final;
       inherit fetchCargoVendor;
     }

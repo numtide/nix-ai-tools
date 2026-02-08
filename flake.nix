@@ -30,7 +30,7 @@
       );
 
       overlays.default = import ./overlays {
-        flake = self;
+        inherit lib;
       };
 
       mkPerSystem =
