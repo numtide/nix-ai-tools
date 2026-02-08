@@ -14,6 +14,7 @@
   gdk-pixbuf,
   glib,
   gtk3,
+  gtk-layer-shell,
   libayatana-appindicator,
   libsoup_3,
   openssl,
@@ -80,6 +81,7 @@ stdenv.mkDerivation {
     gdk-pixbuf
     glib
     gtk3
+    gtk-layer-shell
     libsoup_3
     openssl
     vulkan-loader
