@@ -49,6 +49,44 @@ restore_ignored_paths() {
   done <"$IGNORE_FILE"
 }
 
+sync_flake_lock_subset() {
+  local base_lock_tmp
+  local upstream_lock_tmp
+
+  if ! git cat-file -e "${BASE_REMOTE_NAME}/${BASE_BRANCH}:flake.lock" 2>/dev/null; then
+    return 1
+  fi
+
+  if ! git cat-file -e "${UPSTREAM_REMOTE_NAME}/${UPSTREAM_BRANCH}:flake.lock" 2>/dev/null; then
+    return 1
+  fi
+
+  base_lock_tmp="$(mktemp)"
+  upstream_lock_tmp="$(mktemp)"
+
+  git show "${BASE_REMOTE_NAME}/${BASE_BRANCH}:flake.lock" >"$base_lock_tmp"
+  git show "${UPSTREAM_REMOTE_NAME}/${UPSTREAM_BRANCH}:flake.lock" >"$upstream_lock_tmp"
+
+  jq -S -n --argfile base "$base_lock_tmp" --argfile upstream "$upstream_lock_tmp" '
+    reduce ($base | paths(scalars)) as $p (
+      $base;
+      if ($upstream | try (getpath($p) | true) catch false)
+      then setpath($p; $upstream | getpath($p))
+      else .
+      end
+    )
+  ' >flake.lock
+
+  rm -f "$base_lock_tmp" "$upstream_lock_tmp"
+
+  git add flake.lock
+  if git diff --cached --quiet -- flake.lock; then
+    return 1
+  fi
+
+  return 0
+}
+
 set_remote "$UPSTREAM_REMOTE_NAME" "$UPSTREAM_REMOTE_URL"
 
 git fetch "$BASE_REMOTE_NAME" "$BASE_BRANCH"
@@ -106,6 +144,11 @@ for commit in "${upstream_commits[@]}"; do
 
   applied_commit_count=$((applied_commit_count + 1))
 done
+
+if sync_flake_lock_subset; then
+  git commit -m "flake.lock: sync subset from upstream ${UPSTREAM_BRANCH}"
+  applied_commit_count=$((applied_commit_count + 1))
+fi
 
 needs_sync=false
 if (( applied_commit_count > 0 )); then

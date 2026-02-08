@@ -9,8 +9,10 @@ packages/formatter/default.nix
 packages/formatter/treefmt.nix
 # modified README
 README.md
-# we update our own flake.lock
-# this needs to be synchronized with upstream for cache usage
+# these need to be reviewed manually
+flake.nix
+# keep upstream commit-level lockfile changes out of cherry-picks
+# flake.lock is synced separately as a filtered subset in sync-upstream.sh
 flake.lock
 # we have our own actions
 :(glob).github/**/*
