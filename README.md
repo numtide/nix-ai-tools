@@ -549,6 +549,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>localgpt</strong> - Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/localgpt-app/localgpt
+- **Usage**: `nix run github:numtide/llm-agents.nix#localgpt -- --help`
+- **Nix**: [packages/localgpt/package.nix](packages/localgpt/package.nix)
+
+</details>
+<details>
 <summary><strong>openclaw</strong> - Your own personal AI assistant. Any OS. Any Platform. The lobster way</summary>
 
 - **Source**: source
