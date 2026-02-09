@@ -10,13 +10,13 @@
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "0.11.2";
+  version = "0.11.4";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     rev = "v${version}";
-    hash = "sha256-E+pV/OOSyK+sfgvOUZ3eLIhoeSfX73kNr5vYyjw0fpQ=";
+    hash = "sha256-Iq12nwYPffu8N0D3OVhcipIsFycTa9r/qnrDCEeFpmQ=";
   };
 
   vendorHash = "sha256-A5ZFyf7nljg8x0mnGSqW/lNW52wwLGv8UBD3c6YycJM=";
