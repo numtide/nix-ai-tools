@@ -10,16 +10,24 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "workmux";
-  version = "0.1.108";
+  version = "0.1.109";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "workmux";
     rev = "v${version}";
-    hash = "sha256-KyiVlU/8wtkyYxks9JCcftNR9UAxuQnz4coPo98XBmE=";
+    hash = "sha256-cyRAYAaNCxT39fFp1rxxqv/OI1a7rp4pCiKsk2fhnvU=";
   };
 
-  cargoHash = "sha256-MXlPGQoOErgSTR+KSHAgl9z5xW1qkXxgLi97KqJNGLI=";
+  cargoHash = "sha256-0OoZX3Etmxw28tF3CnUXXavvOiYp5qGvnzYOkVMrN6Q=";
+
+  patches = [
+    # Fix bash completion panic caused by __exec subcommand name.
+    # clap_complete uses __ as delimiter, so subcommand names starting
+    # with __ break the round-trip encoding. Rename to _exec.
+    # https://github.com/raine/workmux/issues/14
+    ./fix-bash-completion-panic.patch
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
 

@@ -1,0 +1,75 @@
+From f0e5a382c7a92737ed6518e69724b164ae480b5d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rg=20Thalheim?= <joerg@thalheim.io>
+Date: Tue, 10 Feb 2026 19:59:08 +0100
+Subject: [PATCH] fix: rename __exec to _exec to fix bash completion panic
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+clap_complete's bash generator uses '__' as a delimiter to encode
+hierarchical subcommand paths (e.g., 'workmux add' -> 'workmux__add').
+When a subcommand name itself starts with '__' (like '__exec'), the
+round-trip breaks:
+
+  1. 'workmux __exec' -> replace spaces with '__' -> 'workmux____exec'
+  2. Split on '__' -> ['workmux', '', 'exec']
+  3. find_subcommand('') -> None -> unwrap() panics
+
+This is the same class of bug previously fixed in issue #14, where
+'__complete-branches' was renamed to '_complete-branches'.
+
+Signed-off-by: Jörg Thalheim <joerg@thalheim.io>
+---
+ src/cli.rs          | 2 +-
+ src/command/exec.rs | 2 +-
+ src/command/run.rs  | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/cli.rs b/src/cli.rs
+index 63928c6..9077e54 100644
+--- a/src/cli.rs
++++ b/src/cli.rs
+@@ -447,7 +447,7 @@ enum Commands {
+     },
+ 
+     /// Execute a run spec (internal use)
+-    #[command(hide = true, name = "__exec")]
++    #[command(hide = true, name = "_exec")]
+     Exec {
+         /// Absolute path to run directory
+         #[arg(long)]
+diff --git a/src/command/exec.rs b/src/command/exec.rs
+index 746b95b..38d9ad8 100644
+--- a/src/command/exec.rs
++++ b/src/command/exec.rs
+@@ -1,4 +1,4 @@
+-//! Hidden `__exec` subcommand for running commands in worktree panes.
++//! Hidden `_exec` subcommand for running commands in worktree panes.
+ //!
+ //! This is invoked by `workmux run` in a split pane to execute the command
+ //! while capturing output to files.
+diff --git a/src/command/run.rs b/src/command/run.rs
+index 274b148..8e3c9e7 100644
+--- a/src/command/run.rs
++++ b/src/command/run.rs
+@@ -56,14 +56,14 @@ pub fn run(
+     };
+     let run_dir = create_run(&run_id, &spec)?;
+ 
+-    // Get path to current executable for __exec
++    // Get path to current executable for _exec
+     let exe_path = std::env::current_exe()
+         .map(|p| p.to_string_lossy().into_owned())
+         .unwrap_or_else(|_| "workmux".to_string());
+ 
+-    // Split pane with __exec command (pass absolute run_dir path)
++    // Split pane with _exec command (pass absolute run_dir path)
+     let exec_cmd = format!(
+-        "{} __exec --run-dir {}",
++        "{} _exec --run-dir {}",
+         shell_escape(&exe_path),
+         shell_escape(&run_dir.to_string_lossy())
+     );
+-- 
+2.52.0
+
