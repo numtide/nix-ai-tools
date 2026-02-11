@@ -28,6 +28,8 @@ python3.pkgs.buildPythonApplication rec {
     platformdirs
     readchar
     truststore
+    pyyaml
+    packaging
   ];
 
   pythonImportsCheck = [ "specify_cli" ];
