@@ -2,6 +2,8 @@
   lib,
   stdenv,
   fetchurl,
+  wrapBuddy,
+  gcc-unwrapped,
   versionCheckHook,
 }:
 
@@ -28,6 +30,12 @@ stdenv.mkDerivation {
   };
 
   sourceRoot = "br-v${version}-${platformSuffix}";
+
+  nativeBuildInputs = lib.optionals stdenv.isLinux [ wrapBuddy ];
+
+  buildInputs = lib.optionals stdenv.isLinux [
+    gcc-unwrapped.lib
+  ];
 
   dontConfigure = true;
   dontBuild = true;
