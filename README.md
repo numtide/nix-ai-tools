@@ -423,6 +423,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>get-shit-done</strong> - Meta-prompting, context engineering and spec-driven development system for Claude Code</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/gsd-build/get-shit-done
+- **Usage**: `nix run github:numtide/llm-agents.nix#get-shit-done -- --help`
+- **Nix**: [packages/get-shit-done/package.nix](packages/get-shit-done/package.nix)
+
+</details>
+<details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
 - **Source**: bytecode
