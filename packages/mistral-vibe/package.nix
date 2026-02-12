@@ -109,7 +109,11 @@ python.pkgs.buildPythonApplication rec {
   dependencies = with python.pkgs; [
     agent-client-protocol
     aiofiles
+    cryptography
+    gitpython
+    giturlparse
     httpx
+    keyring
     mcp
     mistralai
     packaging
@@ -119,6 +123,7 @@ python.pkgs.buildPythonApplication rec {
     pyperclip
     pytest-xdist
     python-dotenv
+    pyyaml
     rich
     textual
     textual-speedups
@@ -126,15 +131,22 @@ python.pkgs.buildPythonApplication rec {
     tree-sitter
     tree-sitter-bash
     watchfiles
+    zstandard
   ];
 
   # Relax version constraints - nixpkgs versions are slightly older but compatible
   pythonRelaxDeps = [
     "agent-client-protocol"
+    "cryptography"
+    "gitpython"
+    "giturlparse"
+    "keyring"
     "mistralai"
     "pydantic"
     "pydantic-settings"
+    "pyyaml"
     "watchfiles"
+    "zstandard"
   ];
 
   pythonImportsCheck = [ "vibe" ];
