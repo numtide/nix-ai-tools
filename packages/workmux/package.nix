@@ -10,16 +10,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "workmux";
-  version = "0.1.109";
+  version = "0.1.110";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "workmux";
     rev = "v${version}";
-    hash = "sha256-cyRAYAaNCxT39fFp1rxxqv/OI1a7rp4pCiKsk2fhnvU=";
+    hash = "sha256-lq+fLnRMyoNggZEh2fcrDEPzqEQNsJYXMHwoNBFDWR0=";
   };
 
-  cargoHash = "sha256-0OoZX3Etmxw28tF3CnUXXavvOiYp5qGvnzYOkVMrN6Q=";
+  cargoHash = "sha256-1oy3hXC+VlAdcfRHUub8uGodZhXwVIWTaE37kZkA7Ko=";
 
   patches = [
     # Fix bash completion panic caused by __exec subcommand name.
