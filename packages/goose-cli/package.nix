@@ -7,20 +7,21 @@
   libxcb,
   dbus,
   versionCheckHook,
+  librusty_v8,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "goose-cli";
-  version = "1.23.2";
+  version = "1.24.0";
 
   src = fetchFromGitHub {
     owner = "block";
     repo = "goose";
     rev = "v${version}";
-    hash = "sha256-Zwb3y9XhtmKxJG6XOIHl49YVZMBsYtOPePM7heJfEvE=";
+    hash = "sha256-98psnT7hmnLav7pYFN55fj04R+avjzoc2lVpXsFN6M8=";
   };
 
-  cargoHash = "sha256-G6Jok2OfSlOVlkF62gxivrKM0VlGqWFNdR0pQh79A0Q=";
+  cargoHash = "sha256-jZpk9x0d4JXfFGSmgi51uO774boOlUEyNhkSQMZZmSM=";
 
   nativeBuildInputs = [ pkg-config ];
 
@@ -29,6 +30,10 @@ rustPlatform.buildRustPackage rec {
     libxcb
     dbus
   ];
+
+  # The v8 package will try to download a `librusty_v8.a` release at build time to our read-only filesystem
+  # To avoid this we pre-download the file and export it via RUSTY_V8_ARCHIVE
+  env.RUSTY_V8_ARCHIVE = librusty_v8;
 
   # Build only the CLI package
   cargoBuildFlags = [
