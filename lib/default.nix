@@ -27,6 +27,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 20208;
         name = "Rok Garbas";
       };
+      afterthought = {
+        github = "afterthought";
+        githubId = 198010;
+        name = "Charles Swanberg";
+      };
     };
   }
 )
