@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchCargoVendor,
   installShellFiles,
   rustPlatform,
   pkg-config,
@@ -9,20 +10,28 @@
   versionCheckHook,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
-rustPlatform.buildRustPackage (finalAttrs: {
-  pname = "code";
-  version = "0.6.66";
 
+let
+  version = "0.6.66";
+  
   src = fetchFromGitHub {
     owner = "just-every";
     repo = "code";
-    tag = "v${finalAttrs.version}";
+    tag = "v${version}";
     hash = "sha256-gj9ZFjXq9Gr/DWvUy0ERkMEEXc9kEy7Up0aeNShWfrg=";
   };
+in
+rustPlatform.buildRustPackage {
+  pname = "code";
+  inherit version src;
 
-  sourceRoot = "${finalAttrs.src.name}/code-rs";
+  cargoDeps = fetchCargoVendor {
+    inherit src;
+    sourceRoot = "source/code-rs";
+    hash = "sha256-9V6N49CswKbIGyN9fAkJo7/DVzOdMj3xrDDMF0AqRMk=";
+  };
 
-  cargoHash = "sha256-9V6N49CswKbIGyN9fAkJo7/DVzOdMj3xrDDMF0AqRMk=";
+  sourceRoot = "source/code-rs";
 
   cargoBuildFlags = [
     "--bin"
@@ -40,7 +49,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   buildInputs = [ openssl ];
 
-  env.CODE_VERSION = finalAttrs.version;
+  env.CODE_VERSION = version;
 
   preBuild = ''
     # Remove LTO to speed up builds
@@ -70,10 +79,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.";
     homepage = "https://github.com/just-every/code/";
-    changelog = "https://github.com/just-every/code/releases/tag/v${finalAttrs.version}";
+    changelog = "https://github.com/just-every/code/releases/tag/v${version}";
     license = lib.licenses.asl20;
     mainProgram = "code";
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.unix;
   };
-})
+}
