@@ -21,14 +21,6 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-AwLNCZcnNUrlmngLANqki2IYyrn/PKUY7JMyAvCw/J8=";
 
-  patches = [
-    # Fix bash completion panic caused by __exec subcommand name.
-    # clap_complete uses __ as delimiter, so subcommand names starting
-    # with __ break the round-trip encoding. Rename to _exec.
-    # https://github.com/raine/workmux/issues/14
-    ./fix-bash-completion-panic.patch
-  ];
-
   nativeBuildInputs = [ installShellFiles ];
 
   # Some tests require filesystem access outside the sandbox
