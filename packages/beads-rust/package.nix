@@ -61,7 +61,7 @@ stdenv.mkDerivation {
     downloadPage = "https://github.com/Dicklesworthstone/beads_rust/releases";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ afterthought ];
     mainProgram = "br";
     platforms = [
       "x86_64-linux"
