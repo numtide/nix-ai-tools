@@ -91,14 +91,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.0.2";
+  version = "2.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-eZqNxibJ0Ps65tHT6msaizRxvUPNNq0OZ++aAYvUi0E=";
+    hash = "sha256-Xeb16Ravk60DXAjRs1OcCl8axCRwTf9yqXWnva9VQro=";
   };
 
   build-system = with python.pkgs; [
@@ -109,7 +109,11 @@ python.pkgs.buildPythonApplication rec {
   dependencies = with python.pkgs; [
     agent-client-protocol
     aiofiles
+    cryptography
+    gitpython
+    giturlparse
     httpx
+    keyring
     mcp
     mistralai
     packaging
@@ -119,6 +123,7 @@ python.pkgs.buildPythonApplication rec {
     pyperclip
     pytest-xdist
     python-dotenv
+    pyyaml
     rich
     textual
     textual-speedups
@@ -126,15 +131,22 @@ python.pkgs.buildPythonApplication rec {
     tree-sitter
     tree-sitter-bash
     watchfiles
+    zstandard
   ];
 
   # Relax version constraints - nixpkgs versions are slightly older but compatible
   pythonRelaxDeps = [
     "agent-client-protocol"
+    "cryptography"
+    "gitpython"
+    "giturlparse"
+    "keyring"
     "mistralai"
     "pydantic"
     "pydantic-settings"
+    "pyyaml"
     "watchfiles"
+    "zstandard"
   ];
 
   pythonImportsCheck = [ "vibe" ];
