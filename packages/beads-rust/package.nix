@@ -1,55 +1,30 @@
 {
   lib,
-  stdenv,
-  fetchurl,
-  wrapBuddy,
-  gcc-unwrapped,
+  rustPlatform,
+  fetchFromGitHub,
   versionCheckHook,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux_amd64";
-    x86_64-darwin = "darwin_amd64";
-    aarch64-darwin = "darwin_arm64";
-  };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
-in
-stdenv.mkDerivation {
+rustPlatform.buildRustPackage {
   pname = "beads-rust";
-  inherit version;
+  version = "0.1.13";
 
-  src = fetchurl {
-    url = "https://github.com/Dicklesworthstone/beads_rust/releases/download/v${version}/br-v${version}-${platformSuffix}.tar.gz";
-    hash = hashes.${platform};
+  src = fetchFromGitHub {
+    owner = "Dicklesworthstone";
+    repo = "beads_rust";
+    tag = "v0.1.13";
+    hash = "sha256-GRoQObThaDCqHW0SfVEFNLWfvxkGBfKDl5Ia8QXPGTs=";
   };
 
-  sourceRoot = "br-v${version}-${platformSuffix}";
+  cargoHash = "sha256-OvNmnZDs5eKgT1TuOboXSgv2w5RfRhfQ7TzK/AAp/g8=";
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ wrapBuddy ];
+  # Disable self_update feature — doesn't make sense in Nix
+  buildNoDefaultFeatures = true;
 
-  buildInputs = lib.optionals stdenv.isLinux [
-    gcc-unwrapped.lib
-  ];
-
-  dontConfigure = true;
-  dontBuild = true;
-
-  installPhase = ''
-    runHook preInstall
-
-    install -Dm755 br $out/bin/br
-
-    runHook postInstall
-  '';
+  # Tests require a git repository context
+  doCheck = false;
 
   doInstallCheck = true;
-
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Workflow & Project Management";
@@ -57,16 +32,12 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Fast Rust port of beads - a local-first issue tracker for git repositories";
     homepage = "https://github.com/Dicklesworthstone/beads_rust";
-    changelog = "https://github.com/Dicklesworthstone/beads_rust/releases/tag/v${version}";
+    changelog = "https://github.com/Dicklesworthstone/beads_rust/releases/tag/v0.1.13";
     downloadPage = "https://github.com/Dicklesworthstone/beads_rust/releases";
     license = licenses.mit;
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+    sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ afterthought ];
     mainProgram = "br";
-    platforms = [
-      "x86_64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = platforms.unix;
   };
 }
