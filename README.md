@@ -403,6 +403,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>beads-rust</strong> - Fast Rust port of beads - a local-first issue tracker for git repositories</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/Dicklesworthstone/beads_rust
+- **Usage**: `nix run github:numtide/llm-agents.nix#beads-rust -- --help`
+- **Nix**: [packages/beads-rust/package.nix](packages/beads-rust/package.nix)
+
+</details>
+<details>
 <summary><strong>cc-sdd</strong> - Spec-driven development framework for AI coding agents</summary>
 
 - **Source**: source
