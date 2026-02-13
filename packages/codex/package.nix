@@ -7,6 +7,7 @@
   rustPlatform,
   pkg-config,
   openssl,
+  libcap,
   versionCheckHook,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
 }:
@@ -44,7 +45,7 @@ rustPlatform.buildRustPackage {
     pkg-config
   ];
 
-  buildInputs = [ openssl ];
+  buildInputs = [ openssl ] ++ lib.optionals stdenv.isLinux [ libcap ];
 
   preBuild = ''
     # Remove LTO to speed up builds
