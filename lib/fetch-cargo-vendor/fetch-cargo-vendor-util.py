@@ -194,14 +194,21 @@ def find_crate_manifest_in_tree(tree: Path, crate_name: str) -> Path:
     # These often contain example/test code with unstable Cargo features
     skip_dirs = {"examples", "tests", "benches", "target", ".git"}
 
+    eprint(f"DEBUG: Looking for crate '{crate_name}' in tree: {tree}")
     for manifest_path in manifest_paths:
         # Skip manifests in excluded directories
+        eprint(f"DEBUG: Checking manifest: {manifest_path}")
+        eprint(f"DEBUG: Manifest parts: {manifest_path.parts}")
         if any(part in skip_dirs for part in manifest_path.parts):
+            eprint(f"DEBUG: SKIPPING manifest in excluded directory: {manifest_path}")
             continue
 
+        eprint(f"DEBUG: Trying to get metadata for: {manifest_path}")
         res = try_get_crate_manifest_path_from_mainfest_path(manifest_path, crate_name)
         if res is not None:
+            eprint(f"DEBUG: FOUND crate '{crate_name}' at: {res}")
             return res
+        eprint(f"DEBUG: Crate '{crate_name}' not found in: {manifest_path}")
 
     raise Exception(f"Couldn't find manifest for crate {crate_name} inside {tree}.")
 
