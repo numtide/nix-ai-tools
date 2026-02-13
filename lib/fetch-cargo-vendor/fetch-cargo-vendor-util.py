@@ -190,7 +190,15 @@ def find_crate_manifest_in_tree(tree: Path, crate_name: str) -> Path:
     # in some cases Cargo.toml is not located at the top level, so we also look at subdirectories
     manifest_paths = tree.glob("**/Cargo.toml")
 
+    # Directories to skip when searching for crate manifests
+    # These often contain example/test code with unstable Cargo features
+    skip_dirs = {"examples", "tests", "benches", "target", ".git"}
+
     for manifest_path in manifest_paths:
+        # Skip manifests in excluded directories
+        if any(part in skip_dirs for part in manifest_path.parts):
+            continue
+
         res = try_get_crate_manifest_path_from_mainfest_path(manifest_path, crate_name)
         if res is not None:
             return res
