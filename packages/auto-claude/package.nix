@@ -35,7 +35,10 @@ buildNpmPackage rec {
   env.ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
 
   postPatch = ''
-    # Remove the postinstall script that tries to download/rebuild native modules
+    # Remove the postinstall script that runs electron-rebuild.
+    # @lydell/node-pty ships prebuilt Node-API binaries as platform-specific
+    # optional dependencies (e.g. @lydell/node-pty-linux-x64), so rebuilding
+    # against Electron headers is not needed.
     substituteInPlace apps/frontend/package.json \
       --replace-fail '"postinstall": "node scripts/postinstall.cjs",' ""
   '';
@@ -56,11 +59,20 @@ buildNpmPackage rec {
     runHook preInstall
 
     mkdir -p $out/share/auto-claude
+
+    # Copy electron-vite build output
     cp -r apps/frontend/out $out/share/auto-claude/
-    cp -r apps/frontend/node_modules $out/share/auto-claude/
     cp apps/frontend/package.json $out/share/auto-claude/
 
-    # Include the Python backend
+    # Copy runtime node_modules from the workspace root (npm hoists deps there).
+    # This includes @lydell/node-pty and its platform-specific prebuilt binaries,
+    # which are needed at runtime since electron-vite externalizes them.
+    npm prune --omit=dev
+    # Remove workspace symlinks that point to build-time paths
+    find node_modules -maxdepth 1 -type l -delete
+    cp -r node_modules $out/share/auto-claude/
+
+    # Include the Python backend as a resource
     mkdir -p $out/share/auto-claude/resources/backend
     cp -r apps/backend/* $out/share/auto-claude/resources/backend/
 
