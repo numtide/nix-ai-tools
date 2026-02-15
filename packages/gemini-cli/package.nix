@@ -142,6 +142,10 @@ buildNpmPackage (finalAttrs: {
     # module resolves the native architecture without pulling in system_cmds.
     (writeShellScriptBin "sysctl" "echo 0")
   ];
+  # versionCheckHook runs with --ignore-environment by default, stripping PATH.
+  # We need PATH preserved so the sysctl stub (and node itself) can be found
+  # by child processes spawned during `gemini --version`.
+  versionCheckKeepEnvironment = "PATH";
 
   passthru = {
     category = "AI Coding Agents";
