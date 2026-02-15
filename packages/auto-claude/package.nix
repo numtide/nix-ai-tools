@@ -7,7 +7,6 @@
   npmConfigHook,
   makeWrapper,
   electron_39,
-  python3,
 }:
 
 buildNpmPackage rec {
@@ -77,9 +76,12 @@ buildNpmPackage rec {
     cp -r apps/backend/* $out/share/auto-claude/resources/backend/
 
     mkdir -p $out/bin
+    # Pass the app directory (not a .js file) so Electron treats it as a
+    # packaged app (app.isPackaged = true). This prevents DevTools from
+    # opening and enables production behaviours like auto-update.
+    # Upstream pins electron 39.x in devDependencies.
     makeWrapper ${electron_39}/bin/electron $out/bin/auto-claude \
-      --add-flags "$out/share/auto-claude/out/main/index.js" \
-      --prefix PATH : ${lib.makeBinPath [ python3 ]}
+      --add-flags "$out/share/auto-claude"
 
     runHook postInstall
   '';
