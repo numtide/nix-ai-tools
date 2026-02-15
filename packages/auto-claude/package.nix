@@ -94,8 +94,11 @@ buildNpmPackage rec {
     # Upstream pins electron 39.x in devDependencies.
     # The app's PythonEnvManager searches for python3 on PATH to create a
     # venv and pip-install backend dependencies at first launch.
+    # ELECTRON_FORCE_IS_PACKAGED makes app.isPackaged return true so the
+    # app uses production code paths (no DevTools, venv in userData, etc.).
     makeWrapper ${electron_39}/bin/electron $out/bin/auto-claude \
       --add-flags "$out/share/auto-claude" \
+      --set ELECTRON_FORCE_IS_PACKAGED 1 \
       --prefix PATH : ${lib.makeBinPath [ python3 ]}
 
     runHook postInstall
