@@ -47,6 +47,17 @@ buildNpmPackage rec {
   buildPhase = ''
     runHook preBuild
 
+    # Ensure our electron major version matches what upstream expects.
+    # This will fail loudly on version bumps instead of silently diverging.
+    upstream_electron=$(node -p "require('./apps/frontend/package.json').devDependencies.electron")
+    upstream_major=''${upstream_electron%%.*}
+    nix_major=${lib.versions.major electron_39.version}
+    if [[ "$upstream_major" != "$nix_major" ]]; then
+      echo "error: upstream expects electron $upstream_electron (major $upstream_major), but we provide electron ${electron_39.version} (major $nix_major)"
+      echo "Update the electron_39 input in package.nix to match."
+      exit 1
+    fi
+
     cd apps/frontend
     npx electron-vite build
     cd ../..
