@@ -24,7 +24,7 @@ buildNpmPackage rec {
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-3Dk50/76SiYfv3YS5JjEvjMOlZ/HcR/rkblZWIx+CNg=";
+    hash = "sha256-zSSKC6B0AvarOps3qsaAIja3oNJf3Q3ZapJ9Xg9d6j0=";
     fetcherVersion = 2;
   };
   inherit npmConfigHook;
