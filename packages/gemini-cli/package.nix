@@ -11,6 +11,7 @@
   makeBinaryWrapper,
   versionCheckHook,
   versionCheckHomeHook,
+  writeShellScriptBin,
   xsel,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
@@ -132,6 +133,14 @@ buildNpmPackage (finalAttrs: {
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # clipboardy → system-architecture calls `sysctl -inq sysctl.proc_translated`
+    # at import time to detect Rosetta 2. In the Nix sandbox /usr/sbin/sysctl
+    # is absent, causing ENOENT and crashing the version check. Provide a
+    # minimal stub that reports "not translated" (exit 0, empty output) so the
+    # module resolves the native architecture without pulling in system_cmds.
+    (writeShellScriptBin "sysctl" "echo 0")
   ];
 
   passthru = {
