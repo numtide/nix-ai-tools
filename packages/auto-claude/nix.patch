@@ -1,0 +1,83 @@
+From 6642eb5f5a964e2f34b7452d1351e3ec94f04f00 Mon Sep 17 00:00:00 2001
+From: Nix <nix@localhost>
+Date: Sun, 15 Feb 2026 10:28:33 +0100
+Subject: [PATCH] Disable auto-updater and postinstall for Nix packaging
+
+- Remove postinstall script that runs electron-rebuild. @lydell/node-pty
+  ships prebuilt Node-API binaries as platform-specific optional deps,
+  so rebuilding against Electron headers is not needed.
+
+- Disable the Electron auto-updater initialization. Nix manages the
+  package version, and electron-updater crashes looking for
+  app-update.yml in Electron's read-only store path.
+
+- Stub out manual update check/download IPC handlers so the UI doesn't
+  trigger the updater either.
+
+Signed-off-by: Nix <nix@localhost>
+---
+ apps/frontend/package.json                                 | 2 +-
+ apps/frontend/src/main/index.ts                            | 2 +-
+ apps/frontend/src/main/ipc-handlers/app-update-handlers.ts | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/apps/frontend/package.json b/apps/frontend/package.json
+index fce7408..555dc7f 100644
+--- a/apps/frontend/package.json
++++ b/apps/frontend/package.json
+@@ -19,7 +19,7 @@
+     "npm": ">=10.0.0"
+   },
+   "scripts": {
+-    "postinstall": "node scripts/postinstall.cjs",
++    
+     "dev": "electron-vite dev",
+     "dev:debug": "cross-env DEBUG=true electron-vite dev",
+     "dev:mcp": "electron-vite dev -- --remote-debugging-port=9222",
+diff --git a/apps/frontend/src/main/index.ts b/apps/frontend/src/main/index.ts
+index eebbcc7..dbfe7ab 100644
+--- a/apps/frontend/src/main/index.ts
++++ b/apps/frontend/src/main/index.ts
+@@ -427,7 +427,7 @@ app.whenReady().then(() => {
+ 
+     // Initialize app auto-updater (only in production, or when DEBUG_UPDATER is set)
+     const forceUpdater = process.env.DEBUG_UPDATER === 'true';
+-    if (app.isPackaged || forceUpdater) {
++    if (false && (app.isPackaged || forceUpdater)) {
+       // Load settings to get beta updates preference
+       const settings = loadSettingsSync();
+       const betaUpdates = settings.betaUpdates ?? false;
+diff --git a/apps/frontend/src/main/ipc-handlers/app-update-handlers.ts b/apps/frontend/src/main/ipc-handlers/app-update-handlers.ts
+index 33f4d6b..dad1d28 100644
+--- a/apps/frontend/src/main/ipc-handlers/app-update-handlers.ts
++++ b/apps/frontend/src/main/ipc-handlers/app-update-handlers.ts
+@@ -35,7 +35,7 @@ export function registerAppUpdateHandlers(): void {
+     IPC_CHANNELS.APP_UPDATE_CHECK,
+     async (): Promise<IPCResult<AppUpdateInfo | null>> => {
+       try {
+-        const result = await checkForUpdates();
++        const result = null;
+         return { success: true, data: result };
+       } catch (error) {
+         console.error('[app-update-handlers] Check for updates failed:', error);
+@@ -55,7 +55,7 @@ export function registerAppUpdateHandlers(): void {
+     IPC_CHANNELS.APP_UPDATE_DOWNLOAD,
+     async (): Promise<IPCResult> => {
+       try {
+-        await downloadUpdate();
++        throw new Error("Updates are managed by Nix");
+         return { success: true };
+       } catch (error) {
+         console.error('[app-update-handlers] Download update failed:', error);
+@@ -75,7 +75,7 @@ export function registerAppUpdateHandlers(): void {
+     IPC_CHANNELS.APP_UPDATE_DOWNLOAD_STABLE,
+     async (): Promise<IPCResult> => {
+       try {
+-        await downloadStableVersion();
++        throw new Error("Updates are managed by Nix");
+         return { success: true };
+       } catch (error) {
+         console.error('[app-update-handlers] Download stable version failed:', error);
+-- 
+2.52.0
+
