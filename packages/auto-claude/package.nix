@@ -34,14 +34,7 @@ buildNpmPackage rec {
 
   env.ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
 
-  postPatch = ''
-    # Remove the postinstall script that runs electron-rebuild.
-    # @lydell/node-pty ships prebuilt Node-API binaries as platform-specific
-    # optional dependencies (e.g. @lydell/node-pty-linux-x64), so rebuilding
-    # against Electron headers is not needed.
-    substituteInPlace apps/frontend/package.json \
-      --replace-fail '"postinstall": "node scripts/postinstall.cjs",' ""
-  '';
+  patches = [ ./nix.patch ];
 
   npmFlags = [ "--ignore-scripts" ];
 
@@ -88,10 +81,6 @@ buildNpmPackage rec {
     cp -r apps/backend/* $out/share/auto-claude/resources/backend/
 
     mkdir -p $out/bin
-    # Pass the app directory (not a .js file) so Electron treats it as a
-    # packaged app (app.isPackaged = true). This prevents DevTools from
-    # opening and enables production behaviours like auto-update.
-    # Upstream pins electron 39.x in devDependencies.
     # The app's PythonEnvManager searches for python3 on PATH to create a
     # venv and pip-install backend dependencies at first launch.
     # ELECTRON_FORCE_IS_PACKAGED makes app.isPackaged return true so the
