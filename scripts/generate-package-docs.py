@@ -78,6 +78,7 @@ CATEGORY_ORDER = [
     "AI Coding Agents",
     "Claude Code Ecosystem",
     "ACP Ecosystem",
+    "MCP",
     "Usage Analytics",
     "Workflow & Project Management",
     "Code Review",
