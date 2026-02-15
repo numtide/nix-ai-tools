@@ -653,19 +653,22 @@ Alternatively, use the overlay to access packages under the `llm-agents` namespa
 
 ### Try Without Installing
 
+Browse all available tools with the interactive launcher:
+
 ```bash
-# Try Claude Code
+nix run github:numtide/llm-agents.nix
+```
+
+This opens an fzf picker listing every package with its description.
+Select one and it will be run via `nix run`.
+
+Or run a specific tool directly:
+
+```bash
 nix run github:numtide/llm-agents.nix#claude-code
-
-# Try OpenCode
 nix run github:numtide/llm-agents.nix#opencode
-
-# Try Gemini CLI
 nix run github:numtide/llm-agents.nix#gemini-cli
-
-# Try Qwen Code
 nix run github:numtide/llm-agents.nix#qwen-code
-
 # etc...
 ```
 
