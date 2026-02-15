@@ -7,6 +7,7 @@
   npmConfigHook,
   makeWrapper,
   electron_39,
+  python3,
 }:
 
 buildNpmPackage rec {
@@ -91,8 +92,11 @@ buildNpmPackage rec {
     # packaged app (app.isPackaged = true). This prevents DevTools from
     # opening and enables production behaviours like auto-update.
     # Upstream pins electron 39.x in devDependencies.
+    # The app's PythonEnvManager searches for python3 on PATH to create a
+    # venv and pip-install backend dependencies at first launch.
     makeWrapper ${electron_39}/bin/electron $out/bin/auto-claude \
-      --add-flags "$out/share/auto-claude"
+      --add-flags "$out/share/auto-claude" \
+      --prefix PATH : ${lib.makeBinPath [ python3 ]}
 
     runHook postInstall
   '';
