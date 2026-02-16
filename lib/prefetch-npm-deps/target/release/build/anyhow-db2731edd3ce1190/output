@@ -1,3 +1,0 @@
-cargo:rerun-if-changed=build/probe.rs
-cargo:rerun-if-env-changed=RUSTC_BOOTSTRAP
-cargo:rustc-cfg=std_backtrace

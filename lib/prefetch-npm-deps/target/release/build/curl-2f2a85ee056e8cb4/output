@@ -1,1 +1,0 @@
-cargo:rustc-cfg=need_openssl_probe

@@ -1,1 +1,0 @@
-cargo:rustc-env=ISAHC_FEATURES=
