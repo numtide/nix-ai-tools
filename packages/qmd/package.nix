@@ -27,14 +27,14 @@ let
   effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
 
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) rev srcHash npmDepsHash;
+  inherit (versionData) tag srcHash npmDepsHash;
 
-  version = "1.0.0-unstable";
+  version = versionData.version;
 
   src = fetchFromGitHub {
     owner = "tobi";
     repo = "qmd";
-    inherit rev;
+    inherit tag;
     hash = srcHash;
   };
 
