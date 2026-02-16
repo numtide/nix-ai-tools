@@ -1,0 +1,4 @@
+src/smoke.c: In function ‘main’:
+src/smoke.c:4:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+    4 |   return (int) adler32;
+      |          ^
