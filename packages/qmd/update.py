@@ -28,6 +28,7 @@ SCRIPT_DIR = Path(__file__).parent
 HASHES_FILE = SCRIPT_DIR / "hashes.json"
 OWNER = "tobi"
 REPO = "qmd"
+FLAKE_PACKAGE = ".#qmd"
 
 
 def fetch_latest_commit() -> tuple[str, str]:
@@ -153,7 +154,7 @@ def main() -> None:
     # Calculate npmDepsHash
     try:
         npm_deps_hash = calculate_dependency_hash(
-            ".#qmd", "npmDepsHash", HASHES_FILE, new_data
+            FLAKE_PACKAGE, "npmDepsHash", HASHES_FILE, new_data
         )
         new_data["npmDepsHash"] = npm_deps_hash
         save_hashes(HASHES_FILE, new_data)
