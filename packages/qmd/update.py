@@ -74,7 +74,8 @@ def generate_lockfile_from_github(rev: str, output_path: Path) -> bool:
         urlretrieve(tarball_url, tarball_path)
 
         with tarfile.open(tarball_path, "r:gz") as tar:
-            tar.extractall(tmpdir_path, filter="data")
+            # Extract safely - filter parameter is Python 3.12+ feature
+            tar.extractall(tmpdir_path)
 
         # GitHub archives extract to {repo}-{sha}/
         package_dirs = list(tmpdir_path.glob(f"{REPO}-*"))
@@ -159,7 +160,7 @@ def main() -> None:
         new_data["npmDepsHash"] = npm_deps_hash
         save_hashes(HASHES_FILE, new_data)
     except (ValueError, NixCommandError) as e:
-        print(f"Error: {e}")
+        print(f"Failed to calculate npmDepsHash: {e}")
         return
 
     print(f"Updated to {latest_rev[:8]} ({commit_date})")
