@@ -101,11 +101,17 @@ def generate_lockfile_from_github(rev: str, output_path: Path) -> bool:
             json.dump(pkg_data, f, indent=2)
 
         # Generate package-lock.json
-        subprocess.run(
+        result = subprocess.run(
             ["npm", "install", "--package-lock-only", "--ignore-scripts"],
             cwd=package_dir,
-            check=True,
+            capture_output=True,
+            text=True,
+            check=False,
         )
+
+        if result.returncode != 0:
+            print(f"ERROR: npm install failed:\n{result.stderr}")
+            return False
 
         new_lock = package_dir / "package-lock.json"
         if new_lock.exists():
