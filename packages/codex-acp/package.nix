@@ -1,22 +1,47 @@
 {
   lib,
   fetchFromGitHub,
+  fetchurl,
   rustPlatform,
   pkg-config,
   openssl,
 }:
-rustPlatform.buildRustPackage rec {
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData)
+    version
+    hash
+    cargoHash
+    codexRev
+    nodeVersionHash
+    ;
+
+  # codex-core's js_repl/mod.rs uses include_str!("../../../../node-version.txt")
+  # which in the original codex monorepo resolves to codex-rs/node-version.txt.
+  # Cargo vendoring flattens the workspace structure so this file is missing;
+  # we fetch it from the exact commit that Cargo.lock pins.
+  nodeVersionFile = fetchurl {
+    url = "https://raw.githubusercontent.com/zed-industries/codex/${codexRev}/codex-rs/node-version.txt";
+    hash = nodeVersionHash;
+  };
+in
+rustPlatform.buildRustPackage {
   pname = "codex-acp";
-  version = "0.9.2";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "zed-industries";
     repo = "codex-acp";
     rev = "v${version}";
-    hash = "sha256-UtfvuejBnciksytIkTE2yFLTTy5gIB/kbOg7abTBGqQ=";
+    inherit hash;
   };
 
-  cargoHash = "sha256-pCHmYa+5xkON2BoAh7RRe5lQeUqSNgqemt0stHQly6c=";
+  inherit cargoHash;
+
+  # Place node-version.txt at the vendor dir root where the include_str! resolves to
+  preBuild = ''
+    cp ${nodeVersionFile} "$NIX_BUILD_TOP/codex-acp-${version}-vendor/node-version.txt"
+  '';
 
   nativeBuildInputs = [
     pkg-config
