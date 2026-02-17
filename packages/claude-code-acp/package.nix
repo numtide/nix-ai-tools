@@ -9,19 +9,19 @@
 buildNpmPackage rec {
   inherit npmConfigHook;
   pname = "claude-code-acp";
-  version = "0.16.1";
+  version = "0.17.0";
 
   src = fetchFromGitHub {
     owner = "zed-industries";
     repo = "claude-code-acp";
     rev = "v${version}";
-    hash = "sha256-/HeAz0jdXhLhYGcwTgthrE7cGjKjro30GQUmAn4egXs=";
+    hash = "sha256-fqWFQTbUeTxwYUhFje4GoGiyU/CKWaXPjqIvKZ8EXP8=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-3sG48kPiWSZTXwgOP1ye1EvDSbneqttlJ4pHO4T9UVA=";
+    hash = "sha256-zYDi+V9sBslQEYMxRsJyII8oIwbvzba3JIIYV2Xl4aI=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
