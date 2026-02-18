@@ -180,6 +180,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>omp</strong> - A terminal-based coding agent with multi-model support (binary release)</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://github.com/can1357/oh-my-pi
+- **Usage**: `nix run github:numtide/llm-agents.nix#omp -- --help`
+- **Nix**: [packages/omp/package.nix](packages/omp/package.nix)
+
+</details>
+<details>
 <summary><strong>opencode</strong> - AI coding agent built for the terminal</summary>
 
 - **Source**: binary
