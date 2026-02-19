@@ -26,16 +26,13 @@ let
   # Vulkan supported on all Linux
   effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
 
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) tag srcHash npmDepsHash;
-
-  version = versionData.version;
+  version = "1.0.7";
 
   src = fetchFromGitHub {
     owner = "tobi";
     repo = "qmd";
-    inherit tag;
-    hash = srcHash;
+    tag = "v${version}";
+    hash = "sha256-QOdiLji06g6VntkcGVIEsHrAc6eVCVAXWXXCKCsc6cI=";
   };
 
   # Shared patch: add package-lock.json and remove win32 optional dependency
@@ -58,7 +55,7 @@ buildNpmPackage {
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src postPatch;
     name = "qmd-${version}-npm-deps";
-    hash = npmDepsHash;
+    hash = "sha256-XLhwVd/qyOhbcF5PZlTP65nnsCSDXUbW79z8WCGKvk0=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
@@ -84,32 +81,24 @@ buildNpmPackage {
   ];
 
   # Ignore missing optional dependencies based on enabled GPU backends
-  autoPatchelfIgnoreMissingDeps =
-    # Always ignore musl (we use glibc)
-    [
-      "libc.musl-x86_64.so.1"
-      "libc.musl-aarch64.so.1"
-    ]
-    # Ignore CUDA libs - they're loaded at runtime via LD_LIBRARY_PATH
+  autoPatchelfIgnoreMissingDeps = [
+    # musl (we use glibc)
+    "libc.musl-x86_64.so.1"
+    "libc.musl-aarch64.so.1"
+    # Prebuilt binaries target CUDA 13 but we provide CUDA 12 (ABI compatible)
     # libcuda.so.1 comes from nvidia driver (autoAddDriverRunpath)
-    # Prebuilt binaries want CUDA 13 but we provide CUDA 12 (ABI compatible)
-    ++ lib.optionals (!effectiveCudaSupport) [
-      "libcudart.so.12"
-      "libcudart.so.13"
-      "libcublas.so.12"
-      "libcublas.so.13"
-      "libcuda.so.1"
-    ]
-    ++ lib.optionals effectiveCudaSupport [
-      # Always ignore these - loaded at runtime
-      "libcudart.so.13"
-      "libcublas.so.13"
-      "libcuda.so.1" # from nvidia driver
-    ]
-    # Ignore Vulkan libs if Vulkan support is disabled
-    ++ lib.optionals (!effectiveVulkanSupport) [
-      "libvulkan.so.1"
-    ];
+    "libcudart.so.13"
+    "libcublas.so.13"
+    "libcuda.so.1"
+  ]
+  # CUDA 12 libs — only ignore when CUDA is disabled (otherwise provided by cudaPackages)
+  ++ lib.optionals (!effectiveCudaSupport) [
+    "libcudart.so.12"
+    "libcublas.so.12"
+  ]
+  ++ lib.optionals (!effectiveVulkanSupport) [
+    "libvulkan.so.1"
+  ];
 
   # Skip any build scripts since this is a TypeScript project run with bun
   npmFlags = [ "--ignore-scripts" ];
@@ -170,7 +159,10 @@ buildNpmPackage {
     description = "mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local";
     homepage = "https://github.com/tobi/qmd";
     license = licenses.mit;
-    sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    sourceProvenance = with lib.sourceTypes; [
+      fromSource
+      binaryNativeCode
+    ];
     maintainers = with flake.lib.maintainers; [ mulatta ];
     platforms = lib.platforms.unix;
     mainProgram = "qmd";
