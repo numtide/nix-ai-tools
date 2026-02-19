@@ -1,10 +1,12 @@
 {
   lib,
+  stdenv,
   fetchFromGitHub,
   fetchurl,
   rustPlatform,
   pkg-config,
   openssl,
+  libcap,
 }:
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -13,6 +15,7 @@ let
     hash
     cargoHash
     codexRev
+    codexSrcHash
     nodeVersionHash
     ;
 
@@ -23,6 +26,18 @@ let
   nodeVersionFile = fetchurl {
     url = "https://raw.githubusercontent.com/zed-industries/codex/${codexRev}/codex-rs/node-version.txt";
     hash = nodeVersionHash;
+  };
+
+  # codex-linux-sandbox's build.rs compiles a vendored copy of bubblewrap (with
+  # patches) that lives in codex-rs/vendor/bubblewrap in the main codex repo.
+  # Cargo vendoring flattens the workspace so this directory is missing; we
+  # fetch the codex source at the pinned rev to provide it via
+  # CODEX_BWRAP_SOURCE_DIR.
+  codexSrc = fetchFromGitHub {
+    owner = "zed-industries";
+    repo = "codex";
+    rev = codexRev;
+    hash = codexSrcHash;
   };
 in
 rustPlatform.buildRustPackage {
@@ -43,12 +58,20 @@ rustPlatform.buildRustPackage {
     cp ${nodeVersionFile} "$NIX_BUILD_TOP/codex-acp-${version}-vendor/node-version.txt"
   '';
 
+  env = lib.optionalAttrs stdenv.hostPlatform.isLinux {
+    # Point the codex-linux-sandbox build.rs at the vendored bubblewrap source
+    CODEX_BWRAP_SOURCE_DIR = "${codexSrc}/codex-rs/vendor/bubblewrap";
+  };
+
   nativeBuildInputs = [
     pkg-config
   ];
 
   buildInputs = [
     openssl
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    libcap
   ];
 
   doCheck = false;

@@ -89,6 +89,14 @@ def main() -> None:
     codex_rev = extract_codex_rev_from_tarball(tag)
     print(f"  codexRev: {codex_rev}")
 
+    # Calculate codex source hash (needed for vendored bubblewrap on Linux)
+    codex_src_url = (
+        f"https://github.com/zed-industries/codex/archive/{codex_rev}.tar.gz"
+    )
+    print("Calculating codex source hash...")
+    codex_src_hash = calculate_url_hash(codex_src_url, unpack=True)
+    print(f"  codexSrcHash: {codex_src_hash}")
+
     # Calculate node-version.txt hash
     node_version_url = f"https://raw.githubusercontent.com/zed-industries/codex/{codex_rev}/codex-rs/node-version.txt"
     print("Calculating node-version.txt hash...")
@@ -101,6 +109,7 @@ def main() -> None:
         "hash": source_hash,
         "cargoHash": DUMMY_SHA256_HASH,
         "codexRev": codex_rev,
+        "codexSrcHash": codex_src_hash,
         "nodeVersionHash": node_version_hash,
     }
     save_hashes(HASHES_FILE, data)
