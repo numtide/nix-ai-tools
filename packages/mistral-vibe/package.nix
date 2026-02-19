@@ -91,14 +91,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.1.0";
+  version = "2.2.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-Xeb16Ravk60DXAjRs1OcCl8axCRwTf9yqXWnva9VQro=";
+    hash = "sha256-vJnykMcnwQDmzq0L4OhPzortliggtK8Hz+iG2cGu8BM=";
   };
 
   build-system = with python.pkgs; [
@@ -108,10 +108,11 @@ python.pkgs.buildPythonApplication rec {
 
   dependencies = with python.pkgs; [
     agent-client-protocol
-    aiofiles
+    anyio
     cryptography
     gitpython
     giturlparse
+    google-auth
     httpx
     keyring
     mcp
@@ -121,9 +122,9 @@ python.pkgs.buildPythonApplication rec {
     pydantic
     pydantic-settings
     pyperclip
-    pytest-xdist
     python-dotenv
     pyyaml
+    requests
     rich
     textual
     textual-speedups
