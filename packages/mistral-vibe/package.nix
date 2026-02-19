@@ -108,10 +108,11 @@ python.pkgs.buildPythonApplication rec {
 
   dependencies = with python.pkgs; [
     agent-client-protocol
-    aiofiles
+    anyio
     cryptography
     gitpython
     giturlparse
+    google-auth
     httpx
     keyring
     mcp
@@ -121,9 +122,9 @@ python.pkgs.buildPythonApplication rec {
     pydantic
     pydantic-settings
     pyperclip
-    pytest-xdist
     python-dotenv
     pyyaml
+    requests
     rich
     textual
     textual-speedups
