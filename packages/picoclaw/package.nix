@@ -23,7 +23,7 @@ buildGoModule.override { go = go_1_25; } rec {
 
   postPatch = ''
     # Relax Go version requirement to match nixpkgs go_1_25
-    substituteInPlace go.mod --replace-fail 'go 1.25.7' 'go 1.25.5'
+    sed -i "s/^go .*/go ${go_1_25.version}/" go.mod
 
     # go:embed in cmd_onboard.go expects a workspace directory copied by go:generate
     cp -r workspace cmd/picoclaw/workspace
