@@ -86,7 +86,7 @@ rustPlatform.buildRustPackage {
     versionCheckHomeHook
   ];
 
-  passthru.category = "Utilities";
+  passthru.category = "AI Assistants";
 
   meta = with lib; {
     description = "Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search";

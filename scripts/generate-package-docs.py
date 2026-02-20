@@ -76,6 +76,7 @@ def generate_package_doc(package: str, metadata: dict[str, str | bool | None]) -
 # Define category order for display
 CATEGORY_ORDER = [
     "AI Coding Agents",
+    "AI Assistants",
     "Claude Code Ecosystem",
     "ACP Ecosystem",
     "MCP",
