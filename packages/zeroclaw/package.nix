@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   rustPlatform,
   fetchFromGitHub,
   versionCheckHook,
@@ -36,6 +37,7 @@ rustPlatform.buildRustPackage rec {
     changelog = "https://github.com/zeroclaw-labs/zeroclaw/releases";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    maintainers = with flake.lib.maintainers; [ commandodev ];
     mainProgram = "zeroclaw";
     platforms = lib.platforms.unix;
   };
