@@ -1,0 +1,59 @@
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  go_1_25,
+  versionCheckHook,
+  versionCheckHomeHook,
+}:
+
+buildGoModule.override { go = go_1_25; } rec {
+  pname = "picoclaw";
+  version = "0.1.2";
+
+  src = fetchFromGitHub {
+    owner = "sipeed";
+    repo = "picoclaw";
+    tag = "v${version}";
+    hash = "sha256-2q/BQmZaSh88kwquiQlWGS36MVFWWdUzsMxGp4cAMiE=";
+  };
+
+  vendorHash = "sha256-3kDU3pbcz+2cd36/bcbdU/IXTAeJosBZ+syUQqO2bls=";
+
+  postPatch = ''
+    # Relax Go version requirement to match nixpkgs go_1_25
+    substituteInPlace go.mod --replace-fail 'go 1.25.7' 'go 1.25.5'
+
+    # go:embed in cmd_onboard.go expects a workspace directory copied by go:generate
+    cp -r workspace cmd/picoclaw/workspace
+  '';
+
+  subPackages = [ "cmd/picoclaw" ];
+
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.version=${version}"
+  ];
+
+  # Tests require runtime configuration and network access
+  doCheck = false;
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+
+  passthru.category = "AI Coding Agents";
+
+  meta = {
+    description = "Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity";
+    homepage = "https://picoclaw.io";
+    changelog = "https://github.com/sipeed/picoclaw/releases";
+    license = lib.licenses.mit;
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    mainProgram = "picoclaw";
+    platforms = lib.platforms.unix;
+  };
+}
