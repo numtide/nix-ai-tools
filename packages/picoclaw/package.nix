@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   buildGoModule,
   fetchFromGitHub,
   go_1_25,
@@ -53,6 +54,7 @@ buildGoModule.override { go = go_1_25; } rec {
     changelog = "https://github.com/sipeed/picoclaw/releases";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
+    maintainers = with flake.lib.maintainers; [ commandodev ];
     mainProgram = "picoclaw";
     platforms = lib.platforms.unix;
   };
