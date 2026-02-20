@@ -628,6 +628,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/qmd/package.nix](packages/qmd/package.nix)
 
 </details>
+<details>
+<summary><strong>rtk</strong> - CLI proxy that reduces LLM token consumption by 60-90% on common dev commands</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/rtk-ai/rtk
+- **Usage**: `nix run github:numtide/llm-agents.nix#rtk -- --help`
+- **Nix**: [packages/rtk/package.nix](packages/rtk/package.nix)
+
+</details>
 <!-- END GENERATED PACKAGE DOCS -->
 
 ## Installation
