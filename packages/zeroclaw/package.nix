@@ -29,7 +29,7 @@ rustPlatform.buildRustPackage rec {
     versionCheckHomeHook
   ];
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "AI Assistants";
 
   meta = {
     description = "Fast, small, and fully autonomous AI assistant infrastructure";

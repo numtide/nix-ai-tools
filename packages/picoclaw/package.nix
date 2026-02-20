@@ -46,7 +46,7 @@ buildGoModule.override { go = go_1_25; } rec {
     versionCheckHomeHook
   ];
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "AI Assistants";
 
   meta = {
     description = "Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity";

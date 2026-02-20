@@ -105,7 +105,7 @@ stdenv.mkDerivation (finalAttrs: {
     versionCheckHomeHook
   ];
 
-  passthru.category = "Utilities";
+  passthru.category = "AI Assistants";
 
   meta = {
     description = "Your own personal AI assistant. Any OS. Any Platform. The lobster way";

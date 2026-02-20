@@ -230,6 +230,49 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 
+### AI Assistants
+
+<details>
+<summary><strong>localgpt</strong> - Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/localgpt-app/localgpt
+- **Usage**: `nix run github:numtide/llm-agents.nix#localgpt -- --help`
+- **Nix**: [packages/localgpt/package.nix](packages/localgpt/package.nix)
+
+</details>
+<details>
+<summary><strong>openclaw</strong> - Your own personal AI assistant. Any OS. Any Platform. The lobster way</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://openclaw.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#openclaw -- --help`
+- **Nix**: [packages/openclaw/package.nix](packages/openclaw/package.nix)
+
+</details>
+<details>
+<summary><strong>picoclaw</strong> - Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://picoclaw.io
+- **Usage**: `nix run github:numtide/llm-agents.nix#picoclaw -- --help`
+- **Nix**: [packages/picoclaw/package.nix](packages/picoclaw/package.nix)
+
+</details>
+<details>
+<summary><strong>zeroclaw</strong> - Fast, small, and fully autonomous AI assistant infrastructure</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/zeroclaw-labs/zeroclaw
+- **Usage**: `nix run github:numtide/llm-agents.nix#zeroclaw -- --help`
+- **Nix**: [packages/zeroclaw/package.nix](packages/zeroclaw/package.nix)
+
+</details>
+
 ### Claude Code Ecosystem
 
 <details>
@@ -579,16 +622,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>localgpt</strong> - Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/localgpt-app/localgpt
-- **Usage**: `nix run github:numtide/llm-agents.nix#localgpt -- --help`
-- **Nix**: [packages/localgpt/package.nix](packages/localgpt/package.nix)
-
-</details>
-<details>
 <summary><strong>mcporter</strong> - TypeScript runtime and CLI for the Model Context Protocol</summary>
 
 - **Source**: source
@@ -596,16 +629,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/steipete/mcporter
 - **Usage**: `nix run github:numtide/llm-agents.nix#mcporter -- --help`
 - **Nix**: [packages/mcporter/package.nix](packages/mcporter/package.nix)
-
-</details>
-<details>
-<summary><strong>openclaw</strong> - Your own personal AI assistant. Any OS. Any Platform. The lobster way</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://openclaw.ai
-- **Usage**: `nix run github:numtide/llm-agents.nix#openclaw -- --help`
-- **Nix**: [packages/openclaw/package.nix](packages/openclaw/package.nix)
 
 </details>
 <details>
