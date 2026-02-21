@@ -3,7 +3,7 @@
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
-  go_1_25,
+  go_1_26,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -11,6 +11,10 @@
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash vendorHash;
+in
+(buildGoModule.override { go = go_1_26; }) {
+  pname = "crush";
+  inherit version vendorHash;
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
@@ -18,26 +22,6 @@ let
     rev = "v${version}";
     inherit hash;
   };
-
-  # Override Go to report the required version to satisfy all dependency version requirements
-  # This is simpler than patching all transitive dependencies
-  # The actual Go 1.25.4 toolchain is API-compatible with 1.25.5+ requirements
-  go_1_25_patched = go_1_25.overrideAttrs (oldAttrs: {
-    # Patch the version file that Go reads to determine its version
-    # Extract the required version from crush's go.mod to make it future-compatible
-    postPatch = (oldAttrs.postPatch or "") + ''
-      # Extract the required Go version from crush's go.mod
-      REQUIRED_VERSION=$(grep -E "^go [0-9]+\.[0-9]+(\.[0-9]+)?" ${src}/go.mod | \
-        sed -E 's/^go ([0-9]+\.[0-9]+(\.[0-9]+)?)/\1/')
-
-      # Update VERSION file to report the required Go version
-      echo "go$REQUIRED_VERSION" > VERSION
-    '';
-  });
-in
-(buildGoModule.override { go = go_1_25_patched; }) {
-  pname = "crush";
-  inherit version vendorHash src;
 
   nativeBuildInputs = [ installShellFiles ];
 
