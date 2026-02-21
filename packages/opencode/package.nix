@@ -9,6 +9,7 @@
   ripgrep,
   versionCheckHook,
   versionCheckHomeHook,
+  writeShellScriptBin,
 }:
 
 let
@@ -61,7 +62,19 @@ stdenv.mkDerivation {
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # clipboardy → system-architecture calls `sysctl -inq sysctl.proc_translated`
+    # at import time to detect Rosetta 2. In the Nix sandbox /usr/sbin/sysctl
+    # is absent, causing ENOENT and crashing the version check. Provide a
+    # minimal stub that reports "not translated" (exit 0, empty output) so the
+    # module resolves the native architecture without pulling in system_cmds.
+    (writeShellScriptBin "sysctl" "echo 0")
   ];
+  # versionCheckHook runs with --ignore-environment by default, stripping PATH.
+  # We need PATH preserved so the sysctl stub (and node itself) can be found
+  # by child processes spawned during `opencode --version`.
+  versionCheckKeepEnvironment = "PATH";
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
