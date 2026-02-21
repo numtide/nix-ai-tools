@@ -97,7 +97,10 @@ buildNpmPackage {
   ];
 
   # Skip any build scripts since this is a TypeScript project run with bun
-  npmFlags = [ "--ignore-scripts" "--legacy-peer-deps" ];
+  npmFlags = [
+    "--ignore-scripts"
+    "--legacy-peer-deps"
+  ];
 
   # No build step needed - we'll run directly with bun
   dontNpmBuild = true;

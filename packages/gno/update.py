@@ -7,7 +7,6 @@ Handles package-lock.json generation (upstream uses bun.lockb)
 and inline hash updates in package.nix.
 """
 
-import json
 import re
 import subprocess
 import sys
@@ -121,7 +120,13 @@ def generate_lockfile_from_github(tag: str, output_path: Path) -> bool:
 
         # Generate package-lock.json using pinned nodejs_24 (from nix shell shebang)
         result = subprocess.run(
-            ["npm", "install", "--package-lock-only", "--ignore-scripts", "--legacy-peer-deps"],
+            [
+                "npm",
+                "install",
+                "--package-lock-only",
+                "--ignore-scripts",
+                "--legacy-peer-deps",
+            ],
             cwd=package_dir,
             capture_output=True,
             text=True,
