@@ -12,19 +12,19 @@
 
 buildNpmPackage rec {
   pname = "auto-claude";
-  version = "2.7.5";
+  version = "2.7.6";
 
   src = fetchFromGitHub {
     owner = "AndyMik90";
     repo = "Auto-Claude";
     rev = "v${version}";
-    hash = "sha256-GBTrrR97AILIESjYt2vkoAE37XkzathOwTiYyaawvMA=";
+    hash = "sha256-MwT/FGpnAbGjJAGoKJkyL0ngKWtPIpQiCSN2LzHSMAY=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-zSSKC6B0AvarOps3qsaAIja3oNJf3Q3ZapJ9Xg9d6j0=";
+    hash = "sha256-iuN5f2TRD+C1CB/r3DdQEOQMio5x6G0ibNo83mktxrk=";
     fetcherVersion = 2;
   };
   inherit npmConfigHook;
