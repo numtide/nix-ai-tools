@@ -6,25 +6,25 @@
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   makeWrapper,
-  electron_39,
+  electron_40,
   python3,
 }:
 
 buildNpmPackage rec {
   pname = "auto-claude";
-  version = "2.7.5";
+  version = "2.7.6";
 
   src = fetchFromGitHub {
     owner = "AndyMik90";
     repo = "Auto-Claude";
     rev = "v${version}";
-    hash = "sha256-GBTrrR97AILIESjYt2vkoAE37XkzathOwTiYyaawvMA=";
+    hash = "sha256-MwT/FGpnAbGjJAGoKJkyL0ngKWtPIpQiCSN2LzHSMAY=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-zSSKC6B0AvarOps3qsaAIja3oNJf3Q3ZapJ9Xg9d6j0=";
+    hash = "sha256-iuN5f2TRD+C1CB/r3DdQEOQMio5x6G0ibNo83mktxrk=";
     fetcherVersion = 2;
   };
   inherit npmConfigHook;
@@ -45,10 +45,10 @@ buildNpmPackage rec {
     # This will fail loudly on version bumps instead of silently diverging.
     upstream_electron=$(node -p "require('./apps/frontend/package.json').devDependencies.electron")
     upstream_major=''${upstream_electron%%.*}
-    nix_major=${lib.versions.major electron_39.version}
+    nix_major=${lib.versions.major electron_40.version}
     if [[ "$upstream_major" != "$nix_major" ]]; then
-      echo "error: upstream expects electron $upstream_electron (major $upstream_major), but we provide electron ${electron_39.version} (major $nix_major)"
-      echo "Update the electron_39 input in package.nix to match."
+      echo "error: upstream expects electron $upstream_electron (major $upstream_major), but we provide electron ${electron_40.version} (major $nix_major)"
+      echo "Update the electron_40 input in package.nix to match."
       exit 1
     fi
 
@@ -85,7 +85,7 @@ buildNpmPackage rec {
     # venv and pip-install backend dependencies at first launch.
     # ELECTRON_FORCE_IS_PACKAGED makes app.isPackaged return true so the
     # app uses production code paths (no DevTools, venv in userData, etc.).
-    makeWrapper ${electron_39}/bin/electron $out/bin/auto-claude \
+    makeWrapper ${electron_40}/bin/electron $out/bin/auto-claude \
       --add-flags "$out/share/auto-claude" \
       --set ELECTRON_FORCE_IS_PACKAGED 1 \
       --prefix PATH : ${lib.makeBinPath [ python3 ]}
