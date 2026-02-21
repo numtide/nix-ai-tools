@@ -210,16 +210,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>picoclaw</strong> - Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://picoclaw.io
-- **Usage**: `nix run github:numtide/llm-agents.nix#picoclaw -- --help`
-- **Nix**: [packages/picoclaw/package.nix](packages/picoclaw/package.nix)
-
-</details>
-<details>
 <summary><strong>qoder-cli</strong> - Qoder AI CLI tool - Terminal-based AI assistant for code development</summary>
 
 - **Source**: binary
@@ -237,16 +227,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/QwenLM/qwen-code
 - **Usage**: `nix run github:numtide/llm-agents.nix#qwen-code -- --help`
 - **Nix**: [packages/qwen-code/package.nix](packages/qwen-code/package.nix)
-
-</details>
-<details>
-<summary><strong>zeroclaw</strong> - Fast, small, and fully autonomous AI assistant infrastructure</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/zeroclaw-labs/zeroclaw
-- **Usage**: `nix run github:numtide/llm-agents.nix#zeroclaw -- --help`
-- **Nix**: [packages/zeroclaw/package.nix](packages/zeroclaw/package.nix)
 
 </details>
 
