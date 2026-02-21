@@ -160,7 +160,7 @@ buildNpmPackage {
       fromSource
       binaryNativeCode
     ];
-    maintainers = with flake.lib.maintainers; [ mulatta ];
+    maintainers = with flake.lib.maintainers; [ afterthought ];
     platforms = lib.platforms.unix;
     mainProgram = "gno";
   };
