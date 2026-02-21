@@ -6,12 +6,12 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "mistralai";
-  version = "1.12.3";
+  version = "1.12.4";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-1Zp4joLBb9fTQPny5yLtCJf+FczOeXJ4uDbWX6Zx724=";
+    hash = "sha256-5StTurWAJdzSCO6sE+PD31d41BEu7KHwgSQJbHc4kp8=";
   };
 
   build-system = with python3.pkgs; [ hatchling ];
