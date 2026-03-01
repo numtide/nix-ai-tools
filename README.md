@@ -308,7 +308,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>cc-switch-cli</strong> - CLI version of CC Switch - All-in-One Assistant for Claude Code, Codex & Gemini CLI</summary>
 
-- **Source**: binary
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/SaladDay/cc-switch-cli
 - **Usage**: `nix run github:numtide/llm-agents.nix#cc-switch-cli -- --help`
@@ -629,6 +629,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/entireio/cli
 - **Usage**: `nix run github:numtide/llm-agents.nix#entire -- --help`
 - **Nix**: [packages/entire/package.nix](packages/entire/package.nix)
+
+</details>
+<details>
+<summary><strong>gno</strong> - Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/gmickel/gno
+- **Usage**: `nix run github:numtide/llm-agents.nix#gno -- --help`
+- **Nix**: [packages/gno/package.nix](packages/gno/package.nix)
 
 </details>
 <details>
