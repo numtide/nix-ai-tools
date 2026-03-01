@@ -6,18 +6,22 @@
   versionCheckHook,
 }:
 
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage rec {
   pname = "beads-rust";
   version = "0.1.20";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "beads_rust";
-    tag = "v0.1.13";
-    hash = "sha256-GRoQObThaDCqHW0SfVEFNLWfvxkGBfKDl5Ia8QXPGTs=";
+    tag = "v${version}";
+    hash = "sha256-8EGZkvdqqb46TUYjrZl+gTLM8hzY4dJBGhSQTfK0f1Q=";
   };
 
-  cargoHash = "sha256-OvNmnZDs5eKgT1TuOboXSgv2w5RfRhfQ7TzK/AAp/g8=";
+  cargoHash = "sha256-tYf3v/cAndzS+4/hjW+CiRLWNM9TdJS8OoFzIR+U8gI=";
+
+  # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
+  # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
+  env.RUSTC_BOOTSTRAP = 1;
 
   # Disable self_update feature — doesn't make sense in Nix
   buildNoDefaultFeatures = true;
@@ -33,7 +37,7 @@ rustPlatform.buildRustPackage {
   meta = with lib; {
     description = "Fast Rust port of beads - a local-first issue tracker for git repositories";
     homepage = "https://github.com/Dicklesworthstone/beads_rust";
-    changelog = "https://github.com/Dicklesworthstone/beads_rust/releases/tag/v0.1.13";
+    changelog = "https://github.com/Dicklesworthstone/beads_rust/releases/tag/v${version}";
     downloadPage = "https://github.com/Dicklesworthstone/beads_rust/releases";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
