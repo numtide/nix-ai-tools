@@ -18,19 +18,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "qwen-code";
-  version = "0.10.6";
+  version = "0.11.0";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-rK8QBc+TskyX+Tpy4i07FZMz9vvQ3kES3llrtmW7hJo=";
+    hash = "sha256-45h72qQtwcagTSFWwluSUL2xnWqtYDJAaTjYg8Q9G5A=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-w1VDmK7zZHm2tQTb1Mk7z7xiggW41Y0QyJR9OZaa9vw=";
+    hash = "sha256-bZL8isrAhl9pn1/MQSaWY0/Rgl378RGNC1qQ+s+1AmI=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
@@ -54,6 +54,9 @@ buildNpmPackage (finalAttrs: {
     runHook preBuild
 
     npm run generate
+    # web-templates generates Vite-bundled assets into src/generated/ then
+    # compiles to dist/; the CLI esbuild bundle imports from this package.
+    npm run build --workspace=packages/web-templates
     npm run bundle
 
     runHook postBuild
