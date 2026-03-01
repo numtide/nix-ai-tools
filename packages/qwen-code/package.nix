@@ -54,6 +54,9 @@ buildNpmPackage (finalAttrs: {
     runHook preBuild
 
     npm run generate
+    # web-templates generates Vite-bundled assets into src/generated/ then
+    # compiles to dist/; the CLI esbuild bundle imports from this package.
+    npm run build --workspace=packages/web-templates
     npm run bundle
 
     runHook postBuild
