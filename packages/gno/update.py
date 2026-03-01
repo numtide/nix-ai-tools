@@ -35,7 +35,8 @@ def main() -> None:
     data = load_hashes(HASHES_FILE)
     current_version = data["version"]
 
-    tag, latest_version = fetch_github_latest_release(OWNER, REPO)
+    latest_version = fetch_github_latest_release(OWNER, REPO)
+    tag = f"v{latest_version}"
     print(f"Current version: {current_version}")
     print(f"Latest version:  {latest_version} ({tag})")
 
@@ -50,7 +51,8 @@ def main() -> None:
     extract_or_generate_lockfile(
         tarball_url=tarball_url,
         output_path=SCRIPT_DIR / "package-lock.json",
-        extra_npm_flags=["--legacy-peer-deps"],
+        # Use legacy-peer-deps to resolve peer dependency conflicts
+        env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
     )
 
     # Calculate source hash
