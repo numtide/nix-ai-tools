@@ -9,19 +9,19 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "cc-switch-cli";
-  version = "4.7.3";
+  version = "4.8.0";
 
   src = fetchFromGitHub {
     owner = "SaladDay";
     repo = "cc-switch-cli";
     tag = "v${version}";
-    hash = "sha256-mu3vQtQIuDE5QSSsbfkOLhv6Z56etBcsxO6PjyzYVRI=";
+    hash = "sha256-Je4dPwbrZELrWpcn6Tr0pTrOzjanh+Xa7m9Wxd0KpKo=";
   };
 
   cargoRoot = "src-tauri";
   buildAndTestSubdir = "src-tauri";
 
-  cargoHash = "sha256-S4h5qn7MwGFe8FvagTyzX/pW4I/PZVU9kuiqDVo3K0I=";
+  cargoHash = "sha256-g6g9b0UP+edy9GiBb7TVjWjSDlkfg6Rk7heqZUVkLZg=";
 
   # Tests require network access and runtime configuration
   doCheck = false;
