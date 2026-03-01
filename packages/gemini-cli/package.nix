@@ -72,6 +72,14 @@ buildNpmPackage (finalAttrs: {
       packages/cli/src/config/settingsSchema.ts
   '';
 
+  # v0.31.0 added @google/gemini-cli-devtools as an implicit workspace
+  # dependency of the cli package. npm --workspaces builds packages
+  # alphabetically (cli before devtools), so tsc fails to resolve the
+  # import. Pre-build devtools so its types are available when cli compiles.
+  preBuild = ''
+    npm run build --workspace=@google/gemini-cli-devtools
+  '';
+
   # Prevent build-only deps from leaking into the runtime closure
   disallowedReferences = [
     finalAttrs.npmDeps
@@ -86,27 +94,24 @@ buildNpmPackage (finalAttrs: {
 
     cp -r node_modules $out/share/gemini-cli/
 
-    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli
-    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-core
-    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-a2a-server
-    rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-sdk
+    # Replace workspace symlinks with the actual built packages
+    for pkg in cli:gemini-cli core:gemini-cli-core a2a-server:gemini-cli-a2a-server \
+               devtools:gemini-cli-devtools sdk:gemini-cli-sdk; do
+      dir=''${pkg%%:*}
+      name=''${pkg##*:}
+      rm -f $out/share/gemini-cli/node_modules/@google/"$name"
+      cp -r packages/"$dir" $out/share/gemini-cli/node_modules/@google/"$name"
+    done
     rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-test-utils
     rm -f $out/share/gemini-cli/node_modules/gemini-cli-vscode-ide-companion
-    cp -r packages/cli $out/share/gemini-cli/node_modules/@google/gemini-cli
-    cp -r packages/core $out/share/gemini-cli/node_modules/@google/gemini-cli-core
-    cp -r packages/a2a-server $out/share/gemini-cli/node_modules/@google/gemini-cli-a2a-server
-    cp -r packages/sdk $out/share/gemini-cli/node_modules/@google/gemini-cli-sdk
 
     # Remove dangling symlinks to source directory
     rm -f $out/share/gemini-cli/node_modules/@google/gemini-cli-core/dist/docs/CONTRIBUTING.md
 
-    ln -s $out/share/gemini-cli/node_modules/@google/gemini-cli/dist/index.js $out/bin/gemini
-    chmod +x "$out/bin/gemini"
-
-    ${lib.optionalString stdenv.hostPlatform.isLinux ''
-      wrapProgram $out/bin/gemini \
-        --prefix PATH : ${lib.makeBinPath [ xsel ]}
-    ''}
+    makeWrapper ${lib.getExe nodejs} $out/bin/gemini \
+      --add-flags "--no-warnings=DEP0040" \
+      --add-flags "$out/share/gemini-cli/node_modules/@google/gemini-cli/dist/index.js" \
+      ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${lib.makeBinPath [ xsel ]}"}
 
     # Install JSON schema
     install -Dm644 schemas/settings.schema.json $out/share/gemini-cli/settings.schema.json
@@ -114,21 +119,17 @@ buildNpmPackage (finalAttrs: {
     runHook postInstall
   '';
 
-  # Clean up files that would create closure references to build-only deps.
-  # Must run in preFixup (before patchShebangs patches shebangs to Nix store paths).
+  # Remove files that embed build-time store paths (python shebangs, build
+  # artifacts, lockfiles) to satisfy disallowedReferences. Must run in
+  # preFixup before patchShebangs rewrites shebangs to Nix store paths.
   preFixup = ''
-    # Remove python files and gyp-mac-tool scripts that have python shebangs
-    find $out/share/gemini-cli/node_modules -name "*.py" -delete
-    find $out/share/gemini-cli/node_modules -name "gyp-mac-tool" -delete
-    # Remove native module build artifacts that reference python/build-time deps.
-    # Only the compiled .node files in build/Release/ are needed at runtime.
+    find $out/share/gemini-cli/node_modules \
+      -name "*.py" -o -name "gyp-mac-tool" \
+      -o -name "package-lock.json" -o -name ".package-lock.json" \
+      -o -name "config.gypi" \
+      -o -path '*/build/*.mk' -o -path '*/build/Makefile' \
+      | xargs rm -f
     rm -rf $out/share/gemini-cli/node_modules/keytar/build
-    find $out/share/gemini-cli/node_modules -path '*/build/*.mk' -delete
-    find $out/share/gemini-cli/node_modules -path '*/build/Makefile' -delete
-    # Remove metadata files that embed build-time store paths
-    find $out/share/gemini-cli/node_modules -name "package-lock.json" -delete
-    find $out/share/gemini-cli/node_modules -name ".package-lock.json" -delete
-    find $out/share/gemini-cli/node_modules -name "config.gypi" -delete
   '';
 
   doInstallCheck = true;
