@@ -44,7 +44,11 @@ def main() -> None:
         f"https://registry.npmjs.org/agent-browser/-/agent-browser-{latest}.tgz"
     )
     print("Extracting/generating package-lock.json...")
-    if not extract_or_generate_lockfile(tarball_url, SCRIPT_DIR / "package-lock.json"):
+    if not extract_or_generate_lockfile(
+        tarball_url,
+        SCRIPT_DIR / "package-lock.json",
+        env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
+    ):
         return
 
     # Calculate new src hash from GitHub
