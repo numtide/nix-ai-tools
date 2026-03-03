@@ -276,6 +276,7 @@ def create_vendor(vendor_staging_dir: Path, out_dir: Path) -> None:
     ]
 
     seen_source_keys = set()
+    seen_crate_dirs = set()
     for pkg in cargo_lock_toml["package"]:
 
         # ignore local dependenices
@@ -294,11 +295,16 @@ def create_vendor(vendor_staging_dir: Path, out_dir: Path) -> None:
             git_sha_rev = source_info["git_sha_rev"]
             git_tree = vendor_staging_dir / "git" / git_sha_rev
 
-            copy_and_patch_git_crate_subtree(git_tree, pkg["name"], crate_out_dir)
+            if dir_name not in seen_crate_dirs:
+                copy_and_patch_git_crate_subtree(git_tree, pkg["name"], crate_out_dir)
 
-            # git based crates allow having no checksum information
-            with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
-                json.dump({"files": {}}, f)
+                # git based crates allow having no checksum information
+                with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
+                    json.dump({"files": {}}, f)
+
+                seen_crate_dirs.add(dir_name)
+            else:
+                eprint(f"Skipping duplicate vendor dir {dir_name} (git source)")
 
             source_key = source[0:source.find("#")]
 
@@ -318,11 +324,16 @@ def create_vendor(vendor_staging_dir: Path, out_dir: Path) -> None:
             filename = f"{pkg["name"]}-{pkg["version"]}.tar.gz"
             tarball_path = vendor_staging_dir / "tarballs" / filename
 
-            extract_crate_tarball_contents(tarball_path, crate_out_dir)
+            if dir_name not in seen_crate_dirs:
+                extract_crate_tarball_contents(tarball_path, crate_out_dir)
 
-            # non-git based crates need the package checksum at minimum
-            with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
-                json.dump({"files": {}, "package": pkg["checksum"]}, f)
+                # non-git based crates need the package checksum at minimum
+                with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
+                    json.dump({"files": {}, "package": pkg["checksum"]}, f)
+
+                seen_crate_dirs.add(dir_name)
+            else:
+                eprint(f"Skipping duplicate vendor dir {dir_name} (registry source)")
 
         else:
             raise Exception(f"Can't process source: {source}.")
