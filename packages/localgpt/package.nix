@@ -16,32 +16,26 @@
   versionCheckHomeHook,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash cargoHash;
-in
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage rec {
   pname = "localgpt";
-  inherit version;
+  version = "0.3.1";
 
   src = fetchFromGitHub {
     owner = "localgpt-app";
     repo = "localgpt";
     tag = "v${version}";
-    inherit hash;
+    hash = "sha256-qhyYO9kuusO1IBVEl3njG5nvI4Bs10ELMy+2umUS0Xg=";
   };
 
-  cargoPatches = [ ./update-lockfile.patch ];
-
-  inherit cargoHash;
+  cargoHash = "sha256-xGTUdcsVUx/4WRcGOFuGmyJWjlOmkOaLF7exUGzB2vs=";
 
   # Disable slow LTO and single codegen-unit for faster Nix builds.
-  # Enable x11 and wayland features for eframe (upstream disables defaults).
+  # Use system openssl instead of vendored (which needs perl to build from source).
   postPatch = ''
     substituteInPlace Cargo.toml \
       --replace-fail 'lto = true' 'lto = false' \
       --replace-fail 'codegen-units = 1' "" \
-      --replace-fail 'default-features = false, features = [' 'default-features = false, features = ["x11", "wayland",'
+      --replace-fail 'native-tls-vendored' 'native-tls'
   '';
 
   nativeBuildInputs = [ pkg-config ];
@@ -49,7 +43,7 @@ rustPlatform.buildRustPackage {
   buildInputs = [
     openssl
     onnxruntime
-    # eframe/glow compile-time deps
+    # eframe/glow compile-time deps (desktop feature is default)
     libGL
     libxkbcommon
     wayland
