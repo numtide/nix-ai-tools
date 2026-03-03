@@ -52,9 +52,10 @@ rustPlatform.buildRustPackage {
   env.CODE_VERSION = version;
 
   preBuild = ''
-    # Remove LTO to speed up builds
+    # Remove LTO and increase codegen-units to reduce memory usage during builds
     substituteInPlace Cargo.toml \
-      --replace-fail 'lto = "fat"' 'lto = false'
+      --replace-fail 'lto = "fat"' 'lto = false' \
+      --replace-fail 'codegen-units = 1' 'codegen-units = 16'
   '';
 
   doCheck = false;

@@ -276,7 +276,7 @@ def create_vendor(vendor_staging_dir: Path, out_dir: Path) -> None:
     ]
 
     seen_source_keys = set()
-    seen_crate_dirs = set()
+    seen_crate_dirs: dict[str, str] = {}
     for pkg in cargo_lock_toml["package"]:
 
         # ignore local dependenices
@@ -302,7 +302,17 @@ def create_vendor(vendor_staging_dir: Path, out_dir: Path) -> None:
                 with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
                     json.dump({"files": {}}, f)
 
-                seen_crate_dirs.add(dir_name)
+                seen_crate_dirs[dir_name] = "git"
+            elif seen_crate_dirs[dir_name] == "registry":
+                # Git sources take priority over registry: replace the registry vendor dir
+                eprint(f"Replacing registry vendor dir {dir_name} with git source")
+                shutil.rmtree(crate_out_dir)
+                copy_and_patch_git_crate_subtree(git_tree, pkg["name"], crate_out_dir)
+
+                with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
+                    json.dump({"files": {}}, f)
+
+                seen_crate_dirs[dir_name] = "git"
             else:
                 eprint(f"Skipping duplicate vendor dir {dir_name} (git source)")
 
@@ -331,9 +341,10 @@ def create_vendor(vendor_staging_dir: Path, out_dir: Path) -> None:
                 with open(crate_out_dir / ".cargo-checksum.json", "w") as f:
                     json.dump({"files": {}, "package": pkg["checksum"]}, f)
 
-                seen_crate_dirs.add(dir_name)
+                seen_crate_dirs[dir_name] = "registry"
             else:
-                eprint(f"Skipping duplicate vendor dir {dir_name} (registry source)")
+                # git source already claimed this dir; git takes priority over registry
+                eprint(f"Skipping duplicate vendor dir {dir_name} (registry source, git takes priority)")
 
         else:
             raise Exception(f"Can't process source: {source}.")
