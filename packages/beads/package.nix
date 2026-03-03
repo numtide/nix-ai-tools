@@ -8,16 +8,16 @@
 
 buildGoModule rec {
   pname = "beads";
-  version = "0.57.0";
+  version = "0.58.0";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-    hash = "sha256-BjDuqadUtNMeiclWzRNnx/lXjUvHkj+F7J17VfCMEH0=";
+    hash = "sha256-UxselIcerU590C2hQP/ZsVo+vQf3y4L1AoW+oIBhEs8=";
   };
 
-  vendorHash = "sha256-uf6ET13OImaGk22I9MJ/wJvX8F0bXaEkf726De/80PY=";
+  vendorHash = "sha256-OL6QGf4xSMpEbmU+41pFdO0Rrs3H162T3pdiW9UfWR0=";
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
 
