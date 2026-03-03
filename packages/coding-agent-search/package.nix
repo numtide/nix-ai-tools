@@ -13,16 +13,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "coding-agent-search";
-  version = "0.1.64";
+  version = "0.2.0";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "coding_agent_session_search";
     rev = "v${version}";
-    hash = "sha256-mZnxK8ZRtKQmR/AHksY9JuoAFgL3qwLn516FaWDZzY4=";
+    hash = "sha256-Lm7/yJF5uCgI3Hd7K8LnhEHYGKn7zLgklazvuXBDMuY=";
   };
 
-  cargoHash = "sha256-ZwZBoJmXPmNnlog4HP4LnYKERUyYp1MRI5YB1TE0izU=";
+  cargoHash = "sha256-4wNLWOAUKl0v6yLBFaG5riz/wYop5AXaRpKLX6eu0/4=";
 
   # Disable slow LTO settings for faster builds
   # Remove lld linker override - it breaks rpath setting in Nix
