@@ -67,7 +67,12 @@ buildNpmPackage {
 
   # Skip the postinstall script that downloads Chromium
   # We'll use the Nix-provided chromium instead
-  npmFlags = [ "--ignore-scripts" ];
+  # --legacy-peer-deps: @anthropic-ai/claude-agent-sdk requires zod@^4.0.0
+  # as peer dep but root project uses zod@^3.22.4
+  npmFlags = [
+    "--ignore-scripts"
+    "--legacy-peer-deps"
+  ];
 
   buildPhase = ''
     runHook preBuild
