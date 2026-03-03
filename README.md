@@ -602,16 +602,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>coding-agent-search</strong> - Unified, high-performance TUI to index and search your local coding agent history</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/Dicklesworthstone/coding_agent_session_search
-- **Usage**: `nix run github:numtide/llm-agents.nix#coding-agent-search -- --help`
-- **Nix**: [packages/coding-agent-search/package.nix](packages/coding-agent-search/package.nix)
-
-</details>
-<details>
 <summary><strong>copilot-language-server</strong> - GitHub Copilot Language Server - AI pair programmer LSP</summary>
 
 - **Source**: bytecode
