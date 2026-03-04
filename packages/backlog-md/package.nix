@@ -35,8 +35,16 @@ stdenv.mkDerivation {
   dontUseBunBuild = true;
   dontUseBunInstall = true;
 
+  # postinstall runs bun2nix (needs .git), prepare runs husky (needs .git)
+  dontRunLifecycleScripts = true;
+
   buildPhase = ''
     runHook preBuild
+
+    # Native node modules like @parcel/watcher need libstdc++ at build time
+    ${lib.optionalString stdenv.isLinux ''
+      export LD_LIBRARY_PATH="${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}"
+    ''}
 
     # Step 1: Build CSS with tailwindcss
     bun ./node_modules/@tailwindcss/cli/dist/index.mjs \
