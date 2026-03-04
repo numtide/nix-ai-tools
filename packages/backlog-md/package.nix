@@ -1,47 +1,64 @@
 {
   lib,
   stdenv,
-  fetchurl,
-  wrapBuddy,
+  bun2nix,
+  bun,
+  fetchFromGitHub,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux-x64-baseline";
-    aarch64-linux = "linux-arm64";
-    x86_64-darwin = "darwin-x64";
-    aarch64-darwin = "darwin-arm64";
-  };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
+  inherit (versionData) version hash;
 in
 stdenv.mkDerivation {
   pname = "backlog-md";
   inherit version;
 
-  src = fetchurl {
-    url = "https://github.com/MrLesk/Backlog.md/releases/download/v${version}/backlog-bun-${platformSuffix}";
-    hash = hashes.${platform};
+  src = fetchFromGitHub {
+    owner = "MrLesk";
+    repo = "Backlog.md";
+    rev = "v${version}";
+    inherit hash;
   };
 
-  dontUnpack = true;
+  nativeBuildInputs = [
+    bun2nix.hook
+    bun
+  ];
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ wrapBuddy ];
+  bunDeps = bun2nix.fetchBunDeps {
+    bunNix = ./bun.nix;
+  };
 
-  # Don't strip the binary - bun compile embeds the JavaScript program
-  # in the executable and stripping would remove it
+  # We handle build and install ourselves since we need a custom
+  # two-step build: CSS compilation then bun build --compile
+  dontUseBunBuild = true;
+  dontUseBunInstall = true;
+
+  buildPhase = ''
+    runHook preBuild
+
+    # Step 1: Build CSS with tailwindcss
+    bun ./node_modules/@tailwindcss/cli/dist/index.mjs \
+      -i src/web/styles/source.css \
+      -o src/web/styles/style.css \
+      --minify
+
+    # Step 2: Compile standalone binary
+    bun build --production --compile --minify \
+      --outfile=dist/backlog src/cli.ts
+
+    runHook postBuild
+  '';
+
+  # bun compile embeds JS in the binary; stripping would break it
   dontStrip = true;
 
   installPhase = ''
     runHook preInstall
 
     mkdir -p $out/bin
-    cp $src $out/bin/backlog
-    chmod +x $out/bin/backlog
+    cp dist/backlog $out/bin/backlog
 
     runHook postInstall
   '';
@@ -53,14 +70,9 @@ stdenv.mkDerivation {
     homepage = "https://github.com/MrLesk/Backlog.md";
     changelog = "https://github.com/MrLesk/Backlog.md/releases";
     license = licenses.mit;
-    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ ];
     mainProgram = "backlog";
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = platforms.unix;
   };
 }
