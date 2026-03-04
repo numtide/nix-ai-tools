@@ -496,6 +496,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>beads-viewer</strong> - Graph-aware TUI for the Beads issue tracker</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/Dicklesworthstone/beads_viewer
+- **Usage**: `nix run github:numtide/llm-agents.nix#beads-viewer -- --help`
+- **Nix**: [packages/beads-viewer/package.nix](packages/beads-viewer/package.nix)
+
+</details>
+<details>
 <summary><strong>cc-sdd</strong> - Spec-driven development framework for AI coding agents</summary>
 
 - **Source**: source
