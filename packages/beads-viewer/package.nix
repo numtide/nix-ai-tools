@@ -18,12 +18,17 @@ buildGoModule rec {
 
   vendorHash = null;
 
+  # Remove go version constraint that requires newer Go than nixpkgs provides
+  postPatch = ''
+    sed -i '/^toolchain /d' go.mod
+  '';
+
   subPackages = [ "cmd/bv" ];
 
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/Dicklesworthstone/beads_viewer/pkg/version.version=v${version}"
+    "-X github.com/Dicklesworthstone/beads_viewer/pkg/version.Version=v${version}"
   ];
 
   doCheck = false;
