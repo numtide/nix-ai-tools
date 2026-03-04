@@ -8,16 +8,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "beads-rust";
-  version = "0.1.20";
+  version = "0.1.21";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "beads_rust";
     tag = "v${version}";
-    hash = "sha256-8EGZkvdqqb46TUYjrZl+gTLM8hzY4dJBGhSQTfK0f1Q=";
+    hash = "sha256-14UmSfPmNkX7zf+wDfyJ3JHF9sc/pF0O4fpW4TIdn9U=";
   };
 
-  cargoHash = "sha256-tYf3v/cAndzS+4/hjW+CiRLWNM9TdJS8OoFzIR+U8gI=";
+  cargoHash = "sha256-73DFtKaZR+/QDYSWd/erJLmJxGFHKjF3Kk2m4eiHGKc=";
 
   # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
