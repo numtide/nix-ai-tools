@@ -4,6 +4,9 @@ This library provides utilities for updating Nix packages in flakes,
 including version fetching, hash calculation, and file modification.
 """
 
+# Bun package utilities
+from .bun import clone_and_generate_bun_nix, regenerate_bun_nix
+
 # Dependency hash calculation
 from .deps import calculate_dependency_hash
 
@@ -42,6 +45,7 @@ __all__ = [
     "calculate_dependency_hash",
     "calculate_platform_hashes",
     "calculate_url_hash",
+    "clone_and_generate_bun_nix",
     "extract_or_generate_lockfile",
     "fetch_github_latest_release",
     "fetch_json",
@@ -51,6 +55,7 @@ __all__ = [
     "load_hashes",
     "nix_build",
     "nix_eval",
+    "regenerate_bun_nix",
     "save_hashes",
     "should_update",
 ]
