@@ -1,15 +1,17 @@
 {
   lib,
   stdenv,
-  buildNpmPackage,
   fetchFromGitHub,
+  fetchurl,
   bun,
+  bun2nix,
   makeWrapper,
   sqlite,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   autoPatchelfHook,
   flake,
+  libarchive,
+  runCommandLocal,
+  glibcLocales ? null,
 
   # GPU support
   config,
@@ -26,7 +28,63 @@ let
   effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
 
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash npmDepsHash;
+  inherit (versionData) version hash;
+
+  # Work around bsdtar failing on non-ASCII filenames in the Nix sandbox (LANG=C).
+  # @fastify/send contains "test/fixtures/snow ☃/index.html" which triggers:
+  #   "bsdtar: Pathname can't be converted from UTF-8 to current locale."
+  # We override this package to extract it with proper locale settings,
+  # bypassing bun2nix's default extractPackage which lacks locale support.
+  bunPackages = import ./bun.nix { inherit fetchurl; };
+  fastifySendAttr = lib.findFirst (lib.hasPrefix "@fastify/send@") null (
+    builtins.attrNames bunPackages
+  );
+
+  mkFastifySendOverride =
+    tgz: _prev:
+    runCommandLocal "fastify-send-utf8-extract"
+      {
+        nativeBuildInputs = [ libarchive ] ++ lib.optionals stdenv.isLinux [ glibcLocales ];
+      }
+      (
+        let
+          # On Linux, LOCALE_ARCHIVE + LC_ALL=C.UTF-8 are required for bsdtar UTF-8 support.
+          # On macOS, just LANG=en_US.UTF-8 suffices (no locale archive needed).
+          localeEnv =
+            if stdenv.isLinux then
+              ''
+                export LOCALE_ARCHIVE="${glibcLocales}/lib/locale/locale-archive"
+                export LC_ALL=C.UTF-8
+              ''
+            else
+              ''
+                export LANG=en_US.UTF-8
+              '';
+        in
+        ''
+          ${localeEnv}
+          mkdir -p $out
+          bsdtar --extract \
+            --file "${tgz}" \
+            --directory "$out" \
+            --strip-components=1 \
+            --no-same-owner \
+            --no-same-permissions
+          chmod -R u+rwx $out
+        ''
+      );
+
+  fastifySendOverrides =
+    assert
+      fastifySendAttr != null
+      || throw "gno: @fastify/send not found in bun.nix — the UTF-8 locale override needs updating";
+    {
+      ${fastifySendAttr} = mkFastifySendOverride bunPackages.${fastifySendAttr};
+    };
+in
+stdenv.mkDerivation {
+  inherit version;
+  pname = "gno";
 
   src = fetchFromGitHub {
     owner = "gmickel";
@@ -35,29 +93,8 @@ let
     inherit hash;
   };
 
-  # Add package-lock.json (upstream uses bun.lock)
-  postPatch = ''
-    cp ${./package-lock.json} package-lock.json
-  '';
-in
-buildNpmPackage {
-  inherit
-    npmConfigHook
-    version
-    src
-    postPatch
-    ;
-  pname = "gno";
-
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit src postPatch;
-    name = "gno-${version}-npm-deps";
-    hash = npmDepsHash;
-    fetcherVersion = 2;
-  };
-  makeCacheWritable = true;
-
   nativeBuildInputs = [
+    bun2nix.hook
     makeWrapper
   ]
   ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
@@ -97,14 +134,16 @@ buildNpmPackage {
     "libvulkan.so.1"
   ];
 
-  # Skip any build scripts since this is a TypeScript project run with bun
-  npmFlags = [
-    "--ignore-scripts"
-    "--legacy-peer-deps"
-  ];
+  bunDeps = bun2nix.fetchBunDeps {
+    bunNix = ./bun.nix;
+    overrides = fastifySendOverrides;
+  };
 
   # No build step needed - we'll run directly with bun
-  dontNpmBuild = true;
+  dontUseBunBuild = true;
+  dontUseBunInstall = true;
+  # Skip lifecycle scripts (lefthook install requires git which isn't needed at build time)
+  dontRunLifecycleScripts = true;
 
   installPhase =
     let
