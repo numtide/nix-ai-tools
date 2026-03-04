@@ -8,15 +8,19 @@
   makeWrapper,
 }:
 
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash;
+in
 stdenv.mkDerivation {
   pname = "ralph-tui";
-  version = "0.11.0";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "subsy";
     repo = "ralph-tui";
-    rev = "4477972cc6959c8e396536cf2dc05818e3c25e05";
-    hash = "sha256-xwdrmar8YnnkzuU6H229VHZDXSkQiF1kPbCATAYSS5I=";
+    rev = "v${version}";
+    inherit hash;
   };
 
   nativeBuildInputs = [
