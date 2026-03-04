@@ -2,6 +2,8 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  makeWrapper,
+  dolt,
   unpinGoModVersionHook,
   versionCheckHook,
 }:
@@ -19,11 +21,19 @@ buildGoModule rec {
 
   vendorHash = "sha256-OL6QGf4xSMpEbmU+41pFdO0Rrs3H162T3pdiW9UfWR0=";
 
-  nativeBuildInputs = [ unpinGoModVersionHook ];
+  nativeBuildInputs = [
+    unpinGoModVersionHook
+    makeWrapper
+  ];
 
   subPackages = [ "cmd/bd" ];
 
   doCheck = false;
+
+  postInstall = ''
+    wrapProgram $out/bin/bd \
+      --prefix PATH : ${lib.makeBinPath [ dolt ]}
+  '';
 
   doInstallCheck = true;
 
