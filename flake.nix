@@ -36,7 +36,6 @@
       blueprintOutputs = inputs.blueprint {
         inherit inputs;
         nixpkgs.config.allowUnfree = true;
-        nixpkgs.config.cudaSupport = true;
       };
 
     in
