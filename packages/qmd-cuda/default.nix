@@ -10,5 +10,5 @@ pkgs.callPackage ./package.nix {
   inherit flake bun2nix;
   inherit (pkgs) vulkan-loader autoAddDriverRunpath;
   inherit (pkgs) cudaPackages;
-  cudaSupport = false;  # CPU only by default
+  cudaSupport = true;  # Force CUDA on for this variant
 }
