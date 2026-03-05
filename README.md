@@ -468,7 +468,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>backlog-md</strong> - Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem</summary>
 
-- **Source**: binary
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/MrLesk/Backlog.md
 - **Usage**: `nix run github:numtide/llm-agents.nix#backlog-md -- --help`
@@ -533,6 +533,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/Fission-AI/OpenSpec
 - **Usage**: `nix run github:numtide/llm-agents.nix#openspec -- --help`
 - **Nix**: [packages/openspec/package.nix](packages/openspec/package.nix)
+
+</details>
+<details>
+<summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/subsy/ralph-tui
+- **Usage**: `nix run github:numtide/llm-agents.nix#ralph-tui -- --help`
+- **Nix**: [packages/ralph-tui/package.nix](packages/ralph-tui/package.nix)
 
 </details>
 <details>
