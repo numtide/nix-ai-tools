@@ -1,0 +1,11 @@
+--- a/node_modules/node-llama-cpp/dist/config.js
++++ b/node_modules/node-llama-cpp/dist/config.js
+@@ -11,7 +11,7 @@
+ export const llamaDirectory = path.join(__dirname, "..", "llama");
+ export const llamaToolchainsDirectory = path.join(llamaDirectory, "toolchains");
+ export const llamaPrebuiltBinsDirectory = path.join(__dirname, "..", "bins");
+-export const llamaLocalBuildBinsDirectory = path.join(llamaDirectory, "localBuilds");
++export const llamaLocalBuildBinsDirectory = path.join(os.homedir(), ".cache", "node-llama-cpp", "localBuilds");
+ export const llamaBinsGrammarsDirectory = path.join(__dirname, "..", "llama", "grammars");
+ export const projectTemplatesDirectory = path.join(__dirname, "..", "templates");
+ export const packedProjectTemplatesDirectory = path.join(projectTemplatesDirectory, "packed");
