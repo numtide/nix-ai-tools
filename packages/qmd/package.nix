@@ -1,14 +1,11 @@
 {
   lib,
   stdenv,
-  buildNpmPackage,
   fetchFromGitHub,
+  bun2nix,
   bun,
   makeWrapper,
   sqlite,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
-  jq,
   autoPatchelfHook,
   flake,
 
@@ -26,41 +23,22 @@ let
   # Vulkan supported on all Linux
   effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
 
-  version = "1.0.7";
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash;
+in
+stdenv.mkDerivation {
+  pname = "qmd";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "tobi";
     repo = "qmd";
     tag = "v${version}";
-    hash = "sha256-QOdiLji06g6VntkcGVIEsHrAc6eVCVAXWXXCKCsc6cI=";
+    inherit hash;
   };
-
-  # Shared patch: add package-lock.json and remove win32 optional dependency
-  postPatch = ''
-    cp ${./package-lock.json} package-lock.json
-    # Remove win32 optional dependency from package.json to match our package-lock.json
-    ${jq}/bin/jq 'del(.optionalDependencies."sqlite-vec-win32-x64")' package.json > package.json.tmp
-    mv package.json.tmp package.json
-  '';
-in
-buildNpmPackage {
-  inherit
-    npmConfigHook
-    version
-    src
-    postPatch
-    ;
-  pname = "qmd";
-
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit src postPatch;
-    name = "qmd-${version}-npm-deps";
-    hash = "sha256-XLhwVd/qyOhbcF5PZlTP65nnsCSDXUbW79z8WCGKvk0=";
-    fetcherVersion = 2;
-  };
-  makeCacheWritable = true;
 
   nativeBuildInputs = [
+    bun2nix.hook
     makeWrapper
   ]
   ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
@@ -79,6 +57,10 @@ buildNpmPackage {
   ++ lib.optionals effectiveVulkanSupport [
     vulkan-loader
   ];
+
+  bunDeps = bun2nix.fetchBunDeps {
+    bunNix = ./bun.nix;
+  };
 
   # Ignore missing optional dependencies based on enabled GPU backends
   autoPatchelfIgnoreMissingDeps = [
@@ -100,11 +82,9 @@ buildNpmPackage {
     "libvulkan.so.1"
   ];
 
-  # Skip any build scripts since this is a TypeScript project run with bun
-  npmFlags = [ "--ignore-scripts" ];
-
   # No build step needed - we'll run directly with bun
-  dontNpmBuild = true;
+  dontUseBunBuild = true;
+  dontUseBunInstall = true;
 
   installPhase =
     let

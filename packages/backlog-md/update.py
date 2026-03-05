@@ -1,7 +1,12 @@
 #!/usr/bin/env nix
-#! nix shell --inputs-from .# nixpkgs#python3 --command python3
+#! nix shell --inputs-from .# nixpkgs#python3 nixpkgs#bun nixpkgs#git --command python3
 
-"""Update script for backlog-md package."""
+"""Update script for backlog-md package.
+
+Custom updater needed because backlog-md uses bun2nix: after each version
+bump the bun.nix lockfile must be regenerated from the upstream bun.lock
+using the bun2nix CLI.
+"""
 
 import sys
 from pathlib import Path
@@ -9,28 +14,28 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    calculate_platform_hashes,
+    clone_and_generate_bun_nix,
     fetch_github_latest_release,
     load_hashes,
     save_hashes,
     should_update,
 )
+from updater.nix import nix_prefetch_url
 
-HASHES_FILE = Path(__file__).parent / "hashes.json"
+PKG_DIR = Path(__file__).parent
+FLAKE_ROOT = PKG_DIR.parent.parent
+HASHES_FILE = PKG_DIR / "hashes.json"
+BUN_NIX = PKG_DIR / "bun.nix"
 
-PLATFORMS = {
-    "x86_64-linux": "linux-x64-baseline",
-    "aarch64-linux": "linux-arm64",
-    "x86_64-darwin": "darwin-x64",
-    "aarch64-darwin": "darwin-arm64",
-}
+OWNER = "MrLesk"
+REPO = "Backlog.md"
 
 
 def main() -> None:
     """Update the backlog-md package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_github_latest_release("MrLesk", "Backlog.md")
+    latest = fetch_github_latest_release(OWNER, REPO)
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -40,10 +45,27 @@ def main() -> None:
 
     print(f"Updating backlog-md from {current} to {latest}")
 
-    url = "https://github.com/MrLesk/Backlog.md/releases/download/v{version}/backlog-bun-{platform}"
-    hashes = calculate_platform_hashes(url, PLATFORMS, version=latest)
-    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
-    print(f"Updated to {latest}")
+    # Step 1: Calculate new source hash
+    print("Calculating source hash...")
+    url = f"https://github.com/{OWNER}/{REPO}/archive/refs/tags/v{latest}.tar.gz"
+    src_hash = nix_prefetch_url(url, unpack=True)
+    print(f"  source hash: {src_hash}")
+
+    # Step 2: Update hashes.json
+    save_hashes(HASHES_FILE, {"version": latest, "hash": src_hash})
+    print("Updated hashes.json")
+
+    # Step 3: Regenerate bun.nix from upstream bun.lock
+    clone_and_generate_bun_nix(
+        OWNER,
+        REPO,
+        latest,
+        BUN_NIX,
+        FLAKE_ROOT,
+        ref_prefix="v",
+    )
+
+    print(f"Updated backlog-md to {latest}")
 
 
 if __name__ == "__main__":

@@ -5,11 +5,9 @@
   ...
 }:
 let
-  npmPackumentSupport = pkgs.callPackage ../../lib/fetch-npm-deps.nix { };
+  bun2nix = (pkgs.extend flake.inputs.bun2nix.overlays.default).bun2nix;
 in
 pkgs.callPackage ./package.nix {
-  inherit flake cudaSupport;
-  inherit (npmPackumentSupport) fetchNpmDepsWithPackuments npmConfigHook;
-  inherit (pkgs) vulkan-loader autoAddDriverRunpath;
-  inherit (pkgs) cudaPackages;
+  inherit flake cudaSupport bun2nix;
+  inherit (pkgs) vulkan-loader autoAddDriverRunpath cudaPackages;
 }

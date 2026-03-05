@@ -1,10 +1,11 @@
 #!/usr/bin/env nix
-#! nix shell --inputs-from .# nixpkgs#python3 nixpkgs#nodejs_24 --command python3
+#! nix shell --inputs-from .# nixpkgs#python3 nixpkgs#bun nixpkgs#git --command python3
 
 """Update script for gno package.
 
-Generates package-lock.json from upstream source (which uses bun.lock),
-and stores version + hashes in hashes.json.
+Custom updater needed because gno uses bun2nix: after each version
+bump the bun.nix lockfile must be regenerated from the upstream bun.lock
+using the bun2nix CLI.
 """
 
 import sys
@@ -13,85 +14,58 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    calculate_url_hash,
-    extract_or_generate_lockfile,
+    clone_and_generate_bun_nix,
     fetch_github_latest_release,
     load_hashes,
     save_hashes,
     should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
-from updater.nix import NixCommandError, nix_build
+from updater.nix import nix_prefetch_url
 
-SCRIPT_DIR = Path(__file__).parent
-HASHES_FILE = SCRIPT_DIR / "hashes.json"
+PKG_DIR = Path(__file__).parent
+FLAKE_ROOT = PKG_DIR.parent.parent
+HASHES_FILE = PKG_DIR / "hashes.json"
+BUN_NIX = PKG_DIR / "bun.nix"
+
 OWNER = "gmickel"
 REPO = "gno"
-FLAKE_PACKAGE = ".#gno"
 
 
 def main() -> None:
     """Update the gno package."""
     data = load_hashes(HASHES_FILE)
-    current_version = data["version"]
+    current = data["version"]
+    latest = fetch_github_latest_release(OWNER, REPO)
 
-    latest_version = fetch_github_latest_release(OWNER, REPO)
-    tag = f"v{latest_version}"
-    print(f"Current version: {current_version}")
-    print(f"Latest version:  {latest_version} ({tag})")
+    print(f"Current: {current}, Latest: {latest}")
 
-    if not should_update(current_version, latest_version):
+    if not should_update(current, latest):
         print("Already up to date")
         return
 
-    print(f"Updating gno to {latest_version}...")
+    print(f"Updating gno from {current} to {latest}")
 
-    # Generate package-lock.json from upstream source
-    tarball_url = f"https://github.com/{OWNER}/{REPO}/archive/refs/tags/{tag}.tar.gz"
-    extract_or_generate_lockfile(
-        tarball_url=tarball_url,
-        output_path=SCRIPT_DIR / "package-lock.json",
-        # Use legacy-peer-deps to resolve peer dependency conflicts
-        env={"NPM_CONFIG_LEGACY_PEER_DEPS": "true"},
+    # Step 1: Calculate new source hash
+    print("Calculating source hash...")
+    url = f"https://github.com/{OWNER}/{REPO}/archive/refs/tags/v{latest}.tar.gz"
+    src_hash = nix_prefetch_url(url, unpack=True)
+    print(f"  source hash: {src_hash}")
+
+    # Step 2: Update hashes.json
+    save_hashes(HASHES_FILE, {"version": latest, "hash": src_hash})
+    print("Updated hashes.json")
+
+    # Step 3: Regenerate bun.nix from upstream bun.lock
+    clone_and_generate_bun_nix(
+        OWNER,
+        REPO,
+        latest,
+        BUN_NIX,
+        FLAKE_ROOT,
+        ref_prefix="v",
     )
 
-    # Calculate source hash
-    print(f"Calculating source hash for {tarball_url}...")
-    src_hash = calculate_url_hash(tarball_url, unpack=True)
-    print(f"  srcHash: {src_hash}")
-
-    # Save with dummy npmDepsHash, then calculate via build
-    save_hashes(
-        HASHES_FILE,
-        {
-            "version": latest_version,
-            "hash": src_hash,
-            "npmDepsHash": DUMMY_SHA256_HASH,
-        },
-    )
-
-    # Calculate npmDepsHash via dummy-hash-and-build pattern
-    try:
-        nix_build(FLAKE_PACKAGE, check=True)
-        msg = "Build succeeded with dummy hash - unexpected"
-        raise ValueError(msg)
-    except NixCommandError as e:
-        npm_deps_hash = extract_hash_from_build_error(e.args[0])
-        if not npm_deps_hash:
-            msg = f"Could not extract hash from build error:\n{e.args[0]}"
-            raise ValueError(msg) from e
-
-        save_hashes(
-            HASHES_FILE,
-            {
-                "version": latest_version,
-                "hash": src_hash,
-                "npmDepsHash": npm_deps_hash,
-            },
-        )
-        print(f"  npmDepsHash: {npm_deps_hash}")
-
-    print(f"Updated to {latest_version}")
+    print(f"Updated gno to {latest}")
 
 
 if __name__ == "__main__":
