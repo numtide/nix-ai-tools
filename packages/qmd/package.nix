@@ -115,11 +115,14 @@ stdenv.mkDerivation {
       # Without this patch, it falls back to building llama.cpp which fails in read-only store
       patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-detectGlibc.patch}
 
-      # Redirect localBuilds directory from the read-only Nix store to a writable
-      # user cache path. When the prebuilt CUDA binary fails its compatibility test,
-      # node-llama-cpp falls back to building from source and tries to create a
-      # lockfile + output directory inside its own package dir. On NixOS this is
+      # Redirect writable paths (localBuilds, llama.cpp clone, toolchains, xpack,
+      # build metadata) from the read-only Nix store to ~/.cache/node-llama-cpp.
+      # When the prebuilt CUDA binary fails its compatibility test, node-llama-cpp
+      # falls back to building llama.cpp from source, which requires cloning the
+      # repo and writing build artifacts. On NixOS these paths resolve to
       # /nix/store/... which is read-only, causing EROFS errors.
+      # Read-only assets (prebuilt bins, grammars, git bundle, release JSON) are
+      # kept pointing to the Nix store.
       patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-nix-compat.patch}
 
       makeWrapper ${bun}/bin/bun $out/bin/qmd \
