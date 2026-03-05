@@ -11,7 +11,7 @@
 
   # GPU support
   config,
-  cudaSupport ? config.cudaSupport or false,
+  cudaSupport,
   cudaPackages ? { },
   vulkanSupport ? stdenv.isLinux,
   vulkan-loader,
