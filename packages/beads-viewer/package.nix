@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   buildGoModule,
   fetchFromGitHub,
   versionCheckHook,
@@ -44,7 +45,7 @@ buildGoModule rec {
     homepage = "https://github.com/Dicklesworthstone/beads_viewer";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = with maintainers; [ afterthought ];
+    maintainers = with flake.lib.maintainers; [ afterthought ];
     mainProgram = "bv";
     platforms = platforms.unix;
   };
