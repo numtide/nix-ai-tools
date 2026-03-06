@@ -1,5 +1,6 @@
 {
   pkgs,
+  flake,
   wrapBuddy,
   versionCheckHomeHook,
 }:
@@ -73,7 +74,7 @@ let
         homepage = "https://github.com/editor-code-assistant/eca";
         license = licenses.asl20;
         sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-        maintainers = with maintainers; [ jojo ];
+        maintainers = with flake.lib.maintainers; [ zrubing ];
         mainProgram = "eca";
         platforms = [ system ];
       };
@@ -161,7 +162,7 @@ else
       homepage = "https://github.com/editor-code-assistant/eca";
       license = licenses.asl20;
       sourceProvenance = with sourceTypes; [ binaryBytecode ];
-      maintainers = with maintainers; [ jojo ];
+      maintainers = with flake.lib.maintainers; [ zrubing ];
       mainProgram = "eca";
     };
   }
