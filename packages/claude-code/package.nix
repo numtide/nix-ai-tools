@@ -7,6 +7,7 @@
   versionCheckHook,
   bubblewrap,
   socat,
+  disableTelemetry ? false,
 }:
 
 let
@@ -46,8 +47,14 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  # Disable auto-updates, telemetry, and installation method warnings
+  # Disable auto-updates and installation method warnings.
   # See: https://github.com/anthropics/claude-code/issues/15592
+  #
+  # DISABLE_TELEMETRY and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC are NOT set
+  # by default: both break remote-control and potentially other features.
+  # Use disableTelemetry = true to opt in to disabling them.
+  # See: https://github.com/numtide/llm-agents.nix/issues/2811
+  # See: https://github.com/anthropics/claude-code/issues/28098#issuecomment-3957698158
   #
   # Uses a single wrapProgram call to avoid double-wrapping which causes the
   # process to show as ".claude-wrapped_" instead of "claude" in ps/htop.
@@ -56,9 +63,8 @@ stdenv.mkDerivation {
     wrapProgram $out/bin/claude \
       --argv0 claude \
       --set DISABLE_AUTOUPDATER 1 \
-      --set-default CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1 \
       --set-default DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
-      --set-default DISABLE_TELEMETRY 1 \
+      ${lib.optionalString disableTelemetry "--set DISABLE_TELEMETRY 1 --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1"} \
       --set DISABLE_INSTALLATION_CHECKS 1 ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${
         lib.makeBinPath [
           bubblewrap
