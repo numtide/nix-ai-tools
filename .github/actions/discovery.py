@@ -48,6 +48,7 @@ def discover_packages(packages_filter: str | None, system: str) -> list[MatrixIt
 
     # Build a nix expression that evaluates all versions at once
     # Pass data via env var + builtins.fromJSON to avoid string interpolation
+    # Packages with passthru.hideFromDocs = true are internal helpers and skipped
     config = json.dumps(
         {
             "system": system,
@@ -59,14 +60,15 @@ def discover_packages(packages_filter: str | None, system: str) -> list[MatrixIt
       config = builtins.fromJSON (builtins.getEnv "DISCOVERY_CONFIG");
       flake = builtins.getFlake (toString ./.);
       pkgs = flake.packages.${config.system};
+      isHidden = pkg: pkg.passthru.hideFromDocs or false;
       getVersion = name:
-        if pkgs ? ${name} && pkgs.${name} ? version
+        if pkgs ? ${name} && pkgs.${name} ? version && !(isHidden pkgs.${name})
         then { inherit name; value = pkgs.${name}.version; }
         else null;
     in
       if config.filter == null then
         builtins.mapAttrs (name: pkg:
-          if pkg ? version then pkg.version else null
+          if pkg ? version && !(isHidden pkg) then pkg.version else null
         ) pkgs
       else
         builtins.listToAttrs
