@@ -5,6 +5,7 @@
 
 makeSetupHook {
   name = "unpin-go-mod-version-hook";
+  passthru.hideFromDocs = true;
   meta = {
     description = "Setup hook that relaxes go.mod version constraints to match the build toolchain";
     license = lib.licenses.mit;

@@ -77,6 +77,7 @@ let
   hook = makeSetupHook {
     name = "wrap-buddy-hook";
     propagatedBuildInputs = [ wrapBuddy ];
+    passthru.hideFromDocs = true;
     meta = {
       description = "Setup hook that patches ELF binaries with stub loader";
       license = lib.licenses.mit;
