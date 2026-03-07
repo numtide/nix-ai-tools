@@ -26,6 +26,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://claude.ai/code
 - **Usage**: `nix run github:numtide/llm-agents.nix#claude-code -- --help`
 - **Nix**: [packages/claude-code/package.nix](packages/claude-code/package.nix)
+- **Documentation**: See [packages/claude-code/README.md](packages/claude-code/README.md) for detailed usage
 
 </details>
 <details>
@@ -699,6 +700,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/tobi/qmd
 - **Usage**: `nix run github:numtide/llm-agents.nix#qmd -- --help`
 - **Nix**: [packages/qmd/package.nix](packages/qmd/package.nix)
+- **Documentation**: See [packages/qmd/README.md](packages/qmd/README.md) for detailed usage
 
 </details>
 <details>
