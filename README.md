@@ -876,7 +876,7 @@ Contributions are welcome! Please:
 ## See also
 
 - [natsukium/mcp-servers-nix](https://github.com/natsukium/mcp-servers-nix) - Nix packages for MCP (Model Context Protocol) servers
-- [k3d3/claude-desktop-linux-flake](https://github.com/k3d3/claude-desktop-linux-flake) - Claude Desktop for Linux
+- [aaddrick/claude-desktop-debian](https://github.com/aaddrick/claude-desktop-debian?tab=readme-ov-file#using-nix-flake-nixos) - Claude Desktop for Linux
 
 ## License
 
