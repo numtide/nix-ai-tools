@@ -6,6 +6,7 @@
   pkg-config,
   openssl,
   wrapGAppsHook3,
+  makeWrapper,
   # Linux GUI dependencies
   at-spi2-atk,
   cairo,
@@ -21,6 +22,12 @@
   # Desktop file integration
   copyDesktopItems,
   makeDesktopItem,
+  # Runtime tools
+  playwright,
+  chromium,
+  yt-dlp,
+  nodejs,
+  claude-code,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -43,6 +50,7 @@ rustPlatform.buildRustPackage rec {
     pkg-config
     wrapGAppsHook3
     copyDesktopItems
+    makeWrapper
   ];
 
   buildInputs = [
@@ -71,9 +79,21 @@ rustPlatform.buildRustPackage rec {
   doInstallCheck = false;
 
   # Add rpath for dlopen'd libayatana-appindicator (tray icon support)
+  # and wrap with runtime tools in PATH
   postFixup = ''
     patchelf --add-rpath "${lib.makeLibraryPath [ libayatana-appindicator ]}" \
       $out/bin/.openfang-desktop-wrapped
+
+    wrapProgram $out/bin/openfang-desktop \
+      --prefix PATH : "${
+        lib.makeBinPath [
+          playwright
+          chromium
+          yt-dlp
+          nodejs
+          claude-code
+        ]
+      }"
   '';
 
   desktopItems = [
