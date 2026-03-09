@@ -10,48 +10,6 @@ from pathlib import Path
 
 from .nix import run_command
 
-# Resolved once and cached
-_BUN2NIX_BIN: str | None = None
-
-
-def _resolve_bun2nix(flake_root: Path) -> str:
-    """Resolve the bun2nix binary from the flake's bun2nix input.
-
-    Uses ``nix eval --impure`` to read the locked flake input and
-    obtain the store path for bun2nix, which is pinned in flake.lock.
-
-    Args:
-        flake_root: Root directory of the flake (where flake.nix lives)
-
-    Returns:
-        Path to the bun2nix binary
-
-    """
-    global _BUN2NIX_BIN  # noqa: PLW0603
-    if _BUN2NIX_BIN is not None:
-        return _BUN2NIX_BIN
-
-    # Build the Nix expression to resolve bun2nix from the flake input.
-    # Uses Nix interpolation (${...}) so we avoid Python f-string confusion.
-    nix_expr = (
-        f"let flake = builtins.getFlake (toString {flake_root}); "
-        'sys = builtins.currentSystem; in "${flake.inputs.bun2nix.packages.${sys}.bun2nix}"'
-    )
-    result = run_command(
-        [
-            "nix",
-            "eval",
-            "--raw",
-            "--impure",
-            "--expr",
-            nix_expr,
-        ],
-        cwd=flake_root,
-    )
-    store_path = result.stdout.strip()
-    _BUN2NIX_BIN = f"{store_path}/bin/bun2nix"
-    return _BUN2NIX_BIN
-
 
 def regenerate_bun_nix(
     bun_lock_path: Path,
@@ -59,6 +17,10 @@ def regenerate_bun_nix(
     flake_root: Path,
 ) -> None:
     """Regenerate a bun.nix file from a bun.lock using bun2nix.
+
+    Runs bun2nix directly from the flake's bun2nix input via
+    ``nix run --inputs-from``, which handles building and caching
+    the binary automatically.
 
     Args:
         bun_lock_path: Path to the bun.lock file
@@ -69,17 +31,21 @@ def regenerate_bun_nix(
         RuntimeError: If bun2nix fails
 
     """
-    bun2nix_bin = _resolve_bun2nix(flake_root)
-
     try:
         run_command(
             [
-                bun2nix_bin,
+                "nix",
+                "run",
+                "--inputs-from",
+                str(flake_root),
+                "bun2nix#bun2nix",
+                "--",
                 "--lock-file",
                 str(bun_lock_path),
                 "--output-file",
                 str(bun_nix_output),
             ],
+            cwd=flake_root,
         )
         print(f"Regenerated {bun_nix_output.name}")
     except Exception as e:
