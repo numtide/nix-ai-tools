@@ -1,12 +1,13 @@
 {
   lib,
-  buildNpmPackage,
   fetchFromGitHub,
   chromium,
   makeBinaryWrapper,
-  fetchNpmDepsWithPackuments,
+  fetchPnpmDeps,
   nodejs-slim,
-  npmConfigHook,
+  nodejs,
+  pnpm_10,
+  pnpmConfigHook,
   rustPlatform,
   stdenv,
 }:
@@ -17,7 +18,7 @@ let
     version
     hash
     cargoHash
-    npmDepsHash
+    pnpmDepsHash
     ;
 
   src = fetchFromGitHub {
@@ -34,6 +35,9 @@ let
 
     sourceRoot = "source/cli";
 
+    # Auth/credential tests require a keyring unavailable in the sandbox
+    doCheck = false;
+
     meta = {
       description = "Native Rust CLI for agent-browser";
       license = lib.licenses.asl20;
@@ -41,42 +45,32 @@ let
     };
   };
 in
-buildNpmPackage {
-  inherit npmConfigHook version src;
+stdenv.mkDerivation {
+  inherit version src;
   pname = "agent-browser";
 
-  npmDeps = fetchNpmDepsWithPackuments {
+  pnpmDeps = fetchPnpmDeps {
     inherit src;
-    name = "agent-browser-${version}-npm-deps";
-    hash = npmDepsHash;
+    pname = "agent-browser";
+    inherit version;
+    pnpm = pnpm_10;
+    hash = pnpmDepsHash;
     fetcherVersion = 2;
-    postPatch = ''
-      cp ${./package-lock.json} package-lock.json
-    '';
   };
-  makeCacheWritable = true;
 
-  nativeBuildInputs = [ makeBinaryWrapper ];
+  nativeBuildInputs = [
+    makeBinaryWrapper
+    nodejs
+    pnpm_10
+    pnpmConfigHook
+  ];
 
   # On Linux, bundle chromium; on macOS, use system-installed Chrome
   buildInputs = [ agent-browser-native-binary ] ++ lib.optional stdenv.isLinux chromium;
 
-  postPatch = ''
-    cp ${./package-lock.json} package-lock.json
-  '';
-
-  # Skip the postinstall script that downloads Chromium
-  # We'll use the Nix-provided chromium instead
-  # --legacy-peer-deps: @anthropic-ai/claude-agent-sdk requires zod@^4.0.0
-  # as peer dep but root project uses zod@^3.22.4
-  npmFlags = [
-    "--ignore-scripts"
-    "--legacy-peer-deps"
-  ];
-
   buildPhase = ''
     runHook preBuild
-    npm run build
+    pnpm run build
     runHook postBuild
   '';
 
@@ -108,7 +102,11 @@ buildNpmPackage {
 
   doInstallCheck = false;
 
-  passthru.category = "Utilities";
+  passthru = {
+    category = "Utilities";
+    # Exposed for the update script to calculate cargoHash independently
+    inherit agent-browser-native-binary;
+  };
 
   meta = {
     description = "Headless browser automation CLI for AI agents";
