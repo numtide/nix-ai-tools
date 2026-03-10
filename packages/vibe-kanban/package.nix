@@ -10,7 +10,7 @@
   pnpmConfigHook,
   nodejs-slim,
   pkg-config,
-  openssl,
+  cmake,
   libgit2,
   sqlite,
   llvmPackages,
@@ -44,6 +44,7 @@ let
   };
 
   # Phase 1: Build frontend
+  # The project is a pnpm monorepo; the frontend lives at packages/local-web/
   frontend = stdenv.mkDerivation {
     pname = "vibe-kanban-frontend";
     inherit version src;
@@ -75,15 +76,16 @@ let
           | cut -d'"' -f2
       )
 
-      cd frontend
-      pnpm build
+      export VITE_VK_SHARED_API_BASE="https://api.vibekanban.com"
+
+      pnpm --filter @vibe/local-web run build
       runHook postBuild
     '';
 
     installPhase = ''
       runHook preInstall
       mkdir -p $out
-      cp -r dist/* $out/
+      cp -r packages/local-web/dist/* $out/
       runHook postInstall
     '';
   };
@@ -99,22 +101,25 @@ rustPlatform.buildRustPackage {
     "server"
     "--package"
     "review"
+    "--package"
+    "mcp"
   ];
 
   nativeBuildInputs = [
     pkg-config
+    cmake
     llvmPackages.libclang
   ];
   buildInputs = [
-    openssl
     libgit2
     sqlite
   ];
 
-  # Copy frontend assets before Rust build
+  # Copy frontend assets where rust-embed expects them
+  # (crates/server references ../../packages/local-web/dist)
   preBuild = ''
-    mkdir -p frontend/dist
-    cp -r ${frontend}/* frontend/dist/
+    mkdir -p packages/local-web/dist
+    cp -r ${frontend}/* packages/local-web/dist/
   '';
 
   env = {
@@ -126,8 +131,8 @@ rustPlatform.buildRustPackage {
 
   postInstall = ''
     mv $out/bin/server $out/bin/vibe-kanban
-    mv $out/bin/mcp_task_server $out/bin/vibe-kanban-mcp
     mv $out/bin/review $out/bin/vibe-kanban-review
+    # mcp crate already outputs binary named "vibe-kanban-mcp", no rename needed
     rm -f $out/bin/generate_types
     rm -rf $out/bin/*.dSYM
   '';
