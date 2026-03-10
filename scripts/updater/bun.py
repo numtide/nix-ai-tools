@@ -47,6 +47,13 @@ def regenerate_bun_nix(
             ],
             cwd=flake_root,
         )
+        # Run the project formatter (deadnix + nixfmt) to strip unused
+        # imports and normalise style so CI doesn't fail.
+        print(f"Formatting {bun_nix_output.name}...")
+        run_command(
+            ["nix", "fmt", "--", str(bun_nix_output)],
+            cwd=flake_root,
+        )
         print(f"Regenerated {bun_nix_output.name}")
     except Exception as e:
         msg = f"bun2nix failed: {e}"
