@@ -57,6 +57,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 21324081;
         name = "Rubing";
       };
+      titaniumtown = {
+        github = "titaniumtown";
+        githubId = 11786225;
+        name = "Simon Gardling";
+      };
     };
   }
 )
