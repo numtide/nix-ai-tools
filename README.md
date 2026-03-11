@@ -191,6 +191,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>oh-my-opencode</strong> - The Best AI Agent Harness - Multi-Model Orchestration for OpenCode</summary>
+
+- **Source**: source
+- **License**: unfree
+- **Homepage**: https://github.com/code-yeongyu/oh-my-openagent
+- **Usage**: `nix run github:numtide/llm-agents.nix#oh-my-opencode -- --help`
+- **Nix**: [packages/oh-my-opencode/package.nix](packages/oh-my-opencode/package.nix)
+
+</details>
+<details>
 <summary><strong>omp</strong> - A terminal-based coding agent with multi-model support (binary release)</summary>
 
 - **Source**: binary
