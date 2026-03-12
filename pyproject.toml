@@ -21,8 +21,8 @@ strict_optional = true
 # Treat each update.py as a separate script, not a module
 explicit_package_bases = true
 namespace_packages = true
-# Add scripts directory to path so updater module can be found
-mypy_path = "scripts"
+# Add module paths so imports resolve correctly
+mypy_path = "scripts:.github/ci"
 
 [[tool.mypy.overrides]]
 module = "elftools.*"
@@ -47,6 +47,11 @@ ignore = [
   "EXE005", # nix multi-line shebang is valid
   "COM812", # conflicts with formatter
 ]
+
+[tool.ruff.lint.per-file-ignores]
+".github/ci/lib.py" = [
+  "INP001",
+] # shared module for standalone CI scripts, not a package
 
 [tool.ruff.lint.pylint]
 max-args = 7     # Allow more arguments for updater classes
