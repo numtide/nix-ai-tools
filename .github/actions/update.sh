@@ -55,8 +55,15 @@ if [ "$type" = "package" ]; then
   new_version=$(nix eval .#packages.x86_64-linux."$name".version --raw 2>/dev/null || echo "unknown")
   echo "New version: $new_version"
 
+  # Get changelog URL for commit message
+  changelog=$(nix eval .#packages.x86_64-linux."$name".meta.changelog --raw 2>/dev/null || echo "")
+  if [ -z "$changelog" ]; then
+    echo "::warning::Package $name is missing meta.changelog"
+  fi
+
   echo "updated=true" >>"$output_var"
   echo "new_version=$new_version" >>"$output_var"
+  echo "changelog=$changelog" >>"$output_var"
 
 elif [ "$type" = "flake-input" ]; then
   echo "Updating input $name..."

@@ -98,6 +98,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_LABELS: ${{ inputs.pr-labels }}
           AUTO_MERGE: ${{ inputs.auto-merge }}
+          CHANGELOG_URL: ${{ steps.update.outputs.changelog }}
         run: |
           # The script should be available from the checkout
           .github/actions/create-pr.sh \

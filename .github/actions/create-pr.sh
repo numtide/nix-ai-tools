@@ -22,6 +22,7 @@ new_version="$4"
 # Extract optional arguments from environment
 pr_labels="${PR_LABELS:-dependencies,automated}"
 auto_merge="${AUTO_MERGE:-false}"
+changelog_url="${CHANGELOG_URL:-}"
 
 # Handle type-specific logic
 if [ "$type" = "package" ]; then
@@ -52,6 +53,10 @@ if [ "$type" = "flake-input" ]; then
   commit_message="$pr_title
 
 ${current_version} -> ${new_version}"
+elif [ -n "$changelog_url" ]; then
+  commit_message="$pr_title
+
+$changelog_url"
 else
   commit_message="$pr_title"
 fi
