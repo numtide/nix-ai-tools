@@ -4,5 +4,5 @@
   ...
 }:
 pkgs.callPackage ./package.nix {
-  inherit (perSystem.self) unpinGoModVersionHook;
+  inherit (perSystem.self) go-bin;
 }

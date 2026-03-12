@@ -4,25 +4,24 @@
   fetchFromGitHub,
   makeWrapper,
   dolt,
-  unpinGoModVersionHook,
+  go-bin,
   versionCheckHook,
 }:
 
-buildGoModule rec {
+buildGoModule.override { go = go-bin; } rec {
   pname = "beads";
-  version = "0.59.0";
+  version = "0.60.0";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-    hash = "sha256-IyO0RWP98NQ8GHVsolhu80FS06aqrZjg0JprDiFdyCk=";
+    hash = "sha256-z3EDtaBHB3ltPRT7vuBFURD7UwgAJBXAPozRnkjejeU=";
   };
 
-  vendorHash = "sha256-ygZPi56fVEHaEShGVGpObFkrLs1DHrM8i2Y4BktMmpA=";
+  vendorHash = "sha256-1BJsEPP5SYZFGCWHLn532IUKlzcGDg5nhrqGWylEHgY=";
 
   nativeBuildInputs = [
-    unpinGoModVersionHook
     makeWrapper
   ];
 

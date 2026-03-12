@@ -1,0 +1,9 @@
+{
+  "version": "1.25.8",
+  "hashes": {
+    "darwin-amd64": "sha256-oLgTZZi68ZKvQABRzuJIH/tAf0wROoH/QAiW4my86eQ=",
+    "darwin-arm64": "sha256-xlR5WfXb6EQL89qXK9ZbqQAWjeXnqwFGT73HrIN1whw=",
+    "linux-amd64": "sha256-zrXgQbvDiThGvRYU12y0aByR2t7leUJs8hpj8tfgO+Y=",
+    "linux-arm64": "sha256-fRN/WfZruT9AprKxHnE63CqdDI2a5YFxjj+tGeUpXcc="
+  }
+}
