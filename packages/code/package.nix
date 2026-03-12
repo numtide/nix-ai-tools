@@ -52,9 +52,12 @@ rustPlatform.buildRustPackage {
   env.CODE_VERSION = version;
 
   preBuild = ''
-    # Remove LTO to speed up builds
+    # Remove LTO and single codegen-unit to reduce peak memory usage.
+    # The code-tui crate has a 42k-line source file (chatwidget.rs) that
+    # causes the compiler to OOM on aarch64-linux with codegen-units=1.
     substituteInPlace Cargo.toml \
-      --replace-fail 'lto = "fat"' 'lto = false'
+      --replace-fail 'lto = "fat"' 'lto = false' \
+      --replace-fail 'codegen-units = 1' 'codegen-units = 16'
   '';
 
   doCheck = false;

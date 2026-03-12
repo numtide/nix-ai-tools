@@ -186,12 +186,38 @@ def try_get_crate_manifest_path_from_mainfest_path(manifest_path: Path, crate_na
     return None
 
 
+def try_get_crate_manifest_path_from_toml(manifest_path: Path, crate_name: str) -> Path | None:
+    """Fallback: parse Cargo.toml directly to find crate name without cargo metadata.
+
+    This handles cases where cargo metadata fails for all manifests in a workspace
+    (e.g. when the workspace has broken absolute path dependencies).
+    """
+    try:
+        toml_data = load_toml(manifest_path)
+        pkg = toml_data.get("package", {})
+        if pkg.get("name") == crate_name:
+            return manifest_path
+    except Exception:
+        pass
+    return None
+
+
 def find_crate_manifest_in_tree(tree: Path, crate_name: str) -> Path:
     # in some cases Cargo.toml is not located at the top level, so we also look at subdirectories
-    manifest_paths = tree.glob("**/Cargo.toml")
+    manifest_paths = list(tree.glob("**/Cargo.toml"))
 
+    # First try using cargo metadata (handles workspace inheritance etc.)
     for manifest_path in manifest_paths:
         res = try_get_crate_manifest_path_from_mainfest_path(manifest_path, crate_name)
+        if res is not None:
+            return res
+
+    # Fallback: parse Cargo.toml files directly for the package name.
+    # This handles workspaces where cargo metadata universally fails
+    # (e.g. broken absolute path dependencies like ftui in frankensqlite).
+    eprint(f"cargo metadata failed for all manifests, falling back to TOML parsing for {crate_name}")
+    for manifest_path in manifest_paths:
+        res = try_get_crate_manifest_path_from_toml(manifest_path, crate_name)
         if res is not None:
             return res
 
@@ -240,8 +266,26 @@ def copy_and_patch_git_crate_subtree(git_tree: Path, crate_name: str, crate_out_
         manifest_data = f.read()
 
     if "workspace" in manifest_data:
-        crate_manifest_metadata = get_manifest_metadata(crate_manifest_path)
-        workspace_root = Path(crate_manifest_metadata["workspace_root"])
+        try:
+            crate_manifest_metadata = get_manifest_metadata(crate_manifest_path)
+            workspace_root = Path(crate_manifest_metadata["workspace_root"])
+        except subprocess.CalledProcessError:
+            # Fallback: walk up from the crate to find the workspace root Cargo.toml
+            eprint(f"Warning: cargo metadata failed for {crate_manifest_path}, searching for workspace root manually")
+            workspace_root = crate_manifest_path.parent
+            while workspace_root != workspace_root.parent:
+                candidate = workspace_root / "Cargo.toml"
+                if candidate.exists() and candidate != crate_manifest_path:
+                    try:
+                        toml_data = load_toml(candidate)
+                        if "workspace" in toml_data:
+                            break
+                    except Exception:
+                        pass
+                workspace_root = workspace_root.parent
+            else:
+                eprint(f"Warning: could not find workspace root for {crate_manifest_path}, skipping workspace patching")
+                return
 
         root_manifest_path = workspace_root / "Cargo.toml"
         manifest_path = crate_out_dir / "Cargo.toml"
