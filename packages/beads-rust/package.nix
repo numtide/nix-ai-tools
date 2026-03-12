@@ -3,6 +3,7 @@
   flake,
   rustPlatform,
   fetchFromGitHub,
+  fetchCargoVendor,
   versionCheckHook,
 }:
 
@@ -17,7 +18,10 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-M+/SDjnLNjCIk5dhjMFTQs3YQqcyGoP4OfHIK3EwFHA=";
   };
 
-  cargoHash = "sha256-9qs/hsJcQcJJ5nmoMHC+WgzWAsKEPiWPt9ICdnEDIE4=";
+  cargoDeps = fetchCargoVendor {
+    inherit pname version src;
+    hash = "sha256-9qs/hsJcQcJJ5nmoMHC+WgzWAsKEPiWPt9ICdnEDIE4=";
+  };
 
   # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
