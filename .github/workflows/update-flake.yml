@@ -48,7 +48,7 @@ jobs:
         env:
           PACKAGES: "${{ inputs.packages }}"
           INPUTS: "${{ inputs.inputs }}"
-        run: python3 .github/actions/discovery.py
+        run: .github/ci/discovery.py
   update:
     needs: discover
     if: needs.discover.outputs.has-updates == 'true'
@@ -85,12 +85,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          # Use the update script
           if [[ "${{ matrix.type }}" = package ]]; then
             # Only load the devshell to update packages
-            nix develop -c .github/actions/update.sh "${{ matrix.type }}" "${{ matrix.name }}"
+            nix develop -c .github/ci/update.py "${{ matrix.type }}" "${{ matrix.name }}"
           else
-            .github/actions/update.sh "${{ matrix.type }}" "${{ matrix.name }}"
+            .github/ci/update.py "${{ matrix.type }}" "${{ matrix.name }}"
           fi
       - name: Create pull request
         if: steps.update.outputs.updated == 'true'
@@ -98,9 +97,9 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_LABELS: ${{ inputs.pr-labels }}
           AUTO_MERGE: ${{ inputs.auto-merge }}
+          CHANGELOG_URL: ${{ steps.update.outputs.changelog }}
         run: |
-          # The script should be available from the checkout
-          .github/actions/create-pr.sh \
+          .github/ci/create_pr.py \
             "${{ matrix.type }}" \
             "${{ matrix.name }}" \
             "${{ matrix.current_version }}" \

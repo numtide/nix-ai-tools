@@ -43,6 +43,7 @@ buildGoModule rec {
   meta = with lib; {
     description = "Graph-aware TUI for the Beads issue tracker";
     homepage = "https://github.com/Dicklesworthstone/beads_viewer";
+    changelog = "https://github.com/Dicklesworthstone/beads_viewer/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ afterthought ];

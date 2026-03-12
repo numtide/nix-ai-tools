@@ -32,6 +32,7 @@ buildNpmPackage (finalAttrs: {
   meta = {
     description = "Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent";
     homepage = "https://github.com/numman-ali/openskills";
+    changelog = "https://github.com/numman-ali/openskills/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ ypares ];

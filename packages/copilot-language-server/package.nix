@@ -65,6 +65,7 @@ buildNpmPackage {
   meta = with lib; {
     description = "GitHub Copilot Language Server - AI pair programmer LSP";
     homepage = "https://github.com/github/copilot-language-server-release";
+    changelog = "https://github.com/github/copilot-language-server-release/releases/tag/${version}";
     downloadPage = "https://www.npmjs.com/package/@github/copilot-language-server";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];

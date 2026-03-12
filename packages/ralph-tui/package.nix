@@ -59,6 +59,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "AI Agent Loop Orchestrator TUI";
     homepage = "https://github.com/subsy/ralph-tui";
+    changelog = "https://github.com/subsy/ralph-tui/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ afterthought ];

@@ -49,6 +49,7 @@ pkgs.runCommand "claudebox"
       mainProgram = "claudebox";
       description = "Sandboxed environment for Claude Code";
       homepage = "https://github.com/numtide/claudebox";
+      changelog = "https://github.com/numtide/claudebox/releases";
       sourceProvenance = with sourceTypes; [ fromSource ];
       platforms = platforms.linux ++ platforms.darwin;
     };

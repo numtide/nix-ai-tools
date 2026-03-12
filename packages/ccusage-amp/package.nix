@@ -46,6 +46,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Usage analysis tool for Amp CLI sessions";
     homepage = "https://github.com/ryoppippi/ccusage";
+    changelog = "https://github.com/ryoppippi/ccusage/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with maintainers; [ ryoppippi ];

@@ -58,6 +58,7 @@ stdenv.mkDerivation {
   meta = {
     description = "The open-source AI coding agent. Now available in your terminal.";
     homepage = "https://kilocode.ai/cli";
+    changelog = "https://github.com/Kilo-Org/kilocode/releases/tag/v${version}";
     downloadPage = "https://www.npmjs.com/package/@kilocode/cli";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];

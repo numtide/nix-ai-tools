@@ -125,6 +125,7 @@ stdenv.mkDerivation {
       It provides an interactive AI coding experience directly in your terminal.
     '';
     homepage = "https://github.com/anomalyco/opencode";
+    changelog = "https://github.com/anomalyco/opencode/releases/tag/v${version}";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [

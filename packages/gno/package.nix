@@ -195,6 +195,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration";
     homepage = "https://github.com/gmickel/gno";
+    changelog = "https://github.com/gmickel/gno/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [
       fromSource

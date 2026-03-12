@@ -85,6 +85,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search";
     homepage = "https://github.com/localgpt-app/localgpt";
+    changelog = "https://github.com/localgpt-app/localgpt/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     # onnxruntime rpath linking is broken on Darwin
