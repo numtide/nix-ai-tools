@@ -166,6 +166,7 @@ python.pkgs.buildPythonApplication rec {
   meta = with lib; {
     description = "Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral";
     homepage = "https://github.com/mistralai/mistral-vibe";
+    changelog = "https://github.com/mistralai/mistral-vibe/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     platforms = [

@@ -61,6 +61,7 @@ in
   meta = with lib; {
     description = "The glamourous AI coding agent for your favourite terminal";
     homepage = "https://github.com/charmbracelet/crush";
+    changelog = "https://github.com/charmbracelet/crush/releases/tag/v${version}";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with lib.maintainers; [ zimbatm ];

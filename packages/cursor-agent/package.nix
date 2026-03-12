@@ -81,6 +81,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "Cursor Agent - CLI tool for Cursor AI code editor";
     homepage = "https://cursor.com/";
+    changelog = "https://www.cursor.com/changelog";
     license = licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];

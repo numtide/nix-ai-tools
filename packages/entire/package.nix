@@ -43,6 +43,7 @@
   meta = with lib; {
     description = "CLI tool that captures AI agent sessions and links them to code changes";
     homepage = "https://github.com/entireio/cli";
+    changelog = "https://github.com/entireio/cli/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ yutakobayashidev ];

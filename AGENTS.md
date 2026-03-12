@@ -73,6 +73,7 @@ Every package MUST have proper metadata in `package.nix`:
 meta = with lib; {
   description = "Clear, concise description";
   homepage = "https://project-homepage.com";
+  changelog = "https://github.com/owner/repo/releases/tag/v${version}";
   license = licenses.mit; # or licenses.unfree, etc.
   sourceProvenance = with lib.sourceTypes; [ fromSource ];
   maintainers = with maintainers; [ username ];
@@ -80,6 +81,8 @@ meta = with lib; {
   platforms = platforms.all; # or specific platforms
 };
 ```
+
+The `changelog` attribute is **required** — our updater uses it to generate release notes. Use a version-specific URL matching the upstream tag format (e.g. `v${version}`, `${version}`, `rust-v${version}`). Fall back to `/releases` when tags are inconsistent. Verify the URL doesn't 404.
 
 ### Package Categories
 

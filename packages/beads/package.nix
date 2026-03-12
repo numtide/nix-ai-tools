@@ -44,6 +44,7 @@ buildGoModule rec {
   meta = with lib; {
     description = "A distributed issue tracker designed for AI-supervised coding workflows";
     homepage = "https://github.com/steveyegge/beads";
+    changelog = "https://github.com/steveyegge/beads/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ zimbatm ];

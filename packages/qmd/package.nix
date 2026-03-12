@@ -148,6 +148,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local";
     homepage = "https://github.com/tobi/qmd";
+    changelog = "https://github.com/tobi/qmd/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [
       fromSource

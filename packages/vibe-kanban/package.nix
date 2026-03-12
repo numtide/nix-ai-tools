@@ -137,6 +137,7 @@ rustPlatform.buildRustPackage {
   meta = {
     description = "Kanban board to orchestrate AI coding agents like Claude Code, Codex, and Gemini CLI";
     homepage = "https://github.com/BloopAI/vibe-kanban";
+    changelog = "https://github.com/BloopAI/vibe-kanban/releases";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     mainProgram = "vibe-kanban";

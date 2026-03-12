@@ -54,6 +54,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Jules, the asynchronous coding agent from Google, in the terminal";
     homepage = "https://jules.google";
+    changelog = "https://jules.google/docs/changelog";
     license = licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     mainProgram = "jules";

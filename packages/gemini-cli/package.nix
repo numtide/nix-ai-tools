@@ -158,6 +158,7 @@ buildNpmPackage (finalAttrs: {
   meta = {
     description = "AI agent that brings the power of Gemini directly into your terminal";
     homepage = "https://github.com/google-gemini/gemini-cli";
+    changelog = "https://github.com/google-gemini/gemini-cli/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.all;

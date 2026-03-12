@@ -43,6 +43,7 @@ buildNpmPackage {
   meta = {
     description = "Spec-driven development for AI coding assistants";
     homepage = "https://github.com/Fission-AI/OpenSpec";
+    changelog = "https://github.com/Fission-AI/OpenSpec/releases/tag/v${version}";
     downloadPage = "https://www.npmjs.com/package/@fission-ai/openspec";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];

@@ -37,6 +37,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "A highly customizable status line formatter for Claude Code CLI";
     homepage = "https://github.com/sirmalloc/ccstatusline";
+    changelog = "https://github.com/sirmalloc/ccstatusline/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with flake.lib.maintainers; [ ypares ];

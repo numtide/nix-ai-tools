@@ -50,6 +50,7 @@ buildGoModule rec {
   meta = with lib; {
     description = "Your AI agent command center";
     homepage = "https://github.com/asheshgoplani/agent-deck";
+    changelog = "https://github.com/asheshgoplani/agent-deck/releases/tag/v${version}";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ garbas ];

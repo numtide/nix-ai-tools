@@ -72,6 +72,7 @@ let
       meta = with pkgs.lib; {
         description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
         homepage = "https://github.com/editor-code-assistant/eca";
+        changelog = "https://github.com/editor-code-assistant/eca/releases/tag/${version}";
         license = licenses.asl20;
         sourceProvenance = with sourceTypes; [ binaryNativeCode ];
         maintainers = with flake.lib.maintainers; [ zrubing ];
@@ -160,6 +161,7 @@ else
     meta = with pkgs.lib; {
       description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";
       homepage = "https://github.com/editor-code-assistant/eca";
+      changelog = "https://github.com/editor-code-assistant/eca/releases/tag/${version}";
       license = licenses.asl20;
       sourceProvenance = with sourceTypes; [ binaryBytecode ];
       maintainers = with flake.lib.maintainers; [ zrubing ];

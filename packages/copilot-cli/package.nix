@@ -45,6 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.";
     homepage = "https://github.com/github/copilot-cli";
+    changelog = "https://github.com/github/copilot-cli/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     platforms = [

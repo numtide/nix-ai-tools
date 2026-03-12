@@ -63,6 +63,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks";
     homepage = "https://github.com/block/goose";
+    changelog = "https://github.com/block/goose/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     mainProgram = "goose";

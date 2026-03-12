@@ -39,6 +39,7 @@ python3.pkgs.buildPythonApplication rec {
   meta = with lib; {
     description = "Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)";
     homepage = "https://github.com/github/spec-kit";
+    changelog = "https://github.com/github/spec-kit/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     platforms = [

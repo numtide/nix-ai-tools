@@ -111,6 +111,7 @@ stdenv.mkDerivation {
   meta = {
     description = "Headless browser automation CLI for AI agents";
     homepage = "https://github.com/vercel-labs/agent-browser";
+    changelog = "https://github.com/vercel-labs/agent-browser/releases/tag/v${version}";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.all;

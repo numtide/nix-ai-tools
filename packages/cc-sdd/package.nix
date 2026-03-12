@@ -64,6 +64,7 @@ buildNpmPackage {
   meta = with lib; {
     description = "Spec-driven development framework for AI coding agents";
     homepage = "https://github.com/gotalab/cc-sdd";
+    changelog = "https://github.com/gotalab/cc-sdd/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ ryoppippi ];

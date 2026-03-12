@@ -45,6 +45,7 @@ python3.pkgs.buildPythonPackage rec {
   meta = with lib; {
     description = "Python Client SDK for the Mistral AI API";
     homepage = "https://github.com/mistralai/client-python";
+    changelog = "https://github.com/mistralai/client-python/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     platforms = platforms.all;

@@ -40,6 +40,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "Simple, lean issue tracker CLI designed for AI-assisted development";
     homepage = "https://github.com/dollspace-gay/chainlink";
+    changelog = "https://github.com/dollspace-gay/chainlink/releases/tag/chainlink-${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ Chickensoupwithrice ];

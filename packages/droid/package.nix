@@ -76,6 +76,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Factory AI's Droid - AI-powered development agent for your terminal";
     homepage = "https://factory.ai";
+    changelog = "https://docs.factory.ai/changelog/cli-updates";
     downloadPage = "https://factory.ai/product/ide";
     license = licenses.unfree;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];

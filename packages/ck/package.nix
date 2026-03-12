@@ -51,6 +51,7 @@ rustPlatform.buildRustPackage {
   meta = with lib; {
     description = "Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!";
     homepage = "https://github.com/BeaconBay/ck";
+    changelog = "https://github.com/BeaconBay/ck/releases/tag/${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     mainProgram = "ck";
