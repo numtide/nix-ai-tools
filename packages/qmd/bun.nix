@@ -438,9 +438,9 @@
     url = "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz";
     hash = "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==";
   };
-  "better-sqlite3@11.10.0" = fetchurl {
-    url = "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-11.10.0.tgz";
-    hash = "sha512-EwhOpyXiOEL/lKzHz9AW1msWFNzGc/z+LzeB3/jnFJpxu+th2yqvzsSWas1v9jgs9+xiXJcD5A8CJxAG2TaghQ==";
+  "better-sqlite3@12.6.2" = fetchurl {
+    url = "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-12.6.2.tgz";
+    hash = "sha512-8VYKM3MjCa9WcaSAI3hzwhmyHVlH8tiGFwf0RlTsZPWJ1I5MkzjiudCo4KC4DxOaL/53A5B1sI/IbldNFDbsKA==";
   };
   "bindings@1.5.0" = fetchurl {
     url = "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz";

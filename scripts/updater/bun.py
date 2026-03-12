@@ -74,8 +74,8 @@ def clone_and_generate_bun_nix(
     This is the high-level helper most update.py scripts should use.
     It handles cloning the repo, locating the bun.lock, and running bun2nix.
 
-    If the repo does not contain a bun.lock, it runs ``bun install`` to
-    generate one first (requires bun on PATH).
+    Always runs ``bun install`` to ensure bun.lock is consistent with
+    package.json (upstream lockfiles are sometimes stale).
 
     Args:
         owner: GitHub repository owner
@@ -106,18 +106,36 @@ def clone_and_generate_bun_nix(
         )
 
         bun_lock = repo_dir / "bun.lock"
+        lockfile_was_stale = False
+
         if not bun_lock.exists():
-            print("No bun.lock found, running bun install...")
+            # No lockfile shipped — generate one from scratch.
+            print("No bun.lock found, generating lockfile...")
             subprocess.run(
-                ["bun", "install", "--frozen-lockfile"],
+                ["bun", "install", "--lockfile-only"],
+                cwd=repo_dir,
+                check=True,
+                capture_output=True,
+            )
+        else:
+            # Verify the shipped lockfile is consistent with package.json.
+            # If it's stale, the Nix build will fail because bun tries to
+            # resolve the mismatched deps from the network inside the sandbox.
+            result = subprocess.run(
+                ["bun", "install", "--frozen-lockfile", "--lockfile-only"],
                 cwd=repo_dir,
                 check=False,
                 capture_output=True,
+                text=True,
             )
-            # If frozen-lockfile fails, try without it
-            if not bun_lock.exists():
+            if result.returncode != 0:
+                lockfile_was_stale = True
+                print(
+                    "⚠️  Upstream bun.lock is out of sync with package.json, "
+                    "refreshing..."
+                )
                 subprocess.run(
-                    ["bun", "install"],
+                    ["bun", "install", "--lockfile-only"],
                     cwd=repo_dir,
                     check=True,
                     capture_output=True,
@@ -128,3 +146,23 @@ def clone_and_generate_bun_nix(
             raise FileNotFoundError(msg)
 
         regenerate_bun_nix(bun_lock, bun_nix_output, flake_root)
+
+        if lockfile_was_stale:
+            msg = (
+                f"Upstream {owner}/{repo} {ref} has a stale bun.lock "
+                f"that does not match package.json.\n"
+                f"bun.nix was regenerated from the refreshed lockfile, "
+                f"but the Nix build will still use the stale in-tree "
+                f"bun.lock from the source tarball.\n"
+                f"You need to add a patch that fixes bun.lock at build "
+                f"time (see packages/qmd/fix-stale-bun-lock.patch for "
+                f"an example).\n"
+                f"\n"
+                f"To generate the patch:\n"
+                f"  git clone --depth=1 --branch={ref} "
+                f"https://github.com/{owner}/{repo}.git /tmp/{repo}\n"
+                f"  cd /tmp/{repo}\n"
+                f"  bun install --lockfile-only\n"
+                f"  git diff bun.lock > fix-stale-bun-lock.patch\n"
+            )
+            raise RuntimeError(msg)
