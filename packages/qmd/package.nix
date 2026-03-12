@@ -37,6 +37,12 @@ stdenv.mkDerivation {
     inherit hash;
   };
 
+  # Upstream v2.0.1 ships a bun.lock out of sync with package.json
+  # (better-sqlite3@11 vs ^12.4.5).  Without this patch bun tries to
+  # resolve from the network inside the sandbox.
+  # https://github.com/tobi/qmd/issues/386
+  patches = [ ./fix-stale-bun-lock.patch ];
+
   nativeBuildInputs = [
     bun2nix.hook
     makeWrapper
@@ -84,6 +90,9 @@ stdenv.mkDerivation {
 
   # No build step needed - we'll run directly with bun
   dontUseBunBuild = true;
+  # Use stdenv's patchPhase so `patches` are applied (bun2nix's
+  # bunPatchPhase only runs patchShebangs and skips them).
+  dontUseBunPatch = true;
   dontUseBunInstall = true;
 
   installPhase =
@@ -126,7 +135,7 @@ stdenv.mkDerivation {
       patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-nix-compat.patch}
 
       makeWrapper ${bun}/bin/bun $out/bin/qmd \
-        --add-flags "$out/lib/qmd/src/qmd.ts" \
+        --add-flags "$out/lib/qmd/src/cli/qmd.ts" \
         --set DYLD_LIBRARY_PATH "${sqlite.out}/lib" \
         --set LD_LIBRARY_PATH "${ldLibraryPath}"
 
