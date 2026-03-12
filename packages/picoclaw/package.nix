@@ -35,13 +35,14 @@ buildGoModule.override { go = go_1_25; } rec {
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/sipeed/picoclaw/cmd/picoclaw/internal.version=${version}"
+    "-X github.com/sipeed/picoclaw/pkg/config.Version=${version}"
   ];
 
   # Tests require runtime configuration and network access
   doCheck = false;
 
   doInstallCheck = true;
+  versionCheckProgramArg = "version";
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
