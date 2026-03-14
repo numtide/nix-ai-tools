@@ -1,8 +1,8 @@
 {
-  "version": "0.9.5",
-  "hash": "sha256-w39vCcLWOOanXT+a4HXJ3lhysBzERy4LdDHxh5ZQng8=",
-  "cargoHash": "sha256-kF5Ul7fBpnBw2UFtoCDmsRAFZRyHSPBPK52QcM75Li0=",
-  "codexRev": "3721cf0999e14b0c64e83e3b6f18d4807ceee0c3",
-  "codexSrcHash": "sha256-38rmjvY2MGbp7ClKke97l0/KrB2QoRw6bjExUkAoVF4=",
+  "version": "0.10.0",
+  "hash": "sha256-pFlQ1ETjSfZ9oDhJ3J6AWgTyfLSPWf6oFJ/UiOTqVU8=",
+  "cargoHash": "sha256-70CHZYLRRQJE42ZqARVl4gUryuUGFwhKBHGCALWdCJ4=",
+  "codexRev": "ab7a5b87a9e455235f65637f1675c03051481c87",
+  "codexSrcHash": "sha256-uhT2jQUKuefLjGl39E2YZ9fRPL/f/TvVldvv/9EKQK8=",
   "nodeVersionHash": "sha256-QTcJTneSy0n+Gv3cP4cgjw70rf7306zR3vAZh4bTk8I="
 }
