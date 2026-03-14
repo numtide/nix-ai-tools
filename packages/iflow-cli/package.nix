@@ -2,7 +2,6 @@
   lib,
   fetchurl,
   buildNpmPackage,
-  nodejs_22,
   makeWrapper,
   ripgrep,
   fetchNpmDepsWithPackuments,
@@ -41,18 +40,7 @@ buildNpmPackage {
   makeCacheWritable = true;
 
   postPatch = ''
-    # Remove prepack script as we are using a pre-bundled package
-    # and we don't want it to run git/bundle commands
-    ${nodejs_22}/bin/node -e '
-      const fs = require("fs");
-      const pkg = JSON.parse(fs.readFileSync("package.json"));
-      delete pkg.scripts.prepack;
-      delete pkg.scripts.postinstall;
-      fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
-    '
-
-    # Disable auto-update by patching the bundled JS
-    # Replace `process.env.DEV==="true"` with `true` in ybt()
+    # Disable auto-update: replace `process.env.DEV==="true"` with `true` in ybt()
     substituteInPlace bundle/iflow.js \
       --replace-fail 'process.env.DEV==="true"' 'true'
   '';
