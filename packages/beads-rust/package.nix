@@ -3,7 +3,6 @@
   flake,
   rustPlatform,
   fetchFromGitHub,
-  fetchCargoVendor,
   versionCheckHook,
 }:
 
@@ -18,10 +17,22 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-X7D5OHCLwHPUdfUjSPzAIP/ufsO+yHX3qrgyZqy1UQM=";
   };
 
-  cargoDeps = fetchCargoVendor {
-    inherit pname version src;
-    hash = "sha256-AR+gYP+yEv0k7MGzdo6CtEeriMflzU4kFxhEuK4hcN0=";
+  # Upstream uses [patch.crates-io] with local path deps pointing at a sibling
+  # frankensqlite checkout.  Fetch it separately and place it where Cargo expects.
+  # https://github.com/Dicklesworthstone/beads_rust/issues/183
+  frankensqlite = fetchFromGitHub {
+    owner = "Dicklesworthstone";
+    repo = "frankensqlite";
+    rev = "4c58ce050141ae5cb7dee4010446f532ca292224";
+    hash = "sha256-pEOOOqIXcKxCMW2yc2ksQEbzY2hXvi1jF73YSIQawYM=";
   };
+
+  postUnpack = ''
+    cp -r $frankensqlite frankensqlite
+    chmod -R u+w frankensqlite
+  '';
+
+  cargoHash = "sha256-AR+gYP+yEv0k7MGzdo6CtEeriMflzU4kFxhEuK4hcN0=";
 
   # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
