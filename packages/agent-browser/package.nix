@@ -7,26 +7,20 @@
   stdenv,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData)
-    version
-    hash
-    cargoHash
-    ;
-in
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage rec {
   pname = "agent-browser";
-  inherit version cargoHash;
+  version = "0.20.0";
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    inherit hash;
+    hash = "sha256-04Y3OUiCfuIimO0KmF7VPFG3REvqD+nq7QprnuIZwKE=";
   };
 
   sourceRoot = "source/cli";
+
+  cargoHash = "sha256-7l/2Q1P5JIC+kp0Pm729LBXXHVDt//Xe1cieWHjcvdc=";
 
   nativeBuildInputs = lib.optional stdenv.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.isLinux chromium;
