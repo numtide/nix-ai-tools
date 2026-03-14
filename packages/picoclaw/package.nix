@@ -11,16 +11,16 @@
 
 buildGoModule.override { go = go_1_25; } rec {
   pname = "picoclaw";
-  version = "0.2.2";
+  version = "0.2.3";
 
   src = fetchFromGitHub {
     owner = "sipeed";
     repo = "picoclaw";
     tag = "v${version}";
-    hash = "sha256-GUtEoni8zk17jh6eWVl2dNBlvmOW1vZpk/7eLjlavTU=";
+    hash = "sha256-362hFUk2eeJKU3u8g4/yKOQ/PjlLOw9BDSbip9nyo1U=";
   };
 
-  vendorHash = "sha256-lAyXXUAgYY/6uyLm2cLkm4RKdMZ+yD4DKJ3Rmyyzp9s=";
+  vendorHash = "sha256-R7PKYkNVrs4v5/KO2baSgh5tRJQH2/cIfeRSw0EFccg=";
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
 
