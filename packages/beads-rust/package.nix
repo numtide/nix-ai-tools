@@ -6,15 +6,18 @@
   versionCheckHook,
 }:
 
-rustPlatform.buildRustPackage rec {
+let
+  data = builtins.fromJSON (builtins.readFile ./hashes.json);
+in
+rustPlatform.buildRustPackage {
   pname = "beads-rust";
-  version = "0.1.28";
+  inherit (data) version cargoHash;
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "beads_rust";
-    tag = "v${version}";
-    hash = "sha256-X7D5OHCLwHPUdfUjSPzAIP/ufsO+yHX3qrgyZqy1UQM=";
+    tag = "v${data.version}";
+    inherit (data) hash;
   };
 
   # Upstream uses [patch.crates-io] with local path deps pointing at a sibling
@@ -23,16 +26,13 @@ rustPlatform.buildRustPackage rec {
   frankensqlite = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "frankensqlite";
-    rev = "4c58ce050141ae5cb7dee4010446f532ca292224";
-    hash = "sha256-pEOOOqIXcKxCMW2yc2ksQEbzY2hXvi1jF73YSIQawYM=";
+    inherit (data.frankensqlite) rev hash;
   };
 
   postUnpack = ''
     cp -r $frankensqlite frankensqlite
     chmod -R u+w frankensqlite
   '';
-
-  cargoHash = "sha256-AR+gYP+yEv0k7MGzdo6CtEeriMflzU4kFxhEuK4hcN0=";
 
   # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
@@ -52,7 +52,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "Fast Rust port of beads - a local-first issue tracker for git repositories";
     homepage = "https://github.com/Dicklesworthstone/beads_rust";
-    changelog = "https://github.com/Dicklesworthstone/beads_rust/releases/tag/v${version}";
+    changelog = "https://github.com/Dicklesworthstone/beads_rust/releases/tag/v${data.version}";
     downloadPage = "https://github.com/Dicklesworthstone/beads_rust/releases";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
