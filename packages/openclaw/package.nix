@@ -20,8 +20,11 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-nPeOuvzx4SL6wvafnEAWGsSXuYWyNnMiFhkgGl/FHDo=";
+    # v2026.3.13 was a broken release; upstream published v2026.3.13-1 as a
+    # recovery tag (GitHub immutable releases prevent tag reuse). The npm/app
+    # version remains 2026.3.13.
+    rev = "v${finalAttrs.version}-1";
+    hash = "sha256-OUPUKDfvKQezDhbpfrKw+4q2qssIVN7eAjS044Z2KJg=";
   };
 
   pnpmDeps = fetchPnpmDeps {
