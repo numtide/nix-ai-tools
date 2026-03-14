@@ -723,6 +723,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/rtk/package.nix](packages/rtk/package.nix)
 
 </details>
+<details>
+<summary><strong>showboat</strong> - Create executable demo documents showing and proving an agent's work</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/simonw/showboat
+- **Usage**: `nix run github:numtide/llm-agents.nix#showboat -- --help`
+- **Nix**: [packages/showboat/package.nix](packages/showboat/package.nix)
+
+</details>
 <!-- END GENERATED PACKAGE DOCS -->
 
 ## Installation
