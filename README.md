@@ -141,6 +141,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>iflow-cli</strong> - AI coding agent for the terminal with free model access via the iFlow platform</summary>
+
+- **Source**: bytecode
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/iflow-ai/iflow-cli
+- **Usage**: `nix run github:numtide/llm-agents.nix#iflow-cli -- --help`
+- **Nix**: [packages/iflow-cli/package.nix](packages/iflow-cli/package.nix)
+
+</details>
+<details>
 <summary><strong>jules</strong> - Jules, the asynchronous coding agent from Google, in the terminal</summary>
 
 - **Source**: binary
