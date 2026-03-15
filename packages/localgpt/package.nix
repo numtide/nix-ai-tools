@@ -18,16 +18,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "localgpt";
-  version = "0.3.2";
+  version = "0.3.4";
 
   src = fetchFromGitHub {
     owner = "localgpt-app";
     repo = "localgpt";
     tag = "v${version}";
-    hash = "sha256-F+mm6w//wTJlSiilqwwuiPJ4vQWh3FZhf7Gd6H7rLLI=";
+    hash = "sha256-SxFFOfRbi7hFKAtcxRKuxCvKzTaCl5Z+2l1t96dtxIg=";
   };
 
-  cargoHash = "sha256-fuOeqE3qO0E1Ie9+Ep7GthsTrB1gRwOl4kl0P6gmV3s=";
+  cargoHash = "sha256-SgfRSAii8JSND4u4uTqsJmUCiKipNZZmUbYSWvSvZbQ=";
 
   # Disable slow LTO and single codegen-unit for faster Nix builds.
   # Use system openssl instead of vendored (which needs perl to build from source).
