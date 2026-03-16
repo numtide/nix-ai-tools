@@ -62,6 +62,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 11786225;
         name = "Simon Gardling";
       };
+      aliez-ren = {
+        github = "aliez-ren";
+        githubId = 8287771;
+        name = "Aliez Ren";
+      };
     };
   }
 )

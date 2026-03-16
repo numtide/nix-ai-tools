@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   python3,
   fetchFromGitHub,
   fetchPypi,
@@ -127,6 +128,7 @@ python3.pkgs.buildPythonApplication rec {
       "x86_64-darwin"
       "aarch64-darwin"
     ];
+    maintainers = with flake.lib.maintainers; [ aliez-ren ];
     mainProgram = "hermes";
   };
 }
