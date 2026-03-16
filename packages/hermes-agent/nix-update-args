@@ -1,0 +1,2 @@
+--version-regex
+^v(\d+\.\d+\.\d+)$

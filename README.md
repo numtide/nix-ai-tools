@@ -264,6 +264,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### AI Assistants
 
 <details>
+<summary><strong>hermes-agent</strong> - Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://hermes-agent.nousresearch.com/
+- **Usage**: `nix run github:numtide/llm-agents.nix#hermes-agent -- --help`
+- **Nix**: [packages/hermes-agent/package.nix](packages/hermes-agent/package.nix)
+
+</details>
+<details>
 <summary><strong>localgpt</strong> - Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search</summary>
 
 - **Source**: source
