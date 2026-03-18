@@ -6,12 +6,12 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "mistralai";
-  version = "1.12.4";
+  version = "2.0.0";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-5StTurWAJdzSCO6sE+PD31d41BEu7KHwgSQJbHc4kp8=";
+    hash = "sha256-rLeTelMRns5n9JeICdTPYw+/VLTf6FwO6ud4rECFD6s=";
   };
 
   build-system = with python3.pkgs; [ hatchling ];
@@ -19,22 +19,16 @@ python3.pkgs.buildPythonPackage rec {
   dependencies = with python3.pkgs; [
     eval-type-backport
     httpx
-    invoke
     opentelemetry-api
-    opentelemetry-exporter-otlp-proto-http
-    opentelemetry-sdk
     opentelemetry-semantic-conventions
     pydantic
     python-dateutil
     typing-inspection
-    pyyaml
   ];
 
   # Relax version constraints for OpenTelemetry packages where nixpkgs versions are older:
-  # - opentelemetry-exporter-otlp-proto-http: requires >=1.37.0, nixpkgs has 1.34.0
-  # - opentelemetry-semantic-conventions: requires >=0.59b0, nixpkgs has 0.55b0
+  # - opentelemetry-semantic-conventions: requires >=0.60b1, nixpkgs has 0.55b0
   pythonRelaxDeps = [
-    "opentelemetry-exporter-otlp-proto-http"
     "opentelemetry-semantic-conventions"
   ];
 
