@@ -10,13 +10,13 @@
 
 buildNpmPackage rec {
   pname = "nanocoder";
-  version = "1.23.0";
+  version = "1.24.0";
 
   src = fetchFromGitHub {
     owner = "Mote-Software";
     repo = "nanocoder";
     rev = "v${version}";
-    hash = "sha256-zb2gU6o/sQIGaDU55MI+x3MroGdLAGr4Gjs/votOpio=";
+    hash = "sha256-mmwSID4cJMbL6ii7/3qzpzw0pHmCAanL/LFWV6n/7ps=";
     postFetch = ''
       rm -f $out/pnpm-workspace.yaml
     '';
@@ -27,7 +27,7 @@ buildNpmPackage rec {
     inherit pname version src;
     inherit pnpm;
     fetcherVersion = 2;
-    hash = "sha256-MswMF9aXpf/54n2nWNLk0XR99HrJfwhQWP1PT+vdv8g=";
+    hash = "sha256-6Bc2hHSdREJmmM4t10/4ti5yJmwJiWXKOhQ3S0/NdLE=";
   };
 
   nativeBuildInputs = [ pnpm ];
