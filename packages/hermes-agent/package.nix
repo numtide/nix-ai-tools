@@ -63,6 +63,7 @@ python3.pkgs.buildPythonApplication rec {
   dependencies = with python3.pkgs; [
     # Core
     openai
+    anthropic
     python-dotenv
     fire
     httpx
@@ -80,6 +81,7 @@ python3.pkgs.buildPythonApplication rec {
     fal-client
     # Text-to-speech
     edge-tts
+    faster-whisper
     # mini-swe-agent deps
     litellm
     typer
