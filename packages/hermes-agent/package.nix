@@ -74,7 +74,6 @@ python3.pkgs.buildPythonApplication rec {
     pydantic
     # Interactive CLI
     prompt-toolkit
-    simple-term-menu
     # Tools
     firecrawl-py
     fal-client
