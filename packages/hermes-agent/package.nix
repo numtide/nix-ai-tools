@@ -3,7 +3,6 @@
   flake,
   python3,
   fetchFromGitHub,
-  fetchpatch,
   fetchPypi,
   versionCheckHook,
   versionCheckHomeHook,
