@@ -3,7 +3,6 @@
   flake,
   python3,
   fetchFromGitHub,
-  fetchpatch,
   fetchPypi,
   versionCheckHook,
   versionCheckHomeHook,
@@ -46,25 +45,15 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "hermes-agent";
-  version = "2026.3.12";
+  version = "2026.3.17";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-zOQm9cVjtwpDteIjjQsWn3SfCfw9tobtoAPU65rLYWA=";
+    hash = "sha256-x483+CKrY7r6NwTwb4iVVB3yyfioOwswfXSC5rfkiGI=";
   };
-
-  patches = [
-    # fix: add missing packages to setuptools config for non-editable installs
-    # https://github.com/NousResearch/hermes-agent/commit/1d4a23fa6c835e5bdea8edfa4cfafd01d54f0f8f
-    # drop when > 2026.3.12
-    (fetchpatch {
-      url = "https://github.com/NousResearch/hermes-agent/commit/1d4a23fa6c835e5bdea8edfa4cfafd01d54f0f8f.patch";
-      hash = "sha256-9UY/lWLOLCO5RHMqjuIBF0p19H7X7Ig8Gjtb+vqduao=";
-    })
-  ];
 
   build-system = with python3.pkgs; [
     setuptools
@@ -73,6 +62,7 @@ python3.pkgs.buildPythonApplication rec {
   dependencies = with python3.pkgs; [
     # Core
     openai
+    anthropic
     python-dotenv
     fire
     httpx
@@ -90,6 +80,7 @@ python3.pkgs.buildPythonApplication rec {
     fal-client
     # Text-to-speech
     edge-tts
+    faster-whisper
     # mini-swe-agent deps
     litellm
     typer
