@@ -30,6 +30,8 @@ python3.pkgs.buildPythonApplication rec {
     truststore
     pyyaml
     packaging
+    pathspec
+    json5
   ];
 
   pythonImportsCheck = [ "specify_cli" ];
