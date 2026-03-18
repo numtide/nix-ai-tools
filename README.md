@@ -577,6 +577,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>sidecar</strong> - Terminal-based development companion for AI coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/marcus/sidecar
+- **Usage**: `nix run github:numtide/llm-agents.nix#sidecar -- --help`
+- **Nix**: [packages/sidecar/package.nix](packages/sidecar/package.nix)
+
+</details>
+<details>
 <summary><strong>spec-kit</strong> - Specify CLI, part of GitHub Spec Kit. A tool to bootstrap your projects for Spec-Driven Development (SDD)</summary>
 
 - **Source**: source
