@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchzip,
-  bun,
+  nodejs,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -16,8 +16,6 @@ stdenv.mkDerivation rec {
     hash = "sha256-vuMbXVpMzF4S48oJgoi8ue2Zc+ChyyiUXpY/FNQOQ2E=";
   };
 
-  nativeBuildInputs = [ bun ];
-
   installPhase = ''
     runHook preInstall
 
@@ -29,7 +27,7 @@ stdenv.mkDerivation rec {
     mv $out/bin/index.js $out/bin/ccusage-pi
 
     substituteInPlace $out/bin/ccusage-pi \
-      --replace-fail "#!/usr/bin/env node" "#!${bun}/bin/bun"
+      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
 
     runHook postInstall
   '';
