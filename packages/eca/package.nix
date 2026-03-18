@@ -31,10 +31,6 @@ let
       ]
       ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
         wrapBuddy
-      ]
-      # x86_64-linux binary is UPX-compressed, need to decompress for wrapBuddy
-      ++ pkgs.lib.optionals (system == "x86_64-linux") [
-        pkgs.upx
       ];
 
       buildInputs = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
@@ -58,10 +54,6 @@ let
       installPhase = ''
         runHook preInstall
         mkdir -p $out/bin
-        ${pkgs.lib.optionalString (system == "x86_64-linux") ''
-          # x86_64-linux binary is UPX-compressed, decompress for wrapBuddy to patch
-          upx -d eca
-        ''}
         cp eca $out/bin/eca
         chmod +x $out/bin/eca
         runHook postInstall
