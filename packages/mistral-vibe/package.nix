@@ -128,12 +128,14 @@ python.pkgs.buildPythonApplication rec {
     pyyaml
     requests
     rich
+    sounddevice
     textual
     textual-speedups
     tomli-w
     tree-sitter
     tree-sitter-bash
     watchfiles
+    websockets
     zstandard
   ];
 
