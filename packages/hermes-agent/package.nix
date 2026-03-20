@@ -3,6 +3,7 @@
   flake,
   python3,
   fetchFromGitHub,
+  fetchpatch,
   fetchPypi,
   versionCheckHook,
   versionCheckHomeHook,
@@ -54,6 +55,16 @@ python3.pkgs.buildPythonApplication rec {
     rev = "v${version}";
     hash = "sha256-x483+CKrY7r6NwTwb4iVVB3yyfioOwswfXSC5rfkiGI=";
   };
+
+  patches = [
+    # fix: add source files to wheel
+    # https://github.com/NousResearch/hermes-agent/commit/cd46b1af04626f3baf85700e98f8510777ccfbbf
+    # drop when > 2026.3.17 when https://github.com/NousResearch/hermes-agent/pull/2080 is merged
+    (fetchpatch {
+      url = "https://github.com/NousResearch/hermes-agent/commit/cd46b1af04626f3baf85700e98f8510777ccfbbf.patch";
+      hash = "sha256-b6jw/YIUSeVKYXfd+BM+jD1UMnYClVEtlhKDNDoplTI=";
+    })
+  ];
 
   build-system = with python3.pkgs; [
     setuptools
