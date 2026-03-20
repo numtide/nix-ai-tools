@@ -7,7 +7,6 @@ Claude Code provides version info at a stable endpoint and distributes
 platform-specific binaries with checksums in manifest.json.
 """
 
-import base64
 import sys
 from pathlib import Path
 
@@ -20,6 +19,7 @@ from updater import (
     save_hashes,
     should_update,
 )
+from updater.hash import hex_to_sri
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 BASE_URL = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases"
@@ -46,13 +46,6 @@ def fetch_manifest(version: str) -> dict[str, object]:
         msg = f"Expected dict from manifest.json, got {type(result)}"
         raise TypeError(msg)
     return result
-
-
-def sha256_hex_to_sri(sha256_hex: str) -> str:
-    """Convert a SHA256 hex hash to SRI format."""
-    hash_bytes = bytes.fromhex(sha256_hex)
-    b64_hash = base64.b64encode(hash_bytes).decode("ascii")
-    return f"sha256-{b64_hash}"
 
 
 def main() -> None:
@@ -89,7 +82,7 @@ def main() -> None:
         if not isinstance(checksum, str):
             msg = f"Expected checksum to be a str, got {type(checksum)}"
             raise TypeError(msg)
-        hashes[nix_platform] = sha256_hex_to_sri(checksum)
+        hashes[nix_platform] = hex_to_sri(checksum)
         print(f"  {nix_platform}: {hashes[nix_platform]}")
 
     save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
