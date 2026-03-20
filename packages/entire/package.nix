@@ -10,16 +10,16 @@
 
 (buildGoModule.override { go = go_1_26; }) rec {
   pname = "entire";
-  version = "0.5.0";
+  version = "0.5.1";
 
   src = fetchFromGitHub {
     owner = "entireio";
     repo = "cli";
     rev = "v${version}";
-    hash = "sha256-8aGZ++6oArfZL82CHVIjLw71xxYYTDd6cUct7xbVtGg=";
+    hash = "sha256-79lZkh5mpCBZ4OOKDQL/0sQx2ZFZKZmJv2Una6LLgSs=";
   };
 
-  vendorHash = "sha256-CjuB2rSKFTBYb0Lx9F4vPKUc9jokwzfNe2vGqX2LT9U=";
+  vendorHash = "sha256-MYQUnzVJH3VKReankilC471Qoj76pK/xlICWeYZR094=";
 
   subPackages = [ "./cmd/entire" ];
 
