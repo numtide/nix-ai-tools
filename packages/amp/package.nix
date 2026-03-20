@@ -60,7 +60,6 @@ buildNpmPackage rec {
   meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";
     homepage = "https://ampcode.com/";
-    changelog = "https://ampcode.com/changelog";
     license = licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with maintainers; [ ];
