@@ -13,16 +13,23 @@ from updater import (
     calculate_url_hash,
     extract_or_generate_lockfile,
     fetch_npm_version,
+    fetch_text,
     load_hashes,
     save_hashes,
     should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH
+from updater.hash import DUMMY_SHA256_HASH, hex_to_sri
 from updater.nix import NixCommandError
 
 SCRIPT_DIR = Path(__file__).parent
 HASHES_FILE = SCRIPT_DIR / "hashes.json"
 NPM_PACKAGE = "@sourcegraph/amp"
+BINARY_PLATFORMS = {
+    "x86_64-linux": "linux-x64",
+    "aarch64-linux": "linux-arm64",
+    "x86_64-darwin": "darwin-x64",
+    "aarch64-darwin": "darwin-arm64",
+}
 
 
 def main() -> None:
@@ -50,7 +57,16 @@ def main() -> None:
         "version": latest,
         "sourceHash": source_hash,
         "npmDepsHash": DUMMY_SHA256_HASH,
+        "binaryHashes": {},
     }
+
+    for nix_plat, amp_plat in BINARY_PLATFORMS.items():
+        data["binaryHashes"][nix_plat] = hex_to_sri(
+            fetch_text(
+                f"https://storage.googleapis.com/amp-public-assets-prod-0/cli/{latest}/{amp_plat}-amp.sha256"
+            )
+        )
+
     save_hashes(HASHES_FILE, data)
 
     # Calculate npmDepsHash
