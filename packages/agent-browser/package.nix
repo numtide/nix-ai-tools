@@ -9,18 +9,18 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "agent-browser";
-  version = "0.21.2";
+  version = "0.21.4";
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    hash = "sha256-IY12OxMQdJbqKrG4csvjoSB3XapQBxwUvY31rMSTp/8=";
+    hash = "sha256-T+IiizT1e5nuH6EqROn0b/w3H1OShWTTHUqD7tZJDkw=";
   };
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-pAKLllj7qHUv4xeUJNcx4inNH3tGBEnhHfOP3iZBHDk=";
+  cargoHash = "sha256-E0QbXOC4h3MfYeDR+eSW9J4smnAPOf48PhmVK/pPZ+E=";
 
   nativeBuildInputs = lib.optional stdenv.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.isLinux chromium;
