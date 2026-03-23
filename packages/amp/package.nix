@@ -5,6 +5,9 @@
   makeWrapper,
   wrapBuddy,
   ripgrep,
+  cctools,
+  darwin,
+  rcodesign,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -35,7 +38,14 @@ stdenv.mkDerivation {
 
   dontUnpack = true;
 
-  nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
+  nativeBuildInputs = [
+    makeWrapper
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    cctools
+    rcodesign
+  ];
 
   dontStrip = true; # do not mess with the bun runtime
 
@@ -47,21 +57,25 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  # Rewrite the Bun ICU dependency to use Nix-provided darwin.ICU instead of
+  # /usr/lib/libicucore.A.dylib, which needs /usr/share/icu/ at runtime.
+  # This avoids __noChroot and lets the build run in the sandbox on macOS.
+  # Re-signing is required because modifying the binary invalidates its signature.
+  #
   # Uses a single wrapProgram call to avoid double-wrapping which causes the
   # process to show as ".amp-wrapped_" instead of "amp" in ps/htop.
   # --argv0 ensures the process name is preserved through the wrapper.
   postFixup = ''
+    ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+      ${lib.getExe' cctools "${cctools.targetPrefix}install_name_tool"} $out/bin/amp \
+        -change /usr/lib/libicucore.A.dylib '${lib.getLib darwin.ICU}/lib/libicucore.A.dylib'
+      ${lib.getExe rcodesign} sign --code-signature-flags linker-signed $out/bin/amp
+    ''}
     wrapProgram $out/bin/amp \
       --argv0 amp \
       --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
       --set AMP_SKIP_UPDATE_CHECK 1
   '';
-
-  # Bun links against /usr/lib/libicucore.A.dylib which needs ICU data from
-  # /usr/share/icu/ at runtime for Intl.Segmenter. The Nix macOS sandbox
-  # blocks access to /usr/share/icu/, causing "failed to initialize Segmenter".
-  # Disable the sandbox for this derivation on macOS (requires sandbox=relaxed).
-  __noChroot = stdenv.hostPlatform.isDarwin;
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
