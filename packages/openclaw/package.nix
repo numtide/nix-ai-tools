@@ -15,21 +15,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.3.13";
+  version = "2026.3.22";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
-    # v2026.3.13 was a broken release; upstream published v2026.3.13-1 as a
-    # recovery tag (GitHub immutable releases prevent tag reuse). The npm/app
-    # version remains 2026.3.13.
-    rev = "v${finalAttrs.version}-1";
-    hash = "sha256-OUPUKDfvKQezDhbpfrKw+4q2qssIVN7eAjS044Z2KJg=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-Dx4Khi0FxpC+ykiH/bXlX9cctDAHngBDCttV46iIvnQ=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-aSHhUCMFSLI20Nw5PIuOoDSQV8vPlxLnsCVXTt3EzT0=";
+    hash = "sha256-/g9boyz6PSLn1hIk/td48g7ok06HOGJ21jigto/0DO4=";
     fetcherVersion = 2;
   };
 
@@ -56,12 +53,19 @@ stdenv.mkDerivation (finalAttrs: {
     # (relative to the build root); strip "node_modules/" and prepend "../" to
     # get the path relative to node_modules/.bin/. An absolute symlink would
     # point into the ephemeral build directory and break after installation.
-    rolldown_bin=$(find node_modules/.pnpm -name "cli.mjs" -path "*/rolldown/bin/cli.mjs" | head -1)
+    rolldown_bin=$(find node_modules -name "cli.mjs" -path "*/rolldown/bin/cli.mjs" | head -1)
     if [ -z "$rolldown_bin" ]; then
-      echo "error: rolldown cli.mjs not found in node_modules/.pnpm" >&2
+      echo "error: rolldown cli.mjs not found in node_modules" >&2
       exit 1
     fi
     ln -sf "../$(echo "$rolldown_bin" | sed 's|^node_modules/||')" node_modules/.bin/rolldown
+
+    # The runtime-postbuild script calls stageBundledPluginRuntimeDeps which
+    # runs "npm install" for bundled plugin runtime dependencies, requiring
+    # network access.  Patch it out for the sandbox build — plugin runtime
+    # deps are not needed for the main openclaw CLI.
+    substituteInPlace scripts/runtime-postbuild.mjs \
+      --replace-fail 'stageBundledPluginRuntimeDeps(params);' '/* stageBundledPluginRuntimeDeps(params); — disabled in Nix build */'
   '';
 
   buildPhase = ''
