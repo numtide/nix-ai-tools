@@ -4,6 +4,7 @@
   bun2nix,
   bun,
   fetchFromGitHub,
+  jq,
 }:
 
 let
@@ -37,6 +38,23 @@ stdenv.mkDerivation {
 
   # postinstall runs bun2nix (needs .git), prepare runs husky (needs .git)
   dontRunLifecycleScripts = true;
+
+  # bun resolves caret-range specifiers (^x.y.z) via the npm registry even
+  # when the pinned version is already in the local cache.  In the Nix
+  # sandbox this fails because the network is blocked.  Work around by
+  # stripping ^ and ~ prefixes from version specs in both package.json
+  # and bun.lock so bun treats them as exact and skips registry lookups.
+  postPatch = ''
+    ${lib.getExe jq} '
+      if .dependencies    then .dependencies    |= with_entries(.value |= ltrimstr("^") | .value |= ltrimstr("~")) else . end |
+      if .devDependencies then .devDependencies |= with_entries(.value |= ltrimstr("^") | .value |= ltrimstr("~")) else . end
+    ' package.json > package.json.tmp && mv package.json.tmp package.json
+
+    # Also strip ^ and ~ from the workspace deps in bun.lock.
+    # bun.lock uses a JSONC-like format; sed is sufficient for the
+    # simple "key": "^version" patterns in the workspace section.
+    sed -i 's/: "\^/: "/g; s/: "~/: "/g' bun.lock
+  '';
 
   buildPhase = ''
     runHook preBuild
