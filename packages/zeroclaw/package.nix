@@ -5,7 +5,7 @@
   rustPlatform,
   fetchFromGitHub,
   runCommand,
-  nodejs_24,
+  nodejs,
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   versionCheckHook,
@@ -33,7 +33,7 @@ let
     src = frontendSrc;
 
     nativeBuildInputs = [
-      nodejs_24
+      nodejs
       npmConfigHook
     ];
 
