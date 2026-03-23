@@ -11,21 +11,11 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>amp</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph</summary>
 
-- **Source**: bytecode
+- **Source**: binary
 - **License**: unfree
 - **Homepage**: https://ampcode.com/
 - **Usage**: `nix run github:numtide/llm-agents.nix#amp -- --help`
 - **Nix**: [packages/amp/package.nix](packages/amp/package.nix)
-
-</details>
-<details>
-<summary><strong>amp-bin</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph (binary version, for plugin support)</summary>
-
-- **Source**: binary
-- **License**: unfree
-- **Homepage**: https://ampcode.com/
-- **Usage**: `nix run github:numtide/llm-agents.nix#amp-bin -- --help`
-- **Nix**: [packages/amp-bin/package.nix](packages/amp-bin/package.nix)
 
 </details>
 <details>
