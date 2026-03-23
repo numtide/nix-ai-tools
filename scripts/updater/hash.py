@@ -1,5 +1,6 @@
 """Hash calculation utilities for Nix packages."""
 
+import base64
 import re
 
 from .nix import nix_prefetch_url, nix_store_prefetch_file
@@ -49,3 +50,10 @@ def extract_hash_from_build_error(error_output: str) -> str | None:
             return match.group(1)
 
     return None
+
+
+def hex_to_sri(hex_hash: str, algo: str = "sha256") -> str:
+    """Convert a hex hash of the specified algorithm to SRI format."""
+    hash_bytes = bytes.fromhex(hex_hash)
+    b64_hash = base64.b64encode(hash_bytes).decode("ascii")
+    return f"{algo}-{b64_hash}"

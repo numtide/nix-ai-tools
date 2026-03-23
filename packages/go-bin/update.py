@@ -7,7 +7,6 @@ Fetches the latest patch release of the Go minor version we track from the
 official Go download API and updates hashes.json.
 """
 
-import base64
 import sys
 from pathlib import Path
 from typing import Any, cast
@@ -20,6 +19,7 @@ from updater import (
     save_hashes,
     should_update,
 )
+from updater.hash import hex_to_sri
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
@@ -50,12 +50,6 @@ def fetch_latest_go_release(minor: str) -> dict[str, Any] | None:
     return None
 
 
-def sha256_hex_to_sri(hex_hash: str) -> str:
-    """Convert a hex sha256 to SRI format (sha256-<base64>)."""
-    raw = bytes.fromhex(hex_hash)
-    return f"sha256-{base64.b64encode(raw).decode()}"
-
-
 def extract_platform_hashes(release: dict[str, Any]) -> dict[str, str]:
     """Extract SRI sha256 hashes for each platform from a Go release."""
     hashes: dict[str, str] = {}
@@ -64,7 +58,7 @@ def extract_platform_hashes(release: dict[str, Any]) -> dict[str, str]:
             continue
         key = f"{f['os']}-{f['arch']}"
         if key in PLATFORMS:
-            hashes[key] = sha256_hex_to_sri(f["sha256"])
+            hashes[key] = hex_to_sri(f["sha256"])
     missing = set(PLATFORMS) - set(hashes)
     if missing:
         msg = f"Missing hashes for platforms: {missing}"
