@@ -53,9 +53,16 @@ rustPlatform.buildRustPackage {
 
   inherit cargoHash;
 
-  # Place node-version.txt at the vendor dir root where the include_str! resolves to
+  # Place node-version.txt where include_str!("../../../../node-version.txt") in
+  # codex-core's src/tools/js_repl/mod.rs resolves to.  Newer cargo (≥1.84)
+  # groups git-sourced crates under source-git-N/ subdirectories in the vendor
+  # dir, adding one extra path component; older cargo placed them directly in
+  # the vendor root.  Copy to both locations so the build works with either.
   preBuild = ''
     cp ${nodeVersionFile} "$NIX_BUILD_TOP/codex-acp-${version}-vendor/node-version.txt"
+    for d in "$NIX_BUILD_TOP/codex-acp-${version}-vendor"/source-git-*/; do
+      [ -d "$d" ] && cp ${nodeVersionFile} "$d/node-version.txt"
+    done
   '';
 
   env = lib.optionalAttrs stdenv.hostPlatform.isLinux {
