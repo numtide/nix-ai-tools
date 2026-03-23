@@ -17,6 +17,7 @@
   gtk-layer-shell,
   libayatana-appindicator,
   libsoup_3,
+  onnxruntime,
   openssl,
   vulkan-loader,
   webkitgtk_4_1,
@@ -83,6 +84,7 @@ stdenv.mkDerivation {
     gtk3
     gtk-layer-shell
     libsoup_3
+    onnxruntime
     openssl
     vulkan-loader
     webkitgtk_4_1
