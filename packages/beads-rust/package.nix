@@ -8,6 +8,23 @@
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
+
+  # Upstream uses [patch.crates-io] with local path deps pointing at sibling
+  # checkouts of frankensqlite and asupersync.  Fetch them separately and place
+  # them where Cargo expects.
+  # https://github.com/Dicklesworthstone/beads_rust/issues/183
+  frankensqlite = fetchFromGitHub {
+    owner = "Dicklesworthstone";
+    repo = "frankensqlite";
+    inherit (data.frankensqlite) rev hash;
+  };
+
+  # frankensqlite workspace depends on asupersync via path = "../asupersync"
+  asupersync = fetchFromGitHub {
+    owner = "Dicklesworthstone";
+    repo = "asupersync";
+    inherit (data.asupersync) rev hash;
+  };
 in
 rustPlatform.buildRustPackage {
   pname = "beads-rust";
@@ -20,18 +37,11 @@ rustPlatform.buildRustPackage {
     inherit (data) hash;
   };
 
-  # Upstream uses [patch.crates-io] with local path deps pointing at a sibling
-  # frankensqlite checkout.  Fetch it separately and place it where Cargo expects.
-  # https://github.com/Dicklesworthstone/beads_rust/issues/183
-  frankensqlite = fetchFromGitHub {
-    owner = "Dicklesworthstone";
-    repo = "frankensqlite";
-    inherit (data.frankensqlite) rev hash;
-  };
-
   postUnpack = ''
-    cp -r $frankensqlite frankensqlite
+    cp -r ${frankensqlite} frankensqlite
     chmod -R u+w frankensqlite
+    cp -r ${asupersync} asupersync
+    chmod -R u+w asupersync
   '';
 
   # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
