@@ -3,9 +3,9 @@
 
 """Update script for beads-rust package.
 
-Upstream uses [patch.crates-io] with local path deps to a sibling
-frankensqlite repo.  This script updates both beads_rust and the
-matching frankensqlite commit in hashes.json, then recalculates
+Upstream uses [patch.crates-io] with local path deps to sibling
+frankensqlite and asupersync repos.  This script updates beads_rust
+and the matching sibling commits in hashes.json, then recalculates
 cargoHash via a dummy-hash build.
 """
 
@@ -28,6 +28,7 @@ HASHES_FILE = Path(__file__).parent / "hashes.json"
 OWNER = "Dicklesworthstone"
 BEADS_REPO = "beads_rust"
 FRANK_REPO = "frankensqlite"
+ASYNC_REPO = "asupersync"
 
 
 def get_release_date(owner: str, repo: str, version: str) -> str:
@@ -40,15 +41,14 @@ def get_release_date(owner: str, repo: str, version: str) -> str:
     return str(data["created_at"])
 
 
-def get_frankensqlite_rev(until: str) -> str:
-    """Get the latest frankensqlite commit at or before a given date."""
+def get_sibling_rev(repo: str, until: str) -> str:
+    """Get the latest commit of a sibling repo at or before a given date."""
     url = (
-        f"https://api.github.com/repos/{OWNER}/{FRANK_REPO}"
-        f"/commits?until={until}&per_page=1"
+        f"https://api.github.com/repos/{OWNER}/{repo}/commits?until={until}&per_page=1"
     )
     data = fetch_json(url)
     if not isinstance(data, list) or len(data) == 0:
-        msg = "No frankensqlite commits found"
+        msg = f"No {repo} commits found"
         raise ValueError(msg)
     return str(data[0]["sha"])
 
@@ -77,15 +77,17 @@ def main() -> None:
     data["version"] = latest
     data["hash"] = src_hash
 
-    # Update frankensqlite to the commit matching the release
-    print(f"Finding frankensqlite commit matching v{latest} release...")
+    # Update sibling repos to commits matching the release date
     release_date = get_release_date(OWNER, BEADS_REPO, latest)
-    frank_rev = get_frankensqlite_rev(release_date)
-    print(f"frankensqlite rev: {frank_rev}")
 
-    print("Prefetching frankensqlite...")
-    frank_hash = prefetch_github(OWNER, FRANK_REPO, frank_rev)
-    data["frankensqlite"] = {"rev": frank_rev, "hash": frank_hash}
+    for name, repo in [("frankensqlite", FRANK_REPO), ("asupersync", ASYNC_REPO)]:
+        print(f"Finding {name} commit matching v{latest} release...")
+        rev = get_sibling_rev(repo, release_date)
+        print(f"{name} rev: {rev}")
+
+        print(f"Prefetching {name}...")
+        h = prefetch_github(OWNER, repo, rev)
+        data[name] = {"rev": rev, "hash": h}
 
     # Recalculate cargoHash via dummy-hash build
     cargo_hash = calculate_dependency_hash(
@@ -94,7 +96,7 @@ def main() -> None:
     data["cargoHash"] = cargo_hash
 
     save_hashes(HASHES_FILE, data)
-    print(f"Updated beads-rust to {latest} with frankensqlite {frank_rev[:12]}")
+    print(f"Updated beads-rust to {latest}")
 
 
 if __name__ == "__main__":
