@@ -42,6 +42,47 @@ let
       platforms = platforms.all;
     };
   };
+
+  parallel-web = python3.pkgs.buildPythonPackage rec {
+    pname = "parallel-web";
+    version = "0.4.2";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "parallel_web";
+      inherit version;
+      hash = "sha256-WZtajzh9w1x9yMgeNy6t9pWKQKys6li/Fw38ZjwAPac=";
+    };
+
+    build-system = with python3.pkgs; [
+      hatchling
+      hatch-fancy-pypi-readme
+    ];
+
+    # Upstream pins hatchling==1.26.3 in build-system.requires; any recent
+    # hatchling works. pythonRelaxDeps only rewrites runtime metadata, so
+    # skip the pypa-build dependency check instead of patching pyproject.toml.
+    pypaBuildFlags = [ "--skip-dependency-check" ];
+
+    dependencies = with python3.pkgs; [
+      anyio
+      distro
+      httpx
+      pydantic
+      sniffio
+      typing-extensions
+    ];
+
+    pythonImportsCheck = [ "parallel" ];
+
+    meta = with lib; {
+      description = "Python SDK for Parallel Web API";
+      homepage = "https://github.com/parallel-web/parallel-sdk-python";
+      license = licenses.asl20;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
+    };
+  };
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "hermes-agent";
@@ -77,6 +118,7 @@ python3.pkgs.buildPythonApplication rec {
     # Tools
     firecrawl-py
     fal-client
+    parallel-web
     # Text-to-speech
     edge-tts
     faster-whisper
