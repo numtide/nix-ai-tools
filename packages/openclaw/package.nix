@@ -129,6 +129,12 @@ stdenv.mkDerivation (finalAttrs: {
     versionCheckHook
     versionCheckHomeHook
   ];
+  # Upstream tags may carry a "-N" rebuild suffix (e.g. v2026.3.23-2) while
+  # `openclaw --version` only reports the base version. Strip the suffix
+  # before versionCheckHook compares it against the command output.
+  preVersionCheck = ''
+    version=${lib.head (lib.splitString "-" finalAttrs.version)}
+  '';
 
   passthru.category = "AI Assistants";
 
