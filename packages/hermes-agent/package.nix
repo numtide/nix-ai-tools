@@ -46,14 +46,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "hermes-agent";
-  version = "2026.3.17";
+  version = "2026.3.23";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-x483+CKrY7r6NwTwb4iVVB3yyfioOwswfXSC5rfkiGI=";
+    hash = "sha256-ATOm0aJbE7W4q/shheXMIzeVNTjpySDnT5Pk/RxoNPY=";
   };
 
   patches = [
