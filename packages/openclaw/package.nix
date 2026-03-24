@@ -15,13 +15,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.3.23";
+  version = "2026.3.23-2";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-oWEYIzrAnYbyyFWFxFCm93i4eprH7hztX+ZHQRpFtQ4=";
+    hash = "sha256-0e2R3EwUMQaT2JxReDDJktsC1MLdCxphzKl8xf7iV0Y=";
   };
 
   pnpmDeps = fetchPnpmDeps {
@@ -129,6 +129,12 @@ stdenv.mkDerivation (finalAttrs: {
     versionCheckHook
     versionCheckHomeHook
   ];
+  # Upstream tags may carry a "-N" rebuild suffix (e.g. v2026.3.23-2) while
+  # `openclaw --version` only reports the base version. Strip the suffix
+  # before versionCheckHook compares it against the command output.
+  preVersionCheck = ''
+    version=${lib.head (lib.splitString "-" finalAttrs.version)}
+  '';
 
   passthru.category = "AI Assistants";
 
