@@ -119,6 +119,10 @@ python.pkgs.buildPythonApplication rec {
     markdownify
     mcp
     mistralai
+    opentelemetry-api
+    opentelemetry-exporter-otlp-proto-http
+    opentelemetry-sdk
+    opentelemetry-semantic-conventions
     packaging
     pexpect
     pydantic
@@ -147,6 +151,10 @@ python.pkgs.buildPythonApplication rec {
     "giturlparse"
     "keyring"
     "mistralai"
+    "opentelemetry-api"
+    "opentelemetry-exporter-otlp-proto-http"
+    "opentelemetry-sdk"
+    "opentelemetry-semantic-conventions"
     "pydantic"
     "pydantic-settings"
     "pyyaml"
