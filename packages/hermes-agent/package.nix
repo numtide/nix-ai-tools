@@ -3,7 +3,6 @@
   flake,
   python3,
   fetchFromGitHub,
-  fetchpatch,
   fetchPypi,
   versionCheckHook,
   versionCheckHomeHook,
@@ -43,28 +42,59 @@ let
       platforms = platforms.all;
     };
   };
+
+  parallel-web = python3.pkgs.buildPythonPackage rec {
+    pname = "parallel-web";
+    version = "0.4.2";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "parallel_web";
+      inherit version;
+      hash = "sha256-WZtajzh9w1x9yMgeNy6t9pWKQKys6li/Fw38ZjwAPac=";
+    };
+
+    build-system = with python3.pkgs; [
+      hatchling
+      hatch-fancy-pypi-readme
+    ];
+
+    # Upstream pins hatchling==1.26.3 in build-system.requires; any recent
+    # hatchling works. pythonRelaxDeps only rewrites runtime metadata, so
+    # skip the pypa-build dependency check instead of patching pyproject.toml.
+    pypaBuildFlags = [ "--skip-dependency-check" ];
+
+    dependencies = with python3.pkgs; [
+      anyio
+      distro
+      httpx
+      pydantic
+      sniffio
+      typing-extensions
+    ];
+
+    pythonImportsCheck = [ "parallel" ];
+
+    meta = with lib; {
+      description = "Python SDK for Parallel Web API";
+      homepage = "https://github.com/parallel-web/parallel-sdk-python";
+      license = licenses.asl20;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
+    };
+  };
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "hermes-agent";
-  version = "2026.3.17";
+  version = "2026.3.23";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-x483+CKrY7r6NwTwb4iVVB3yyfioOwswfXSC5rfkiGI=";
+    hash = "sha256-ATOm0aJbE7W4q/shheXMIzeVNTjpySDnT5Pk/RxoNPY=";
   };
-
-  patches = [
-    # fix: add source files to wheel
-    # https://github.com/NousResearch/hermes-agent/commit/cd46b1af04626f3baf85700e98f8510777ccfbbf
-    # drop when > 2026.3.17 when https://github.com/NousResearch/hermes-agent/pull/2080 is merged
-    (fetchpatch {
-      url = "https://github.com/NousResearch/hermes-agent/commit/cd46b1af04626f3baf85700e98f8510777ccfbbf.patch";
-      hash = "sha256-b6jw/YIUSeVKYXfd+BM+jD1UMnYClVEtlhKDNDoplTI=";
-    })
-  ];
 
   build-system = with python3.pkgs; [
     setuptools
@@ -88,6 +118,7 @@ python3.pkgs.buildPythonApplication rec {
     # Tools
     firecrawl-py
     fal-client
+    parallel-web
     # Text-to-speech
     edge-tts
     faster-whisper
