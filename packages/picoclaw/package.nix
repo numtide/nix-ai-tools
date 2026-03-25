@@ -3,6 +3,7 @@
   flake,
   buildGoModule,
   fetchFromGitHub,
+  olm,
   unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
@@ -22,6 +23,18 @@ buildGoModule rec {
   vendorHash = "sha256-ocLRiFZs2OnKM7C2/cUafpC8LIRCLybXG0ln8n9ZXr4=";
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
+
+  # mautrix-go crypto backend links libolm via cgo. libolm is marked
+  # insecure in nixpkgs (deprecated upstream, timing side-channels in
+  # its AES/SHA primitives). Accepted here because Matrix is an optional
+  # chat backend and the pure-Go goolm alternative is still experimental.
+  buildInputs = [
+    (olm.overrideAttrs (old: {
+      meta = old.meta // {
+        knownVulnerabilities = [ ];
+      };
+    }))
+  ];
 
   postPatch = ''
     # go:embed in cmd/picoclaw/internal/onboard/command.go expects a workspace
