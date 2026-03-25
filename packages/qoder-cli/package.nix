@@ -33,9 +33,10 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs =
-    lib.optionals stdenv.isDarwin [ unzip ] ++ lib.optionals stdenv.isLinux [ wrapBuddy ];
+    lib.optionals stdenv.hostPlatform.isDarwin [ unzip ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
-  buildInputs = lib.optionals stdenv.isLinux [ gcc-unwrapped.lib ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ gcc-unwrapped.lib ];
 
   sourceRoot = ".";
 

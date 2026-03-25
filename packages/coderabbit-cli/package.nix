@@ -32,9 +32,9 @@ stdenv.mkDerivation rec {
     hash = hashes.${platform};
   };
 
-  nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.isLinux [ wrapBuddy ];
+  nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
-  buildInputs = lib.optionals stdenv.isLinux [ libsecret ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libsecret ];
 
   unpackPhase = ''
     unzip $src

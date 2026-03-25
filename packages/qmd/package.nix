@@ -13,15 +13,15 @@
   config,
   cudaSupport ? config.cudaSupport or false,
   cudaPackages ? { },
-  vulkanSupport ? stdenv.isLinux,
+  vulkanSupport ? stdenv.hostPlatform.isLinux,
   vulkan-loader,
   autoAddDriverRunpath,
 }:
 let
   # CUDA only supported on x86_64-linux
-  effectiveCudaSupport = cudaSupport && stdenv.isLinux && stdenv.hostPlatform.isx86_64;
+  effectiveCudaSupport = cudaSupport && stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64;
   # Vulkan supported on all Linux
-  effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
+  effectiveVulkanSupport = vulkanSupport && stdenv.hostPlatform.isLinux;
 
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash;
@@ -47,13 +47,13 @@ stdenv.mkDerivation {
     bun2nix.hook
     makeWrapper
   ]
-  ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ]
   ++ lib.optionals effectiveCudaSupport [ autoAddDriverRunpath ];
 
   buildInputs = [
     sqlite
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib # For libgcc_s.so.1 and libstdc++.so.6
   ]
   ++ lib.optionals effectiveCudaSupport [

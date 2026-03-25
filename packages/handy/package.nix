@@ -66,16 +66,16 @@ stdenv.mkDerivation {
   inherit pname version src;
 
   nativeBuildInputs =
-    lib.optionals stdenv.isLinux [
+    lib.optionals stdenv.hostPlatform.isLinux [
       autoPatchelfHook
       dpkg
       copyDesktopItems
     ]
-    ++ lib.optionals stdenv.isDarwin [
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
       makeWrapper
     ];
 
-  buildInputs = lib.optionals stdenv.isLinux [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     gcc-unwrapped.lib
     alsa-lib
     cairo
@@ -90,15 +90,15 @@ stdenv.mkDerivation {
     webkitgtk_4_1
   ];
 
-  runtimeDependencies = lib.optionals stdenv.isLinux [
+  runtimeDependencies = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
     libayatana-appindicator
   ];
 
-  desktopItems = lib.optionals stdenv.isLinux [ desktopItem ];
+  desktopItems = lib.optionals stdenv.hostPlatform.isLinux [ desktopItem ];
 
   unpackPhase =
-    if stdenv.isLinux then
+    if stdenv.hostPlatform.isLinux then
       ''
         runHook preUnpack
 
@@ -117,7 +117,7 @@ stdenv.mkDerivation {
       '';
 
   installPhase =
-    if stdenv.isLinux then
+    if stdenv.hostPlatform.isLinux then
       ''
         runHook preInstall
 

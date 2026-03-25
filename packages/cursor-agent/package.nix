@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     makeWrapper
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     wrapBuddy
   ];
 
@@ -45,7 +45,7 @@ stdenv.mkDerivation rec {
     versionCheckHomeHook
   ];
 
-  buildInputs = lib.optionals stdenv.isLinux [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
   ];
 

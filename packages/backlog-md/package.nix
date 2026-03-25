@@ -60,7 +60,7 @@ stdenv.mkDerivation {
     runHook preBuild
 
     # Native node modules like @parcel/watcher need libstdc++ at build time
-    ${lib.optionalString stdenv.isLinux ''
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
       export LD_LIBRARY_PATH="${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}"
     ''}
 
