@@ -34,11 +34,11 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     makeWrapper
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     wrapBuddy
   ];
 
-  buildInputs = lib.optionals stdenv.isLinux [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     gcc-unwrapped.lib
   ];
 

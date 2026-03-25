@@ -30,9 +30,9 @@ stdenv.mkDerivation {
     hash = hashes.${platform};
   };
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ wrapBuddy ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
-  buildInputs = lib.optionals stdenv.isLinux [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     gcc-unwrapped.lib
   ];
 
@@ -42,7 +42,7 @@ stdenv.mkDerivation {
     runHook preInstall
 
     ${
-      if stdenv.isDarwin then
+      if stdenv.hostPlatform.isDarwin then
         ''
           mkdir -p $out/Applications
           cp -r Catnip.app $out/Applications/

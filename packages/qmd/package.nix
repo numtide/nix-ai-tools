@@ -13,15 +13,15 @@
   config,
   cudaSupport ? config.cudaSupport or false,
   cudaPackages ? { },
-  vulkanSupport ? stdenv.isLinux,
+  vulkanSupport ? stdenv.hostPlatform.isLinux,
   vulkan-loader,
   autoAddDriverRunpath,
 }:
 let
   # CUDA only supported on x86_64-linux
-  effectiveCudaSupport = cudaSupport && stdenv.isLinux && stdenv.hostPlatform.isx86_64;
+  effectiveCudaSupport = cudaSupport && stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64;
   # Vulkan supported on all Linux
-  effectiveVulkanSupport = vulkanSupport && stdenv.isLinux;
+  effectiveVulkanSupport = vulkanSupport && stdenv.hostPlatform.isLinux;
 
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash;
@@ -47,13 +47,13 @@ stdenv.mkDerivation {
     bun2nix.hook
     makeWrapper
   ]
-  ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ]
   ++ lib.optionals effectiveCudaSupport [ autoAddDriverRunpath ];
 
   buildInputs = [
     sqlite
   ]
-  ++ lib.optionals stdenv.isLinux [
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib # For libgcc_s.so.1 and libstdc++.so.6
   ]
   ++ lib.optionals effectiveCudaSupport [
@@ -122,7 +122,7 @@ stdenv.mkDerivation {
       # Patch detectGlibc.js to always return true on Linux
       # node-llama-cpp checks FHS paths (/lib, /usr/lib) for glibc which don't exist on NixOS
       # Without this patch, it falls back to building llama.cpp which fails in read-only store
-      patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-detectGlibc.patch}
+      patch -p1 -d $out/lib/qmd < ${../../patches/node-llama-cpp-detectGlibc.patch}
 
       # Redirect writable paths (localBuilds, llama.cpp clone, toolchains, xpack,
       # build metadata) from the read-only Nix store to ~/.cache/node-llama-cpp.

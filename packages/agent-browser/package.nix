@@ -22,8 +22,8 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-fNnJaqTc9UqJaH3tbeZBVZSLX3Uk2CBfData5bSRsvA=";
 
-  nativeBuildInputs = lib.optional stdenv.isLinux makeBinaryWrapper;
-  buildInputs = lib.optional stdenv.isLinux chromium;
+  nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
+  buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;
 
   # Upstream enables fat LTO with codegen-units=1 while pulling in the full
   # `image` crate (avif/webp/tiff/jpeg/png/gif codecs). The final monolithic
@@ -34,7 +34,7 @@ rustPlatform.buildRustPackage rec {
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
 
-  postInstall = lib.optionalString stdenv.isLinux ''
+  postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/agent-browser \
       --set AGENT_BROWSER_EXECUTABLE_PATH ${chromium}/bin/chromium
   '';
