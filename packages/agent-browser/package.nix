@@ -25,6 +25,12 @@ rustPlatform.buildRustPackage rec {
   nativeBuildInputs = lib.optional stdenv.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.isLinux chromium;
 
+  # Upstream enables fat LTO with codegen-units=1 while pulling in the full
+  # `image` crate (avif/webp/tiff/jpeg/png/gif codecs). The final monolithic
+  # LTO link OOMs rustc on the aarch64-linux builder. Thin LTO keeps most of
+  # the optimisation at a fraction of the peak memory.
+  env.CARGO_PROFILE_RELEASE_LTO = "thin";
+
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
 
