@@ -122,7 +122,7 @@ stdenv.mkDerivation {
       # Patch detectGlibc.js to always return true on Linux
       # node-llama-cpp checks FHS paths (/lib, /usr/lib) for glibc which don't exist on NixOS
       # Without this patch, it falls back to building llama.cpp which fails in read-only store
-      patch -p1 -d $out/lib/qmd < ${./node-llama-cpp-detectGlibc.patch}
+      patch -p1 -d $out/lib/qmd < ${../../patches/node-llama-cpp-detectGlibc.patch}
 
       # Redirect writable paths (localBuilds, llama.cpp clone, toolchains, xpack,
       # build metadata) from the read-only Nix store to ~/.cache/node-llama-cpp.
