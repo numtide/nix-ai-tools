@@ -3,13 +3,12 @@
   flake,
   buildGoModule,
   fetchFromGitHub,
-  go_1_25,
   unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-buildGoModule.override { go = go_1_25; } rec {
+buildGoModule rec {
   pname = "picoclaw";
   version = "0.2.3";
 
@@ -17,10 +16,10 @@ buildGoModule.override { go = go_1_25; } rec {
     owner = "sipeed";
     repo = "picoclaw";
     tag = "v${version}";
-    hash = "sha256-362hFUk2eeJKU3u8g4/yKOQ/PjlLOw9BDSbip9nyo1U=";
+    hash = "sha256-CnwfnYl7hciCbgC0P/I9anGdmrzpRalutGmPAJ6H7NI=";
   };
 
-  vendorHash = "sha256-R7PKYkNVrs4v5/KO2baSgh5tRJQH2/cIfeRSw0EFccg=";
+  vendorHash = "sha256-3MjBLklUpMTcz5/tW7Lr6d4wJ1x7ylFiEZkyeJI0CUA=";
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
 
