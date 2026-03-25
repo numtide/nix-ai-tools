@@ -9,21 +9,27 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "agent-browser";
-  version = "0.22.1";
+  version = "0.22.2";
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    hash = "sha256-s6agbpdORWy8Ok1/fKcngZDix2WiylohAEu5N4WFCGw=";
+    hash = "sha256-6KzFVK+2M/Ti2cjqr5iDEW53jhiJMXgOfBye3YWzlMo=";
   };
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-ZjF7+9i77IuIY0+loGTP2XZftrylDYfcINtUM2l0xQ0=";
+  cargoHash = "sha256-fNnJaqTc9UqJaH3tbeZBVZSLX3Uk2CBfData5bSRsvA=";
 
   nativeBuildInputs = lib.optional stdenv.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.isLinux chromium;
+
+  # Upstream enables fat LTO with codegen-units=1 while pulling in the full
+  # `image` crate (avif/webp/tiff/jpeg/png/gif codecs). The final monolithic
+  # LTO link OOMs rustc on the aarch64-linux builder. Thin LTO keeps most of
+  # the optimisation at a fraction of the peak memory.
+  env.CARGO_PROFILE_RELEASE_LTO = "thin";
 
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
