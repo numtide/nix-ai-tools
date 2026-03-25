@@ -3,13 +3,12 @@
   flake,
   buildGoModule,
   fetchFromGitHub,
-  go_1_25,
   unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-buildGoModule.override { go = go_1_25; } rec {
+buildGoModule rec {
   pname = "picoclaw";
   version = "0.2.3";
 
