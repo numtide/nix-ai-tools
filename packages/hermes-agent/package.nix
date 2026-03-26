@@ -152,10 +152,12 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://github.com/NousResearch/hermes-agent/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
+    # x86_64-darwin dropped: arrow-cpp (via litellm -> tokenizers -> datasets
+    # -> pyarrow) is marked broken there, and nixpkgs 26.05 is the last
+    # release supporting the platform anyway.
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
     maintainers = with flake.lib.maintainers; [ aliez-ren ];
