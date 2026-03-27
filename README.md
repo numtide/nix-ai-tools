@@ -683,6 +683,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>gitagent</strong> - Framework-agnostic, git-native standard for defining AI agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/open-gitagent/gitagent
+- **Usage**: `nix run github:numtide/llm-agents.nix#gitagent -- --help`
+- **Nix**: [packages/gitagent/package.nix](packages/gitagent/package.nix)
+
+</details>
+<details>
 <summary><strong>gno</strong> - Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration</summary>
 
 - **Source**: source
