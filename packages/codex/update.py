@@ -1,18 +1,25 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for codex package."""
+"""Update script for codex package.
+
+This script updates both the codex version and the librusty_v8 hashes.
+The v8 version is extracted from the Cargo.lock file of the codex repository.
+"""
 
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
     calculate_dependency_hash,
+    calculate_platform_hashes,
     calculate_url_hash,
     fetch_github_latest_release,
+    fetch_version_from_text,
     load_hashes,
     save_hashes,
     should_update,
@@ -21,6 +28,13 @@ from updater.hash import DUMMY_SHA256_HASH
 from updater.nix import NixCommandError
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
+
+PLATFORMS = {
+    "x86_64-linux": "x86_64-unknown-linux-gnu",
+    "aarch64-linux": "aarch64-unknown-linux-gnu",
+    "x86_64-darwin": "x86_64-apple-darwin",
+    "aarch64-darwin": "aarch64-apple-darwin",
+}
 
 
 def fetch_version() -> str:
@@ -31,6 +45,33 @@ def fetch_version() -> str:
         msg = f"Unexpected tag format: {tag!r}, expected 'rust-v<version>'"
         raise ValueError(msg)
     return match.group(1)
+
+
+def librusty_v8_pins(
+    codex_version: str, previous: dict[str, Any] | None
+) -> dict[str, Any]:
+    """Return the librusty_v8 pin for the given codex version.
+
+    Re-uses existing hashes when the v8 version has not changed to avoid
+    re-downloading four ~100MB archives on every bump.
+    """
+    v8_version = fetch_version_from_text(
+        f"https://raw.githubusercontent.com/openai/codex/rust-v{codex_version}/codex-rs/Cargo.lock",
+        r'name = "v8"\nversion = "([^"]+)"',
+    )
+    print(f"V8 version: {v8_version}")
+
+    if previous and previous.get("version") == v8_version:
+        print("V8 unchanged, reusing hashes")
+        return previous
+
+    hashes = calculate_platform_hashes(
+        "https://github.com/denoland/rusty_v8/releases/download/"
+        "v{version}/librusty_v8_release_{platform}.a.gz",
+        PLATFORMS,
+        version=v8_version,
+    )
+    return {"version": v8_version, "hashes": {k: hashes[k] for k in PLATFORMS}}
 
 
 def main() -> None:
@@ -55,6 +96,7 @@ def main() -> None:
         "version": latest,
         "hash": source_hash,
         "cargoHash": DUMMY_SHA256_HASH,
+        "librusty_v8": librusty_v8_pins(latest, data.get("librusty_v8")),
     }
     save_hashes(HASHES_FILE, data)
 
