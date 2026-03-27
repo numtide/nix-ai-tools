@@ -8,6 +8,7 @@
   rustPlatform,
   pkg-config,
   openssl,
+  bubblewrap,
   libcap,
   versionCheckHook,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
@@ -63,6 +64,14 @@ rustPlatform.buildRustPackage {
     # Remove LTO to speed up builds
     substituteInPlace Cargo.toml \
       --replace-fail 'lto = "fat"' 'lto = false'
+  ''
+  # Use nix store bwrap instead of hardcoded /usr/bin/bwrap.
+  # TODO: remove after next release (openai/codex#15791, openai/codex#15973).
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    substituteInPlace core/src/config/mod.rs \
+      --replace-fail '/usr/bin/bwrap' '${bubblewrap}/bin/bwrap'
+    substituteInPlace linux-sandbox/src/launcher.rs \
+      --replace-fail '/usr/bin/bwrap' '${bubblewrap}/bin/bwrap'
   '';
 
   doCheck = false;
