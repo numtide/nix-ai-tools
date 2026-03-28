@@ -67,6 +67,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 8287771;
         name = "Aliez Ren";
       };
+      SecBear = {
+        github = "SecBear";
+        githubId = 253731654;
+        name = "Bryce Thorpe";
+      };
     };
   }
 )

@@ -733,6 +733,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>parallel-cli</strong> - AI-powered web search, extraction, and research CLI from Parallel</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/parallel-web/parallel-web-tools
+- **Usage**: `nix run github:numtide/llm-agents.nix#parallel-cli -- --help`
+- **Nix**: [packages/parallel-cli/package.nix](packages/parallel-cli/package.nix)
+
+</details>
+<details>
 <summary><strong>qmd</strong> - mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local</summary>
 
 - **Source**: source
