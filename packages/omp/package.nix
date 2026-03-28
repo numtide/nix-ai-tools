@@ -5,6 +5,7 @@
   makeWrapper,
   autoPatchelfHook,
   stdenv,
+  zlib,
 }:
 
 let
@@ -42,6 +43,10 @@ stdenvNoCC.mkDerivation {
 
   buildInputs = lib.optionals stdenvNoCC.hostPlatform.isLinux [
     stdenv.cc.cc.lib
+  ];
+
+  runtimeDependencies = lib.optionals stdenvNoCC.hostPlatform.isLinux [
+    zlib
   ];
 
   installPhase = ''
