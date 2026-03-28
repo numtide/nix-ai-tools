@@ -45,10 +45,6 @@ stdenvNoCC.mkDerivation {
     stdenv.cc.cc.lib
   ];
 
-  runtimeDependencies = lib.optionals stdenvNoCC.hostPlatform.isLinux [
-    zlib
-  ];
-
   installPhase = ''
     runHook preInstall
 
@@ -57,7 +53,13 @@ stdenvNoCC.mkDerivation {
     chmod +x $out/bin/omp
 
     wrapProgram $out/bin/omp \
-      --set PI_SKIP_VERSION_CHECK 1
+      --set PI_SKIP_VERSION_CHECK 1 \
+      ${lib.optionalString stdenvNoCC.hostPlatform.isLinux "--prefix LD_LIBRARY_PATH : ${
+        lib.makeLibraryPath [
+          zlib
+          stdenv.cc.cc.lib
+        ]
+      }"}
 
     runHook postInstall
   '';
