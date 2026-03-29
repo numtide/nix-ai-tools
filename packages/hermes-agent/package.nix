@@ -133,6 +133,10 @@ python3.pkgs.buildPythonApplication rec {
   pythonRelaxDeps = [
     "litellm"
     "pydantic"
+    "tenacity"
+    "requests"
+    "firecrawl-py"
+    "pyjwt"
   ];
 
   pythonImportsCheck = [ "hermes_cli" ];
