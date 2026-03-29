@@ -64,6 +64,11 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-yWdtCaw6UI6wgJEG9XdKhgG9OgqcuJBEPF3C3R15hNc=";
 
+  # Upstream v0.6.6 tag does not compile (incomplete cherry-picks).
+  # See https://github.com/zeroclaw-labs/zeroclaw/issues/4946
+  # Remove once a fixed release is tagged.
+  patches = [ ./fix-v0.6.6-build.patch ];
+
   preBuild = ''
     mkdir -p web/dist
     cp -r ${frontend}/* web/dist/
