@@ -16,15 +16,15 @@ buildNpmPackage (finalAttrs: {
   version = "1.4.10";
 
   src = fetchFromGitHub {
-    owner = "PieterPel";
+    owner = "abhigyanpatwari";
     repo = "GitNexus";
-    rev = "fefa95354effa7a29e9b3b65735d3fbb56fd5933";
-    hash = "sha256-YfI6m/rfswGwwN68AlTyFBosGhniasq4uc3Xh6e5gXc=";
+    rev = "c72890d59d41f928c91f4d7b5c94fc2981f80ebe";
+    hash = "sha256-p0l2dDD788opW3ocSphVQ1Yd9eXHox/TwNTh6aSPdwU=";
   };
 
   sourceRoot = "source/gitnexus";
 
-  patches = [ ];
+  patches = [ ./system-onnxruntime-node.patch ];
 
   postUnpack = ''
     chmod -R u+w source/gitnexus-shared
@@ -89,7 +89,10 @@ buildNpmPackage (finalAttrs: {
       fi
 
       wrapProgram $out/bin/gitnexus \
-        --set-default GITNEXUS_ORT_BINDING_PATH "${ortBinding}"
+        --set-default GITNEXUS_ORT_BINDING_PATH "${ortBinding}" \
+        --set-default XDG_CACHE_HOME "\$HOME/.cache" \
+        --set-default HF_HOME "\$HOME/.cache/huggingface" \
+        --set-default TRANSFORMERS_CACHE "\$HOME/.cache/huggingface/transformers"
     '';
 
   passthru.category = "AI Coding Agents";
