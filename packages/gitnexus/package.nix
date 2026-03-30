@@ -89,9 +89,7 @@ buildNpmPackage (finalAttrs: {
 
       wrapProgram $out/bin/gitnexus \
         --set-default GITNEXUS_ORT_BINDING_PATH "${ortBinding}" \
-        --set-default XDG_CACHE_HOME "\$HOME/.cache" \
-        --set-default HF_HOME "\$HOME/.cache/huggingface" \
-        --set-default TRANSFORMERS_CACHE "\$HOME/.cache/huggingface/transformers"
+        --run 'export GITNEXUS_CACHE_DIR="$HOME/.cache"'
     '';
 
   passthru.category = "AI Coding Agents";
