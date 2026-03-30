@@ -7,6 +7,7 @@
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   makeWrapper,
+  nodePackages,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -15,21 +16,25 @@ buildNpmPackage (finalAttrs: {
   version = "1.4.10";
 
   src = fetchFromGitHub {
-    owner = "abhigyanpatwari";
+    owner = "PieterPel";
     repo = "GitNexus";
-    rev = "c27c9f612ca606252f3627cb364c5efa6fbd6f83";
-    hash = "sha256-ywTPFUt7kmaUbEz+mL+LS4m3ykZ6vZLKyV/iJ2GNcKU=";
+    rev = "fefa95354effa7a29e9b3b65735d3fbb56fd5933";
+    hash = "sha256-YfI6m/rfswGwwN68AlTyFBosGhniasq4uc3Xh6e5gXc=";
   };
 
   sourceRoot = "source/gitnexus";
 
-  patches = [ ./system-onnxruntime-node.patch ];
+  patches = [ ];
+
+  postUnpack = ''
+    chmod -R u+w source/gitnexus-shared
+  '';
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     sourceRoot = "source/gitnexus";
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-uEONNB0BIb6AEiXJjAC3/xzSt3XMQB8CpyLzZIxBCeM=";
+    hash = "sha256-DIrte2Ksc3zzSZx9jQ58j5rq9D+qcygsJ8/1m7XmheQ=";
     fetcherVersion = 2;
     forceGitDeps = true;
   };
@@ -37,7 +42,18 @@ buildNpmPackage (finalAttrs: {
 
   npmFlags = [ "--ignore-scripts" ];
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    makeWrapper
+    nodePackages.typescript
+  ];
+
+  preBuild = ''
+    pushd ../gitnexus-shared
+    tsc
+    popd
+  '';
+
+  dontPatchELF = stdenv.hostPlatform.isDarwin;
 
   postInstall =
     let
@@ -58,6 +74,10 @@ buildNpmPackage (finalAttrs: {
       ortBinding = "$out/lib/node_modules/gitnexus/node_modules/onnxruntime-node/bin/napi-v6/${ortPlatform}/${ortArch}/onnxruntime_binding.node";
     in
     ''
+      mkdir -p $out/lib/node_modules/gitnexus-shared
+      cp -R ../gitnexus-shared/dist ../gitnexus-shared/src ../gitnexus-shared/package.json \
+        $out/lib/node_modules/gitnexus-shared/
+
       wrapProgram $out/bin/gitnexus \
         --set-default GITNEXUS_ORT_BINDING_PATH "${ortBinding}"
     '';
