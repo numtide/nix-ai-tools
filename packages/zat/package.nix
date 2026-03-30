@@ -7,16 +7,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zat";
-  version = "0.5.1";
+  version = "0.5.2";
 
   src = fetchFromGitHub {
     owner = "bglgwyng";
     repo = "zat";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-SP+ezyWHpC/MPlJu2ZJbPt2ZkI523/u7O0HxFK0C91U=";
+    hash = "sha256-DaFFg7Aj03mUU9wYnwx+6EfOOkQ1t8QSVBGYZoj3i+8=";
   };
 
-  cargoHash = "sha256-7O6zFovE7argbYVE5R+tlco/Kn78haE19vIiR1D8fEU=";
+  cargoHash = "sha256-IRzYQh9VOQtkPmmvvAWjrDJIdoKrbK6YuVk/auI5Gns=";
 
   # Smoke test: zat has no --version flag, so run it against its own source.
   doInstallCheck = true;
