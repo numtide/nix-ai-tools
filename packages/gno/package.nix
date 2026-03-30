@@ -167,7 +167,7 @@ stdenv.mkDerivation {
 
       mkdir -p $out/lib/gno $out/bin
 
-      cp -r node_modules src package.json $out/lib/gno/
+      cp -r node_modules src vendor package.json $out/lib/gno/
 
       # Patch detectGlibc.js to always return true on Linux
       # node-llama-cpp checks FHS paths (/lib, /usr/lib) for glibc which don't exist on NixOS

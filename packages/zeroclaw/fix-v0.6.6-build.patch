@@ -1,0 +1,128 @@
+From 6f5d3dfcfc22a3b180a714944ed060dceff187d4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rg=20Thalheim?= <joerg@thalheim.io>
+Date: Sun, 29 Mar 2026 19:23:49 +0200
+Subject: [PATCH] fix: resolve v0.6.6 compilation errors
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream v0.6.6 tag does not compile due to incomplete cherry-picks
+(see upstream issue #4946). Apply minimal fixes:
+- Disable mqtt module (rumqttc dependency missing from Cargo.toml)
+- Add missing None for new memory/memory_namespace/mqtt struct fields
+- Add missing session_id argument to run_gateway_chat_with_tools
+- Clone memory Arc before moving into MemoryPurgeTool
+
+Signed-off-by: Jörg Thalheim <joerg@thalheim.io>
+---
+ src/channels/mod.rs               | 3 ++-
+ src/config/schema.rs              | 1 +
+ src/daemon/mod.rs                 | 4 +++-
+ src/gateway/mod.rs                | 2 +-
+ src/tools/delegate.rs             | 2 ++
+ src/tools/mod.rs                  | 2 +-
+ src/tools/model_routing_config.rs | 1 +
+ 7 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/src/channels/mod.rs b/src/channels/mod.rs
+index f655cc3f..1760593d 100644
+--- a/src/channels/mod.rs
++++ b/src/channels/mod.rs
+@@ -39,7 +39,8 @@ pub mod matrix;
+ pub mod mattermost;
+ pub mod media_pipeline;
+ pub mod mochat;
+-pub mod mqtt;
++// mqtt module disabled: rumqttc dependency missing from Cargo.toml in v0.6.6
++// pub mod mqtt;
+ pub mod nextcloud_talk;
+ #[cfg(feature = "channel-nostr")]
+ pub mod nostr;
+diff --git a/src/config/schema.rs b/src/config/schema.rs
+index bbebb47b..b49a78df 100644
+--- a/src/config/schema.rs
++++ b/src/config/schema.rs
+@@ -6407,6 +6407,7 @@ impl Default for ChannelsConfig {
+             session_backend: default_session_backend(),
+             session_ttl_hours: 0,
+             debounce_ms: 0,
++            mqtt: None,
+         }
+     }
+ }
+diff --git a/src/daemon/mod.rs b/src/daemon/mod.rs
+index ecdece9c..6fdaa9c9 100644
+--- a/src/daemon/mod.rs
++++ b/src/daemon/mod.rs
+@@ -845,7 +845,9 @@ async fn run_mqtt_sop_listener(config: &crate::config::MqttConfig) -> Result<()>
+ 
+     // Validate MQTT config and run the listener
+     config.validate()?;
+-    crate::channels::mqtt::run_mqtt_sop_listener(config, engine, audit).await
++    // mqtt module disabled in v0.6.6 due to missing rumqttc dependency
++    let _ = (engine, audit);
++    anyhow::bail!("MQTT channel not available in this build (rumqttc dependency missing in v0.6.6)")
+ }
+ 
+ #[cfg(test)]
+diff --git a/src/gateway/mod.rs b/src/gateway/mod.rs
+index 75316097..015947f5 100644
+--- a/src/gateway/mod.rs
++++ b/src/gateway/mod.rs
+@@ -1516,7 +1516,7 @@ async fn handle_webhook(
+             messages_count: 1,
+         });
+ 
+-    match run_gateway_chat_with_tools(&state, message).await {
++    match run_gateway_chat_with_tools(&state, message, None).await {
+         Ok(response) => {
+             let duration = started_at.elapsed();
+             state
+diff --git a/src/tools/delegate.rs b/src/tools/delegate.rs
+index d669a5ac..3f34e2b5 100644
+--- a/src/tools/delegate.rs
++++ b/src/tools/delegate.rs
+@@ -653,6 +653,7 @@ impl DelegateTool {
+                 delegate_config,
+                 workspace_dir: workspace_dir.clone(),
+                 cancellation_token: child_token.clone(),
++                memory: None,
+             };
+ 
+             let args_inner = json!({
+@@ -810,6 +811,7 @@ impl DelegateTool {
+                     delegate_config,
+                     workspace_dir,
+                     cancellation_token,
++                    memory: None,
+                 };
+                 let result = Box::pin(inner.execute_sync(&agent_name, &prompt, &args_clone)).await;
+                 (agent_name, result)
+diff --git a/src/tools/mod.rs b/src/tools/mod.rs
+index db2b7d47..8015a909 100644
+--- a/src/tools/mod.rs
++++ b/src/tools/mod.rs
+@@ -433,7 +433,7 @@ pub fn all_tools_with_runtime(
+         Arc::new(MemoryRecallTool::new(memory.clone())),
+         Arc::new(MemoryForgetTool::new(memory.clone(), security.clone())),
+         Arc::new(MemoryExportTool::new(memory.clone())),
+-        Arc::new(MemoryPurgeTool::new(memory, security.clone())),
++        Arc::new(MemoryPurgeTool::new(memory.clone(), security.clone())),
+         Arc::new(ScheduleTool::new(security.clone(), root_config.clone())),
+         Arc::new(ModelRoutingConfigTool::new(
+             config.clone(),
+diff --git a/src/tools/model_routing_config.rs b/src/tools/model_routing_config.rs
+index 1b5e8c14..05def654 100644
+--- a/src/tools/model_routing_config.rs
++++ b/src/tools/model_routing_config.rs
+@@ -708,6 +708,7 @@ impl ModelRoutingConfigTool {
+                 timeout_secs: None,
+                 agentic_timeout_secs: None,
+                 skills_directory: None,
++                memory_namespace: None,
+             });
+ 
+         next_agent.provider = provider;
+-- 
+2.53.0
+

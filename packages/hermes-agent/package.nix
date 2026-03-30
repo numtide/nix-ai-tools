@@ -86,14 +86,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "hermes-agent";
-  version = "2026.3.23";
+  version = "2026.3.28";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-ATOm0aJbE7W4q/shheXMIzeVNTjpySDnT5Pk/RxoNPY=";
+    hash = "sha256-NUGt70RRu7yk1PzWGofYjG7Ozo8SjjVO5z2oM4GJ53I=";
   };
 
   build-system = with python3.pkgs; [
@@ -133,6 +133,10 @@ python3.pkgs.buildPythonApplication rec {
   pythonRelaxDeps = [
     "litellm"
     "pydantic"
+    "tenacity"
+    "requests"
+    "firecrawl-py"
+    "pyjwt"
   ];
 
   pythonImportsCheck = [ "hermes_cli" ];

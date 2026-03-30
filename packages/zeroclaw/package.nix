@@ -13,13 +13,13 @@
 }:
 let
   pname = "zeroclaw";
-  version = "0.6.5";
+  version = "0.6.6";
 
   src = fetchFromGitHub {
     owner = "zeroclaw-labs";
     repo = "zeroclaw";
     tag = "v${version}";
-    hash = "sha256-uBlM5N9+a22HL7CSlpLIapqFFd+MEqhbb94LtiN3FAs=";
+    hash = "sha256-S0SIhjDZQg66mR+atxzkBvDTLVzIjjUKB4r5cwM8UdU=";
   };
 
   frontendSrc = runCommand "${pname}-web-src-${version}" { } ''
@@ -62,7 +62,12 @@ in
 rustPlatform.buildRustPackage rec {
   inherit pname version src;
 
-  cargoHash = "sha256-1/s2ijYqanhHIsYSw85c4H3T5phnAfvV7oQeAl/6lxQ=";
+  cargoHash = "sha256-yWdtCaw6UI6wgJEG9XdKhgG9OgqcuJBEPF3C3R15hNc=";
+
+  # Upstream v0.6.6 tag does not compile (incomplete cherry-picks).
+  # See https://github.com/zeroclaw-labs/zeroclaw/issues/4946
+  # Remove once a fixed release is tagged.
+  patches = [ ./fix-v0.6.6-build.patch ];
 
   preBuild = ''
     mkdir -p web/dist
