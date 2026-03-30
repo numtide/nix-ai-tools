@@ -1,0 +1,126 @@
+diff --git a/README.md b/README.md
+index 312a465..d66f546 100644
+--- a/README.md
++++ b/README.md
+@@ -179,6 +179,15 @@ gitnexus analyze . --embeddings
+ 
+ Works with Infinity, vLLM, TEI, llama.cpp, Ollama, LM Studio, or OpenAI. When unset, local embeddings are used unchanged.
+ 
++## System ONNX Runtime Binding (Advanced)
++
++If your environment provides a system-built onnxruntime-node binding (for example, Nix),
++you can direct GitNexus to use it instead of the package's bundled binary:
++
++```bash
++export GITNEXUS_ORT_BINDING_PATH=/absolute/path/to/onnxruntime_binding.node
++```
++
+ ## Multi-Repo Support
+ 
+ GitNexus supports indexing multiple repositories. Each `gitnexus analyze` registers the repo in a global registry (`~/.gitnexus/registry.json`). The MCP server serves all indexed repos automatically.
+diff --git a/src/core/embeddings/embedder.ts b/src/core/embeddings/embedder.ts
+index 13ad354..dd7c0bc 100644
+--- a/src/core/embeddings/embedder.ts
++++ b/src/core/embeddings/embedder.ts
+@@ -21,6 +21,7 @@ import { join, dirname } from 'path';
+ import { createRequire } from 'module';
+ import { DEFAULT_EMBEDDING_CONFIG, type EmbeddingConfig, type ModelProgress } from './types.js';
+ import { isHttpMode, getHttpDimensions, httpEmbed } from './http-client.js';
++import { applyOnnxruntimeNodeBindingOverride } from './onnxruntime-node-loader.js';
+ 
+ /**
+  * Check whether the onnxruntime-node package that @huggingface/transformers
+@@ -131,6 +132,8 @@ export const initEmbedder = async (
+     return embedderInstance;
+   }
+ 
++  applyOnnxruntimeNodeBindingOverride();
++
+   // If already initializing, wait for that promise
+   if (isInitializing && initPromise) {
+     return initPromise;
+@@ -352,4 +355,3 @@ export const disposeEmbedder = async (): Promise<void> => {
+     initPromise = null;
+   }
+ };
+-
+diff --git a/src/core/embeddings/onnxruntime-node-loader.ts b/src/core/embeddings/onnxruntime-node-loader.ts
+new file mode 100644
+index 0000000..252064f
+--- /dev/null
++++ b/src/core/embeddings/onnxruntime-node-loader.ts
+@@ -0,0 +1,53 @@
++import Module from 'module';
++import { existsSync } from 'fs';
++import { isAbsolute } from 'path';
++
++const OVERRIDE_ENV = 'GITNEXUS_ORT_BINDING_PATH';
++
++/**
++ * Redirect onnxruntime-node to a system-provided binding binary.
++ *
++ * onnxruntime-node always requires a native .node file from its own package.
++ * We patch Node's module resolver so that specific request is redirected to
++ * the path provided by GITNEXUS_ORT_BINDING_PATH.
++ */
++export const applyOnnxruntimeNodeBindingOverride = (): void => {
++  const overridePath = process.env[OVERRIDE_ENV];
++  if (!overridePath) return;
++
++  if (!isAbsolute(overridePath)) {
++    throw new Error(`${OVERRIDE_ENV} must be an absolute path, got "${overridePath}"`);
++  }
++
++  if (!existsSync(overridePath)) {
++    throw new Error(`${OVERRIDE_ENV} points to a missing file: "${overridePath}"`);
++  }
++
++  const moduleAny = Module as typeof Module & {
++    _gitnexusOrtBindingOverrideApplied?: boolean;
++    _resolveFilename?: (
++      request: string,
++      parent: NodeModule | null,
++      isMain: boolean,
++      options?: unknown
++    ) => string;
++  };
++
++  if (moduleAny._gitnexusOrtBindingOverrideApplied) return;
++  moduleAny._gitnexusOrtBindingOverrideApplied = true;
++
++  const originalResolve = moduleAny._resolveFilename?.bind(Module);
++  if (!originalResolve) return;
++
++  moduleAny._resolveFilename = function (
++    request: string,
++    parent: NodeModule | null,
++    isMain: boolean,
++    options?: unknown
++  ): string {
++    if (typeof request === 'string' && request.endsWith('onnxruntime_binding.node')) {
++      return overridePath;
++    }
++    return originalResolve(request, parent, isMain, options);
++  };
++};
+diff --git a/src/mcp/core/embedder.ts b/src/mcp/core/embedder.ts
+index 11261ff..dce50f5 100644
+--- a/src/mcp/core/embedder.ts
++++ b/src/mcp/core/embedder.ts
+@@ -7,6 +7,7 @@
+ 
+ import { pipeline, env, type FeatureExtractionPipeline } from '@huggingface/transformers';
+ import { isHttpMode, getHttpDimensions, httpEmbedQuery } from '../../core/embeddings/http-client.js';
++import { applyOnnxruntimeNodeBindingOverride } from '../../core/embeddings/onnxruntime-node-loader.js';
+ 
+ // Model config
+ const MODEL_ID = 'Snowflake/snowflake-arctic-embed-xs';
+@@ -28,6 +29,8 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
+     return embedderInstance;
+   }
+ 
++  applyOnnxruntimeNodeBindingOverride();
++
+   if (isInitializing && initPromise) {
+     return initPromise;
+   }
