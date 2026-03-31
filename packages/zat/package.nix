@@ -32,7 +32,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "Code outline viewer for LLM coding agents — shows exported symbols with line numbers";
     homepage = "https://github.com/bglgwyng/zat";
     changelog = "https://github.com/bglgwyng/zat/releases/tag/v${finalAttrs.version}";
-    license = lib.licenses.unfree;
+    license = lib.licenses.gpl3Only;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ mic92 ];
     mainProgram = "zat";
