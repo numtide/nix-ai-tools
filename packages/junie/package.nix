@@ -3,7 +3,9 @@
   stdenv,
   fetchurl,
   unzip,
+  autoPatchelfHook,
   versionCheckHook,
+  zlib,
 }:
 
 let
@@ -29,28 +31,77 @@ stdenv.mkDerivation {
     hash = hashes.${platform};
   };
 
-  nativeBuildInputs = [ unzip ];
+  nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
 
-  unpackPhase = ''
-    runHook preUnpack
-    unzip $src
-    runHook postUnpack
-  '';
+  # The bundled JRE contains modules for AWT/sound/etc that we don't need for
+  # the CLI; mark their deps optional so autoPatchelfHook doesn't fail.
+  autoPatchelfIgnoreMissingDeps = [
+    "libasound.so.2"
+    "libfreetype.so.6"
+    "libharfbuzz.so.0"
+    "libgif.so.7"
+    "libjpeg.so.8"
+    "liblcms2.so.2"
+    "libpng16.so.16"
+    "libpcsclite.so.1"
+    "libX11.so.6"
+    "libXext.so.6"
+    "libXi.so.6"
+    "libXrender.so.1"
+    "libXtst.so.6"
+  ];
+
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    (lib.getLib stdenv.cc.cc) # libstdc++, libgcc_s
+    zlib
+  ];
+
+  sourceRoot = ".";
+
+  # Don't strip: the bundled JRE's jimage (lib/modules) gets corrupted and
+  # macOS binaries are signed.
+  dontStrip = true;
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/bin $out/lib
-    cp -r junie-app/bin/. $out/bin/
-    cp -r junie-app/lib/. $out/lib/
+    mkdir -p $out/bin
+  ''
+  + (
+    if stdenv.hostPlatform.isDarwin then
+      # macOS archive ships a .app bundle plus a trivial `junie` shell
+      # wrapper. The launcher resolves the bundle relative to its own
+      # realpath, so a symlink into $out/Applications works fine.
+      ''
+        mkdir -p $out/Applications
+        cp -R Applications/junie.app $out/Applications/
+        ln -s $out/Applications/junie.app/Contents/MacOS/junie $out/bin/junie
+      ''
+    else
+      # Linux archive is a plain jpackage app-image: junie-app/{bin,lib}.
+      ''
+        mkdir -p $out/opt
+        cp -r junie-app $out/opt/junie
+        ln -s $out/opt/junie/bin/junie $out/bin/junie
+      ''
+  )
+  + ''
+
     runHook postInstall
   '';
 
   doInstallCheck = true;
-  # the version check fails
-  dontVersionCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
   ];
+  versionCheckProgramArg = "--version";
+  # OpenJDK resolves user.home via getpwuid() and ignores $HOME. In the Nix
+  # sandbox /etc/passwd lists the home directory as the literal string
+  # `"/build"` (quotes included), so Junie tries to mkdir a path starting
+  # with `/"` and blows up before it can print the version.
+  versionCheckKeepEnvironment = [ "JAVA_TOOL_OPTIONS" ];
+  preVersionCheck = ''
+    export JAVA_TOOL_OPTIONS="-Duser.home=$(mktemp -d)"
+  '';
 
   passthru.category = "AI Coding Agents";
 
@@ -67,5 +118,9 @@ stdenv.mkDerivation {
       "aarch64-darwin"
     ];
     mainProgram = "junie";
+    maintainers = with lib.maintainers; [
+      mic92
+      daspk04
+    ];
   };
 }
