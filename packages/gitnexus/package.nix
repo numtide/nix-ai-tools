@@ -7,7 +7,7 @@
   fetchNpmDepsWithPackuments,
   npmConfigHook,
   makeWrapper,
-  nodePackages,
+  typescript,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -45,7 +45,7 @@ buildNpmPackage (finalAttrs: {
 
   nativeBuildInputs = [
     makeWrapper
-    nodePackages.typescript
+    typescript
   ];
 
   preBuild = ''
