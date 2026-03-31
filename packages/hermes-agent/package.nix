@@ -9,6 +9,42 @@
 }:
 
 let
+  exa-py = python3.pkgs.buildPythonPackage rec {
+    pname = "exa-py";
+    version = "2.10.2";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "exa_py";
+      inherit version;
+      hash = "sha256-94HzCxmfEQIzM4RyitrmS7Faa7yr+pfpH9cF+QrP/EU=";
+    };
+
+    build-system = with python3.pkgs; [
+      poetry-core
+    ];
+
+    dependencies = with python3.pkgs; [
+      httpcore
+      httpx
+      openai
+      pydantic
+      python-dotenv
+      requests
+      typing-extensions
+    ];
+
+    pythonImportsCheck = [ "exa_py" ];
+
+    meta = with lib; {
+      description = "Python SDK for Exa API";
+      homepage = "https://github.com/exa-labs/exa-py";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
+    };
+  };
+
   fal-client = python3.pkgs.buildPythonPackage rec {
     pname = "fal-client";
     version = "0.13.1";
@@ -116,6 +152,7 @@ python3.pkgs.buildPythonApplication rec {
     # Interactive CLI
     prompt-toolkit
     # Tools
+    exa-py
     firecrawl-py
     fal-client
     parallel-web
