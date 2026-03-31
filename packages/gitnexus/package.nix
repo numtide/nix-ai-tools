@@ -24,6 +24,7 @@ buildNpmPackage (finalAttrs: {
 
   sourceRoot = "source/gitnexus";
 
+  # Upstream: https://github.com/abhigyanpatwari/GitNexus/pull/589
   patches = [ ./system-onnxruntime-node.patch ];
 
   postUnpack = ''
@@ -100,7 +101,7 @@ buildNpmPackage (finalAttrs: {
     changelog = "https://github.com/abhigyanpatwari/GitNexus/releases";
     license = licenses.unfree;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = with flake.lib.maintainers; [ ];
+    maintainers = with flake.lib.maintainers; [ PieterPel ];
     mainProgram = "gitnexus";
     platforms = platforms.linux ++ platforms.darwin;
   };
