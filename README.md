@@ -131,6 +131,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>gitnexus</strong> - Graph-powered code intelligence for AI agents</summary>
+
+- **Source**: source
+- **License**: unfree
+- **Homepage**: https://github.com/abhigyanpatwari/GitNexus
+- **Usage**: `nix run github:numtide/llm-agents.nix#gitnexus -- --help`
+- **Nix**: [packages/gitnexus/package.nix](packages/gitnexus/package.nix)
+
+</details>
+<details>
 <summary><strong>goose-cli</strong> - CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks</summary>
 
 - **Source**: source
