@@ -1,78 +1,29 @@
 {
   lib,
   flake,
-  stdenv,
   rustPlatform,
   fetchFromGitHub,
-  runCommand,
-  nodejs,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   versionCheckHook,
   versionCheckHomeHook,
 }:
-let
+
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zeroclaw";
-  version = "0.6.6";
+  version = "0.1.7-beta.1";
 
   src = fetchFromGitHub {
-    owner = "zeroclaw-labs";
+    owner = "openagen";
     repo = "zeroclaw";
-    tag = "v${version}";
-    hash = "sha256-S0SIhjDZQg66mR+atxzkBvDTLVzIjjUKB4r5cwM8UdU=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-lFehpOKJJuOrbAcMHPu2ZAFYKz/jb1g0tlXkJ8wWncE=";
   };
 
-  frontendSrc = runCommand "${pname}-web-src-${version}" { } ''
-    mkdir -p $out
-    cp -r ${src}/web/. $out/
-  '';
+  cargoHash = "sha256-sbC+fdMzjrx0dF5zHBHzMgZeIPQth1oXNqilooVZF8s=";
 
-  frontend = stdenv.mkDerivation {
-    pname = "${pname}-frontend";
-    inherit version;
-    src = frontendSrc;
-
-    nativeBuildInputs = [
-      nodejs
-      npmConfigHook
-    ];
-
-    npmDeps = fetchNpmDepsWithPackuments {
-      src = frontendSrc;
-      name = "${pname}-${version}-npm-deps";
-      hash = "sha256-LAHTNJX9Fgml2H8T7pE7uhXiDZ8hWtczOryN5SaEqw8=";
-      fetcherVersion = 2;
-    };
-    makeCacheWritable = true;
-
-    buildPhase = ''
-      runHook preBuild
-      npm run build
-      runHook postBuild
-    '';
-
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out
-      cp -r dist/* $out/
-      runHook postInstall
-    '';
-  };
-in
-rustPlatform.buildRustPackage rec {
-  inherit pname version src;
-
-  cargoHash = "sha256-yWdtCaw6UI6wgJEG9XdKhgG9OgqcuJBEPF3C3R15hNc=";
-
-  # Upstream v0.6.6 tag does not compile (incomplete cherry-picks).
-  # See https://github.com/zeroclaw-labs/zeroclaw/issues/4946
-  # Remove once a fixed release is tagged.
-  patches = [ ./fix-v0.6.6-build.patch ];
-
-  preBuild = ''
-    mkdir -p web/dist
-    cp -r ${frontend}/* web/dist/
-  '';
+  # rust-embed picks up web/dist/ at compile time; upstream commits the
+  # prebuilt bundle so no npm build step is needed.
+  # Ensure the embedded path resolves inside the sandbox.
+  RUST_EMBED_STRICT = "1";
 
   # Tests require runtime configuration and network access
   doCheck = false;
@@ -82,20 +33,25 @@ rustPlatform.buildRustPackage rec {
     versionCheckHook
     versionCheckHomeHook
   ];
+  # Cargo.toml reports "0.1.7" even though the tag is "v0.1.7-beta.1".
+  # Strip the pre-release suffix before comparing.
+  preVersionCheck = ''
+    version=''${version%%-*}
+  '';
 
-  passthru = {
-    inherit frontend;
-    category = "AI Assistants";
-  };
+  passthru.category = "AI Assistants";
 
   meta = {
     description = "Fast, small, and fully autonomous AI assistant infrastructure";
-    homepage = "https://github.com/zeroclaw-labs/zeroclaw";
-    changelog = "https://github.com/zeroclaw-labs/zeroclaw/releases/tag/v${version}";
-    license = lib.licenses.mit;
+    homepage = "https://github.com/openagen/zeroclaw";
+    changelog = "https://github.com/openagen/zeroclaw/releases/tag/v${finalAttrs.version}";
+    license = with lib.licenses; [
+      mit
+      asl20
+    ];
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ commandodev ];
     mainProgram = "zeroclaw";
     platforms = lib.platforms.unix;
   };
-}
+})
