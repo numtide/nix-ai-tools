@@ -9,18 +9,18 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "agent-browser";
-  version = "0.23.0";
+  version = "0.23.3";
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    hash = "sha256-ZUcPPsLueMPEiCVXE9N4oBf5xwYvxQ71jfkbo9t/8xs=";
+    hash = "sha256-Q02sJr14zRrVrRJ0M30AD0EG7DGkYtafCH6/kI15/xk=";
   };
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-Ha+R/tlSYfCb/POuoOauQqYXxmY7Dypn/wp1WwZPQ4w=";
+  cargoHash = "sha256-smJ+ODr88moz+16G9fXSz/NNiGngWeoTuQtBn21qu1s=";
 
   nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;
@@ -30,6 +30,9 @@ rustPlatform.buildRustPackage rec {
   # LTO link OOMs rustc on the aarch64-linux builder. Thin LTO keeps most of
   # the optimisation at a fraction of the peak memory.
   env.CARGO_PROFILE_RELEASE_LTO = "thin";
+
+  # cargo-auditable panics on aarch64-darwin with this crate's dependency tree
+  auditable = !stdenv.hostPlatform.isDarwin;
 
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
