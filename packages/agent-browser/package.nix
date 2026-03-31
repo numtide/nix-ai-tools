@@ -31,6 +31,9 @@ rustPlatform.buildRustPackage rec {
   # the optimisation at a fraction of the peak memory.
   env.CARGO_PROFILE_RELEASE_LTO = "thin";
 
+  # cargo-auditable panics on aarch64-darwin with this crate's dependency tree
+  auditable = !stdenv.hostPlatform.isDarwin;
+
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
 
