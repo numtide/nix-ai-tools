@@ -5,6 +5,8 @@
   makeWrapper,
   dolt,
   go-bin,
+  icu,
+  pkg-config,
   versionCheckHook,
 }:
 
@@ -23,7 +25,14 @@ buildGoModule.override { go = go-bin; } rec {
 
   nativeBuildInputs = [
     makeWrapper
+    pkg-config
   ];
+
+  buildInputs = [
+    icu
+  ];
+
+  env.CGO_ENABLED = "1";
 
   subPackages = [ "cmd/bd" ];
 
