@@ -171,6 +171,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>junie</strong> - Junie, JetBrains AI coding agent CLI</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://github.com/JetBrains/junie
+- **Usage**: `nix run github:numtide/llm-agents.nix#junie -- --help`
+- **Nix**: [packages/junie/package.nix](packages/junie/package.nix)
+
+</details>
+<details>
 <summary><strong>kilocode-cli</strong> - The open-source AI coding agent. Now available in your terminal.</summary>
 
 - **Source**: binary
