@@ -797,7 +797,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <summary><strong>zat</strong> - Code outline viewer for LLM coding agents — shows exported symbols with line numbers</summary>
 
 - **Source**: source
-- **License**: GPL-3.0
+- **License**: GPL-3.0-only
 - **Homepage**: https://github.com/bglgwyng/zat
 - **Usage**: `nix run github:numtide/llm-agents.nix#zat -- --help`
 - **Nix**: [packages/zat/package.nix](packages/zat/package.nix)
