@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   unzip,
+  makeWrapper,
   autoPatchelfHook,
   versionCheckHook,
   zlib,
@@ -31,7 +32,11 @@ stdenv.mkDerivation {
     hash = hashes.${platform};
   };
 
-  nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+  nativeBuildInputs = [
+    unzip
+    makeWrapper
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
 
   # The bundled JRE contains modules for AWT/sound/etc that we don't need for
   # the CLI; mark their deps optional so autoPatchelfHook doesn't fail.
@@ -69,12 +74,14 @@ stdenv.mkDerivation {
   + (
     if stdenv.hostPlatform.isDarwin then
       # macOS archive ships a .app bundle plus a trivial `junie` shell
-      # wrapper. The launcher resolves the bundle relative to its own
-      # realpath, so a symlink into $out/Applications works fine.
+      # wrapper. We can't symlink to the launcher: fixupPhase rewrites
+      # $out-internal symlinks to be relative, and the jpackage launcher
+      # then readlink()s itself, gets a relative path, and tries to open
+      # "/../Applications/junie.app/...". Use makeWrapper instead.
       ''
         mkdir -p $out/Applications
         cp -R Applications/junie.app $out/Applications/
-        ln -s $out/Applications/junie.app/Contents/MacOS/junie $out/bin/junie
+        makeWrapper $out/Applications/junie.app/Contents/MacOS/junie $out/bin/junie
       ''
     else
       # Linux archive is a plain jpackage app-image: junie-app/{bin,lib}.
