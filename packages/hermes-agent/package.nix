@@ -86,14 +86,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "hermes-agent";
-  version = "2026.3.28";
+  version = "2026.3.30";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-NUGt70RRu7yk1PzWGofYjG7Ozo8SjjVO5z2oM4GJ53I=";
+    hash = "sha256-sWpWuDOb80blkL+s01FOkpxl5qrT0CMHwb5dpQw3lI0=";
   };
 
   build-system = with python3.pkgs; [
