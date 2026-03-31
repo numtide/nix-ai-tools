@@ -24,9 +24,14 @@ rustPlatform.buildRustPackage rec {
   doCheck = false;
 
   postInstall = ''
-    install -Dm755 $src/hooks/rtk-rewrite.sh $out/libexec/rtk/hooks/rtk-rewrite.sh
-    wrapProgram $out/libexec/rtk/hooks/rtk-rewrite.sh \
-      --prefix PATH : ${lib.makeBinPath [ jq ]}:$out/bin
+    mkdir -p $out/libexec/rtk
+    cp -r $src/hooks $out/libexec/rtk/hooks
+    chmod -R +w $out/libexec/rtk/hooks
+    find $out/libexec/rtk/hooks -name '*.sh' -exec chmod 755 {} \;
+    for f in $(find $out/libexec/rtk/hooks -name '*.sh'); do
+      wrapProgram "$f" \
+        --prefix PATH : ${lib.makeBinPath [ jq ]}:$out/bin
+    done
   '';
 
   passthru.category = "Utilities";
