@@ -5,6 +5,7 @@
   fetchCargoVendor,
   fetchurl,
   installShellFiles,
+  makeWrapper,
   rustPlatform,
   pkg-config,
   openssl,
@@ -53,6 +54,7 @@ rustPlatform.buildRustPackage {
 
   nativeBuildInputs = [
     installShellFiles
+    makeWrapper
     pkg-config
   ];
 
@@ -64,14 +66,11 @@ rustPlatform.buildRustPackage {
     # Remove LTO to speed up builds
     substituteInPlace Cargo.toml \
       --replace-fail 'lto = "fat"' 'lto = false'
-  ''
-  # Use nix store bwrap instead of hardcoded /usr/bin/bwrap.
-  # TODO: remove after next release (openai/codex#15791, openai/codex#15973).
-  + lib.optionalString stdenv.hostPlatform.isLinux ''
-    substituteInPlace core/src/config/mod.rs \
-      --replace-fail '/usr/bin/bwrap' '${bubblewrap}/bin/bwrap'
-    substituteInPlace linux-sandbox/src/launcher.rs \
-      --replace-fail '/usr/bin/bwrap' '${bubblewrap}/bin/bwrap'
+  '';
+
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    wrapProgram $out/bin/codex \
+      --prefix PATH : ${lib.makeBinPath [ bubblewrap ]}
   '';
 
   doCheck = false;
