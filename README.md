@@ -327,7 +327,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <summary><strong>zeroclaw</strong> - Fast, small, and fully autonomous AI assistant infrastructure</summary>
 
 - **Source**: source
-- **License**: Check package
+- **License**: MIT / Apache-2.0
 - **Homepage**: https://github.com/openagen/zeroclaw
 - **Usage**: `nix run github:numtide/llm-agents.nix#zeroclaw -- --help`
 - **Nix**: [packages/zeroclaw/package.nix](packages/zeroclaw/package.nix)
