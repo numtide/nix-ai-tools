@@ -6,17 +6,23 @@ let
     pkg:
     let
       license = pkg.meta.license or null;
+      formatLicense =
+        l:
+        if builtins.isAttrs l && l ? spdxId then
+          l.spdxId
+        else if builtins.isAttrs l && l ? shortName then
+          l.shortName
+        else if builtins.isString l then
+          l
+        else
+          "Check package";
       licenseStr =
         if license == null then
           "Check package"
-        else if builtins.isAttrs license && license ? spdxId then
-          license.spdxId
-        else if builtins.isAttrs license && license ? shortName then
-          license.shortName
-        else if builtins.isString license then
-          license
+        else if builtins.isList license then
+          builtins.concatStringsSep " / " (builtins.map formatLicense license)
         else
-          "Check package";
+          formatLicense license;
 
       # Determine source type from sourceProvenance
       sourceProvenance = pkg.meta.sourceProvenance or null;
