@@ -753,6 +753,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>nono</strong> - Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment. </summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://nono.sh/
+- **Usage**: `nix run github:numtide/llm-agents.nix#nono -- --help`
+- **Nix**: [packages/nono/package.nix](packages/nono/package.nix)
+
+</details>
+<details>
 <summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
 
 - **Source**: source
