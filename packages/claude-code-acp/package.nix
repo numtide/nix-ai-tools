@@ -38,7 +38,7 @@ buildNpmPackage rec {
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ ];
-    mainProgram = "claude-code-acp";
+    mainProgram = "claude-agent-acp";
     platforms = platforms.all;
   };
 }
