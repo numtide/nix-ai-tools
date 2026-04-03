@@ -18,19 +18,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "qwen-code";
-  version = "0.13.2";
+  version = "0.14.0";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-eDNaEjHdW6Xr+YQNdNoASe4qqt9PeSojnUfVQROz5Cw=";
+    hash = "sha256-XeJeBNfIFo2XowIRGgxixAtfz1saeKxt93/EK7EF5tA=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-sgskvNlWk/QvHUybKTujlKhuVTRVTDwsynvPEIAuINw=";
+    hash = "sha256-d3sG8GVEbsqQ1koCXMtERmmFLJUwcST+dLj3AVGt/IA=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
@@ -54,9 +54,19 @@ buildNpmPackage (finalAttrs: {
     runHook preBuild
 
     npm run generate
-    # web-templates generates Vite-bundled assets into src/generated/ then
-    # compiles to dist/; the CLI esbuild bundle imports from this package.
-    npm run build --workspace=packages/web-templates
+    # The CLI esbuild bundle resolves imports against workspace dist/ output,
+    # so build the workspaces it depends on first (subset of upstream's
+    # scripts/build.js buildOrder; we skip webui/sdk/vscode/plugin-example
+    # as the bundled CLI does not pull them in).
+    for ws in \
+      packages/web-templates \
+      packages/channels/base \
+      packages/channels/telegram \
+      packages/channels/weixin \
+      packages/channels/dingtalk
+    do
+      npm run build --workspace=$ws
+    done
     npm run bundle
 
     runHook postBuild
