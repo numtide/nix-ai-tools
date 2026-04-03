@@ -673,6 +673,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>apm</strong> - Agent Package Manager — dependency manager for AI agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/microsoft/apm
+- **Usage**: `nix run github:numtide/llm-agents.nix#apm -- --help`
+- **Nix**: [packages/apm/package.nix](packages/apm/package.nix)
+
+</details>
+<details>
 <summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
 
 - **Source**: source
@@ -753,7 +763,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>nono</strong> - Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment. </summary>
+<summary><strong>nono</strong> - Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment.</summary>
 
 - **Source**: source
 - **License**: Apache-2.0
