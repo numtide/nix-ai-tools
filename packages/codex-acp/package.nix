@@ -14,8 +14,10 @@ let
     version
     hash
     cargoHash
+    codexOwner
     codexRev
     codexSrcHash
+    librusty_v8
     nodeVersionHash
     ;
 
@@ -24,7 +26,7 @@ let
   # Cargo vendoring flattens the workspace structure so this file is missing;
   # we fetch it from the exact commit that Cargo.lock pins.
   nodeVersionFile = fetchurl {
-    url = "https://raw.githubusercontent.com/zed-industries/codex/${codexRev}/codex-rs/node-version.txt";
+    url = "https://raw.githubusercontent.com/${codexOwner}/codex/${codexRev}/codex-rs/node-version.txt";
     hash = nodeVersionHash;
   };
 
@@ -34,10 +36,19 @@ let
   # fetch the codex source at the pinned rev to provide it via
   # CODEX_BWRAP_SOURCE_DIR.
   codexSrc = fetchFromGitHub {
-    owner = "zed-industries";
+    owner = codexOwner;
     repo = "codex";
     rev = codexRev;
     hash = codexSrcHash;
+  };
+
+  # The v8 crate downloads a prebuilt static library at build time. Fetch it
+  # as a fixed-output derivation so the build stays sandboxed.
+  librustyV8 = fetchurl {
+    name = "librusty_v8-${librusty_v8.version}";
+    url = "https://github.com/denoland/rusty_v8/releases/download/v${librusty_v8.version}/librusty_v8_release_${stdenv.hostPlatform.rust.rustcTarget}.a.gz";
+    hash = librusty_v8.hashes.${stdenv.hostPlatform.system};
+    meta.sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
   };
 in
 rustPlatform.buildRustPackage {
@@ -65,7 +76,10 @@ rustPlatform.buildRustPackage {
     done
   '';
 
-  env = lib.optionalAttrs stdenv.hostPlatform.isLinux {
+  env = {
+    RUSTY_V8_ARCHIVE = librustyV8;
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isLinux {
     # Point the codex-linux-sandbox build.rs at the vendored bubblewrap source
     CODEX_BWRAP_SOURCE_DIR = "${codexSrc}/codex-rs/vendor/bubblewrap";
   };
@@ -92,7 +106,10 @@ rustPlatform.buildRustPackage {
     license = licenses.asl20;
     maintainers = with maintainers; [ ];
     platforms = platforms.unix;
-    sourceProvenance = with sourceTypes; [ fromSource ];
+    sourceProvenance = with sourceTypes; [
+      fromSource
+      binaryNativeCode
+    ];
     mainProgram = "codex-acp";
   };
 }
