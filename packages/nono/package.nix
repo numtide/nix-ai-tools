@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   rustPlatform,
   fetchFromGitHub,
   dbus,
@@ -11,19 +12,20 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.26.1";
+  version = "0.28.0";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     rev = "v${version}";
-    hash = "sha256-cfS2SUuJVkiAIp1bbC/TvNYaHO6wLBMq8w3iiDeZhgk=";
+    hash = "sha256-7gYJglDoBZSjjrjjYSNpAr2BKXIcWdbI2AnH0z9zIiI=";
   };
 
-  cargoHash = "sha256-4mXycVJHveQWOdYjKZ7jOuyiePrNZAeDf21CCEvsbp8=";
+  cargoHash = "sha256-VFjXlxYhLuzWBozKVXvflxosDVGvzKNR3Lk2Cf5BOxM=";
 
-  buildInputs = [ dbus ];
-  nativeBuildInputs = [
+  # keyring uses sync-secret-service (dbus) on Linux, apple-native on Darwin
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ dbus ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     pkg-config
     autoPatchelfHook
   ];
@@ -45,6 +47,6 @@ rustPlatform.buildRustPackage rec {
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ pogobanane ];
     mainProgram = "nono";
-    platforms = with platforms; unix ++ darwin;
+    platforms = platforms.unix;
   };
 }
