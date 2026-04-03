@@ -151,6 +151,8 @@ python3.pkgs.buildPythonApplication rec {
     pydantic
     # Interactive CLI
     prompt-toolkit
+    # MCP
+    mcp
     # Tools
     exa-py
     firecrawl-py
