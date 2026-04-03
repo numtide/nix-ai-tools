@@ -231,6 +231,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>oh-my-codex</strong> - Multi-agent orchestration layer for OpenAI Codex CLI</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/Yeachan-Heo/oh-my-codex
+- **Usage**: `nix run github:numtide/llm-agents.nix#oh-my-codex -- --help`
+- **Nix**: [packages/oh-my-codex/package.nix](packages/oh-my-codex/package.nix)
+
+</details>
+<details>
 <summary><strong>oh-my-opencode</strong> - The Best AI Agent Harness - Multi-Model Orchestration for OpenCode</summary>
 
 - **Source**: source
