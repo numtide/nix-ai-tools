@@ -23,6 +23,8 @@ from updater import (
     save_hashes,
     should_update,
 )
+from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
+from updater.nix import NixCommandError, nix_build
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 OWNER = "Dicklesworthstone"
@@ -59,6 +61,30 @@ def prefetch_github(owner: str, repo: str, rev: str) -> str:
     return calculate_url_hash(url, unpack=True)
 
 
+def prefetch_asupersync(data: dict[str, object], rev: str) -> str:
+    """Prefetch asupersync via the package's sparse fetchFromGitHub.
+
+    asupersync grew a multi-hundred-MB .beads/ directory that hangs
+    nix-prefetch-url on the archive endpoint.  package.nix excludes it via
+    sparseCheckout, which produces a different fixed-output hash than the full
+    archive would, so we have to recover the hash from a failed build of that
+    exact derivation rather than prefetching the URL ourselves.
+    """
+    data["asupersync"] = {"rev": rev, "hash": DUMMY_SHA256_HASH}
+    save_hashes(HASHES_FILE, data)
+
+    try:
+        nix_build(".#beads-rust.asupersync", check=True)
+    except NixCommandError as e:
+        h = extract_hash_from_build_error(e.args[0])
+        if h is None:
+            raise
+        return h
+
+    msg = "asupersync prefetch build unexpectedly succeeded with dummy hash"
+    raise ValueError(msg)
+
+
 def main() -> None:
     """Update beads-rust and its frankensqlite dependency."""
     data = load_hashes(HASHES_FILE)
@@ -80,14 +106,22 @@ def main() -> None:
     # Update sibling repos to commits matching the release date
     release_date = get_release_date(OWNER, BEADS_REPO, latest)
 
-    for name, repo in [("frankensqlite", FRANK_REPO), ("asupersync", ASYNC_REPO)]:
-        print(f"Finding {name} commit matching v{latest} release...")
-        rev = get_sibling_rev(repo, release_date)
-        print(f"{name} rev: {rev}")
+    print("Finding frankensqlite commit matching release...")
+    frank_rev = get_sibling_rev(FRANK_REPO, release_date)
+    print(f"frankensqlite rev: {frank_rev}")
+    print("Prefetching frankensqlite...")
+    data["frankensqlite"] = {
+        "rev": frank_rev,
+        "hash": prefetch_github(OWNER, FRANK_REPO, frank_rev),
+    }
 
-        print(f"Prefetching {name}...")
-        h = prefetch_github(OWNER, repo, rev)
-        data[name] = {"rev": rev, "hash": h}
+    print("Finding asupersync commit matching release...")
+    async_rev = get_sibling_rev(ASYNC_REPO, release_date)
+    print(f"asupersync rev: {async_rev}")
+    print("Prefetching asupersync (sparse)...")
+    async_hash = prefetch_asupersync(data, async_rev)
+    data["asupersync"] = {"rev": async_rev, "hash": async_hash}
+    save_hashes(HASHES_FILE, data)
 
     # Recalculate cargoHash via dummy-hash build
     cargo_hash = calculate_dependency_hash(
