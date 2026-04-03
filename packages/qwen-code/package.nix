@@ -54,9 +54,19 @@ buildNpmPackage (finalAttrs: {
     runHook preBuild
 
     npm run generate
-    # web-templates generates Vite-bundled assets into src/generated/ then
-    # compiles to dist/; the CLI esbuild bundle imports from this package.
-    npm run build --workspace=packages/web-templates
+    # The CLI esbuild bundle resolves imports against workspace dist/ output,
+    # so build the workspaces it depends on first (subset of upstream's
+    # scripts/build.js buildOrder; we skip webui/sdk/vscode/plugin-example
+    # as the bundled CLI does not pull them in).
+    for ws in \
+      packages/web-templates \
+      packages/channels/base \
+      packages/channels/telegram \
+      packages/channels/weixin \
+      packages/channels/dingtalk
+    do
+      npm run build --workspace=$ws
+    done
     npm run bundle
 
     runHook postBuild
