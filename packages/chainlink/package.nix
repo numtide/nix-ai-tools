@@ -8,25 +8,26 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "chainlink";
-  version = "1.5";
+  version = "1.6.0";
 
   src = fetchFromGitHub {
     owner = "dollspace-gay";
     repo = "chainlink";
     rev = "chainlink-${version}";
-    hash = "sha256-K9YUTrMUwEm3q0OsH4tDqdFr39vepLQnu9vDxRX9hGY=";
+    hash = "sha256-2n+cM1ADmeDrKZKjMY5Ct4mVxl38as4iu1Y4ZSCuBho=";
   };
 
   # The Rust crate is in the chainlink subdirectory
   cargoRoot = "chainlink";
   buildAndTestSubdir = "chainlink";
 
-  cargoHash = "sha256-vBIA+N8Dro8B9XsbSxFIC3wzwSwHlBF9mBprlKI7YQA=";
+  cargoHash = "sha256-WmV6PRSuzdoCMXy4LMSMdHsSbI+A8jx89lwUt64DWmc=";
 
-  # Upstream doesn't update Cargo.toml version, patch it to match release tag
+  # Upstream Cargo.toml version doesn't match release tags, and is sporadically
+  # updated; replace it with the package version being careful to only update
+  # within [package].
   postPatch = ''
-    substituteInPlace chainlink/Cargo.toml \
-      --replace-fail 'version = "0.1.0"' 'version = "${version}.0"'
+    sed -i '/^\[package\]/,/^\[/{s/^version = ".*"/version = "${lib.versions.pad 3 version}"/}' chainlink/Cargo.toml
   '';
 
   # Tests require a writable filesystem
