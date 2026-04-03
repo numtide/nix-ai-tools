@@ -17,6 +17,8 @@
 }:
 
 let
+  pin = lib.importJSON ./hashes.json;
+
   # Upstream merged the CLI into the slopus/happy yarn-workspaces monorepo
   # and stopped tagging it (the only tags, `v3` and `v1.1.0-2`, refer to the
   # mobile app). So track the npm release; the tarball already contains the
@@ -25,10 +27,9 @@ let
   # The tarball ships no lockfile, but the monorepo root has the
   # authoritative yarn.lock. Pin to the commit that bumped package.json
   # to this version so the resolved deps match what was published.
-  yarnLockCommit = "94a6bdc7b41e96b878a5ca0f8a2becdfe5a7f219";
   yarnLockUpstream = fetchurl {
-    url = "https://raw.githubusercontent.com/slopus/happy/${yarnLockCommit}/yarn.lock";
-    hash = "sha256-qxnLCBCZhmiCXlQ/NCms40z8DANKP0TnVN6tHC/JVRI=";
+    url = "https://raw.githubusercontent.com/slopus/happy/${pin.yarnLockCommit}/yarn.lock";
+    hash = pin.yarnLockHash;
   };
 
   # @slopus/happy-wire is a workspace package in the monorepo (so no
@@ -41,10 +42,10 @@ let
       {
         wireStanza = ''
 
-          "@slopus/happy-wire@^0.1.0":
-            version "0.1.0"
-            resolved "https://registry.npmjs.org/@slopus/happy-wire/-/happy-wire-0.1.0.tgz#7d7c054eca5605e0d5ab4be8e82b6277bd1aa030"
-            integrity sha512-u4UHSJsFT/OLyIClvNyoXK/WS64Ga6RrRLPaM/UJt94hA+MvIdKjm2EUZK3IBmOK6RwxdDUwJDZa3A/P3/XLQA==
+          "@slopus/happy-wire@${pin.wireRange}":
+            version "${pin.wireVersion}"
+            resolved "${pin.wireResolved}"
+            integrity ${pin.wireIntegrity}
             dependencies:
               "@paralleldrive/cuid2" "^2.2.2"
               zod "3.25.76"
@@ -57,11 +58,11 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "happy-coder";
-  version = "1.1.3";
+  inherit (pin) version;
 
   src = fetchzip {
     url = "https://registry.npmjs.org/happy/-/happy-${finalAttrs.version}.tgz";
-    hash = "sha256-d/Ul73VHtLrhd5/wU6otZp2PCHkknqM6Gr0gpzGy16U=";
+    hash = pin.srcHash;
   };
 
   # `resolutions` only takes effect at the workspace root in yarn classic;
@@ -76,7 +77,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   yarnOfflineCache = fetchYarnDeps {
     inherit yarnLock;
-    hash = "sha256-obJJjGq92rsosLihQIbb86I5V8XitWJnXziwGGCfeAA=";
+    hash = pin.yarnOfflineHash;
   };
 
   nativeBuildInputs = [
