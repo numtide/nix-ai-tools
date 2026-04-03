@@ -3,8 +3,7 @@
   python3,
   fetchFromGitHub,
   fetchPypi,
-  mistralai,
-  agent-client-protocol,
+  callPackage,
   rustPlatform,
   cargo,
   rustc,
@@ -76,16 +75,57 @@ let
     };
   };
 
+  # mistral-vibe >=2.6 requires opentelemetry-semantic-conventions>=0.60b1 for
+  # GEN_AI_PROVIDER_NAME (issue #3668). nixpkgs ships 0.55b0. The otel packages
+  # are versioned in lockstep from a monorepo and all inherit src from
+  # opentelemetry-api, so bumping that one source bumps the whole stack.
+  otelVersion = "1.40.0";
+  otelContribVersion = "0.61b0";
+  otelSrc = fetchFromGitHub {
+    owner = "open-telemetry";
+    repo = "opentelemetry-python";
+    tag = "v${otelVersion}";
+    hash = "sha256-1KVy9s+zjlB4w7E45PMCWRxPus24bgBmmM3k2R9d+Jg=";
+  };
+  otelContribSrc = fetchFromGitHub {
+    owner = "open-telemetry";
+    repo = "opentelemetry-python-contrib";
+    tag = "v${otelContribVersion}";
+    hash = "sha256-DT13gcYPNYXBPnf622WsA16C+7sabJfOshDquHn06Ok=";
+  };
+
   python = python3.override {
     self = python;
-    packageOverrides = _final: _prev: {
-      # Inject local packages into the Python package set
-      inherit
-        mistralai
-        agent-client-protocol
-        textual-speedups
-        tree-sitter-bash
-        ;
+    packageOverrides = _pyfinal: pyprev: {
+      inherit textual-speedups tree-sitter-bash;
+
+      # Build mistralai/acp inside this set so they link against the
+      # overridden opentelemetry packages rather than stock python3.pkgs.
+      # Otherwise the prebuilt ones drag old otel into the closure and
+      # pythonRuntimeDepsCheck fails (or worse, succeeds and crashes at runtime).
+      mistralai = callPackage ../mistralai/package.nix { python3 = python; };
+      agent-client-protocol = callPackage ../agent-client-protocol/package.nix { python3 = python; };
+
+      opentelemetry-api = pyprev.opentelemetry-api.overridePythonAttrs (_: {
+        version = otelVersion;
+        src = otelSrc;
+        sourceRoot = "${otelSrc.name}/opentelemetry-api";
+      });
+
+      opentelemetry-instrumentation = pyprev.opentelemetry-instrumentation.overridePythonAttrs (_: {
+        version = otelContribVersion;
+        src = otelContribSrc;
+        sourceRoot = "${otelContribSrc.name}/opentelemetry-instrumentation";
+      });
+
+      # In nixpkgs this inherits version from opentelemetry-instrumentation,
+      # but overridePythonAttrs doesn't re-evaluate that reference, so set it
+      # explicitly to keep the dist-info version in sync with src.
+      opentelemetry-semantic-conventions =
+        pyprev.opentelemetry-semantic-conventions.overridePythonAttrs
+          (_: {
+            version = otelContribVersion;
+          });
     };
   };
 in
@@ -143,7 +183,9 @@ python.pkgs.buildPythonApplication rec {
     zstandard
   ];
 
-  # Relax version constraints - nixpkgs versions are slightly older but compatible
+  # Relax version constraints - nixpkgs versions are slightly older but compatible.
+  # NOTE: do NOT relax opentelemetry-* here; those constraints encode real API
+  # requirements (see issue #3668) and are satisfied by the overrides above.
   pythonRelaxDeps = [
     "agent-client-protocol"
     "cryptography"
@@ -151,10 +193,6 @@ python.pkgs.buildPythonApplication rec {
     "giturlparse"
     "keyring"
     "mistralai"
-    "opentelemetry-api"
-    "opentelemetry-exporter-otlp-proto-http"
-    "opentelemetry-sdk"
-    "opentelemetry-semantic-conventions"
     "pydantic"
     "pydantic-settings"
     "pyyaml"
