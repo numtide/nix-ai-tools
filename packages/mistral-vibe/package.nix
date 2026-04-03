@@ -103,8 +103,8 @@ let
       # overridden opentelemetry packages rather than stock python3.pkgs.
       # Otherwise the prebuilt ones drag old otel into the closure and
       # pythonRuntimeDepsCheck fails (or worse, succeeds and crashes at runtime).
-      mistralai = callPackage ../mistralai/package.nix { python3 = python; };
-      agent-client-protocol = callPackage ../agent-client-protocol/package.nix { python3 = python; };
+      mistralai = callPackage ./mistralai.nix { python3 = python; };
+      agent-client-protocol = callPackage ./agent-client-protocol.nix { python3 = python; };
 
       opentelemetry-api = pyprev.opentelemetry-api.overridePythonAttrs (_: {
         version = otelVersion;

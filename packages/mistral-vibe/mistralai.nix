@@ -26,15 +26,14 @@ python3.pkgs.buildPythonPackage rec {
     typing-inspection
   ];
 
-  # Relax version constraints for OpenTelemetry packages where nixpkgs versions are older:
-  # - opentelemetry-semantic-conventions: requires >=0.60b1, nixpkgs has 0.55b0
+  # mistralai pins opentelemetry-semantic-conventions<0.61 but the
+  # mistral-vibe override supplies 0.61b0; the upper bound is precautionary,
+  # not an actual API break.
   pythonRelaxDeps = [
     "opentelemetry-semantic-conventions"
   ];
 
   pythonImportsCheck = [ "mistralai" ];
-
-  passthru.hideFromDocs = true;
 
   meta = with lib; {
     description = "Python Client SDK for the Mistral AI API";
