@@ -112,6 +112,17 @@ let
         sourceRoot = "${otelSrc.name}/opentelemetry-api";
       });
 
+      # 1.40.0 added timing-sensitive tests that flake on loaded builders
+      # (assertions like `after - before < 0.2` fail by milliseconds on darwin).
+      opentelemetry-exporter-otlp-proto-http =
+        pyprev.opentelemetry-exporter-otlp-proto-http.overridePythonAttrs
+          (old: {
+            disabledTests = (old.disabledTests or [ ]) ++ [
+              "test_retry_timeout"
+              "test_shutdown_interrupts_retry_backoff"
+            ];
+          });
+
       opentelemetry-instrumentation = pyprev.opentelemetry-instrumentation.overridePythonAttrs (_: {
         version = otelContribVersion;
         src = otelContribSrc;
