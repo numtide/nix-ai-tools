@@ -858,6 +858,16 @@ Add to your system configuration:
 }
 ```
 
+> [!NOTE]
+> This flake is only built and tested against its pinned `nixpkgs-unstable`
+> input. If you set `llm-agents.inputs.nixpkgs.follows = "nixpkgs"`, your
+> `nixpkgs` must also track `nixpkgs-unstable` and be reasonably current —
+> using a stable release branch (e.g. `nixos-25.05`) **will** break eventually.
+> Omitting `follows` costs you a second nixpkgs evaluation but guarantees you
+> get the combination we ship in CI — and lets you pull pre-built binaries
+> from our [binary cache](#binary-cache) instead of rebuilding everything
+> against your nixpkgs.
+
 ### Using Overlay
 
 Alternatively, use the overlay to access packages under the `llm-agents` namespace:
