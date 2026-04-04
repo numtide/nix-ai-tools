@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for goose-cli package."""
+"""Update script for goose-server package."""
 
 import sys
 from pathlib import Path
@@ -48,7 +48,7 @@ def fetch_v8_version_from_cargo_lock(goose_version: str) -> str:
 
 
 def main() -> None:
-    """Update the goose-cli package."""
+    """Update the goose-server package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
     latest = fetch_github_latest_release("block", "goose")
@@ -90,7 +90,7 @@ def main() -> None:
 
     try:
         cargo_hash = calculate_dependency_hash(
-            ".#goose-cli", "cargoHash", HASHES_FILE, data
+            ".#goose-server", "cargoHash", HASHES_FILE, data
         )
         data["cargoHash"] = cargo_hash
         save_hashes(HASHES_FILE, data)
