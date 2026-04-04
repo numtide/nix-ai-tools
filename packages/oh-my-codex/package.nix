@@ -14,17 +14,21 @@
 }:
 
 let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   pname = "oh-my-codex";
-  version = "0.11.12";
+  inherit (versionData)
+    version
+    hash
+    cargoHash
+    npmDepsHash
+    ;
 
   src = fetchFromGitHub {
     owner = "Yeachan-Heo";
     repo = "oh-my-codex";
     rev = "v${version}";
-    hash = "sha256-VcaAh0J1Iloxj89R2/UVy1NJNLkD3rK8GUTtYU0nSRI=";
+    inherit hash;
   };
-
-  cargoHash = "sha256-BuA54daR1pIaVEkOVmYk6B54gVl3Flu4sVtWKZnsuHo=";
 
   nodePlatformMap = {
     x86_64-linux = "linux";
@@ -90,7 +94,7 @@ buildNpmPackage (finalAttrs: {
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-or53akxqVQt7zTghO/i4Yv7uHDV7l7no0cp5Hg8QY9Q=";
+    hash = npmDepsHash;
     fetcherVersion = 2;
   };
 
@@ -121,14 +125,14 @@ buildNpmPackage (finalAttrs: {
     install -Dm755 ${exploreHarness}/bin/omx-explore-harness \
       $root/bin/omx-explore-harness
 
-    cat > $root/bin/omx-explore-harness.meta.json <<EOF
+    cat > $root/bin/omx-explore-harness.meta.json <<META
     {
       "binaryName": "omx-explore-harness",
       "platform": "${nodePlatform}",
       "arch": "${nodeArch}",
       "strategy": "nix-packaged"
     }
-    EOF
+    META
 
     install -Dm755 ${sparkShell}/bin/omx-sparkshell \
       $root/bin/native/${nodePlatform}-${nodeArch}/omx-sparkshell
