@@ -13,16 +13,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "goose-server";
-  version = "1.28.0";
+  version = "1.29.0";
 
   src = fetchFromGitHub {
     owner = "block";
     repo = "goose";
     rev = "v${version}";
-    hash = "sha256-/1TtsnNiLoTkvyeFR282qSpo+Jt3pvFxduJ7lyzsTXI=";
+    hash = "sha256-CqNITxafZBT230ETC4nxNEP+cvH8R9aCobcuCDP+IHU=";
   };
 
-  cargoHash = "sha256-bhnbSjGqyWbQd5PjZ116JH91vjVy6R/+iBlNKL6debg=";
+  cargoHash = "sha256-RUWvbV+/LVSyiHJ/2pseuAP8Nobjr8dMrictDlNgl0c=";
 
   LIBCLANG_PATH = "${libclang.lib}/lib";
 

@@ -11,19 +11,18 @@
 }:
 
 let
+  src = fetchFromGitHub {
+    owner = "block";
+    repo = "goose";
+    rev = "v1.29.0";
+    hash = "sha256-CqNITxafZBT230ETC4nxNEP+cvH8R9aCobcuCDP+IHU=";
+  };
   # Create a source with package-lock.json included at the root level
   # fetchNpmDepsWithPackuments looks for the lock file at the source root
   # and npmConfigHook expects it in the npmRoot directory (ui/desktop)
   srcWithLock = runCommand "goose-desktop-src-with-lock" { } ''
     mkdir -p $out
-    cp -r ${
-      fetchFromGitHub {
-        owner = "block";
-        repo = "goose";
-        rev = "v1.28.0";
-        hash = "sha256-/1TtsnNiLoTkvyeFR282qSpo+Jt3pvFxduJ7lyzsTXI=";
-      }
-    }/* $out/
+    cp -r ${src}/* $out/
     # Copy lock file to root for fetchNpmDepsWithPackuments
     cp ${./package-lock.json} $out/package-lock.json
     # Make ui/desktop writable and copy lock file there for npmConfigHook
