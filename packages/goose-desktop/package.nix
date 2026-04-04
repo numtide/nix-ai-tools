@@ -11,53 +11,58 @@
 }:
 
 let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  version = versionData.version;
   src = fetchFromGitHub {
     owner = "block";
     repo = "goose";
-    rev = "v1.29.0";
-    hash = "sha256-CqNITxafZBT230ETC4nxNEP+cvH8R9aCobcuCDP+IHU=";
+    rev = "v${version}";
+    hash = versionData.sourceHash;
   };
-  # Create a source with package-lock.json included at the root level
-  # fetchNpmDepsWithPackuments looks for the lock file at the source root
-  # and npmConfigHook expects it in the npmRoot directory (ui/desktop)
+
   srcWithLock = runCommand "goose-desktop-src-with-lock" { } ''
     mkdir -p $out
     cp -r ${src}/* $out/
-    # Copy lock file to root for fetchNpmDepsWithPackuments
     cp ${./package-lock.json} $out/package-lock.json
-    # Make ui/desktop writable and copy lock file there for npmConfigHook
     chmod +w $out/ui/desktop
     cp ${./package-lock.json} $out/ui/desktop/package-lock.json
   '';
 in
 buildNpmPackage rec {
-  inherit npmConfigHook;
+  inherit npmConfigHook version;
   pname = "goose-desktop";
-  version = "1.28.0";
 
   src = srcWithLock;
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit src;
     name = "${pname}-${version}-npm-deps";
-    hash = "sha256-mp3SC1SYJt5bupqqQmKT05nuR2ZpQz3Jn0lLvkUj9yk=";
+    hash = versionData.npmDepsHash;
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
 
-  # The npm package is in the ui/desktop subdirectory
   npmRoot = "ui/desktop";
-
-  # Use legacy peer deps to match how the lock file was generated
   npmFlags = [ "--legacy-peer-deps" ];
 
   nativeBuildInputs = [ makeWrapper ];
 
   env.ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
+  env.ELECTRON_OVERRIDE_DIST_PATH = "${electron_41}/bin";
 
-  # Use pre-built goosed from goose-server package
+  postPatch = ''
+    # Nix manages updates for packaged builds.
+    substituteInPlace ui/desktop/package.json \
+      --replace-fail '"@aaif/goose-acp": "workspace:*"' '"@aaif/goose-acp": "file:../acp"'
+    node -e "const fs=require('fs'); const p='ui/desktop/forge.config.ts'; const s=fs.readFileSync(p,'utf8'); fs.writeFileSync(p, s.replace('  asar: true,', '  asar: true,\\n  prune: false,'));"
+    substituteInPlace ui/desktop/forge.config.ts \
+      --replace-fail "  rebuildConfig: {}," "  rebuildConfig: { types: [] },"
+    rm -f ui/package.json ui/pnpm-workspace.yaml
+    substituteInPlace ui/desktop/src/updates.ts \
+      --replace-fail "export const UPDATES_ENABLED = true;" "export const UPDATES_ENABLED = false;"
+  '';
+
   preBuild = ''
-    # Copy goosed binary to expected location for Electron bundling
     mkdir -p ui/desktop/src/bin
     cp ${goose-server}/bin/goosed ui/desktop/src/bin/
   '';
@@ -65,7 +70,6 @@ buildNpmPackage rec {
   buildPhase = ''
     runHook preBuild
 
-    # Ensure our electron major version matches what upstream expects
     upstream_electron=$(node -p "require('./ui/desktop/package.json').devDependencies.electron")
     upstream_major=''${upstream_electron%%.*}
     nix_major=${lib.versions.major electron_41.version}
@@ -75,9 +79,10 @@ buildNpmPackage rec {
       exit 1
     fi
 
-    # Build the Electron app
     cd ui/desktop
-    npx electron-forge package
+    node scripts/build-main.js
+    npx vite build --config vite.preload.config.mts
+    npx vite build --config vite.renderer.config.mts --outDir .vite/renderer/main_window
     cd ../..
 
     runHook postBuild
@@ -86,34 +91,17 @@ buildNpmPackage rec {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/share/goose-desktop
+    app_root=$out/share/goose-desktop/app
+    mkdir -p $app_root
 
-    # Copy electron-forge build output
-    if [ -d "ui/desktop/out/*.app" ]; then
-      cp -r ui/desktop/out/*.app $out/share/goose-desktop/
-    fi
-    if [ -d "ui/desktop/out/goose-"* ]; then
-      cp -r ui/desktop/out/goose-* $out/share/goose-desktop/
-    fi
-    if [ -d "ui/desktop/out/Goose-"* ]; then
-      cp -r ui/desktop/out/Goose-* $out/share/goose-desktop/
-    fi
+    cp -r ui/desktop/. $app_root/
+    cp -r ui/acp $out/share/goose-desktop/acp
+    patchShebangs $app_root
 
     mkdir -p $out/bin
-
-    # Determine the app directory name
-    app_dir=$(ls $out/share/goose-desktop | head -1)
-
-    # Create wrapper script
-    if [[ "$app_dir" == *.app ]]; then
-      # macOS app bundle
-      makeWrapper $out/share/goose-desktop/$app_dir/Contents/MacOS/Goose $out/bin/goose-desktop
-    else
-      # Linux/Windows
-      makeWrapper ${electron_41}/bin/electron $out/bin/goose-desktop \
-        --add-flags "$out/share/goose-desktop/$app_dir" \
-        --set ELECTRON_FORCE_IS_PACKAGED 1
-    fi
+    makeWrapper ${electron_41}/bin/electron $out/bin/goose-desktop \
+      --add-flags "$app_root" \
+      --set-default ENABLE_DEV_UPDATES false
 
     runHook postInstall
   '';
