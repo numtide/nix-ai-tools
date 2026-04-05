@@ -156,24 +156,19 @@ python3.pkgs.buildPythonApplication rec {
     # Tools
     exa-py
     firecrawl-py
-    fal-client
     parallel-web
+    fal-client
     # Text-to-speech
     edge-tts
     faster-whisper
-    # mini-swe-agent deps
-    litellm
-    typer
-    platformdirs
     # Skills Hub
     pyjwt
   ];
 
   pythonRelaxDeps = [
-    "litellm"
-    "pydantic"
     "tenacity"
     "requests"
+    "pydantic"
     "firecrawl-py"
     "pyjwt"
   ];
