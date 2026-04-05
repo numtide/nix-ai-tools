@@ -2,6 +2,11 @@
 inputs.nixpkgs.lib.extend (
   _final: prev: {
     maintainers = prev.maintainers // {
+      ak2k = {
+        github = "ak2k";
+        githubId = 19240940;
+        name = "Adam";
+      };
       Bad3r = {
         github = "Bad3r";
         githubId = 25513724;

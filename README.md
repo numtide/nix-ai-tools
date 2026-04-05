@@ -454,6 +454,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Usage Analytics
 
 <details>
+<summary><strong>agentsview</strong> - Local-first viewer and analytics for AI coding agent sessions</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/wesm/agentsview
+- **Usage**: `nix run github:numtide/llm-agents.nix#agentsview -- --help`
+- **Nix**: [packages/agentsview/package.nix](packages/agentsview/package.nix)
+
+</details>
+<details>
 <summary><strong>ccusage</strong> - Usage analysis tool for Claude Code</summary>
 
 - **Source**: bytecode
