@@ -19,11 +19,19 @@ let
     inherit (data.frankensqlite) rev hash;
   };
 
-  # frankensqlite workspace depends on asupersync via path = "../asupersync"
+  # frankensqlite workspace depends on asupersync via path = "../asupersync".
+  # Upstream committed hundreds of MB of issue-tracker recovery dumps under
+  # .beads/ that GitHub's archive endpoint can't even finish streaming on CI,
+  # so do a sparse git checkout that skips that directory entirely.
   asupersync = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "asupersync";
     inherit (data.asupersync) rev hash;
+    sparseCheckout = [
+      "/*"
+      "!/.beads"
+    ];
+    nonConeMode = true;
   };
 in
 rustPlatform.buildRustPackage {
@@ -57,7 +65,11 @@ rustPlatform.buildRustPackage {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  passthru.category = "Workflow & Project Management";
+  passthru = {
+    category = "Workflow & Project Management";
+    # Exposed so update.py can prefetch the sparse-checkout hash
+    inherit asupersync;
+  };
 
   meta = with lib; {
     description = "Fast Rust port of beads - a local-first issue tracker for git repositories";
