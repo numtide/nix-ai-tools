@@ -1,0 +1,95 @@
+name: Sync Upstream
+on:
+  schedule:
+    - cron: '45 2,14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-main
+  cancel-in-progress: false
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Detect upstream repository
+        id: upstream
+        uses: actions/github-script@v7
+        env:
+          UPSTREAM_REPOSITORY: ${{ vars.UPSTREAM_REPOSITORY }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const configuredUpstream = process.env.UPSTREAM_REPOSITORY?.trim();
+
+            if (configuredUpstream) {
+              core.setOutput('has-upstream', 'true');
+              core.setOutput('repository', configuredUpstream);
+              return;
+            }
+
+            const { data } = await github.rest.repos.get(context.repo);
+
+            if (!data.parent) {
+              core.setOutput('has-upstream', 'false');
+              core.notice('Repository is not a fork; skipping upstream sync.');
+              return;
+            }
+
+            core.setOutput('has-upstream', 'true');
+            core.setOutput('repository', data.parent.full_name);
+
+      - name: Checkout repository
+        if: steps.upstream.outputs.has-upstream == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up git
+        if: steps.upstream.outputs.has-upstream == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Rebase main onto upstream/main
+        id: sync
+        if: steps.upstream.outputs.has-upstream == 'true'
+        env:
+          UPSTREAM_REPOSITORY: ${{ steps.upstream.outputs.repository }}
+        run: |
+          git remote add upstream "https://github.com/${UPSTREAM_REPOSITORY}.git"
+          git fetch upstream main
+
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "main is already up to date with upstream/main"
+            echo "result=up-to-date" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git rebase upstream/main
+          git push origin main --force-with-lease
+          echo "result=rebased" >> "$GITHUB_OUTPUT"
+
+      - name: Write summary
+        if: always()
+        run: |
+          if [ "${{ steps.upstream.outputs.has-upstream }}" != 'true' ]; then
+            echo "ℹ️ Repository is not a fork; upstream sync skipped." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "${{ steps.sync.outcome }}" = 'failure' ]; then
+            echo "⚠️ Failed to rebase main onto upstream/main from ${{ steps.upstream.outputs.repository }}." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "${{ steps.sync.outputs.result }}" = 'up-to-date' ]; then
+            echo "ℹ️ main is already up to date with upstream/main from ${{ steps.upstream.outputs.repository }}." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "✅ Rebased main onto upstream/main from ${{ steps.upstream.outputs.repository }}." >> "$GITHUB_STEP_SUMMARY"
