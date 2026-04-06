@@ -1,6 +1,6 @@
---- a/node_modules/node-llama-cpp/dist/config.js
-+++ b/node_modules/node-llama-cpp/dist/config.js
-@@ -8,24 +8,25 @@
+--- a/node_modules/node-llama-cpp/dist/config.js	2026-04-06 12:34:15.778925136 +0200
++++ b/node_modules/node-llama-cpp/dist/config.js	2026-04-06 12:34:19.315180468 +0200
+@@ -8,26 +8,27 @@
  import { nodeLlamaCppGpuOptions, LlamaLogLevel, LlamaLogLevelValues, parseNodeLlamaCppGpuOption, nodeLlamaCppGpuOffStringOptions } from "./bindings/types.js";
  const __dirname = path.dirname(fileURLToPath(import.meta.url));
  const env = envVar.from(process.env);
@@ -13,6 +13,8 @@
 +export const llamaLocalBuildBinsDirectory = path.join(nixCacheDir, "localBuilds");
  export const llamaBinsGrammarsDirectory = path.join(__dirname, "..", "llama", "grammars");
  export const projectTemplatesDirectory = path.join(__dirname, "..", "templates");
+-export const localTempDirectory = path.join(__dirname, "..", ".temp");
++export const localTempDirectory = path.join(nixCacheDir, ".temp");
  export const packedProjectTemplatesDirectory = path.join(projectTemplatesDirectory, "packed");
 -export const llamaCppDirectory = path.join(llamaDirectory, "llama.cpp");
 -export const llamaCppGrammarsDirectory = path.join(llamaDirectory, "llama.cpp", "grammars");
@@ -20,6 +22,7 @@
 +export const llamaCppGrammarsDirectory = path.join(nixCacheDir, "llama.cpp", "grammars");
  export const tempDownloadDirectory = path.join(os.tmpdir(), "node-llama-cpp", nanoid());
  export const cliHomedirDirectory = path.join(os.homedir(), ".node-llama-cpp");
+ export const cliHomedirTempDirectory = path.join(os.homedir(), ".node-llama-cpp", ".temp");
  export const chatCommandHistoryFilePath = path.join(cliHomedirDirectory, ".chat_repl_history");
  export const cliModelsDirectory = path.join(cliHomedirDirectory, "models");
 -export const lastBuildInfoJsonPath = path.join(llamaDirectory, "lastBuild.json");
