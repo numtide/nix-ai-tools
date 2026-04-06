@@ -26,13 +26,20 @@ rustPlatform.buildRustPackage rec {
   # Some tests require filesystem access outside the sandbox
   doCheck = false;
 
-  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-    export HOME=$(mktemp -d)
-    installShellCompletion --cmd workmux \
-      --bash <($out/bin/workmux completions bash) \
-      --fish <($out/bin/workmux completions fish) \
-      --zsh <($out/bin/workmux completions zsh)
-  '';
+  postInstall =
+    lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      export HOME=$(mktemp -d)
+      installShellCompletion --cmd workmux \
+        --bash <($out/bin/workmux completions bash) \
+        --fish <($out/bin/workmux completions fish) \
+        --zsh <($out/bin/workmux completions zsh)
+    ''
+    + ''
+      # Install Claude Code skills shipped with workmux so users can
+      # symlink $out/share/workmux/skills/* into ~/.claude/skills/
+      install -d $out/share/workmux
+      cp -r skills $out/share/workmux/skills
+    '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
