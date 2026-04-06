@@ -36,7 +36,7 @@ let
   };
 in
 
-buildGoModule rec {
+buildGoModule {
   pname = "agentsview";
   inherit version src vendorHash;
 
