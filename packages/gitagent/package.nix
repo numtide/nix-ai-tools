@@ -10,13 +10,13 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "gitagent";
-  version = "0.1.9";
+  version = "0.2.0";
 
   src = fetchFromGitHub {
     owner = "open-gitagent";
     repo = "gitagent";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-iAzgX3hgX0WMHYJGKCSZMhUZ0u4+6NjagP9pmwC+hvI=";
+    hash = "sha256-gZG6sBXMCtsDiiX1sfH1G3m481L5uAr3zEW56kqqskE=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
