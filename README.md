@@ -793,6 +793,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>officecli</strong> - CLI for creating and editing Office Open XML documents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/iOfficeAI/OfficeCLI
+- **Usage**: `nix run github:numtide/llm-agents.nix#officecli -- --help`
+- **Nix**: [packages/officecli/package.nix](packages/officecli/package.nix)
+
+</details>
+<details>
 <summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
 
 - **Source**: source
