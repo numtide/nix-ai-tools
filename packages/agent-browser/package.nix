@@ -1,26 +1,84 @@
 {
   lib,
   fetchFromGitHub,
+  fetchPnpmDeps,
+  fetchurl,
   chromium,
   makeBinaryWrapper,
+  nodejs-slim,
+  pnpmConfigHook,
+  pnpm_10,
   rustPlatform,
   stdenv,
 }:
 
-rustPlatform.buildRustPackage rec {
+let
   pname = "agent-browser";
-  version = "0.24.1";
+  version = "0.25.3";
+
+  # Vendored Geist variable font (OFL-1.1) pinned to a specific upstream
+  # commit so the dashboard's next/font/local build is fully offline.
+  geistVariable = fetchurl {
+    url = "https://raw.githubusercontent.com/vercel/geist-font/77f0563c03009d6c15c6342183fa53b352255b22/packages/next/dist/fonts/geist-sans/Geist-Variable.woff2";
+    hash = "sha256-L/6+mT6WkGmpeJ0VFkt3FdQkkbWDVRbF47k11fgbBfE=";
+  };
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    hash = "sha256-/f2u/GywKEPo/rH7Yow3f6Cn6154Qf9MbIzZhWa7x0E=";
+    hash = "sha256-9wunuGSsxKqy9h3MMahW3hzZ+5iJrz/SotPRRGDu+kg=";
   };
+
+  dashboard = stdenv.mkDerivation {
+    pname = "${pname}-dashboard";
+    inherit version src;
+
+    nativeBuildInputs = [
+      nodejs-slim
+      pnpm_10
+      pnpmConfigHook
+    ];
+
+    pnpmDeps = fetchPnpmDeps {
+      pname = "${pname}-dashboard";
+      inherit version src;
+      pnpm = pnpm_10;
+      hash = "sha256-p9xpkR15JRq3zzx0GtICpETqRWLyHT7RTgkQ0Y9qWsY=";
+      fetcherVersion = 2;
+    };
+
+    # next/font/google fetches Geist from fonts.googleapis.com at build
+    # time, which the Nix sandbox blocks. Vendor the upstream Geist
+    # variable woff2 and rewrite layout.tsx to use next/font/local.
+    postPatch = ''
+      install -Dm644 ${geistVariable} packages/dashboard/src/app/Geist-Variable.woff2
+      substituteInPlace packages/dashboard/src/app/layout.tsx \
+        --replace-fail 'import { Geist } from "next/font/google"' 'import Geist from "next/font/local"' \
+        --replace-fail 'Geist({ subsets: ["latin"], variable: "--font-sans" })' 'Geist({ src: "./Geist-Variable.woff2", variable: "--font-sans", display: "swap" })'
+    '';
+
+    buildPhase = ''
+      runHook preBuild
+      cd packages/dashboard
+      pnpm build
+      runHook postBuild
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r out/. $out/
+      runHook postInstall
+    '';
+  };
+in
+rustPlatform.buildRustPackage {
+  inherit pname version src;
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-FotzoypumLksSqcdslvl+xJ5oojI4x77S9wcsiZXBCs=";
+  cargoHash = "sha256-vCxv2vKSWj5kIWhzWlbWNfEHrxnSg1i0nUBq6hWoQlM=";
 
   nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;
@@ -36,6 +94,13 @@ rustPlatform.buildRustPackage rec {
 
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
+
+  postPatch = ''
+    substituteInPlace build.rs \
+      --replace-fail 'Path::new("../packages/dashboard/out")' 'Path::new("${dashboard}")'
+    substituteInPlace src/native/stream/http.rs \
+      --replace-fail '#[folder = "../packages/dashboard/out/"]' '#[folder = "${dashboard}/"]'
+  '';
 
   postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/agent-browser \
