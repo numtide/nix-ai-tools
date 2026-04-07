@@ -2,6 +2,7 @@
   lib,
   fetchFromGitHub,
   fetchPnpmDeps,
+  fetchurl,
   chromium,
   makeBinaryWrapper,
   nodejs-slim,
@@ -14,6 +15,13 @@
 let
   pname = "agent-browser";
   version = "0.25.3";
+
+  # Vendored Geist variable font (OFL-1.1) pinned to a specific upstream
+  # commit so the dashboard's next/font/local build is fully offline.
+  geistVariable = fetchurl {
+    url = "https://raw.githubusercontent.com/vercel/geist-font/77f0563c03009d6c15c6342183fa53b352255b22/packages/next/dist/fonts/geist-sans/Geist-Variable.woff2";
+    hash = "sha256-L/6+mT6WkGmpeJ0VFkt3FdQkkbWDVRbF47k11fgbBfE=";
+  };
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
@@ -39,6 +47,16 @@ let
       hash = "sha256-p9xpkR15JRq3zzx0GtICpETqRWLyHT7RTgkQ0Y9qWsY=";
       fetcherVersion = 2;
     };
+
+    # next/font/google fetches Geist from fonts.googleapis.com at build
+    # time, which the Nix sandbox blocks. Vendor the upstream Geist
+    # variable woff2 and rewrite layout.tsx to use next/font/local.
+    postPatch = ''
+      install -Dm644 ${geistVariable} packages/dashboard/src/app/Geist-Variable.woff2
+      substituteInPlace packages/dashboard/src/app/layout.tsx \
+        --replace-fail 'import { Geist } from "next/font/google"' 'import Geist from "next/font/local"' \
+        --replace-fail 'Geist({ subsets: ["latin"], variable: "--font-sans" })' 'Geist({ src: "./Geist-Variable.woff2", variable: "--font-sans", display: "swap" })'
+    '';
 
     buildPhase = ''
       runHook preBuild
