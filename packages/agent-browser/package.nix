@@ -1,26 +1,66 @@
 {
   lib,
   fetchFromGitHub,
+  fetchPnpmDeps,
   chromium,
   makeBinaryWrapper,
+  nodejs-slim,
+  pnpmConfigHook,
+  pnpm_10,
   rustPlatform,
   stdenv,
 }:
 
-rustPlatform.buildRustPackage rec {
+let
   pname = "agent-browser";
-  version = "0.24.1";
+  version = "0.25.3";
 
   src = fetchFromGitHub {
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    hash = "sha256-/f2u/GywKEPo/rH7Yow3f6Cn6154Qf9MbIzZhWa7x0E=";
+    hash = "sha256-9wunuGSsxKqy9h3MMahW3hzZ+5iJrz/SotPRRGDu+kg=";
   };
+
+  dashboard = stdenv.mkDerivation {
+    pname = "${pname}-dashboard";
+    inherit version src;
+
+    nativeBuildInputs = [
+      nodejs-slim
+      pnpm_10
+      pnpmConfigHook
+    ];
+
+    pnpmDeps = fetchPnpmDeps {
+      pname = "${pname}-dashboard";
+      inherit version src;
+      pnpm = pnpm_10;
+      hash = "sha256-p9xpkR15JRq3zzx0GtICpETqRWLyHT7RTgkQ0Y9qWsY=";
+      fetcherVersion = 2;
+    };
+
+    buildPhase = ''
+      runHook preBuild
+      cd packages/dashboard
+      pnpm build
+      runHook postBuild
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out
+      cp -r out/. $out/
+      runHook postInstall
+    '';
+  };
+in
+rustPlatform.buildRustPackage {
+  inherit pname version src;
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-FotzoypumLksSqcdslvl+xJ5oojI4x77S9wcsiZXBCs=";
+  cargoHash = "sha256-vCxv2vKSWj5kIWhzWlbWNfEHrxnSg1i0nUBq6hWoQlM=";
 
   nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;
@@ -36,6 +76,13 @@ rustPlatform.buildRustPackage rec {
 
   # Auth/credential tests require a keyring unavailable in the sandbox
   doCheck = false;
+
+  postPatch = ''
+    substituteInPlace build.rs \
+      --replace-fail 'Path::new("../packages/dashboard/out")' 'Path::new("${dashboard}")'
+    substituteInPlace src/native/stream/http.rs \
+      --replace-fail '#[folder = "../packages/dashboard/out/"]' '#[folder = "${dashboard}/"]'
+  '';
 
   postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/agent-browser \
