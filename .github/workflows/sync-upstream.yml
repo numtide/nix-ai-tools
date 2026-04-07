@@ -3,14 +3,11 @@ on:
   schedule:
     - cron: '45 2,14 * * *'
   workflow_dispatch:
-
 permissions:
   contents: write
-
 concurrency:
   group: sync-upstream-main
   cancel-in-progress: false
-
 jobs:
   sync-upstream:
     runs-on: ubuntu-slim
@@ -41,20 +38,17 @@ jobs:
 
             core.setOutput('has-upstream', 'true');
             core.setOutput('repository', data.parent.full_name);
-
       - name: Checkout repository
         if: steps.upstream.outputs.has-upstream == 'true'
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-
       - name: Set up git
         if: steps.upstream.outputs.has-upstream == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
       - name: Rebase main onto upstream/main
         id: sync
         if: steps.upstream.outputs.has-upstream == 'true'
@@ -73,7 +67,6 @@ jobs:
           git rebase upstream/main
           git push origin main --force-with-lease
           echo "result=rebased" >> "$GITHUB_OUTPUT"
-
       - name: Write summary
         if: always()
         run: |
