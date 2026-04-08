@@ -43,7 +43,7 @@ python3.pkgs.buildPythonApplication rec {
     owner = "chernistry";
     repo = "bernstein";
     tag = "v${version}";
-    hash = lib.fakeHash;
+    hash = "sha256-ykfW0mrR9QP2W/O5sgD5vUPIA+Zso6i0aIcjCqEv9Y8=";
   };
 
   build-system = with python3.pkgs; [
@@ -58,7 +58,7 @@ python3.pkgs.buildPythonApplication rec {
     mcp
     openai
     opentelemetry-api
-    opentelemetry-exporter-otlp-proto-http
+    opentelemetry-exporter-otlp
     opentelemetry-sdk
     pillow
     pluggy
