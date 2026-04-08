@@ -4,7 +4,8 @@
   fetchFromGitHub,
   bun2nix,
   bun,
-  rustToolchain,
+  rustc,
+  cargo,
   rustPlatform,
   pkg-config,
   makeWrapper,
@@ -38,7 +39,8 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     bun2nix.hook
     bun
-    rustToolchain
+    rustc
+    cargo
     rustPlatform.cargoSetupHook
     pkg-config
     makeWrapper
@@ -50,6 +52,10 @@ stdenv.mkDerivation {
     stdenv.cc.cc.lib
     zlib
   ];
+
+  # smallvec's `specialization` feature requires nightly Rust.
+  # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
+  env.RUSTC_BOOTSTRAP = 1;
 
   bunDeps = bun2nix.fetchBunDeps {
     bunNix = ./bun.nix;
