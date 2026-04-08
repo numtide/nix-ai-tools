@@ -127,7 +127,6 @@ stdenv.mkDerivation {
 
       # Generate the napi type definitions and JS loader by running the
       # napi CLI from node_modules
-      local napiBin
       napiBin="$(pwd)/node_modules/.bin/napi"
       if [ -x "$napiBin" ]; then
         "$napiBin" build \
@@ -147,19 +146,6 @@ stdenv.mkDerivation {
         bun packages/natives/scripts/gen-enums.ts || true
       fi
 
-      # Generate the embedded-addon.js that imports the .node file for
-      # bun build --compile to embed
-      cat > packages/natives/native/embedded-addon.js <<EMBED
-      import addonPath0 from "../native/pi_natives.${platformTag}.node" with { type: "file" };
-      export const embeddedAddon = {
-        platformTag: "${platformTag}",
-        version: "${version}",
-        files: [
-          { variant: "default", filename: "pi_natives.${platformTag}.node", filePath: addonPath0 },
-        ],
-      };
-      EMBED
-
       # Generate the docs index (prepack script in coding-agent)
       echo "Generating docs index..."
       bun packages/coding-agent/scripts/generate-docs-index.ts
@@ -177,14 +163,22 @@ stdenv.mkDerivation {
       runHook postBuild
     '';
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    let
+      platformTag = if stdenv.hostPlatform.isAarch64 then "linux-arm64" else "linux-x64";
+    in
+    ''
+      runHook preInstall
 
-    mkdir -p $out/bin
-    cp dist/omp $out/bin/omp
+      mkdir -p $out/lib/omp $out/bin
+      cp dist/omp $out/lib/omp/omp
+      # native.ts probes dirname(process.execPath) for the addon. On x64 it
+      # looks for -modern / -baseline / plain in that order, on arm64 only
+      # the plain name. Ship the plain name so both arches resolve it.
+      cp packages/natives/native/pi_natives.${platformTag}.node $out/lib/omp/
 
-    wrapProgram $out/bin/omp \
-      --set PI_SKIP_VERSION_CHECK 1 \
+      makeWrapper $out/lib/omp/omp $out/bin/omp \
+        --set PI_SKIP_VERSION_CHECK 1 \
       ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix LD_LIBRARY_PATH : ${
         lib.makeLibraryPath [
           zlib
@@ -192,8 +186,8 @@ stdenv.mkDerivation {
         ]
       }"}
 
-    runHook postInstall
-  '';
+      runHook postInstall
+    '';
 
   passthru.category = "AI Coding Agents";
 
