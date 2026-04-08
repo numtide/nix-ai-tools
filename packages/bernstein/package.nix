@@ -87,6 +87,18 @@ python3.pkgs.buildPythonApplication rec {
     "python-dotenv"
   ];
 
+  # bernstein re-invokes itself and uvicorn via ``sys.executable -m ...``
+  # in subprocesses (server_launch.py, server_supervisor.py, adapters/*).
+  # The Nix wrapper sets NIX_PYTHONPATH which is consumed and unset by
+  # sitecustomize.py, so child interpreters lose access to the closure.
+  # Export PYTHONPATH so subprocess spawns can resolve the runtime deps.
+  makeWrapperArgs = [
+    "--prefix"
+    "PYTHONPATH"
+    ":"
+    "${placeholder "out"}/${python3.sitePackages}:${python3.pkgs.makePythonPath dependencies}"
+  ];
+
   pythonImportsCheck = [ "bernstein" ];
 
   doInstallCheck = true;
