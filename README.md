@@ -19,16 +19,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>bernstein</strong> - Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/chernistry/bernstein
-- **Usage**: `nix run github:numtide/llm-agents.nix#bernstein -- --help`
-- **Nix**: [packages/bernstein/package.nix](packages/bernstein/package.nix)
-
-</details>
-<details>
 <summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
 - **Source**: binary
@@ -241,9 +231,9 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>omp</strong> - A terminal-based coding agent with multi-model support</summary>
+<summary><strong>omp</strong> - A terminal-based coding agent with multi-model support (binary release)</summary>
 
-- **Source**: source
+- **Source**: binary
 - **License**: MIT
 - **Homepage**: https://github.com/can1357/oh-my-pi
 - **Usage**: `nix run github:numtide/llm-agents.nix#omp -- --help`
