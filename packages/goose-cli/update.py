@@ -1,7 +1,11 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for goose-cli package."""
+"""Update script for goose-cli package.
+
+This script updates both the goose-cli version and the librusty_v8 hashes.
+The v8 version is extracted from the Cargo.lock file of the goose repository.
+"""
 
 import sys
 from pathlib import Path
@@ -9,19 +13,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
-    calculate_dependency_hash,
     calculate_platform_hashes,
-    calculate_url_hash,
-    fetch_github_latest_release,
     fetch_text,
     load_hashes,
     save_hashes,
-    should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH
-from updater.nix import NixCommandError
 
-HASHES_FILE = Path(__file__).parent / "hashes.json"
+HASHES_FILE = Path(__file__).parent / "librusty_v8_hashes.json"
 
 PLATFORMS = {
     "x86_64-linux": "x86_64-unknown-linux-gnu",
@@ -36,9 +34,11 @@ def fetch_v8_version_from_cargo_lock(goose_version: str) -> str:
     url = f"https://raw.githubusercontent.com/block/goose/v{goose_version}/Cargo.lock"
     cargo_lock = fetch_text(url)
 
+    # Parse the Cargo.lock to find v8 version
     lines = cargo_lock.split("\n")
     for i, line in enumerate(lines):
         if line.strip() == 'name = "v8"':
+            # Look for version in the next few lines
             for j in range(i + 1, min(i + 10, len(lines))):
                 if "version = " in lines[j]:
                     return lines[j].split('"')[1]
@@ -48,57 +48,59 @@ def fetch_v8_version_from_cargo_lock(goose_version: str) -> str:
 
 
 def main() -> None:
-    """Update the goose-cli package."""
-    data = load_hashes(HASHES_FILE)
-    current = data["version"]
-    latest = fetch_github_latest_release("block", "goose")
-
-    print(f"Current: {current}, Latest: {latest}")
-
-    if not should_update(current, latest):
-        print("Already up to date")
-        return
-
-    source_url = f"https://github.com/block/goose/archive/refs/tags/v{latest}.tar.gz"
-
-    print("Calculating source hash...")
-    source_hash = calculate_url_hash(source_url, unpack=True)
-
-    v8_version = fetch_v8_version_from_cargo_lock(latest)
-    previous_v8 = data.get("librusty_v8")
-    if previous_v8 and previous_v8.get("version") == v8_version:
-        v8_hashes = previous_v8["hashes"]
+    """Update the librusty_v8 hashes for goose-cli."""
+    # Read the current goose-cli version from package.nix
+    package_nix = (Path(__file__).parent / "package.nix").read_text()
+    for line in package_nix.split("\n"):
+        if "version = " in line and '"' in line:
+            goose_version = line.split('"')[1]
+            break
     else:
-        print(f"V8 version: {v8_version}")
-        v8_hashes = calculate_platform_hashes(
-            "https://github.com/denoland/rusty_v8/releases/download/"
-            "v{version}/librusty_v8_release_{platform}.a.gz",
-            PLATFORMS,
-            version=v8_version,
-        )
+        msg = "Could not find version in package.nix"
+        raise ValueError(msg)
 
-    data = {
-        "version": latest,
-        "hash": source_hash,
-        "cargoHash": DUMMY_SHA256_HASH,
-        "librusty_v8": {
-            "version": v8_version,
-            "hashes": v8_hashes,
-        },
-    }
-    save_hashes(HASHES_FILE, data)
+    print(f"Goose version: {goose_version}")
 
+    # Get the v8 version from Cargo.lock
+    v8_version = fetch_v8_version_from_cargo_lock(goose_version)
+    print(f"V8 version: {v8_version}")
+
+    # Check if we need to update
     try:
-        cargo_hash = calculate_dependency_hash(
-            ".#goose-cli", "cargoHash", HASHES_FILE, data
-        )
-        data["cargoHash"] = cargo_hash
-        save_hashes(HASHES_FILE, data)
-    except (ValueError, NixCommandError) as e:
-        print(f"Error: {e}")
-        return
+        data = load_hashes(HASHES_FILE)
+        current_v8 = data.get("version", "")
+        if current_v8 == v8_version:
+            print(f"V8 hashes already up to date ({v8_version})")
+            return
+    except FileNotFoundError:
+        print("No existing hashes file, creating new one")
 
-    print(f"Updated to {latest}")
+    # Calculate hashes for all platforms
+    url_template = f"https://github.com/denoland/rusty_v8/releases/download/v{v8_version}/librusty_v8_release_{{platform}}.a.gz"
+    hashes = calculate_platform_hashes(url_template, PLATFORMS)
+
+    # Save the hashes
+    save_hashes(HASHES_FILE, {"version": v8_version, "hashes": hashes})
+
+    # Update librusty_v8.nix
+    librusty_v8_nix = Path(__file__).parent / "librusty_v8.nix"
+    content = f"""# Pre-built librusty_v8 library for goose-cli
+# This file specifies the rusty_v8 version and hashes for all supported platforms
+{{ fetchLibrustyV8 }}:
+
+fetchLibrustyV8 {{
+  version = "{v8_version}";
+  shas = {{
+    x86_64-linux = "{hashes["x86_64-linux"]}";
+    aarch64-linux = "{hashes["aarch64-linux"]}";
+    x86_64-darwin = "{hashes["x86_64-darwin"]}";
+    aarch64-darwin = "{hashes["aarch64-darwin"]}";
+  }};
+}}
+"""
+    librusty_v8_nix.write_text(content)
+
+    print(f"Updated librusty_v8 to {v8_version}")
 
 
 if __name__ == "__main__":
