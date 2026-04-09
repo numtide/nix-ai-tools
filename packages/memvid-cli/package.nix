@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchzip,
   makeWrapper,
@@ -77,12 +78,12 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "AI memory CLI - crash-safe, single-file storage with semantic search";
     homepage = "https://memvid.com";
-    changelog = "https://github.com/memvid/memvid/releases/tag/v${version}";
+    changelog = "https://github.com/memvid/memvid/releases";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [
       binaryNativeCode
     ];
-    maintainers = [ ];
+    maintainers = with flake.lib.maintainers; [ ypares ];
     mainProgram = "memvid";
     platforms = [ "x86_64-linux" ];
   };
