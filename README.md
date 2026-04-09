@@ -40,16 +40,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>cli-proxy-api-plus</strong> - Unified proxy providing OpenAI/Gemini/Claude/Codex and others compatible APIs for AI coding CLI tools</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/router-for-me/CLIProxyAPIPlus
-- **Usage**: `nix run github:numtide/llm-agents.nix#cli-proxy-api-plus -- --help`
-- **Nix**: [packages/cli-proxy-api-plus/package.nix](packages/cli-proxy-api-plus/package.nix)
-
-</details>
-<details>
 <summary><strong>code</strong> - Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.</summary>
 
 - **Source**: source
@@ -158,26 +148,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/block/goose
 - **Usage**: `nix run github:numtide/llm-agents.nix#goose-cli -- --help`
 - **Nix**: [packages/goose-cli/package.nix](packages/goose-cli/package.nix)
-
-</details>
-<details>
-<summary><strong>goose-desktop</strong> - Desktop app for Goose - a local, extensible, open source AI agent</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/block/goose
-- **Usage**: `nix run github:numtide/llm-agents.nix#goose-desktop -- --help`
-- **Nix**: [packages/goose-desktop/package.nix](packages/goose-desktop/package.nix)
-
-</details>
-<details>
-<summary><strong>goose-server</strong> - HTTP server for Goose - a local, extensible, open source AI agent</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/block/goose
-- **Usage**: `nix run github:numtide/llm-agents.nix#goose-server -- --help`
-- **Nix**: [packages/goose-server/package.nix](packages/goose-server/package.nix)
 
 </details>
 <details>
@@ -341,26 +311,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://openclaw.ai
 - **Usage**: `nix run github:numtide/llm-agents.nix#openclaw -- --help`
 - **Nix**: [packages/openclaw/package.nix](packages/openclaw/package.nix)
-
-</details>
-<details>
-<summary><strong>openfang</strong> - Open-source Agent Operating System built in Rust</summary>
-
-- **Source**: source
-- **License**: Apache-2.0 / MIT
-- **Homepage**: https://openfang.sh
-- **Usage**: `nix run github:numtide/llm-agents.nix#openfang -- --help`
-- **Nix**: [packages/openfang/package.nix](packages/openfang/package.nix)
-
-</details>
-<details>
-<summary><strong>openfang-desktop</strong> - Native desktop application for the OpenFang Agent OS (Tauri 2.0)</summary>
-
-- **Source**: source
-- **License**: Apache-2.0 / MIT
-- **Homepage**: https://openfang.sh
-- **Usage**: `nix run github:numtide/llm-agents.nix#openfang-desktop -- --help`
-- **Nix**: [packages/openfang-desktop/package.nix](packages/openfang-desktop/package.nix)
 
 </details>
 <details>
@@ -753,46 +703,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>camofox-browser</strong> - Anti-detection browser server for AI agents powered by Camoufox</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/redf0x1/camofox-browser
-- **Usage**: `nix run github:numtide/llm-agents.nix#camofox-browser -- --help`
-- **Nix**: [packages/camofox-browser/package.nix](packages/camofox-browser/package.nix)
-
-</details>
-<details>
-<summary><strong>camofox-cli</strong> - Anti-detect browser automation CLI for AI agents powered by Camoufox</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/Bin-Huang/camoufox-cli
-- **Usage**: `nix run github:numtide/llm-agents.nix#camofox-cli -- --help`
-- **Nix**: [packages/camofox-cli/package.nix](packages/camofox-cli/package.nix)
-
-</details>
-<details>
-<summary><strong>camofox-jo</strong> - Headless browser automation server for AI agents to visit blocked sites</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/jo-inc/camofox-browser
-- **Usage**: `nix run github:numtide/llm-agents.nix#camofox-jo -- --help`
-- **Nix**: [packages/camofox-jo/package.nix](packages/camofox-jo/package.nix)
-
-</details>
-<details>
-<summary><strong>camofox-mcp</strong> - Anti-detection browser MCP server for AI agents</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/redf0x1/camofox-mcp
-- **Usage**: `nix run github:numtide/llm-agents.nix#camofox-mcp -- --help`
-- **Nix**: [packages/camofox-mcp/package.nix](packages/camofox-mcp/package.nix)
-
-</details>
-<details>
 <summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
 
 - **Source**: source
@@ -941,19 +851,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/bglgwyng/zat
 - **Usage**: `nix run github:numtide/llm-agents.nix#zat -- --help`
 - **Nix**: [packages/zat/package.nix](packages/zat/package.nix)
-
-</details>
-
-### Uncategorized
-
-<details>
-<summary><strong>camoufox</strong> - Camoufox browser built from a patched Firefox source tree</summary>
-
-- **Source**: source
-- **License**: MPL-2.0
-- **Homepage**: https://github.com/CloverLabsAI/camoufox
-- **Usage**: `nix run github:numtide/llm-agents.nix#camoufox -- --help`
-- **Nix**: [packages/camoufox/package.nix](packages/camoufox/package.nix)
 
 </details>
 <!-- END GENERATED PACKAGE DOCS -->
