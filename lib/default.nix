@@ -12,6 +12,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 25513724;
         name = "Bad3r";
       };
+      chernistry = {
+        github = "chernistry";
+        githubId = 73943355;
+        name = "chernistry";
+      };
       ypares = {
         github = "YPares";
         githubId = 1377233;
