@@ -87,11 +87,6 @@ inputs.nixpkgs.lib.extend (
         githubId = 25645555;
         name = "Pieter Pel";
       };
-      smdex = {
-        github = "smdex";
-        githubId = 105790745;
-        name = "Sergii Maksymov";
-      };
     };
   }
 )
