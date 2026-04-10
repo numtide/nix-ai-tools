@@ -3,6 +3,7 @@
   flake,
   fetchFromGitHub,
   rustPlatform,
+  git,
   versionCheckHook,
 }:
 
@@ -25,8 +26,21 @@ rustPlatform.buildRustPackage rec {
     "--package"
     "rusty-claude-cli"
   ];
+  cargoTestFlags = cargoBuildFlags;
 
-  doCheck = false;
+  nativeCheckInputs = [ git ];
+
+  preCheck = ''
+    export HOME=$TMPDIR
+  '';
+
+  checkFlags = [
+    # broken upstream at this rev: tool allow-list assertions out of sync with implementation
+    "--skip=tests::rejects_unknown_allowed_tools"
+    "--skip=tests::build_runtime_plugin_state_discovers_mcp_tools_and_surfaces_pending_servers"
+    # integration harness expects scripted plugin fixtures not present in sandbox
+    "--skip=clean_env_cli_reaches_mock_anthropic_service_across_scripted_parity_scenarios"
+  ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
