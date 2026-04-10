@@ -81,6 +81,14 @@ stdenv.mkDerivation {
     done
     sed -i 's/: "\^/: "/g; s/: "~/: "/g' bun.lock
 
+    # swarm-extension declares a peerDependency on @oh-my-pi/pi-coding-agent
+    # with a hard-coded major (e.g. ^13) that upstream forgot to bump for the
+    # v14 release. With the workspace package now at 14.x bun cannot satisfy
+    # the constraint locally and falls back to the npm registry, which is
+    # unreachable in the sandbox. Rewrite it to the workspace reference.
+    sed -i 's|"@oh-my-pi/pi-coding-agent": "[0-9][^"]*"|"@oh-my-pi/pi-coding-agent": "workspace:*"|' \
+      packages/swarm-extension/package.json bun.lock
+
     # Reset the stats embedded client bundle to the placeholder so we don't
     # need to build the full React dashboard.
     cat > packages/stats/src/embedded-client.generated.txt <<'PLACEHOLDER'
