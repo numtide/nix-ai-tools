@@ -15,18 +15,18 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.4.8";
+  version = "2026.4.9";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-Y9FvI6Vhyi+kBLVio7/Qz77NWBViYMD0KheV7cXyeXs=";
+    hash = "sha256-wqvLBe+cEoo0x096fK6qKR8bDs4QHPTlxK5e64K4yls=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-miIxfJxbRwAZLZuipD8mrGhrWSzYH17J2uRDke72FWM=";
+    hash = "sha256-+aalm6p9O11AIOAWRiUxUfaYPtuUPAQ+VMryvS6sb2c=";
     fetcherVersion = 2;
   };
 
@@ -45,20 +45,19 @@ stdenv.mkDerivation (finalAttrs: {
 
   preBuild = ''
     # rolldown is a transitive dependency (via tsdown), not a direct root
-    # dependency. pnpm does not expose its binary in the root node_modules/.bin.
-    # bundle-a2ui.sh falls back to 'pnpm dlx rolldown' (requires network) when
-    # rolldown is not in PATH, which fails in the Nix sandbox. Create the
-    # missing bin link so the pre-fetched rolldown binary is used instead.
-    # Use a relative symlink: find returns "node_modules/.pnpm/rolldown@.../bin/cli.mjs"
-    # (relative to the build root); strip "node_modules/" and prepend "../" to
-    # get the path relative to node_modules/.bin/. An absolute symlink would
-    # point into the ephemeral build directory and break after installation.
-    rolldown_bin=$(find node_modules -name "cli.mjs" -path "*/rolldown/bin/cli.mjs" | head -1)
-    if [ -z "$rolldown_bin" ]; then
+    # dependency, so pnpm does not link its binary into node_modules/.bin.
+    # scripts/bundle-a2ui.mjs probes two hard-coded paths under
+    # node_modules/.pnpm/ (the layout produced by pnpm's default isolated
+    # node-linker) and falls back to 'pnpm dlx rolldown' (network) when neither
+    # exists. Upstream however sets `node-linker=hoisted` in .npmrc, so the
+    # package ends up at node_modules/rolldown instead and the probes miss it.
+    # Link it where the script expects so the pre-fetched binary is used.
+    if [ ! -e node_modules/rolldown/bin/cli.mjs ]; then
       echo "error: rolldown cli.mjs not found in node_modules" >&2
       exit 1
     fi
-    ln -sf "../$(echo "$rolldown_bin" | sed 's|^node_modules/||')" node_modules/.bin/rolldown
+    mkdir -p node_modules/.pnpm/node_modules
+    ln -sfT ../../rolldown node_modules/.pnpm/node_modules/rolldown
 
     # The runtime-postbuild script calls stageBundledPluginRuntimeDeps which
     # runs "npm install" for bundled plugin runtime dependencies, requiring
@@ -129,7 +128,7 @@ stdenv.mkDerivation (finalAttrs: {
     versionCheckHook
     versionCheckHomeHook
   ];
-  # Upstream tags may carry a "-N" rebuild suffix (e.g. v2026.4.8) while
+  # Upstream tags may carry a "-N" rebuild suffix (e.g. v2026.4.9) while
   # `openclaw --version` only reports the base version. Strip the suffix
   # before versionCheckHook compares it against the command output.
   preVersionCheck = ''
