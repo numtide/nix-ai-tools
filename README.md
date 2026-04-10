@@ -294,6 +294,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### AI Assistants
 
 <details>
+<summary><strong>aionui</strong> - Desktop and WebUI cowork app that turns AI agents into a local assistant and server</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/iOfficeAI/AionUi
+- **Usage**: `nix run github:numtide/llm-agents.nix#aionui -- --help`
+- **Nix**: [packages/aionui/package.nix](packages/aionui/package.nix)
+
+</details>
+<details>
 <summary><strong>hermes-agent</strong> - Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere</summary>
 
 - **Source**: source
