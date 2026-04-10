@@ -40,6 +40,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>claw-code</strong> - Claude Code rewrite CLI built from the official claw-code Rust workspace</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/ultraworkers/claw-code
+- **Usage**: `nix run github:numtide/llm-agents.nix#claw-code -- --help`
+- **Nix**: [packages/claw-code/package.nix](packages/claw-code/package.nix)
+
+</details>
+<details>
 <summary><strong>cli-proxy-api</strong> - Unified proxy providing OpenAI/Gemini/Claude/Codex compatible APIs for AI coding CLI tools</summary>
 
 - **Source**: source
