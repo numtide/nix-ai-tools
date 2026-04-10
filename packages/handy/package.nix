@@ -17,7 +17,6 @@
   gtk-layer-shell,
   libayatana-appindicator,
   libsoup_3,
-  onnxruntime,
   openssl,
   vulkan-loader,
   webkitgtk_4_1,
@@ -84,7 +83,6 @@ stdenv.mkDerivation {
     gtk3
     gtk-layer-shell
     libsoup_3
-    onnxruntime
     openssl
     vulkan-loader
     webkitgtk_4_1
@@ -123,6 +121,13 @@ stdenv.mkDerivation {
 
         # Install the binary
         install -Dm755 usr/bin/handy $out/bin/handy
+
+        # Install the bundled onnxruntime. Upstream onnxruntime tags its
+        # exported symbols with a VERS_<exact-version> ELF symbol version, so
+        # the prebuilt handy binary can only load the exact libonnxruntime
+        # version it was linked against and is not compatible with whatever
+        # version nixpkgs currently ships.
+        install -Dm755 usr/lib/libonnxruntime.so.1 $out/lib/libonnxruntime.so.1
 
         # Install resources
         mkdir -p $out/lib/Handy/resources
