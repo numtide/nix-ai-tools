@@ -34,7 +34,9 @@ def main() -> None:
         print("Already up to date")
         return
 
-    url = f"https://github.com/Yeachan-Heo/oh-my-codex/archive/refs/tags/v{latest}.tar.gz"
+    url = (
+        f"https://github.com/Yeachan-Heo/oh-my-codex/archive/refs/tags/v{latest}.tar.gz"
+    )
 
     print("Calculating source hash...")
     source_hash = calculate_url_hash(url, unpack=True)
