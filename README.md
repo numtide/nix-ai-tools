@@ -864,6 +864,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>toon</strong> - Rust implementation of TOON - Token-Oriented Object Notation for LLM prompts</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/toon-format/toon-rust
+- **Usage**: `nix run github:numtide/llm-agents.nix#toon -- --help`
+- **Nix**: [packages/toon/package.nix](packages/toon/package.nix)
+
+</details>
+<details>
 <summary><strong>zat</strong> - Code outline viewer for LLM coding agents — shows exported symbols with line numbers</summary>
 
 - **Source**: source
