@@ -36,15 +36,22 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "bernstein";
-  version = "1.6.4";
+  version = "1.6.6";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "chernistry";
     repo = "bernstein";
     tag = "v${version}";
-    hash = "sha256-XwQL/HHNE+eFm/3uolI636utQ/+nAn5cziKOtCBBB9Q=";
+    hash = "sha256-Y6bUWYhYPMkLYU1RIXFHrnVJ0j/cCNjR+iEFjF8OyOY=";
   };
+
+  # Upstream sometimes tags a release without bumping the version in
+  # pyproject.toml (e.g. v1.6.6 still says 1.6.5), which trips the
+  # versionCheckHook. Align the metadata with the tag we are building.
+  postPatch = ''
+    sed -i -E 's/^version = ".*"/version = "${version}"/' pyproject.toml
+  '';
 
   build-system = with python3.pkgs; [
     hatchling
