@@ -9,6 +9,7 @@ prefetch source hash via fetchCrate, and recalculate cargo hash via dummy-hash b
 
 import sys
 from pathlib import Path
+from typing import cast
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
@@ -33,7 +34,7 @@ def fetch_crates_version(crate: str) -> str:
     if not isinstance(data, dict):
         msg = f"Expected dict from crates.io API, got {type(data)}"
         raise TypeError(msg)
-    return data["crate"]["max_version"]
+    return cast("str", data["crate"]["max_version"])
 
 
 def main() -> None:
