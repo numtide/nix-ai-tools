@@ -36,14 +36,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "bernstein";
-  version = "1.6.3";
+  version = "1.6.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "chernistry";
     repo = "bernstein";
     tag = "v${version}";
-    hash = "sha256-hjufzTzs+S6nz6Ta5SSxeOyWV3eFU9flxK9TDGyTlWo=";
+    hash = "sha256-XwQL/HHNE+eFm/3uolI636utQ/+nAn5cziKOtCBBB9Q=";
   };
 
   build-system = with python3.pkgs; [
