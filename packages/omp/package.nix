@@ -56,6 +56,14 @@ stdenv.mkDerivation {
   # smallvec's `specialization` feature requires nightly Rust.
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
   env.RUSTC_BOOTSTRAP = 1;
+  env.RUSTFLAGS = lib.concatStringsSep " " [
+    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_create"
+    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_destroy"
+    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_reset"
+    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_scan"
+    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_serialize"
+    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_deserialize"
+  ];
 
   bunDeps = bun2nix.fetchBunDeps {
     bunNix = ./bun.nix;
