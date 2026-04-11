@@ -5,19 +5,16 @@
   fetchCrate,
 }:
 
-let
-  data = builtins.fromJSON (builtins.readFile ./hashes.json);
-in
 rustPlatform.buildRustPackage rec {
   pname = "toon-format";
-  version = data.version;
+  version = "0.4.5";
 
   src = fetchCrate {
     inherit pname version;
-    hash = data.hash;
+    hash = "sha256-DA3X3e6amIpjqbYSgqzbsKMoNyDA7wtY+nLZy5xUnMA=";
   };
 
-  cargoHash = data.cargoHash;
+  cargoHash = "sha256-oxfWoUInKrPlQbuDzOinIYONg8pg5nKp8RY4oWUcARY=";
 
   cargoBuildFlags = [
     "--features"
