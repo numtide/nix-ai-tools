@@ -4,6 +4,7 @@
   fetchFromGitHub,
   fetchCargoVendor,
   fetchurl,
+  fetchzip,
   installShellFiles,
   makeWrapper,
   rustPlatform,
@@ -27,6 +28,27 @@ let
     hash = versionData.librusty_v8.hashes.${stdenv.hostPlatform.system};
     meta.sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
   };
+
+  # codex-realtime-webrtc pulls in livekit's webrtc-sys on macOS, whose
+  # build.rs would download a ~300MB prebuilt libwebrtc archive at build
+  # time. Prefetch it as a fixed-output derivation and point the crate at
+  # it via LK_CUSTOM_WEBRTC so the build stays sandboxed.
+  livekitWebrtcTriple =
+    {
+      x86_64-darwin = "mac-x64";
+      aarch64-darwin = "mac-arm64";
+    }
+    .${stdenv.hostPlatform.system} or null;
+  livekitWebrtc =
+    if livekitWebrtcTriple == null then
+      null
+    else
+      fetchzip {
+        name = "livekit-webrtc-${versionData.livekit_webrtc.tag}-${livekitWebrtcTriple}";
+        url = "https://github.com/livekit/rust-sdks/releases/download/${versionData.livekit_webrtc.tag}/webrtc-${livekitWebrtcTriple}-release.zip";
+        hash = versionData.livekit_webrtc.hashes.${stdenv.hostPlatform.system};
+        meta.sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
+      };
 
   src = fetchFromGitHub {
     owner = "openai";
@@ -60,7 +82,12 @@ rustPlatform.buildRustPackage {
 
   buildInputs = [ openssl ] ++ lib.optionals stdenv.hostPlatform.isLinux [ libcap ];
 
-  env.RUSTY_V8_ARCHIVE = librusty_v8;
+  env = {
+    RUSTY_V8_ARCHIVE = librusty_v8;
+  }
+  // lib.optionalAttrs (livekitWebrtc != null) {
+    LK_CUSTOM_WEBRTC = livekitWebrtc;
+  };
 
   preBuild = ''
     # Remove LTO to speed up builds

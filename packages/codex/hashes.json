@@ -1,7 +1,7 @@
 {
-  "version": "0.118.0",
-  "hash": "sha256-FdtV+CIqTInnegcXrXBxw4aE0JnNDh4GdYKwUDjSk9Y=",
-  "cargoHash": "sha256-7rexlmc79eUkwcqTa8rN3GFDy1dWs+0h/SUllZqAcpM=",
+  "version": "0.120.0",
+  "hash": "sha256-kj8WWFNk0/ZIefA7xgDox8zvW3y4tyLT2lyi1SyeHz8=",
+  "cargoHash": "sha256-VY97UmTju9p+0rjdHXPaIq7JWTebZCrFzzrxyIjxaOg=",
   "librusty_v8": {
     "version": "146.4.0",
     "hashes": {
@@ -9,6 +9,13 @@
       "aarch64-linux": "sha256-2/FlsHyBvbBUvARrQ9I+afz3vMGkwbW0d2mDpxBi7Ng=",
       "x86_64-darwin": "sha256-YwzSQPG77NsHFBfcGDh6uBz2fFScHFFaC0/Pnrpke7c=",
       "aarch64-darwin": "sha256-v+LJvjKlbChUbw+WWCXuaPv2BkBfMQzE4XtEilaM+Yo="
+    }
+  },
+  "livekit_webrtc": {
+    "tag": "webrtc-24f6822-2",
+    "hashes": {
+      "x86_64-darwin": "sha256-XapngujlXtcDEGd2hacmP3nHFycEVZRybO/ORHPc6Og=",
+      "aarch64-darwin": "sha256-4IwJM6EzTFgQd2AdX+Hj9NWzmyqXrSioRax2L6GKL1U="
     }
   }
 }
