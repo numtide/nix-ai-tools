@@ -6,6 +6,7 @@
   wrapBuddy,
   cacert,
   nodejs_24,
+  ripgrep,
   versionCheckHook,
 }:
 
@@ -31,7 +32,10 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p $out/bin
     makeWrapper ${nodejs_24}/bin/node $out/bin/copilot \
       --add-flags "$out/lib/${finalAttrs.pname}/index.js" \
-      --set SSL_CERT_DIR "${cacert}/etc/ssl/certs"
+      --set SSL_CERT_DIR "${cacert}/etc/ssl/certs" \
+      --set-default COPILOT_AUTO_UPDATE false \
+      --set-default USE_BUILTIN_RIPGREP false \
+      --prefix PATH : ${lib.makeBinPath [ ripgrep ]}
 
     runHook postInstall
   '';
