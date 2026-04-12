@@ -4,6 +4,8 @@ Provides helpers for regenerating bun.nix lockfiles using bun2nix,
 used by packages that depend on the bun2nix flake input.
 """
 
+from __future__ import annotations
+
 import subprocess
 import tempfile
 from pathlib import Path
@@ -68,6 +70,7 @@ def clone_and_generate_bun_nix(
     flake_root: Path,
     *,
     ref_prefix: str = "",
+    pkg_dir: Path | None = None,
 ) -> None:
     """Clone a repo at a given version and regenerate bun.nix from its bun.lock.
 
@@ -77,6 +80,12 @@ def clone_and_generate_bun_nix(
     Always runs ``bun install`` to ensure bun.lock is consistent with
     package.json (upstream lockfiles are sometimes stale).
 
+    When the upstream lockfile is stale and ``pkg_dir`` is provided, a patch
+    file ``fix-stale-bun-lock.patch`` is written into ``pkg_dir`` so that the
+    Nix build can apply it at build time.  When the lockfile is fresh, any
+    existing patch file in ``pkg_dir`` is removed so it does not break future
+    builds.
+
     Args:
         owner: GitHub repository owner
         repo: GitHub repository name
@@ -84,6 +93,8 @@ def clone_and_generate_bun_nix(
         bun_nix_output: Path where bun.nix should be written
         flake_root: Root directory of the flake
         ref_prefix: Prefix for the git ref (e.g. "v" for "v1.0.0" tags)
+        pkg_dir: Package directory; when set, stale-lockfile patches are
+            written here automatically instead of raising an error.
 
     """
     ref = f"{ref_prefix}{version}"
@@ -147,22 +158,34 @@ def clone_and_generate_bun_nix(
 
         regenerate_bun_nix(bun_lock, bun_nix_output, flake_root)
 
+        patch_file = pkg_dir / "fix-stale-bun-lock.patch" if pkg_dir else None
+
         if lockfile_was_stale:
-            msg = (
-                f"Upstream {owner}/{repo} {ref} has a stale bun.lock "
-                f"that does not match package.json.\n"
-                f"bun.nix was regenerated from the refreshed lockfile, "
-                f"but the Nix build will still use the stale in-tree "
-                f"bun.lock from the source tarball.\n"
-                f"You need to add a patch that fixes bun.lock at build "
-                f"time (see packages/qmd/fix-stale-bun-lock.patch for "
-                f"an example).\n"
-                f"\n"
-                f"To generate the patch:\n"
-                f"  git clone --depth=1 --branch={ref} "
-                f"https://github.com/{owner}/{repo}.git /tmp/{repo}\n"
-                f"  cd /tmp/{repo}\n"
-                f"  bun install --lockfile-only\n"
-                f"  git diff bun.lock > fix-stale-bun-lock.patch\n"
-            )
-            raise RuntimeError(msg)
+            if patch_file is not None:
+                # Generate the diff and save it so the Nix build can apply it.
+                diff_result = run_command(["git", "diff", "bun.lock"], cwd=repo_dir)
+                patch_file.write_text(diff_result.stdout)
+                print(
+                    f"⚠️  Upstream bun.lock was stale — wrote patch to {patch_file.name}"
+                )
+            else:
+                msg = (
+                    f"Upstream {owner}/{repo} {ref} has a stale bun.lock "
+                    f"that does not match package.json.\n"
+                    f"bun.nix was regenerated from the refreshed lockfile, "
+                    f"but the Nix build will still use the stale in-tree "
+                    f"bun.lock from the source tarball.\n"
+                    f"You need to add a patch that fixes bun.lock at build "
+                    f"time.\n"
+                    f"\n"
+                    f"To generate the patch:\n"
+                    f"  git clone --depth=1 --branch={ref} "
+                    f"https://github.com/{owner}/{repo}.git /tmp/{repo}\n"
+                    f"  cd /tmp/{repo}\n"
+                    f"  bun install --lockfile-only\n"
+                    f"  git diff bun.lock > fix-stale-bun-lock.patch\n"
+                )
+                raise RuntimeError(msg)
+        elif patch_file is not None:
+            # Upstream lockfile is now fresh — clear the patch so it's a no-op.
+            patch_file.write_text("")
