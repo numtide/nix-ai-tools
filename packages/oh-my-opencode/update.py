@@ -63,6 +63,7 @@ def main() -> None:
         BUN_NIX,
         FLAKE_ROOT,
         ref_prefix="v",
+        pkg_dir=PKG_DIR,
     )
 
     print(f"Updated oh-my-opencode to {latest}")
