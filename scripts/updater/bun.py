@@ -165,7 +165,9 @@ def clone_and_generate_bun_nix(
                 # Generate the diff and save it so the Nix build can apply it.
                 diff_result = run_command(["git", "diff", "bun.lock"], cwd=repo_dir)
                 patch_file.write_text(diff_result.stdout)
-                print(f"⚠️  Upstream bun.lock was stale — wrote patch to {patch_file.name}")
+                print(
+                    f"⚠️  Upstream bun.lock was stale — wrote patch to {patch_file.name}"
+                )
             else:
                 msg = (
                     f"Upstream {owner}/{repo} {ref} has a stale bun.lock "

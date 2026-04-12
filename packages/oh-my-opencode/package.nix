@@ -25,7 +25,9 @@ stdenv.mkDerivation {
   };
 
   # Non-empty when upstream ships a stale bun.lock; kept in sync by update.py
-  patches = lib.optional (builtins.readFile ./fix-stale-bun-lock.patch != "") ./fix-stale-bun-lock.patch;
+  patches = lib.optional (
+    builtins.readFile ./fix-stale-bun-lock.patch != ""
+  ) ./fix-stale-bun-lock.patch;
 
   nativeBuildInputs = [
     bun2nix.hook
