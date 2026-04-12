@@ -597,6 +597,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>but</strong> - GitButler CLI - virtual branches and AI-assisted Git workflow from the terminal</summary>
+
+- **Source**: source
+- **License**: Check package
+- **Homepage**: https://github.com/gitbutlerapp/gitbutler
+- **Usage**: `nix run github:numtide/llm-agents.nix#but -- --help`
+- **Nix**: [packages/but/package.nix](packages/but/package.nix)
+
+</details>
+<details>
 <summary><strong>cc-sdd</strong> - Spec-driven development framework for AI coding agents</summary>
 
 - **Source**: source
