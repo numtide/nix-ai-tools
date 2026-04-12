@@ -7,6 +7,7 @@
   cacert,
   nodejs_24,
   ripgrep,
+  bash,
   versionCheckHook,
 }:
 
@@ -35,7 +36,12 @@ stdenv.mkDerivation (finalAttrs: {
       --set SSL_CERT_DIR "${cacert}/etc/ssl/certs" \
       --set-default COPILOT_AUTO_UPDATE false \
       --set-default USE_BUILTIN_RIPGREP false \
-      --prefix PATH : ${lib.makeBinPath [ ripgrep ]}
+      --prefix PATH : ${
+        lib.makeBinPath [
+          ripgrep
+          bash
+        ]
+      }
 
     runHook postInstall
   '';
