@@ -36,14 +36,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "bernstein";
-  version = "1.6.8";
+  version = "1.6.9";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "chernistry";
     repo = "bernstein";
     tag = "v${version}";
-    hash = "sha256-Iqohz+X9hG8zZlmpAe6r5HW5324tvqc+Cu8awDgPBjU=";
+    hash = "sha256-UWL6gQYi8B+uw4z6S07Ft+Cj+KEPh6vI7JmDJ8Sr5Gw=";
   };
 
   # Upstream sometimes tags a release without bumping the version in
@@ -51,6 +51,10 @@ python3.pkgs.buildPythonApplication rec {
   # versionCheckHook. Align the metadata with the tag we are building.
   postPatch = ''
     sed -i -E 's/^version = ".*"/version = "${version}"/' pyproject.toml
+    # Upstream excludes core sub-packages (config/, orchestration/, etc.)
+    # from the wheel, but the lazy-import finder in core/__init__.py still
+    # references them at runtime. Remove the exclude list.
+    sed -i '/^exclude = \[/,/^\]/d' pyproject.toml
   '';
 
   build-system = with python3.pkgs; [
