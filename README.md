@@ -627,6 +627,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>gitbutler</strong> - Git client for simultaneous branches on top of your existing workflow</summary>
+
+- **Source**: source
+- **License**: FSL-1.1-MIT
+- **Homepage**: https://gitbutler.com
+- **Usage**: `nix run github:numtide/llm-agents.nix#gitbutler -- --help`
+- **Nix**: [packages/gitbutler/package.nix](packages/gitbutler/package.nix)
+
+</details>
+<details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
 - **Source**: bytecode
