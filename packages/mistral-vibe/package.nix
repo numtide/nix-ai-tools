@@ -99,6 +99,17 @@ let
     packageOverrides = _pyfinal: pyprev: {
       inherit textual-speedups tree-sitter-bash;
 
+      # mistral-vibe 2.7.5 imports `deep_update` from
+      # `pydantic_settings.sources.base`, a re-export added in 2.13.
+      pydantic-settings = pyprev.pydantic-settings.overridePythonAttrs (_: rec {
+        version = "2.13.1";
+        src = fetchPypi {
+          pname = "pydantic_settings";
+          inherit version;
+          hash = "sha256-tMEYR7FSN/sBceFGK/VA4pSv+5uG202apcAXML2+QCU=";
+        };
+      });
+
       # Build mistralai/acp inside this set so they link against the
       # overridden opentelemetry packages rather than stock python3.pkgs.
       # Otherwise the prebuilt ones drag old otel into the closure and
@@ -142,14 +153,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.7.4";
+  version = "2.7.5";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-SPn6YaGmEt2r9Fm3Eagubqw0Q2U5bSvNUY1qo2XfVlE=";
+    hash = "sha256-4LseZpF7IlTitLEODn+pkUYGA6QR/hzGbO6SmZB0Mto=";
   };
 
   build-system = with python.pkgs; [
@@ -166,6 +177,7 @@ python.pkgs.buildPythonApplication rec {
     giturlparse
     google-auth
     httpx
+    jsonpatch
     keyring
     markdownify
     mcp
