@@ -78,6 +78,75 @@ stdenv.mkDerivation {
   dontStrip = true;
 
   postPatch = ''
+    # Upstream (>=14.1.1) uses bun workspace "catalog:" references that
+    # point at versions declared in the root package.json. bun resolves
+    # these against the registry during `bun build --compile`, which is
+    # unavailable in the Nix sandbox. Inline the catalog entries so every
+    # package.json and bun.lock contains concrete version specifiers.
+    ${bun}/bin/bun run - <<'RESOLVE_CATALOG'
+    import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
+    import { join } from "node:path";
+
+    const root = JSON.parse(readFileSync("package.json", "utf8"));
+    const catalog = root.workspaces?.catalog ?? {};
+    if (root.workspaces && typeof root.workspaces === "object") {
+      delete root.workspaces.catalog;
+      if (Array.isArray(root.workspaces.packages)) {
+        root.workspaces = root.workspaces.packages;
+      }
+    }
+
+    const rewriteDeps = (deps) => {
+      if (!deps) return;
+      for (const [name, spec] of Object.entries(deps)) {
+        if (typeof spec === "string" && spec.startsWith("catalog")) {
+          const resolved = catalog[name];
+          if (!resolved) throw new Error(`catalog missing entry for ''${name}`);
+          deps[name] = resolved;
+        }
+      }
+    };
+
+    const rewritePkg = (path) => {
+      const pkg = JSON.parse(readFileSync(path, "utf8"));
+      for (const key of [
+        "dependencies",
+        "devDependencies",
+        "peerDependencies",
+        "optionalDependencies",
+      ]) {
+        rewriteDeps(pkg[key]);
+      }
+      writeFileSync(path, `''${JSON.stringify(pkg, null, 2)}\n`);
+    };
+
+    for (const key of [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+    ]) {
+      rewriteDeps(root[key]);
+    }
+    writeFileSync("package.json", `''${JSON.stringify(root, null, 2)}\n`);
+
+    for (const name of readdirSync("packages")) {
+      const p = join("packages", name, "package.json");
+      try { if (statSync(p).isFile()) rewritePkg(p); } catch {}
+    }
+
+    // Rewrite catalog refs in bun.lock too. bun.lock is JSONC-ish but the
+    // entries are simple quoted key/value pairs so a line-wise rewrite is
+    // sufficient and preserves the rest of the file verbatim.
+    let lock = readFileSync("bun.lock", "utf8");
+    lock = lock.replace(/"([^"\n]+)": "catalog:?"/g, (m, name) => {
+      const resolved = catalog[name];
+      if (!resolved) throw new Error(`catalog missing entry for ''${name} (bun.lock)`);
+      return `"''${name}": "''${resolved}"`;
+    });
+    writeFileSync("bun.lock", lock);
+    RESOLVE_CATALOG
+
     # bun resolves caret-range specifiers via the npm registry even when the
     # pinned version is already in the local cache. In the Nix sandbox this
     # fails because the network is blocked. Strip ^ and ~ prefixes so bun
