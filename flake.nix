@@ -22,7 +22,10 @@
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     bun2nix = {
-      url = "github:nix-community/bun2nix";
+      # TODO(#4001): switch back to github:nix-community/bun2nix once
+      # https://github.com/nix-community/bun2nix/pull/86 (catalog: support)
+      # lands upstream.
+      url = "github:Mic92/bun2nix/catalog-support";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
       inputs.treefmt-nix.follows = "treefmt-nix";
