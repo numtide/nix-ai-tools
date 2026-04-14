@@ -13,7 +13,7 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "gitnexus";
-  version = "1.6.0";
+  version = "1.6.1";
 
   src = fetchFromGitHub {
     owner = "abhigyanpatwari";
