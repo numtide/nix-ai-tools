@@ -6,12 +6,12 @@
 
 python3.pkgs.buildPythonPackage rec {
   pname = "mistralai";
-  version = "2.0.0";
+  version = "2.1.3";
   pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-rLeTelMRns5n9JeICdTPYw+/VLTf6FwO6ud4rECFD6s=";
+    hash = "sha256-DF3khVsEPNBYJAbVwd39keF29IShWObuC0oAVCMb4mY=";
   };
 
   build-system = with python3.pkgs; [ hatchling ];
@@ -19,6 +19,7 @@ python3.pkgs.buildPythonPackage rec {
   dependencies = with python3.pkgs; [
     eval-type-backport
     httpx
+    jsonpath-python
     opentelemetry-api
     opentelemetry-semantic-conventions
     pydantic
