@@ -96,13 +96,29 @@ rustPlatform.buildRustPackage {
   doCheck = false;
 
   postPatch = ''
+    # Skill discovery walks up from the executable looking for a directory
+    # that contains skills/. Point it at $out/share/agent-browser instead so
+    # both skills/ and skill-data/ are found without polluting $out.
+    substituteInPlace src/skills.rs \
+      --replace-fail \
+        'fn find_package_root() -> Option<PathBuf> {' \
+        'fn find_package_root() -> Option<PathBuf> {
+    let nix_root = PathBuf::from("${placeholder "out"}/share/agent-browser");
+    if nix_root.join("skills").is_dir() {
+        return Some(nix_root);
+    }'
+
     substituteInPlace build.rs \
       --replace-fail 'Path::new("../packages/dashboard/out")' 'Path::new("${dashboard}")'
     substituteInPlace src/native/stream/http.rs \
       --replace-fail '#[folder = "../packages/dashboard/out/"]' '#[folder = "${dashboard}/"]'
   '';
 
-  postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
+  postInstall = ''
+    mkdir -p $out/share/agent-browser
+    cp -r ../skills ../skill-data $out/share/agent-browser/
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
     wrapProgram $out/bin/agent-browser \
       --set AGENT_BROWSER_EXECUTABLE_PATH ${chromium}/bin/chromium
   '';
