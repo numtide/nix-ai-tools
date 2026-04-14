@@ -1,11 +1,6 @@
 {
-  "version": "1.1.4",
-  "srcHash": "sha256-MRqVdL6St/6yFWKDStxMh7aMj2oLJYpY/TG6kiolwmA=",
-  "yarnLockCommit": "e1a2095b637965542f5d66b023bd50c3dda710c4",
-  "yarnLockHash": "sha256-qxnLCBCZhmiCXlQ/NCms40z8DANKP0TnVN6tHC/JVRI=",
-  "yarnOfflineHash": "sha256-obJJjGq92rsosLihQIbb86I5V8XitWJnXziwGGCfeAA=",
-  "wireRange": "^0.1.0",
-  "wireVersion": "0.1.0",
-  "wireResolved": "https://registry.npmjs.org/@slopus/happy-wire/-/happy-wire-0.1.0.tgz#7d7c054eca5605e0d5ab4be8e82b6277bd1aa030",
-  "wireIntegrity": "sha512-u4UHSJsFT/OLyIClvNyoXK/WS64Ga6RrRLPaM/UJt94hA+MvIdKjm2EUZK3IBmOK6RwxdDUwJDZa3A/P3/XLQA=="
+  "version": "1.1.6",
+  "srcRev": "cda9302f888262dcc0bf85b94e906d202021d78a",
+  "srcHash": "sha256-ya/rFKsewscbq6eaNBZLSdrSlR/danTdGESuA0ZQI2g=",
+  "pnpmDepsHash": "sha256-f757Rv1KB+ErQiYeGYr0aUTRjdTZsM+G/e5dgxzhXNM="
 }
