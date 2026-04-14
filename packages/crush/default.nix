@@ -1,4 +1,4 @@
 { pkgs, perSystem, ... }:
 pkgs.callPackage ./package.nix {
-  inherit (perSystem.self) versionCheckHomeHook;
+  inherit (perSystem.self) go-bin versionCheckHomeHook;
 }

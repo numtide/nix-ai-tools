@@ -3,7 +3,7 @@
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
-  go_1_26,
+  go-bin,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -12,7 +12,7 @@ let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash vendorHash;
 in
-(buildGoModule.override { go = go_1_26; }) {
+(buildGoModule.override { go = go-bin; }) {
   pname = "crush";
   inherit version vendorHash;
 
