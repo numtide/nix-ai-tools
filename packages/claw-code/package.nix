@@ -9,16 +9,23 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "claw-code";
-  version = "0.1.0";
+  version = "0-unstable-2026-04-13";
 
   src = fetchFromGitHub {
     owner = "ultraworkers";
     repo = "claw-code";
-    rev = "4f670e5513db1ed485e8c822ef404a48e8129028";
-    hash = "sha256-qghvVytVPV8/WDMEKRGGMYN+CPG1+aQepXgtJ3ibDVA=";
+    rev = "e874bc6a4467158d91d644783c497c8eca472874";
+    hash = "sha256-7CglaxUMiy67eG+M8A5SzdTDSCCL+4oN1IhCzBhAJ94=";
   };
 
   sourceRoot = "source/rust";
+
+  patches = [
+    # init::tests share a temp dir when SystemTime nanos collide between
+    # parallel test threads (observed on aarch64-darwin in the sandbox).
+    # Upstreamable; drop once merged.
+    ./init-tests-unique-tmpdir.patch
+  ];
 
   cargoHash = "sha256-P8QqUM1s/fNv7Fb4dmpJWDfTNumgUu1Cdiln8ybSDUU=";
 
@@ -44,7 +51,13 @@ rustPlatform.buildRustPackage rec {
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
-  versionCheckProgramArg = [ "--version" ];
+  versionCheckProgramArg = "--version";
+  # Upstream has no tagged release yet; we track an unstable rev. The binary
+  # reports the Cargo workspace.package.version (e.g. 0.1.0), so compare
+  # against that rather than our `0-unstable-<date>` derivation version.
+  preVersionCheck = ''
+    version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+  '';
 
   passthru.category = "AI Coding Agents";
 
