@@ -20,6 +20,13 @@ rustPlatform.buildRustPackage rec {
 
   sourceRoot = "source/rust";
 
+  patches = [
+    # init::tests share a temp dir when SystemTime nanos collide between
+    # parallel test threads (observed on aarch64-darwin in the sandbox).
+    # Upstreamable; drop once merged.
+    ./init-tests-unique-tmpdir.patch
+  ];
+
   cargoHash = "sha256-P8QqUM1s/fNv7Fb4dmpJWDfTNumgUu1Cdiln8ybSDUU=";
 
   cargoBuildFlags = [

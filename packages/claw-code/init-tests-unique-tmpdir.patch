@@ -1,0 +1,30 @@
+init::tests::temp_dir() keys the path solely on SystemTime::now().as_nanos().
+When two of the init tests run on parallel cargo test threads and the clock
+does not advance between calls (seen on aarch64-darwin in the Nix sandbox),
+both tests share a directory; CLAUDE.md is then "skipped (already exists)"
+and the "Languages: ..." assertions fail.
+
+Mix a monotonically increasing per-process counter into the directory name so
+each call gets a unique path regardless of timer granularity.
+
+--- a/crates/rusty-claude-cli/src/init.rs
++++ b/crates/rusty-claude-cli/src/init.rs
+@@ -336,13 +336,16 @@ mod tests {
+     use super::{initialize_repo, render_init_claude_md};
+     use std::fs;
+     use std::path::Path;
++    use std::sync::atomic::{AtomicU64, Ordering};
+     use std::time::{SystemTime, UNIX_EPOCH};
+ 
+     fn temp_dir() -> std::path::PathBuf {
++        static SEQ: AtomicU64 = AtomicU64::new(0);
++        let seq = SEQ.fetch_add(1, Ordering::Relaxed);
+         let nanos = SystemTime::now()
+             .duration_since(UNIX_EPOCH)
+             .expect("time should be after epoch")
+             .as_nanos();
+-        std::env::temp_dir().join(format!("rusty-claude-init-{nanos}"))
++        std::env::temp_dir().join(format!("rusty-claude-init-{nanos}-{seq}"))
+     }
+ 
+     #[test]
