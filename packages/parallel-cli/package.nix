@@ -96,8 +96,17 @@ let
   # but its upstream test suite exercises local socket/network behavior that is
   # not reliable in our build sandbox. Keep the package and disable checks here
   # instead of dropping Snowflake support from the CLI surface.
-  snowflake-connector-python = python3.pkgs.snowflake-connector-python.overridePythonAttrs (_old: {
+  #
+  # Upstream 4.3.0's setup.py promotes the `boto` extra into install_requires
+  # at egg_info time unless SNOWFLAKE_NO_BOTO is set, which makes
+  # pythonRuntimeDepsCheckHook fail because nixpkgs only lists boto3/botocore
+  # as optional-dependencies. parallel-cli's Snowflake integration does not
+  # touch the S3/STS code paths, so opt out of the boto extra.
+  snowflake-connector-python = python3.pkgs.snowflake-connector-python.overridePythonAttrs (old: {
     doCheck = false;
+    env = (old.env or { }) // {
+      SNOWFLAKE_NO_BOTO = "1";
+    };
   });
 in
 python3.pkgs.buildPythonApplication rec {
