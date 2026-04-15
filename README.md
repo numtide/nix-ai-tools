@@ -940,7 +940,17 @@ Add to your system configuration:
 
 ### Using Overlay
 
-Alternatively, use the overlay to access packages under the `llm-agents` namespace:
+Alternatively, use an overlay to access packages under the `llm-agents`
+namespace. Two are provided:
+
+- `overlays.default` exposes `packages.${system}` as-is. Packages are built
+  against this flake's pinned nixpkgs, so the [binary cache](#binary-cache)
+  hits regardless of your nixpkgs revision, at the cost of evaluating a second
+  nixpkgs instance.
+- `overlays.shared-nixpkgs` rebuilds each package against **your** nixpkgs, so
+  dependencies are shared with the rest of your system and no extra nixpkgs is
+  evaluated. The binary cache will only hit when your nixpkgs revision matches
+  ours.
 
 ```nix
 {
