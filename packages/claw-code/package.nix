@@ -44,7 +44,13 @@ rustPlatform.buildRustPackage rec {
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
-  versionCheckProgramArg = [ "--version" ];
+  versionCheckProgramArg = "--version";
+  # Upstream has no tagged release yet; we track an unstable rev. The binary
+  # reports the Cargo workspace.package.version (e.g. 0.1.0), so compare
+  # against that rather than our `0-unstable-<date>` derivation version.
+  preVersionCheck = ''
+    version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+  '';
 
   passthru.category = "AI Coding Agents";
 
