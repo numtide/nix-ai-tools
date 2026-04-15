@@ -44,8 +44,13 @@
     in
     blueprintOutputs
     // {
-      overlays.default = import ./overlays {
-        packages = blueprintOutputs.packages;
+      overlays = {
+        default = import ./overlays {
+          inherit (blueprintOutputs) packages;
+        };
+        shared-nixpkgs = import ./overlays/shared-nixpkgs.nix {
+          inherit (blueprintOutputs) mkPackagesFor;
+        };
       };
     };
 }
