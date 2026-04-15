@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.35.0";
+  version = "0.36.0";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     rev = "v${version}";
-    hash = "sha256-/bKquUbVMM1e/YPcuSb0vW4tX/3yNDUxmaBWHKFw+Qs=";
+    hash = "sha256-L03CNKEY799l1e5UsLto/KawKgXS+DLVSnUalwMrAHs=";
   };
 
-  cargoHash = "sha256-ibGIpH6Ls9nxtF6rRl+dZBbbmVRXDQA6vpPI/jzpDqI=";
+  cargoHash = "sha256-FLjxhLczGIU2zcKD6bZMAQyStXsxyQCYG9cSXi6XEjs=";
 
   # keyring uses sync-secret-service (dbus) on Linux, apple-native on Darwin
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ dbus ];
