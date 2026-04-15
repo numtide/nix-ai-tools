@@ -1,13 +1,13 @@
 {
-  "version": "0.1.38",
-  "hash": "sha256-d7GBRvxZ+UE5GGF/AGPfYBo91BS86Qf7rcm3NQ4eA7o=",
-  "cargoHash": "sha256-F1RPmCe9TOfEMCdtZK/RRQhPbxRp4Py7q7ukotkoOoQ=",
+  "version": "0.1.40",
+  "hash": "sha256-1PMYqgoZ8rcWS4SQmmesYUCfTXj7ogLPtBYhDTggvHc=",
+  "cargoHash": "sha256-p/Fv2hXdfsMm0RnwovDXqzGlG7pY/SCH+SluVnDklQI=",
   "frankensqlite": {
-    "rev": "90a9488163acf235db804e6c66a8e6c523d4992f",
-    "hash": "sha256-GP/MbPHvt1DleWu76K7IG/GFSInrAYAmPHyTgFCEqCc="
+    "rev": "a3b36b23c576fee70a90b051976db269e677e1e0",
+    "hash": "sha256-Kl2mr/24zf8OpmBE615ytRYkdIkGSc+Gnlo3Y1G0wuY="
   },
   "asupersync": {
-    "rev": "81b5bc2dc968fe7e36c6d2636aff644603ba0ca7",
-    "hash": "sha256-c0NNVvD/mH7/zWnimq3Du+EPPGKSKTy6ws7oixK4Y1s="
+    "rev": "48b1a2054fbf782b329a19db5077fe24d571bd02",
+    "hash": "sha256-Mk3RlDZWybMV6FUolgjKtaMRSyYdpedwa9+LTErQtyk="
   }
 }
