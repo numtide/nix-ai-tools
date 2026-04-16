@@ -32,7 +32,17 @@ buildGoModule.override { go = go-bin; } rec {
     icu
   ];
 
-  env.CGO_ENABLED = "1";
+  # go-icu-regex's cgo directives use raw -licui18n etc. with no
+  # `#cgo pkg-config:` line, so pkg-config never runs. With go-bin (the
+  # upstream prebuilt toolchain) on darwin the icu include dir does not
+  # make it into the compiler invocation; pass it explicitly so the
+  # build is independent of which cc cgo ends up resolving.
+  env = {
+    CGO_ENABLED = "1";
+    CGO_CFLAGS = "-I${lib.getDev icu}/include";
+    CGO_CXXFLAGS = "-I${lib.getDev icu}/include";
+    CGO_LDFLAGS = "-L${lib.getLib icu}/lib";
+  };
 
   subPackages = [ "cmd/bd" ];
 
