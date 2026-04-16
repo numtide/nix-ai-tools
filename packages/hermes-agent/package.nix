@@ -173,6 +173,12 @@ python3.pkgs.buildPythonApplication rec {
     "pyjwt"
   ];
 
+  postPatch = ''
+    substituteInPlace hermes_cli/gateway.py \
+      --replace-fail 'python_path = get_python_path()' 'hermes_cli = get_hermes_cli_path()' \
+      --replace-fail 'ExecStart={python_path} -m hermes_cli.main{f" {profile_arg}" if profile_arg else ""} gateway run --replace' 'ExecStart={hermes_cli}{f" {profile_arg}" if profile_arg else ""} gateway run --replace'
+  '';
+
   pythonImportsCheck = [ "hermes_cli" ];
 
   doInstallCheck = true;
