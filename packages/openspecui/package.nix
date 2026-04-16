@@ -1,6 +1,7 @@
 {
   buildNpmPackage,
   fetchurl,
+  flake,
   jq,
   lib,
   fetchNpmDepsWithPackuments,
@@ -51,6 +52,7 @@ buildNpmPackage {
     downloadPage = "https://www.npmjs.com/package/openspecui";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    maintainers = with flake.lib.maintainers; [ afterthought ];
     mainProgram = "openspecui";
   };
 }

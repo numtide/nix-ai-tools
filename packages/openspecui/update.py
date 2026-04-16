@@ -37,7 +37,9 @@ def main() -> None:
         print("Already up to date")
         return
 
-    tarball_url = f"https://registry.npmjs.org/{NPM_PACKAGE}/-/{NPM_PACKAGE}-{latest}.tgz"
+    tarball_url = (
+        f"https://registry.npmjs.org/{NPM_PACKAGE}/-/{NPM_PACKAGE}-{latest}.tgz"
+    )
 
     print("Calculating source hash...")
     source_hash = calculate_url_hash(tarball_url)
