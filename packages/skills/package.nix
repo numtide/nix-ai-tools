@@ -35,7 +35,8 @@ stdenv.mkDerivation rec {
 
     mkdir -p $out/bin
     makeWrapper $out/libexec/skills/bin/cli.mjs $out/bin/skills \
-      --prefix PATH : ${lib.makeBinPath [ nodejs ]}
+      --prefix PATH : ${lib.makeBinPath [ nodejs ]} \
+      --set DISABLE_TELEMETRY 1
 
     ln -s $out/bin/skills $out/bin/add-skill
 
