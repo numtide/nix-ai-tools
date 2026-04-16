@@ -4,6 +4,7 @@
   fetchzip,
   makeWrapper,
   nodejs,
+  versionCheckHook,
   flake,
 }:
 
@@ -23,6 +24,8 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ makeWrapper ];
+  # nodejs in buildInputs (not nativeBuildInputs) so the fixup-phase
+  # patchShebangs --host rewrite of bin/cli.mjs resolves to the runtime node.
   buildInputs = [ nodejs ];
 
   installPhase = ''
@@ -44,12 +47,7 @@ stdenv.mkDerivation rec {
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ nodejs ];
-  installCheckPhase = ''
-    runHook preInstallCheck
-    $out/bin/skills --help 2>&1 | grep -qi "skill"
-    runHook postInstallCheck
-  '';
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Claude Code Ecosystem";
 
@@ -58,7 +56,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/vercel-labs/skills";
     changelog = "https://github.com/vercel-labs/skills/releases/tag/v${version}";
     license = licenses.mit;
-    sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
+    sourceProvenance = with lib.sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ ];
     mainProgram = "skills";
     platforms = platforms.all;
