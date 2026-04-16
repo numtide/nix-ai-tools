@@ -12,16 +12,16 @@
 
 buildGoModule.override { go = go-bin; } rec {
   pname = "beads";
-  version = "1.0.0";
+  version = "1.0.2";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-    hash = "sha256-D2jShGpkOWKx9aRmRvV5bmV8t0/Y2eAE8q0m54QrRN0=";
+    hash = "sha256-aRgm2gWO08FZA2HaVxSitmjDk0Fp51oFZ8lmBCKDrzU=";
   };
 
-  vendorHash = "sha256-7DJgqJX2HDa9gcGD8fLNHLIXvGAEivYeDYx3snCUyCE=";
+  vendorHash = "sha256-stY1JxMAeINT73KCvwZyh/TUktkLirEcGa0sW1u7W1s=";
 
   nativeBuildInputs = [
     makeWrapper
@@ -32,7 +32,17 @@ buildGoModule.override { go = go-bin; } rec {
     icu
   ];
 
-  env.CGO_ENABLED = "1";
+  # go-icu-regex's cgo directives use raw -licui18n etc. with no
+  # `#cgo pkg-config:` line, so pkg-config never runs. With go-bin (the
+  # upstream prebuilt toolchain) on darwin the icu include dir does not
+  # make it into the compiler invocation; pass it explicitly so the
+  # build is independent of which cc cgo ends up resolving.
+  env = {
+    CGO_ENABLED = "1";
+    CGO_CFLAGS = "-I${lib.getDev icu}/include";
+    CGO_CXXFLAGS = "-I${lib.getDev icu}/include";
+    CGO_LDFLAGS = "-L${lib.getLib icu}/lib";
+  };
 
   subPackages = [ "cmd/bd" ];
 
