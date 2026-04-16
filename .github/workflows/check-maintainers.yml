@@ -1,0 +1,25 @@
+name: Check maintainers on new packages
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'lib/**'
+      - '.github/ci/check_maintainers.py'
+      - '.github/workflows/check-maintainers.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Need history to compute merge-base against the base branch.
+          fetch-depth: 0
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+      - name: Check new packages declare maintainers
+        run: |
+          python3 .github/ci/check_maintainers.py \
+            --base-ref "origin/${{ github.base_ref }}"
