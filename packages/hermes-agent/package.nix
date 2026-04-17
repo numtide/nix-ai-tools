@@ -6,6 +6,7 @@
   fetchPypi,
   versionCheckHook,
   versionCheckHomeHook,
+  withMessagers ? true,
 }:
 
 let
@@ -163,6 +164,21 @@ python3.pkgs.buildPythonApplication rec {
     faster-whisper
     # Skills Hub
     pyjwt
+  ] ++ lib.optionals withMessagers [
+    qrcode
+    # Telegram
+    python-telegram-bot
+    aiohttp
+    # Matrix
+    mautrix
+    markdown
+    aiosqlite
+    asyncpg
+    # Discord
+    discordpy
+    # Slack
+    slack-bolt
+    slack-sdk
   ];
 
   pythonRelaxDeps = [
@@ -171,6 +187,8 @@ python3.pkgs.buildPythonApplication rec {
     "pydantic"
     "firecrawl-py"
     "pyjwt"
+    "python-telegram-bot"
+    "mautrix"
   ];
 
   postPatch = ''
