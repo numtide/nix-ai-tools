@@ -6,6 +6,7 @@
   fetchPypi,
   versionCheckHook,
   versionCheckHomeHook,
+  buildNpmPackage,
   withMessagers ? true,
 }:
 
@@ -152,6 +153,7 @@ python3.pkgs.buildPythonApplication rec {
     pydantic
     # Interactive CLI
     prompt-toolkit
+    simple-term-menu
     # MCP
     mcp
     # Tools
@@ -159,11 +161,15 @@ python3.pkgs.buildPythonApplication rec {
     firecrawl-py
     parallel-web
     fal-client
+    croniter
     # Text-to-speech
     edge-tts
     faster-whisper
     # Skills Hub
     pyjwt
+    # web dashboard
+    fastapi
+    uvicorn
   ] ++ lib.optionals withMessagers [
     qrcode
     # Telegram
@@ -197,6 +203,11 @@ python3.pkgs.buildPythonApplication rec {
       --replace-fail 'ExecStart={python_path} -m hermes_cli.main{f" {profile_arg}" if profile_arg else ""} gateway run --replace' 'ExecStart={hermes_cli}{f" {profile_arg}" if profile_arg else ""} gateway run --replace'
   '';
 
+  preBuild = ''
+    mkdir -p hermes_cli
+    cp -r ${frontend}/. hermes_cli/web_dist
+  '';
+
   pythonImportsCheck = [ "hermes_cli" ];
 
   doInstallCheck = true;
@@ -206,7 +217,28 @@ python3.pkgs.buildPythonApplication rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
-  passthru.category = "AI Assistants";
+  frontend = buildNpmPackage {
+    pname = "hermes-agent-web";
+    inherit src version;
+    sourceRoot = "${src.name}/web";
+    npmDepsHash = "sha256-Y0pOzdFG8BLjfvCLmsvqYpjxFjAQabXp1i7X9W/cCU4=";
+
+    postPatch = ''
+      substituteInPlace vite.config.ts \
+        --replace-fail 'outDir: "../hermes_cli/web_dist",' 'outDir: "dist",'
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      cp -r dist $out
+      runHook postInstall
+    '';
+  };
+ 
+  passthru = {
+    inherit frontend;
+    category = "AI Assistants";
+  };
 
   meta = with lib; {
     description = "Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere";
