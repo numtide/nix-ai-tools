@@ -5,6 +5,8 @@
   ...
 }:
 let
+  npmPackumentSupport = pkgs.callPackage ../../lib/fetch-npm-deps.nix { };
+
   # ctranslate2 4.7.x tests invoke test_torch_variables, which calls into
   # cpuinfo at import time. On the aarch64-linux remote builders the sandbox
   # does not expose a readable /proc/cpuinfo, so every parametrisation of
@@ -26,5 +28,6 @@ let
 in
 pkgs.callPackage ./package.nix {
   inherit flake python3;
+  inherit (npmPackumentSupport) fetchNpmDepsWithPackuments npmConfigHook;
   inherit (perSystem.self) versionCheckHomeHook;
 }
