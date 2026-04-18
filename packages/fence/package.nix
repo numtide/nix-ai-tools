@@ -79,7 +79,7 @@ in
     changelog = "https://github.com/Use-Tusk/fence/releases";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ uesyn ];
     mainProgram = "fence";
   };
 }
