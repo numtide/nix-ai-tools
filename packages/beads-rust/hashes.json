@@ -5,9 +5,5 @@
   "frankensqlite": {
     "rev": "3ed4712e475a767d2851a6de445834a84afd2a43",
     "hash": "sha256-FDbSBVR9ghLDG9iySAImp+JqPM1l8CnGU/UK8znBg/k="
-  },
-  "asupersync": {
-    "rev": "ce887ab38ebfd33254180491a8b2141481c0ac75",
-    "hash": "sha256-eEIgUNm75CTWaQ145HTJaNYkLwkrqOxMEemgjHyr2a8="
   }
 }

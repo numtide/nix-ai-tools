@@ -9,29 +9,16 @@
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
 
-  # Upstream uses [patch.crates-io] with local path deps pointing at sibling
-  # checkouts of frankensqlite and asupersync.  Fetch them separately and place
-  # them where Cargo expects.
+  # Upstream's tagged Cargo.lock is generated with the dev-local
+  # `[patch.crates-io]` config active, so the fsqlite-* entries have no
+  # `source =` field and are not vendored.  Reproduce that environment by
+  # placing a sibling frankensqlite checkout and installing the upstream
+  # patch table (scripts/dev-local-frankensqlite.toml) as .cargo/config.toml.
   # https://github.com/Dicklesworthstone/beads_rust/issues/183
   frankensqlite = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "frankensqlite";
     inherit (data.frankensqlite) rev hash;
-  };
-
-  # frankensqlite workspace depends on asupersync via path = "../asupersync".
-  # Upstream committed hundreds of MB of issue-tracker recovery dumps under
-  # .beads/ that GitHub's archive endpoint can't even finish streaming on CI,
-  # so do a sparse git checkout that skips that directory entirely.
-  asupersync = fetchFromGitHub {
-    owner = "Dicklesworthstone";
-    repo = "asupersync";
-    inherit (data.asupersync) rev hash;
-    sparseCheckout = [
-      "/*"
-      "!/.beads"
-    ];
-    nonConeMode = true;
   };
 in
 rustPlatform.buildRustPackage {
@@ -48,8 +35,11 @@ rustPlatform.buildRustPackage {
   postUnpack = ''
     cp -r ${frankensqlite} frankensqlite
     chmod -R u+w frankensqlite
-    cp -r ${asupersync} asupersync
-    chmod -R u+w asupersync
+  '';
+
+  postPatch = ''
+    mkdir -p .cargo
+    cp scripts/dev-local-frankensqlite.toml .cargo/config.toml
   '';
 
   # fsqlite uses #![feature(peer_credentials_unix_socket)] which requires nightly.
@@ -65,11 +55,7 @@ rustPlatform.buildRustPackage {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  passthru = {
-    category = "Workflow & Project Management";
-    # Exposed so update.py can prefetch the sparse-checkout hash
-    inherit asupersync;
-  };
+  passthru.category = "Workflow & Project Management";
 
   meta = with lib; {
     description = "Fast Rust port of beads - a local-first issue tracker for git repositories";
