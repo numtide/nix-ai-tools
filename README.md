@@ -647,6 +647,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>openspecui</strong> - Visual interface for spec-driven development</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/jixoai/openspecui
+- **Usage**: `nix run github:numtide/llm-agents.nix#openspecui -- --help`
+- **Nix**: [packages/openspecui/package.nix](packages/openspecui/package.nix)
+
+</details>
+<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
@@ -770,6 +780,26 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/entireio/cli
 - **Usage**: `nix run github:numtide/llm-agents.nix#entire -- --help`
 - **Nix**: [packages/entire/package.nix](packages/entire/package.nix)
+
+</details>
+<details>
+<summary><strong>fence</strong> - Lightweight, container-free sandbox for running commands with network and filesystem restrictions</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://fencesandbox.com/
+- **Usage**: `nix run github:numtide/llm-agents.nix#fence -- --help`
+- **Nix**: [packages/fence/package.nix](packages/fence/package.nix)
+
+</details>
+<details>
+<summary><strong>git-surgeon</strong> - Git primitives for autonomous coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/raine/git-surgeon
+- **Usage**: `nix run github:numtide/llm-agents.nix#git-surgeon -- --help`
+- **Nix**: [packages/git-surgeon/package.nix](packages/git-surgeon/package.nix)
 
 </details>
 <details>
