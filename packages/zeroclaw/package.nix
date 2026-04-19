@@ -13,13 +13,13 @@
 }:
 let
   pname = "zeroclaw";
-  version = "0.6.9";
+  version = "0.7.3";
 
   src = fetchFromGitHub {
     owner = "zeroclaw-labs";
     repo = "zeroclaw";
     tag = "v${version}";
-    hash = "sha256-bYJ48yqp7GR+FbfS9ydBNJ6mIBQkdX6d6kyOA4vT4wA=";
+    hash = "sha256-eIfHjBHE5po0RjJcrfQiJOUW+HbVuizVpKdVBcLyQRg=";
   };
 
   frontendSrc = runCommand "${pname}-web-src-${version}" { } ''
@@ -62,7 +62,7 @@ in
 rustPlatform.buildRustPackage rec {
   inherit pname version src;
 
-  cargoHash = "sha256-HB7lrkQZ53kYoIy8cyOcp8FLgzk5WCxr8/PygFWD2ZQ=";
+  cargoHash = "sha256-5/aUT+cCzZZJJYbouHJ1nu4/7PLyE/b5+zoLyUekTIc=";
 
   preBuild = ''
     mkdir -p web/dist
