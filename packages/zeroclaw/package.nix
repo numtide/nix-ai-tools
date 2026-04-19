@@ -19,7 +19,7 @@ let
     owner = "zeroclaw-labs";
     repo = "zeroclaw";
     tag = "v${version}";
-    hash = "sha256-eIfHjBHE5po0RjJcrfQiJOUW+HbVuizVpKdVBcLyQRg=";
+    hash = "sha256-Lr30nJ2IRAZzxS8Dc43c5mj3ab2suVbZxLTLx0mBRF0=";
   };
 
   frontendSrc = runCommand "${pname}-web-src-${version}" { } ''
