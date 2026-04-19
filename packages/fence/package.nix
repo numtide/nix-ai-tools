@@ -15,20 +15,18 @@
   bpftrace,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash vendorHash;
-in
-(buildGoModule.override { go = go-bin; }) {
+(buildGoModule.override { go = go-bin; }) rec {
   pname = "fence";
-  inherit version vendorHash;
+  version = "0.1.48";
 
   src = fetchFromGitHub {
     owner = "Use-Tusk";
     repo = "fence";
     rev = "v${version}";
-    inherit hash;
+    hash = "sha256-OBbN/mSoQfpeBMl3KYD+fLVwB/ruux9jvk9HJjDmxU8=";
   };
+
+  vendorHash = "sha256-Zfrst8fQNHP3KNpTQLIju9qo2hyozOWwbdNw0qCGhJ0=";
 
   nativeBuildInputs = [
     installShellFiles
