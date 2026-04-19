@@ -3,10 +3,11 @@
 
 """Update script for beads-rust package.
 
-Upstream uses [patch.crates-io] with local path deps to sibling
-frankensqlite and asupersync repos.  This script updates beads_rust
-and the matching sibling commits in hashes.json, then recalculates
-cargoHash via a dummy-hash build.
+Upstream's tagged Cargo.lock is generated with the dev-local
+[patch.crates-io] config active, so we have to build against a sibling
+frankensqlite checkout.  This script updates beads_rust and the matching
+frankensqlite commit in hashes.json, then recalculates cargoHash via a
+dummy-hash build.
 """
 
 import sys
@@ -23,14 +24,11 @@ from updater import (
     save_hashes,
     should_update,
 )
-from updater.hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
-from updater.nix import NixCommandError, nix_build
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 OWNER = "Dicklesworthstone"
 BEADS_REPO = "beads_rust"
 FRANK_REPO = "frankensqlite"
-ASYNC_REPO = "asupersync"
 
 
 def get_release_date(owner: str, repo: str, version: str) -> str:
@@ -59,30 +57,6 @@ def prefetch_github(owner: str, repo: str, rev: str) -> str:
     """Prefetch a GitHub archive and return its SRI hash."""
     url = f"https://github.com/{owner}/{repo}/archive/{rev}.tar.gz"
     return calculate_url_hash(url, unpack=True)
-
-
-def prefetch_asupersync(data: dict[str, object], rev: str) -> str:
-    """Prefetch asupersync via the package's sparse fetchFromGitHub.
-
-    asupersync grew a multi-hundred-MB .beads/ directory that hangs
-    nix-prefetch-url on the archive endpoint.  package.nix excludes it via
-    sparseCheckout, which produces a different fixed-output hash than the full
-    archive would, so we have to recover the hash from a failed build of that
-    exact derivation rather than prefetching the URL ourselves.
-    """
-    data["asupersync"] = {"rev": rev, "hash": DUMMY_SHA256_HASH}
-    save_hashes(HASHES_FILE, data)
-
-    try:
-        nix_build(".#beads-rust.asupersync", check=True)
-    except NixCommandError as e:
-        h = extract_hash_from_build_error(e.args[0])
-        if h is None:
-            raise
-        return h
-
-    msg = "asupersync prefetch build unexpectedly succeeded with dummy hash"
-    raise ValueError(msg)
 
 
 def main() -> None:
@@ -115,12 +89,6 @@ def main() -> None:
         "hash": prefetch_github(OWNER, FRANK_REPO, frank_rev),
     }
 
-    print("Finding asupersync commit matching release...")
-    async_rev = get_sibling_rev(ASYNC_REPO, release_date)
-    print(f"asupersync rev: {async_rev}")
-    print("Prefetching asupersync (sparse)...")
-    async_hash = prefetch_asupersync(data, async_rev)
-    data["asupersync"] = {"rev": async_rev, "hash": async_hash}
     save_hashes(HASHES_FILE, data)
 
     # Recalculate cargoHash via dummy-hash build
