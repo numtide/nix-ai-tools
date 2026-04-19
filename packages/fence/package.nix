@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   buildGoModule,
   fetchFromGitHub,
@@ -79,7 +80,7 @@ in
     changelog = "https://github.com/Use-Tusk/fence/releases";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = with maintainers; [ uesyn ];
+    maintainers = with flake.lib.maintainers; [ uesyn ];
     mainProgram = "fence";
   };
 }
