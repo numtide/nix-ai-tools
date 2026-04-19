@@ -30,6 +30,12 @@ buildGoModule rec {
 
   doCheck = true;
 
+  # The OBS-01 wiring test compiles the binary, launches the full TUI in a
+  # subprocess and waits for it to write debug.log. The TUI bails in the
+  # sandbox (no tmux/terminal), so debug.log never appears. The test guards
+  # the subprocess arm with testing.Short(), so honour that.
+  checkFlags = [ "-short" ];
+
   preCheck = ''
     export HOME=$(mktemp -d)
     export PATH="${git}/bin:$PATH"
