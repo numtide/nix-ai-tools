@@ -8,16 +8,16 @@
 
 buildGoModule rec {
   pname = "sidecar";
-  version = "0.83.0";
+  version = "0.84.0";
 
   src = fetchFromGitHub {
     owner = "marcus";
     repo = "sidecar";
     rev = "v${version}";
-    hash = "sha256-L6q2eZO1rNngWwHVhBJ2ftVbvYTConpqYHEb3nwiXxs=";
+    hash = "sha256-80ldZlaZ99ti8dvw+Awev7ucz03iOVD2yzz/+IFHDvA=";
   };
 
-  vendorHash = "sha256-fIaHzc0L4jwVSh/YjrXBB7nENqCgOfHF5bnljFsGbVo=";
+  vendorHash = "sha256-IDD+hQZODNPj+Gy9CX5GFdMcsvt75aFLpabXZehAjaw=";
 
   subPackages = [ "cmd/sidecar" ];
 
