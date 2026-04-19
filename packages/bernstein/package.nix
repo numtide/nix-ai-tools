@@ -64,6 +64,7 @@ python3.pkgs.buildPythonApplication rec {
   dependencies = with python3.pkgs; [
     click
     cryptography
+    defusedxml
     fastapi
     httpx
     mcp
@@ -80,6 +81,7 @@ python3.pkgs.buildPythonApplication rec {
     pyyaml
     rich
     setproctitle
+    signxml
     terminaltexteffects
     textual
     uvicorn
