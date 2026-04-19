@@ -36,14 +36,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "bernstein";
-  version = "1.8.5";
+  version = "1.8.8";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "chernistry";
     repo = "bernstein";
     tag = "v${version}";
-    hash = "sha256-h6tZGrsSv7Ry68nSDQBtXbH6q9ohNM52HaQaK5+ARo4=";
+    hash = "sha256-textYcxz8GPPTK3RsExZKFJ/1xMext6hR+WfcWXQHDk=";
   };
 
   # Upstream sometimes tags a release without bumping the version in
@@ -64,6 +64,7 @@ python3.pkgs.buildPythonApplication rec {
   dependencies = with python3.pkgs; [
     click
     cryptography
+    defusedxml
     fastapi
     httpx
     mcp
@@ -80,6 +81,7 @@ python3.pkgs.buildPythonApplication rec {
     pyyaml
     rich
     setproctitle
+    signxml
     terminaltexteffects
     textual
     uvicorn
