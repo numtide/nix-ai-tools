@@ -6,5 +6,5 @@
 }:
 pkgs.callPackage ./package.nix {
   inherit flake;
-  inherit (perSystem.self) go-bin versionCheckHomeHook;
+  inherit (perSystem.self) versionCheckHomeHook;
 }

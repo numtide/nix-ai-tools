@@ -6,7 +6,6 @@
   fetchFromGitHub,
   installShellFiles,
   makeWrapper,
-  go-bin,
   versionCheckHook,
   versionCheckHomeHook,
   # Linux dependencies
@@ -15,7 +14,7 @@
   bpftrace,
 }:
 
-(buildGoModule.override { go = go-bin; }) rec {
+buildGoModule rec {
   pname = "fence";
   version = "0.1.48";
 
