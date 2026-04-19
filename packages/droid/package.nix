@@ -6,6 +6,7 @@
   wrapBuddy,
   gcc-unwrapped,
   versionCheckHook,
+  versionCheckHomeHook,
 }:
 
 let
@@ -69,7 +70,12 @@ stdenv.mkDerivation {
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  # 0.104.0 unconditionally creates ~/.factory at startup before parsing
+  # --version, so the empty-env version check needs a writable HOME.
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
 
   passthru.category = "AI Coding Agents";
 

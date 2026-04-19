@@ -4,5 +4,5 @@
   ...
 }:
 pkgs.callPackage ./package.nix {
-  inherit (perSystem.self) wrapBuddy;
+  inherit (perSystem.self) wrapBuddy versionCheckHomeHook;
 }
