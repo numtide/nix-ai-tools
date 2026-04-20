@@ -41,7 +41,7 @@ python3.pkgs.buildPythonApplication rec {
 
   pythonImportsCheck = [ "code_review_graph" ];
 
-  passthru.category = "Developer Tools";
+  passthru.category = "Code Review";
 
   meta = with lib; {
     description = "Local knowledge graph for AI coding agents — builds persistent map of your codebase for token-efficient code reviews";
@@ -49,8 +49,10 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://github.com/tirth8205/code-review-graph/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = with lib; [ maintainers.aldoborrero ];
-    platforms = platforms.linux;
+    maintainers = with maintainers; [ aldoborrero ];
+    # Transitive dependency `lupa` ships a pre-built LuaJIT that only links
+    # on x86_64, so we exclude aarch64-linux.
+    platforms = [ "x86_64-linux" ];
     mainProgram = "code-review-graph";
   };
 }

@@ -97,11 +97,6 @@ inputs.nixpkgs.lib.extend (
         githubId = 17411645;
         name = "Shinya Uemura";
       };
-      aldoborrero = {
-        github = "aldoborrero";
-        githubId = 82811;
-        name = "Aldo Borrero";
-      };
     };
   }
 )
