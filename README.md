@@ -437,6 +437,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>oh-my-claudecode</strong> - Multi-agent orchestration system for Claude Code</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/yeachan-heo/oh-my-claudecode
+- **Usage**: `nix run github:numtide/llm-agents.nix#oh-my-claudecode -- --help`
+- **Nix**: [packages/oh-my-claudecode/package.nix](packages/oh-my-claudecode/package.nix)
+
+</details>
+<details>
 <summary><strong>sandbox-runtime</strong> - Lightweight sandboxing tool for enforcing filesystem and network restrictions</summary>
 
 - **Source**: source
