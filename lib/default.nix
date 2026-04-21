@@ -97,6 +97,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 17411645;
         name = "Shinya Uemura";
       };
+      murlakatam = {
+        github = "murlakatam";
+        githubId = 38276;
+        name = "Eugene Baranovsky";
+      };
     };
   }
 )
