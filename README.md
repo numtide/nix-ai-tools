@@ -710,6 +710,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Code Review
 
 <details>
+<summary><strong>code-review-graph</strong> - Local knowledge graph for AI coding agents — builds persistent map of your codebase for token-efficient code reviews</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/tirth8205/code-review-graph
+- **Usage**: `nix run github:numtide/llm-agents.nix#code-review-graph -- --help`
+- **Nix**: [packages/code-review-graph/package.nix](packages/code-review-graph/package.nix)
+
+</details>
+<details>
 <summary><strong>coderabbit-cli</strong> - AI-powered code review CLI tool</summary>
 
 - **Source**: binary
