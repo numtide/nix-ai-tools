@@ -2,8 +2,8 @@
   "version": "0.2.0",
   "hash": "sha256-wau6A6YB0VawODsEvgZPQufYfOpzyr96Rh2FcmoBUFc=",
   "parallelWeb": {
-    "version": "0.4.2",
-    "hash": "sha256-JlxccLfmwlpsG9l5OjDii5cT3l1BteSQ1w1OhftoBgg="
+    "version": "0.5.0",
+    "hash": "sha256-x/usp9kg75SNok4PFuGkuiBTYeGJMgvhOjcEsMP6L+0="
   },
   "sqlalchemyBigquery": {
     "version": "1.16.0",
