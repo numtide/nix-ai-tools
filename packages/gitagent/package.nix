@@ -10,19 +10,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "gitagent";
-  version = "0.2.0";
+  version = "0.3.2";
 
   src = fetchFromGitHub {
     owner = "open-gitagent";
     repo = "gitagent";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-gZG6sBXMCtsDiiX1sfH1G3m481L5uAr3zEW56kqqskE=";
+    hash = "sha256-YFcsUxnhWj3A9itf/eylM4Os5eXSMakO/LmEi+MbKnw=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-kpN9qoAt6LWYshK9ERILpqGSRAVsqY1kiJCw48loFp0=";
+    hash = "sha256-j0lhpHaPpSvdPSjrfZr/gxs+2fJPKTy58ICyMuZYINA=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
