@@ -92,6 +92,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 105790745;
         name = "Sergii Maksymov";
       };
+      kusold = {
+        github = "kusold";
+        githubId = 509966;
+        name = "Mike Kusold";
+      };
     };
   }
 )

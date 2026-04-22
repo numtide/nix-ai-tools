@@ -57,7 +57,7 @@ stdenv.mkDerivation rec {
     changelog = "https://github.com/vercel-labs/skills/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with flake.lib.maintainers; [ ];
+    maintainers = with flake.lib.maintainers; [ kusold ];
     mainProgram = "skills";
     platforms = platforms.all;
   };
