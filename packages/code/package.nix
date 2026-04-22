@@ -12,13 +12,13 @@
 }:
 
 let
-  version = "0.6.93";
+  version = "0.6.94";
 
   src = fetchFromGitHub {
     owner = "just-every";
     repo = "code";
     tag = "v${version}";
-    hash = "sha256-ZRDVPPJGSREtNJsGmULOvqL55A3PdKbNpZIGfRoCBvE=";
+    hash = "sha256-COFjn3jdC2wLoEDOGPZDSpFdBwR2p2QdYLL+VIqqRSU=";
   };
 in
 rustPlatform.buildRustPackage {
@@ -28,7 +28,7 @@ rustPlatform.buildRustPackage {
   cargoDeps = fetchCargoVendor {
     inherit src;
     sourceRoot = "source/code-rs";
-    hash = "sha256-jpRGhzSCunfoIMiF+k5PY4uuCXDkbjuWjGiFn86ywQc=";
+    hash = "sha256-WzxErEsZaVI4zFQt83hQLBMPjAqOC32j5uqXbwBHkOM=";
   };
 
   sourceRoot = "source/code-rs";
