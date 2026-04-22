@@ -437,6 +437,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>oh-my-claudecode</strong> - Multi-agent orchestration system for Claude Code</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/yeachan-heo/oh-my-claudecode
+- **Usage**: `nix run github:numtide/llm-agents.nix#oh-my-claudecode -- --help`
+- **Nix**: [packages/oh-my-claudecode/package.nix](packages/oh-my-claudecode/package.nix)
+
+</details>
+<details>
 <summary><strong>sandbox-runtime</strong> - Lightweight sandboxing tool for enforcing filesystem and network restrictions</summary>
 
 - **Source**: source
@@ -647,6 +657,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>openspecui</strong> - Visual interface for spec-driven development</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/jixoai/openspecui
+- **Usage**: `nix run github:numtide/llm-agents.nix#openspecui -- --help`
+- **Nix**: [packages/openspecui/package.nix](packages/openspecui/package.nix)
+
+</details>
+<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
@@ -699,6 +719,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 ### Code Review
 
+<details>
+<summary><strong>code-review-graph</strong> - Local knowledge graph for AI coding agents — builds persistent map of your codebase for token-efficient code reviews</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/tirth8205/code-review-graph
+- **Usage**: `nix run github:numtide/llm-agents.nix#code-review-graph -- --help`
+- **Nix**: [packages/code-review-graph/package.nix](packages/code-review-graph/package.nix)
+
+</details>
 <details>
 <summary><strong>coderabbit-cli</strong> - AI-powered code review CLI tool</summary>
 
@@ -770,6 +800,26 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/entireio/cli
 - **Usage**: `nix run github:numtide/llm-agents.nix#entire -- --help`
 - **Nix**: [packages/entire/package.nix](packages/entire/package.nix)
+
+</details>
+<details>
+<summary><strong>fence</strong> - Lightweight, container-free sandbox for running commands with network and filesystem restrictions</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://fencesandbox.com/
+- **Usage**: `nix run github:numtide/llm-agents.nix#fence -- --help`
+- **Nix**: [packages/fence/package.nix](packages/fence/package.nix)
+
+</details>
+<details>
+<summary><strong>git-surgeon</strong> - Git primitives for autonomous coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/raine/git-surgeon
+- **Usage**: `nix run github:numtide/llm-agents.nix#git-surgeon -- --help`
+- **Nix**: [packages/git-surgeon/package.nix](packages/git-surgeon/package.nix)
 
 </details>
 <details>

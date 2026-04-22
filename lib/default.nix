@@ -97,6 +97,16 @@ inputs.nixpkgs.lib.extend (
         githubId = 509966;
         name = "Mike Kusold";
       };
+      uesyn = {
+        github = "uesyn";
+        githubId = 17411645;
+        name = "Shinya Uemura";
+      };
+      murlakatam = {
+        github = "murlakatam";
+        githubId = 38276;
+        name = "Eugene Baranovsky";
+      };
     };
   }
 )

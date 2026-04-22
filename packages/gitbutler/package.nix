@@ -29,13 +29,13 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "gitbutler";
-  version = "0.19.8";
+  version = "0.19.9";
 
   src = fetchFromGitHub {
     owner = "gitbutlerapp";
     repo = "gitbutler";
     tag = "release/${finalAttrs.version}";
-    hash = "sha256-qYPXZ28FpYiQ7+T1XOPuBbsdT82UDbQxxaLmKyYOCTc=";
+    hash = "sha256-hUxtvCxLB++33gKc+UNOAns3UFozWTETYJvEr+HcOgU=";
   };
 
   # Pin the user-facing version into the Tauri release config and disable the
@@ -53,7 +53,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail 'checkUpdate = tauriCheck;' 'checkUpdate = () => null;'
   '';
 
-  cargoHash = "sha256-Ea3U7noKcHhy1wUExwY2tdi3fbAcJLb6bVv6wag5LGI=";
+  cargoHash = "sha256-7dF865YPcVp/g6PUs5QRaU3wZ0UmlAgaPGhHsIjIZPY=";
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
