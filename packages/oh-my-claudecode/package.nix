@@ -11,19 +11,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "oh-my-claudecode";
-  version = "4.13.1";
+  version = "4.13.2";
 
   src = fetchFromGitHub {
     owner = "yeachan-heo";
     repo = "oh-my-claudecode";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-C/m8Vlt6MXy8nlgqtoey9A5JnVTHCPkGUjar9x5Y2uw=";
+    hash = "sha256-gxu64UiKsHJ878HQy6Nu8qrFpVFTTy48t7sG8TkQxzY=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-XeyJSt1J0dGHZMb5Rzb8zPqoNTyy0GOj8J/cnbgSAfw=";
+    hash = "sha256-0CBrlkNvsdZ6OSvFCdqPAFh2D8yASWDaLurdTtaDsFI=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
