@@ -13,18 +13,30 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "mcporter";
-  version = "0.8.1";
+  version = "0.9.0";
 
   src = fetchFromGitHub {
     owner = "steipete";
     repo = "mcporter";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-I7UqHsi4pw4wQB4bb8XObo4aUOVtYpF17aYzEHzgCrg=";
+    hash = "sha256-IH0jYDkmEPPvy/g5+YfkNBwG2QUMwkuVCnSeSTsNHNw=";
   };
 
+  # Upstream's lockfile was generated before the pnpm.overrides entry for vite
+  # was applied, so newer pnpm rejects it as out of sync with package.json.
+  # https://github.com/steipete/mcporter/issues/new (lockfile drift)
+  postPatch = ''
+    sed -i 's/specifier: \^8\.0\.8/specifier: 8.0.8/' pnpm-lock.yaml
+  '';
+
   pnpmDeps = fetchPnpmDeps {
-    inherit (finalAttrs) pname version src;
-    hash = "sha256-OJhlpKwRCE7IqstwIzj1dBJMbMyPVA/w3RVnYfjz764=";
+    inherit (finalAttrs)
+      pname
+      version
+      src
+      postPatch
+      ;
+    hash = "sha256-dCue5Id5gcddoqoHKeB3uwxR4jtoBJx/mUzHLnb8o14=";
     fetcherVersion = 2;
   };
 
