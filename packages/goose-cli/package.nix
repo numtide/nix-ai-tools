@@ -1,71 +1,72 @@
 {
   lib,
-  fetchFromGitHub,
-  rustPlatform,
-  pkg-config,
-  openssl,
-  libxcb,
-  dbus,
+  flake,
+  buildNpmPackage,
+  nodejs,
+  jq,
+  runCommand,
+  makeWrapper,
   versionCheckHook,
-  librusty_v8,
+  versionCheckHomeHook,
+  upstream,
+  gooseServer,
 }:
 
-rustPlatform.buildRustPackage rec {
+let
+  srcWithPatchedPackage = runCommand "goose-cli-src" { nativeBuildInputs = [ jq ]; } ''
+    mkdir -p $out
+    tar -xzf ${upstream.cliNpmSrc} -C $out --strip-components=1
+    chmod -R u+w $out
+    cp ${./package-lock.json} $out/package-lock.json
+    jq 'del(.optionalDependencies) | .scripts.postinstall = ""' \
+      $out/package.json > $out/package.json.tmp
+    mv $out/package.json.tmp $out/package.json
+  '';
+in
+buildNpmPackage (_finalAttrs: {
   pname = "goose-cli";
-  version = "1.24.0";
+  version = upstream.cliVersion;
 
-  src = fetchFromGitHub {
-    owner = "block";
-    repo = "goose";
-    rev = "v${version}";
-    hash = "sha256-98psnT7hmnLav7pYFN55fj04R+avjzoc2lVpXsFN6M8=";
-  };
+  src = srcWithPatchedPackage;
+  npmDepsHash = "sha256-BcKEuVR3oPURBMce30CyhR1dQwncu1Wi/vMhhSNl2R4=";
 
-  cargoHash = "sha256-jZpk9x0d4JXfFGSmgi51uO774boOlUEyNhkSQMZZmSM=";
+  nativeBuildInputs = [ makeWrapper ];
 
-  nativeBuildInputs = [ pkg-config ];
+  dontNpmBuild = true;
 
-  buildInputs = [
-    openssl
-    libxcb
-    dbus
-  ];
+  installPhase = ''
+    runHook preInstall
 
-  # The v8 package will try to download a `librusty_v8.a` release at build time to our read-only filesystem
-  # To avoid this we pre-download the file and export it via RUSTY_V8_ARCHIVE
-  env.RUSTY_V8_ARCHIVE = librusty_v8;
+    npm prune --omit=dev
 
-  # Build only the CLI package
-  cargoBuildFlags = [
-    "--package"
-    "goose-cli"
-  ];
+    mkdir -p $out/lib/goose-cli $out/bin
+    cp -r dist package.json README.md node_modules $out/lib/goose-cli/
 
-  # Enable tests with proper environment
-  doCheck = true;
-  checkPhase = ''
-    export HOME=$(mktemp -d)
-    export XDG_CONFIG_HOME=$HOME/.config
-    export XDG_DATA_HOME=$HOME/.local/share
-    export XDG_STATE_HOME=$HOME/.local/state
-    export XDG_CACHE_HOME=$HOME/.cache
-    mkdir -p $XDG_CONFIG_HOME $XDG_DATA_HOME $XDG_STATE_HOME $XDG_CACHE_HOME
+    makeWrapper ${nodejs}/bin/node $out/bin/goose \
+      --add-flags $out/lib/goose-cli/dist/tui.js \
+      --prefix PATH : ${lib.makeBinPath [ gooseServer ]} \
+      --set GOOSE_BINARY ${gooseServer}/bin/goose
 
-    # Run tests for goose-cli package only
-    cargo test --package goose-cli --release
+    runHook postInstall
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+  versionCheckProgramArg = "--version";
 
   passthru.category = "AI Coding Agents";
 
   meta = with lib; {
-    description = "CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks";
-    homepage = "https://github.com/block/goose";
-    changelog = "https://github.com/block/goose/releases/tag/v${version}";
+    description = "TypeScript terminal UI for Goose, backed by shared Goose binaries";
+    homepage = "https://github.com/aaif-goose/goose";
+    changelog = "https://github.com/aaif-goose/goose/releases/tag/v${upstream.desktopVersion}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
+    maintainers = with flake.lib.maintainers; [ smdex ];
     mainProgram = "goose";
+    platforms = [ "x86_64-linux" ];
   };
-}
+})

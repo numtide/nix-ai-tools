@@ -161,13 +161,23 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>goose-cli</strong> - CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks</summary>
+<summary><strong>goose-cli</strong> - TypeScript terminal UI for Goose, backed by shared Goose binaries</summary>
 
 - **Source**: source
 - **License**: Apache-2.0
-- **Homepage**: https://github.com/block/goose
+- **Homepage**: https://github.com/aaif-goose/goose
 - **Usage**: `nix run github:numtide/llm-agents.nix#goose-cli -- --help`
 - **Nix**: [packages/goose-cli/package.nix](packages/goose-cli/package.nix)
+
+</details>
+<details>
+<summary><strong>goose-desktop</strong> - Desktop frontend for Goose, packaged against shared Goose binaries</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/aaif-goose/goose
+- **Usage**: `nix run github:numtide/llm-agents.nix#goose-desktop`
+- **Nix**: [packages/goose-desktop/package.nix](packages/goose-desktop/package.nix)
 
 </details>
 <details>
