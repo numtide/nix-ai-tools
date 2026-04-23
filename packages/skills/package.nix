@@ -16,11 +16,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "skills";
-  version = "1.5.0";
+  version = "1.5.1";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/${pname}/-/${pname}-${version}.tgz";
-    hash = "sha256-FWmQof42nLo8+w3UQBaalcJ4sAMRoZqeFnvuSe5yroI=";
+    hash = "sha256-T/acdK4oczqRpryLeSVChMRzlMn50zFYwqQxx6nF1AM=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
