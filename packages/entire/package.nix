@@ -4,6 +4,7 @@
   fetchFromGitHub,
   flake,
   go_1_26,
+  unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -19,11 +20,7 @@
     hash = "sha256-3sFQix4tabTs5imJCRh28azQdaUMGdVyfFxdGGqKJCg=";
   };
 
-  # Upstream bumps the toolchain directive faster than nixpkgs ships matching
-  # Go releases; the code itself does not require the exact patch level.
-  postPatch = ''
-    sed -i 's/^go 1\.26\.[0-9]*/go 1.26/' go.mod
-  '';
+  nativeBuildInputs = [ unpinGoModVersionHook ];
 
   vendorHash = "sha256-PkSN+ynGo6xW9IDoc+rX4NMt7R/d5Who0N56QyQxzl8=";
 
