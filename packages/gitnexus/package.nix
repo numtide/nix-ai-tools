@@ -18,8 +18,8 @@ buildNpmPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "abhigyanpatwari";
     repo = "GitNexus";
-    rev = "c72890d59d41f928c91f4d7b5c94fc2981f80ebe";
-    hash = "sha256-p0l2dDD788opW3ocSphVQ1Yd9eXHox/TwNTh6aSPdwU=";
+    rev = "v1.6.2";
+    hash = "sha256-w4+S6sKblAW2P9D8sEkIDXhuDDrGZY6B0kyIjN8KNqM=";
   };
 
   sourceRoot = "source/gitnexus";
@@ -35,7 +35,7 @@ buildNpmPackage (finalAttrs: {
     inherit (finalAttrs) src;
     sourceRoot = "source/gitnexus";
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-DIrte2Ksc3zzSZx9jQ58j5rq9D+qcygsJ8/1m7XmheQ=";
+    hash = "sha256-EITanWfAMoWijySo0L20nGEZaaSbTl+yJFe3A48wDt4=";
     fetcherVersion = 2;
     forceGitDeps = true;
   };
