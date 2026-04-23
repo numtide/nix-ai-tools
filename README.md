@@ -457,6 +457,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>skills</strong> - The open agent skills tool for installing and managing skills across AI coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/vercel-labs/skills
+- **Usage**: `nix run github:numtide/llm-agents.nix#skills -- --help`
+- **Nix**: [packages/skills/package.nix](packages/skills/package.nix)
+
+</details>
+<details>
 <summary><strong>skills-installer</strong> - Install agent skills across multiple AI coding clients</summary>
 
 - **Source**: bytecode
