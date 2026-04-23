@@ -1,8 +1,10 @@
 name: Update Dependencies
 on:
   schedule:
-    # Run twice daily at 2 AM and 2 PM UTC
-    - cron: '0 2,14 * * *'
+    # 4x daily, outside Europe/Berlin work hours, tracking US West Coast release window.
+    # 18:00/21:00 UTC catch US morning/early-afternoon drops (evening in Berlin).
+    # 00:00/04:00 UTC sweep US end-of-day; results ready before Berlin morning.
+    - cron: '0 0,4,18,21 * * *'
   workflow_dispatch:
     inputs:
       packages:
