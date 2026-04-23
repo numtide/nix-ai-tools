@@ -28,9 +28,16 @@ rustPlatform.buildRustPackage rec {
   ];
   cargoTestFlags = cargoBuildFlags;
 
-  # native-tls needs openssl on Linux only; link nixpkgs openssl instead of
-  # upstream's vendored build (avoids perl/clang, inherits security updates).
-  env.OPENSSL_NO_VENDOR = "1";
+  env = {
+    # native-tls needs openssl on Linux only; link nixpkgs openssl instead of
+    # upstream's vendored build (avoids perl/clang, inherits security updates).
+    OPENSSL_NO_VENDOR = "1";
+    # Upstream sets lto=true + codegen-units=1, making the final link a
+    # single-threaded fat-LTO over ~450 crates (wasmtime/cranelift). Override
+    # to keep CI build times reasonable.
+    CARGO_PROFILE_RELEASE_LTO = "off";
+    CARGO_PROFILE_RELEASE_CODEGEN_UNITS = "16";
+  };
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ openssl ];
