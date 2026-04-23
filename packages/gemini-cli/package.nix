@@ -21,19 +21,19 @@
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "gemini-cli";
-  version = "0.38.2";
+  version = "0.39.0";
 
   src = fetchFromGitHub {
     owner = "google-gemini";
     repo = "gemini-cli";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-DPJMpm+hOQQxG87/NyrCrlomeR4AD1WNfNoIsdaakaE=";
+    hash = "sha256-cVEDCnDmICw0b3wQyU3hWynBjn+xPH9Tfmd085nyAUw=";
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-hd8ozYOmyHTVqn3BEWcqfbrMD4DrjtJWu0VG5pK/hb4=";
+    hash = "sha256-hdUMhTl0bzs8awwLcsbSP70Dx4e0tFCQGGFaUzZDOdM=";
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
@@ -129,11 +129,12 @@ buildNpmPackage (finalAttrs: {
       -o -name "config.gypi" \
       -o -path '*/build/*.mk' -o -path '*/build/Makefile' \
       | xargs rm -f
-    # keytar/build: keep only the runtime addon. Object files and .deps/*.d
-    # embed paths to nodejs-source and -dev outputs, bloating the closure.
-    find $out/share/gemini-cli/node_modules/keytar/build \
+    # @github/keytar/build: keep only the runtime addon. Object files and
+    # .deps/*.d embed paths to nodejs-source and -dev outputs, bloating the
+    # closure.
+    find $out/share/gemini-cli/node_modules/@github/keytar/build \
       -type f -not -name 'keytar.node' -delete
-    find $out/share/gemini-cli/node_modules/keytar/build \
+    find $out/share/gemini-cli/node_modules/@github/keytar/build \
       -type d -empty -delete
   '';
 
