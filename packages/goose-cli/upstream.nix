@@ -1,26 +1,38 @@
 {
+  lib,
   fetchurl,
 }:
 
 let
-  desktopVersion = "1.32.0";
-  cliVersion = "0.17.0";
+  versionData = lib.importJSON ./hashes.json;
+  inherit (versionData)
+    desktopVersion
+    cliVersion
+    cliBinaryHash
+    desktopDebHash
+    cliNpmHash
+    npmDepsHash
+    ;
 in
 {
-  inherit desktopVersion cliVersion;
+  inherit
+    desktopVersion
+    cliVersion
+    npmDepsHash
+    ;
 
   cliBinarySrc = fetchurl {
     url = "https://github.com/aaif-goose/goose/releases/download/v${desktopVersion}/goose-x86_64-unknown-linux-gnu.tar.gz";
-    hash = "sha256-OJD/FOu+M5TXgc2qaN4vwdY8UNIu5wQn+KNLY9AOwSc=";
+    hash = cliBinaryHash;
   };
 
   desktopDebSrc = fetchurl {
     url = "https://github.com/aaif-goose/goose/releases/download/v${desktopVersion}/goose_${desktopVersion}_amd64.deb";
-    hash = "sha256-Bj4Hgpt36PLfxvc5E93+50Wse1dD/Zh2phnslXzWJYE=";
+    hash = desktopDebHash;
   };
 
   cliNpmSrc = fetchurl {
     url = "https://registry.npmjs.org/@aaif/goose/-/goose-${cliVersion}.tgz";
-    hash = "sha256-/op6bkUFKLmTzH6iFUqSmbBaCDHfGawr+kTheNfG97o=";
+    hash = cliNpmHash;
   };
 }

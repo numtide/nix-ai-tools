@@ -28,7 +28,7 @@ buildNpmPackage (_finalAttrs: {
   version = upstream.cliVersion;
 
   src = srcWithPatchedPackage;
-  npmDepsHash = "sha256-BcKEuVR3oPURBMce30CyhR1dQwncu1Wi/vMhhSNl2R4=";
+  npmDepsHash = upstream.npmDepsHash;
 
   nativeBuildInputs = [ makeWrapper ];
 

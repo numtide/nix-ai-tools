@@ -1,0 +1,8 @@
+{
+  "desktopVersion": "1.32.0",
+  "cliVersion": "0.17.0",
+  "cliBinaryHash": "sha256-OJD/FOu+M5TXgc2qaN4vwdY8UNIu5wQn+KNLY9AOwSc=",
+  "desktopDebHash": "sha256-Bj4Hgpt36PLfxvc5E93+50Wse1dD/Zh2phnslXzWJYE=",
+  "cliNpmHash": "sha256-/op6bkUFKLmTzH6iFUqSmbBaCDHfGawr+kTheNfG97o=",
+  "npmDepsHash": "sha256-BcKEuVR3oPURBMce30CyhR1dQwncu1Wi/vMhhSNl2R4="
+}
