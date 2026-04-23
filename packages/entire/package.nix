@@ -10,16 +10,22 @@
 
 (buildGoModule.override { go = go_1_26; }) rec {
   pname = "entire";
-  version = "0.5.3";
+  version = "0.5.5";
 
   src = fetchFromGitHub {
     owner = "entireio";
     repo = "cli";
     rev = "v${version}";
-    hash = "sha256-ZQkS3bLnWFewyAXMgbbaeIjfeBumrGuKlOgzuyctNOc=";
+    hash = "sha256-3sFQix4tabTs5imJCRh28azQdaUMGdVyfFxdGGqKJCg=";
   };
 
-  vendorHash = "sha256-+QJyICYbdjZV1JJ1rKuiuryNR5q/H3PECQuarMuT39E=";
+  # Upstream bumps the toolchain directive faster than nixpkgs ships matching
+  # Go releases; the code itself does not require the exact patch level.
+  postPatch = ''
+    sed -i 's/^go 1\.26\.[0-9]*/go 1.26/' go.mod
+  '';
+
+  vendorHash = "sha256-PkSN+ynGo6xW9IDoc+rX4NMt7R/d5Who0N56QyQxzl8=";
 
   subPackages = [ "./cmd/entire" ];
 
