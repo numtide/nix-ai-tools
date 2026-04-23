@@ -1,8 +1,8 @@
 diff --git a/README.md b/README.md
-index b56e6c2..ccc9647 100644
+index ed27bf7..210abd4 100644
 --- a/README.md
 +++ b/README.md
-@@ -180,6 +180,15 @@ gitnexus analyze . --embeddings
+@@ -190,6 +190,15 @@ gitnexus analyze . --embeddings
  
  Works with Infinity, vLLM, TEI, llama.cpp, Ollama, LM Studio, or OpenAI. When unset, local embeddings are used unchanged.
  
@@ -19,7 +19,7 @@ index b56e6c2..ccc9647 100644
  
  GitNexus supports indexing multiple repositories. Each `gitnexus analyze` registers the repo in a global registry (`~/.gitnexus/registry.json`). The MCP server serves all indexed repos automatically.
 diff --git a/src/core/embeddings/embedder.ts b/src/core/embeddings/embedder.ts
-index e2d26c9..7e2a2ca 100644
+index d27718c..652f275 100644
 --- a/src/core/embeddings/embedder.ts
 +++ b/src/core/embeddings/embedder.ts
 @@ -15,12 +15,31 @@ if (!process.env.ORT_LOG_LEVEL) {
@@ -125,10 +125,10 @@ index 0000000..252064f
 +  };
 +};
 diff --git a/src/mcp/core/embedder.ts b/src/mcp/core/embedder.ts
-index 3200a11..d6f3307 100644
+index 592c2bb..7ddf840 100644
 --- a/src/mcp/core/embedder.ts
 +++ b/src/mcp/core/embedder.ts
-@@ -6,11 +6,32 @@
+@@ -6,12 +6,33 @@
   */
  
  import { pipeline, env, type FeatureExtractionPipeline } from '@huggingface/transformers';
@@ -139,6 +139,7 @@ index 3200a11..d6f3307 100644
    getHttpDimensions,
    httpEmbedQuery,
  } from '../../core/embeddings/http-client.js';
+ import { silenceStdout, restoreStdout, realStderrWrite } from '../../core/lbug/pool-adapter.js';
 +import { applyOnnxruntimeNodeBindingOverride } from '../../core/embeddings/onnxruntime-node-loader.js';
 +
 +const configureTransformersCache = () => {
@@ -161,7 +162,7 @@ index 3200a11..d6f3307 100644
  
  // Model config
  const MODEL_ID = 'Snowflake/snowflake-arctic-embed-xs';
-@@ -32,6 +53,9 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
+@@ -33,6 +54,9 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
      return embedderInstance;
    }
  

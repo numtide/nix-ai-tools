@@ -18,14 +18,22 @@ buildNpmPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "abhigyanpatwari";
     repo = "GitNexus";
-    rev = "c72890d59d41f928c91f4d7b5c94fc2981f80ebe";
-    hash = "sha256-p0l2dDD788opW3ocSphVQ1Yd9eXHox/TwNTh6aSPdwU=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-w4+S6sKblAW2P9D8sEkIDXhuDDrGZY6B0kyIjN8KNqM=";
   };
 
   sourceRoot = "source/gitnexus";
 
   # Upstream: https://github.com/abhigyanpatwari/GitNexus/pull/589
   patches = [ ./system-onnxruntime-node.patch ];
+
+  postPatch = ''
+    # scripts/build.js shells out to `npx tsc`, which tries to hit the
+    # registry in the sandbox. typescript is already on PATH via
+    # nativeBuildInputs, so call it directly.
+    substituteInPlace scripts/build.js \
+      --replace-fail "'npx tsc'" "'tsc'"
+  '';
 
   postUnpack = ''
     chmod -R u+w source/gitnexus-shared
@@ -35,7 +43,7 @@ buildNpmPackage (finalAttrs: {
     inherit (finalAttrs) src;
     sourceRoot = "source/gitnexus";
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-DIrte2Ksc3zzSZx9jQ58j5rq9D+qcygsJ8/1m7XmheQ=";
+    hash = "sha256-EITanWfAMoWijySo0L20nGEZaaSbTl+yJFe3A48wDt4=";
     fetcherVersion = 2;
     forceGitDeps = true;
   };
@@ -47,12 +55,6 @@ buildNpmPackage (finalAttrs: {
     makeWrapper
     typescript
   ];
-
-  preBuild = ''
-    pushd ../gitnexus-shared
-    tsc
-    popd
-  '';
 
   dontPatchELF = stdenv.hostPlatform.isDarwin;
 
@@ -77,10 +79,6 @@ buildNpmPackage (finalAttrs: {
       lbugBindingTarget = "$out/lib/node_modules/gitnexus/node_modules/@ladybugdb/core/lbugjs.node";
     in
     ''
-      mkdir -p $out/lib/node_modules/gitnexus-shared
-      cp -R ../gitnexus-shared/dist ../gitnexus-shared/src ../gitnexus-shared/package.json \
-        $out/lib/node_modules/gitnexus-shared/
-
       if [ -f "${lbugBindingSource}" ]; then
         cp "${lbugBindingSource}" "${lbugBindingTarget}"
       else
