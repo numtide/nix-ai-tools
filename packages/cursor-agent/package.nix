@@ -5,6 +5,7 @@
   makeWrapper,
   coreutils,
   wrapBuddy,
+  zlib,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -47,6 +48,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
+    zlib
   ];
 
   unpackPhase = ''
