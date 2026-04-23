@@ -13,13 +13,11 @@
   versionCheckHomeHook,
   writeShellScriptBin,
   xsel,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   nodejs,
 }:
 
 buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+  npmDepsFetcherVersion = 2;
   pname = "gemini-cli";
   version = "0.39.0";
 
@@ -30,12 +28,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-cVEDCnDmICw0b3wQyU3hWynBjn+xPH9Tfmd085nyAUw=";
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-hdUMhTl0bzs8awwLcsbSP70Dx4e0tFCQGGFaUzZDOdM=";
-    fetcherVersion = 2;
-  };
+  npmDepsHash = "sha256-hdUMhTl0bzs8awwLcsbSP70Dx4e0tFCQGGFaUzZDOdM=";
   makeCacheWritable = true;
 
   nativeBuildInputs = [

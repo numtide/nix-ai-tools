@@ -3,13 +3,11 @@
   buildNpmPackage,
   fetchFromGitHub,
   flake,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   versionCheckHook,
 }:
 
 buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+  npmDepsFetcherVersion = 2;
   pname = "oh-my-claudecode";
   version = "4.13.2";
 
@@ -20,12 +18,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-gxu64UiKsHJ878HQy6Nu8qrFpVFTTy48t7sG8TkQxzY=";
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-0CBrlkNvsdZ6OSvFCdqPAFh2D8yASWDaLurdTtaDsFI=";
-    fetcherVersion = 2;
-  };
+  npmDepsHash = "sha256-0CBrlkNvsdZ6OSvFCdqPAFh2D8yASWDaLurdTtaDsFI=";
   makeCacheWritable = true;
 
   # Native deps (better-sqlite3, @ast-grep/napi) need rebuild skipped

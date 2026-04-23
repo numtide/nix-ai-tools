@@ -4,8 +4,6 @@
   buildNpmPackage,
   makeWrapper,
   ripgrep,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   runCommand,
 }:
 
@@ -26,17 +24,13 @@ let
   '';
 in
 buildNpmPackage {
-  inherit npmConfigHook version;
+  npmDepsFetcherVersion = 2;
+  inherit version;
   pname = "iflow-cli";
 
   src = srcWithLock;
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    src = srcWithLock;
-    name = "iflow-cli-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    fetcherVersion = 2;
-  };
+  npmDepsHash = versionData.npmDepsHash;
   makeCacheWritable = true;
 
   postPatch = ''

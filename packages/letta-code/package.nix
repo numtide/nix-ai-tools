@@ -2,8 +2,6 @@
   lib,
   buildNpmPackage,
   fetchurl,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   nodejs,
   runCommand,
   versionCheckHook,
@@ -26,18 +24,14 @@ let
   '';
 in
 buildNpmPackage rec {
-  inherit npmConfigHook nodejs;
+  npmDepsFetcherVersion = 2;
+  inherit nodejs;
   pname = "letta-code";
   inherit version;
 
   src = srcWithLock;
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit src;
-    name = "${pname}-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    fetcherVersion = 2;
-  };
+  npmDepsHash = versionData.npmDepsHash;
 
   npmInstallFlags = [ "--ignore-scripts" ];
   npmRebuildFlags = [ "--ignore-scripts" ];

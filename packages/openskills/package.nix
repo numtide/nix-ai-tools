@@ -3,12 +3,10 @@
   buildNpmPackage,
   fetchFromGitHub,
   flake,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
 }:
 
 buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+  npmDepsFetcherVersion = 2;
   pname = "openskills";
   version = "1.5.0";
 
@@ -19,12 +17,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-rOrLi43J+w6XBRZYYwlDPl8RqU7Zhr45B9UyP6Xarj0=";
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-ZYiY66PKF7hAnFkw3RQ5xBw7L9WZx0giUhgE8ySE0Xw=";
-    fetcherVersion = 2;
-  };
+  npmDepsHash = "sha256-ZYiY66PKF7hAnFkw3RQ5xBw7L9WZx0giUhgE8ySE0Xw=";
   makeCacheWritable = true;
 
   passthru.category = "Utilities";

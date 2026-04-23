@@ -4,8 +4,6 @@
   flake,
   jq,
   lib,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   runCommand,
 }:
 
@@ -28,17 +26,13 @@ let
   '';
 in
 buildNpmPackage {
-  inherit npmConfigHook version;
+  npmDepsFetcherVersion = 2;
+  inherit version;
   pname = "openspecui";
 
   src = srcWithLock;
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    src = srcWithLock;
-    name = "openspecui-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    fetcherVersion = 2;
-  };
+  npmDepsHash = versionData.npmDepsHash;
   makeCacheWritable = true;
 
   dontNpmBuild = true;

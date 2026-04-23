@@ -2,8 +2,6 @@
   buildNpmPackage,
   fetchurl,
   lib,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   runCommand,
 }:
 
@@ -23,17 +21,13 @@ let
   '';
 in
 buildNpmPackage {
-  inherit npmConfigHook version;
+  npmDepsFetcherVersion = 2;
+  inherit version;
   pname = "openspec";
 
   src = srcWithLock;
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    src = srcWithLock;
-    name = "openspec-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    fetcherVersion = 2;
-  };
+  npmDepsHash = versionData.npmDepsHash;
   makeCacheWritable = true;
 
   dontNpmBuild = true;

@@ -3,8 +3,6 @@
   buildNpmPackage,
   fetchzip,
   versionCheckHook,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   nodejs,
   runCommand,
   makeWrapper,
@@ -27,16 +25,10 @@ let
   '';
 in
 buildNpmPackage {
-  inherit npmConfigHook nodejs;
+  npmDepsFetcherVersion = 2;
+  inherit nodejs;
   pname = "copilot-language-server";
-  inherit version src;
-
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit src;
-    name = "copilot-language-server-${version}-npm-deps";
-    hash = npmDepsHash;
-    fetcherVersion = 2;
-  };
+  inherit version src npmDepsHash;
   makeCacheWritable = true;
 
   nativeBuildInputs = [ makeWrapper ];

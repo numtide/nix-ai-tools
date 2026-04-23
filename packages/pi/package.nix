@@ -2,8 +2,6 @@
   lib,
   buildNpmPackage,
   fetchurl,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   fd,
   ripgrep,
   runCommand,
@@ -28,17 +26,13 @@ let
   '';
 in
 buildNpmPackage {
-  inherit npmConfigHook version;
+  npmDepsFetcherVersion = 2;
+  inherit version;
   pname = "pi";
 
   src = srcWithLock;
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    src = srcWithLock;
-    name = "pi-${version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    cacheVersion = 2;
-  };
+  npmDepsHash = versionData.npmDepsHash;
   makeCacheWritable = true;
 
   # The package from npm is already built
