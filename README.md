@@ -281,6 +281,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>openfang</strong> - Open-source Agent OS built in Rust — CLI for the OpenFang platform</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/RightNow-AI/openfang
+- **Usage**: `nix run github:numtide/llm-agents.nix#openfang -- --help`
+- **Nix**: [packages/openfang/package.nix](packages/openfang/package.nix)
+
+</details>
+<details>
 <summary><strong>pi</strong> - A terminal-based coding agent with multi-model support</summary>
 
 - **Source**: bytecode
