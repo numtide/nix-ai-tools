@@ -3,14 +3,13 @@
   flake,
   buildNpmPackage,
   fetchFromGitHub,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   makeWrapper,
   electron_40,
   python3,
 }:
 
 buildNpmPackage rec {
+  npmDepsFetcherVersion = 2;
   pname = "auto-claude";
   version = "2.7.6";
 
@@ -21,13 +20,7 @@ buildNpmPackage rec {
     hash = "sha256-MwT/FGpnAbGjJAGoKJkyL0ngKWtPIpQiCSN2LzHSMAY=";
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit src;
-    name = "${pname}-${version}-npm-deps";
-    hash = "sha256-iuN5f2TRD+C1CB/r3DdQEOQMio5x6G0ibNo83mktxrk=";
-    fetcherVersion = 2;
-  };
-  inherit npmConfigHook;
+  npmDepsHash = "sha256-iuN5f2TRD+C1CB/r3DdQEOQMio5x6G0ibNo83mktxrk=";
   makeCacheWritable = true;
 
   nativeBuildInputs = [ makeWrapper ];

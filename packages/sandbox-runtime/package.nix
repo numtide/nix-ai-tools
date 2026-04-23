@@ -4,8 +4,6 @@
   buildNpmPackage,
   fetchzip,
   makeWrapper,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   nodejs,
   runCommand,
   # Linux dependencies
@@ -31,16 +29,10 @@ let
   '';
 in
 buildNpmPackage {
-  inherit npmConfigHook nodejs;
+  npmDepsFetcherVersion = 2;
+  inherit nodejs;
   pname = "sandbox-runtime";
-  inherit version src;
-
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit src;
-    name = "sandbox-runtime-${version}-npm-deps";
-    hash = npmDepsHash;
-    fetcherVersion = 2;
-  };
+  inherit version src npmDepsHash;
   makeCacheWritable = true;
 
   nativeBuildInputs = [ makeWrapper ];

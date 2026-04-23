@@ -4,8 +4,6 @@
   stdenv,
   buildNpmPackage,
   fetchFromGitHub,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   rustPlatform,
   makeWrapper,
   nodejs,
@@ -83,20 +81,14 @@ let
   exploreHarness = mkNativeBinary "omx-explore-harness" "omx-explore-harness";
   sparkShell = mkNativeBinary "omx-sparkshell" "omx-sparkshell";
 in
-buildNpmPackage (finalAttrs: {
+buildNpmPackage {
+  npmDepsFetcherVersion = 2;
   inherit
-    npmConfigHook
     pname
     version
     src
+    npmDepsHash
     ;
-
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${pname}-${version}-npm-deps";
-    hash = npmDepsHash;
-    fetcherVersion = 2;
-  };
 
   makeCacheWritable = true;
   npmFlags = [ "--ignore-scripts" ];
@@ -170,4 +162,4 @@ buildNpmPackage (finalAttrs: {
       "aarch64-darwin"
     ];
   };
-})
+}

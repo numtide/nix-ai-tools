@@ -3,12 +3,10 @@
   buildNpmPackage,
   fetchFromGitHub,
   flake,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
 }:
 
 buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+  npmDepsFetcherVersion = 2;
   pname = "gitagent";
   version = "0.3.2";
 
@@ -19,12 +17,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-YFcsUxnhWj3A9itf/eylM4Os5eXSMakO/LmEi+MbKnw=";
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-j0lhpHaPpSvdPSjrfZr/gxs+2fJPKTy58ICyMuZYINA=";
-    fetcherVersion = 2;
-  };
+  npmDepsHash = "sha256-j0lhpHaPpSvdPSjrfZr/gxs+2fJPKTy58ICyMuZYINA=";
   makeCacheWritable = true;
 
   passthru.category = "Utilities";

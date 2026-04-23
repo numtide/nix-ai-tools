@@ -10,13 +10,11 @@
   libsecret,
   darwinOpenptyHook,
   clang_20,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   versionCheckHook,
 }:
 
 buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+  npmDepsFetcherVersion = 2;
   pname = "qwen-code";
   version = "0.15.1";
 
@@ -27,12 +25,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-YqnmzE6jCqFfL43uGn+kH/rDVXUyLEq0+FxlKUZCDLI=";
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-hRIcSL999zIcyzuHhjLOX37Os7nah/k/S5wl/3TQu8w=";
-    fetcherVersion = 2;
-  };
+  npmDepsHash = "sha256-hRIcSL999zIcyzuHhjLOX37Os7nah/k/S5wl/3TQu8w=";
   makeCacheWritable = true;
 
   nativeBuildInputs = [

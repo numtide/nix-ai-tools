@@ -6,7 +6,7 @@
   fetchFromGitHub,
   runCommand,
   nodejs,
-  fetchNpmDepsWithPackuments,
+  fetchNpmDeps,
   npmConfigHook,
   versionCheckHook,
   versionCheckHomeHook,
@@ -37,7 +37,9 @@ let
       npmConfigHook
     ];
 
-    npmDeps = fetchNpmDepsWithPackuments {
+    env.NIX_NPM_FETCHER_VERSION = "2";
+
+    npmDeps = fetchNpmDeps {
       src = frontendSrc;
       name = "${pname}-${version}-npm-deps";
       hash = "sha256-6UGmpYBuDvD1iOHy3z2ERrFdiVaAV6t/RT1cRdLuaRw=";

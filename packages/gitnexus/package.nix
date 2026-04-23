@@ -4,14 +4,13 @@
   stdenv,
   buildNpmPackage,
   fetchFromGitHub,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   makeWrapper,
   typescript,
 }:
 
 buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+  npmDepsFetcherVersion = 2;
+  forceGitDeps = true;
   pname = "gitnexus";
   version = "1.6.2";
 
@@ -39,14 +38,7 @@ buildNpmPackage (finalAttrs: {
     chmod -R u+w source/gitnexus-shared
   '';
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    sourceRoot = "source/gitnexus";
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-EITanWfAMoWijySo0L20nGEZaaSbTl+yJFe3A48wDt4=";
-    fetcherVersion = 2;
-    forceGitDeps = true;
-  };
+  npmDepsHash = "sha256-EITanWfAMoWijySo0L20nGEZaaSbTl+yJFe3A48wDt4=";
   makeCacheWritable = true;
 
   npmFlags = [ "--ignore-scripts" ];
