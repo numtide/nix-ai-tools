@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   flake,
   python3,
   fetchFromGitHub,
@@ -136,34 +137,90 @@ python3.pkgs.buildPythonApplication rec {
     setuptools
   ];
 
-  dependencies = with python3.pkgs; [
-    # Core
-    openai
-    anthropic
-    python-dotenv
-    fire
-    httpx
-    rich
-    tenacity
-    pyyaml
-    requests
-    jinja2
-    pydantic
-    # Interactive CLI
-    prompt-toolkit
-    # MCP
-    mcp
-    # Tools
-    exa-py
-    firecrawl-py
-    parallel-web
-    fal-client
-    # Text-to-speech
-    edge-tts
-    faster-whisper
-    # Skills Hub
-    pyjwt
-  ];
+  dependencies =
+    with python3.pkgs;
+    [
+      # Core
+      openai
+      anthropic
+      python-dotenv
+      fire
+      httpx
+      rich
+      tenacity
+      pyyaml
+      requests
+      jinja2
+      pydantic
+      # Interactive CLI
+      prompt-toolkit
+      # MCP
+      mcp
+      # Tools
+      exa-py
+      firecrawl-py
+      parallel-web
+      fal-client
+      # Text-to-speech
+      edge-tts
+      faster-whisper
+      # Skills Hub
+      pyjwt
+    ]
+    ++ optional-dependencies.gateway
+    ++ optional-dependencies.misc;
+
+  # Upstream ships most integrations as setuptools extras and degrades
+  # "gracefully" at runtime by logging a warning and refusing to start the
+  # adapter (see #4175 for the slack-bolt case). In a Nix closure the user
+  # cannot `pip install hermes-agent[slack]`, so pull in every extra that is
+  # already packaged in nixpkgs. Extras whose deps are not yet in nixpkgs
+  # (honcho, daytona, dingtalk, feishu) are intentionally omitted.
+  optional-dependencies = with python3.pkgs; {
+    # Everything the `hermes gateway` command can use.
+    gateway = [
+      # [messaging] / [slack]
+      slack-bolt
+      slack-sdk
+      python-telegram-bot
+      discordpy
+      aiohttp # also covers [homeassistant] and [sms]
+      # [cron]
+      croniter
+      # [web]
+      fastapi
+      uvicorn
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      # [matrix] — upstream gates this on linux because python-olm is
+      # broken on modern macOS toolchains.
+      mautrix
+      markdown
+      aiosqlite
+      asyncpg
+    ];
+    # Non-gateway extras kept separate so the test closure can stay slim if
+    # someone later wants `hermes-agent.override { withExtras = false; }`.
+    misc = [
+      # [cli]
+      simple-term-menu
+      # [pty]
+      ptyprocess
+      # [acp]
+      agent-client-protocol
+      # [voice] (faster-whisper already in core deps above)
+      sounddevice
+      numpy
+      # [tts-premium]
+      elevenlabs
+      # [mistral]
+      mistralai
+      # [bedrock]
+      boto3
+      # [modal]
+      modal
+    ];
+  };
 
   pythonRelaxDeps = [
     "tenacity"
@@ -173,7 +230,15 @@ python3.pkgs.buildPythonApplication rec {
     "pyjwt"
   ];
 
-  pythonImportsCheck = [ "hermes_cli" ];
+  pythonImportsCheck = [
+    "hermes_cli"
+    # Regression guard for #4175: these adapters swallow ImportError and only
+    # warn at runtime, so assert the underlying libraries import cleanly.
+    "slack_bolt"
+    "discord"
+    "telegram.ext"
+    "croniter"
+  ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
