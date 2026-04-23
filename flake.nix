@@ -22,10 +22,9 @@
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     bun2nix = {
-      # TODO(#4001): switch back to github:nix-community/bun2nix once
-      # https://github.com/nix-community/bun2nix/pull/86 (catalog: support)
-      # lands upstream.
-      url = "github:Mic92/bun2nix/catalog-support";
+      # TODO(#4001): drop the branch pin once catalog support
+      # (nix-community/bun2nix#86) reaches the default branch.
+      url = "github:nix-community/bun2nix/staging-2.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.systems.follows = "systems";
       inputs.treefmt-nix.follows = "treefmt-nix";
