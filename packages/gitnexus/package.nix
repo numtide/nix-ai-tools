@@ -8,7 +8,7 @@
   typescript,
 }:
 
-buildNpmPackage (_finalAttrs: {
+buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   forceGitDeps = true;
   pname = "gitnexus";
