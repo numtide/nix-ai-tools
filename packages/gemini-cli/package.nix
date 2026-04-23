@@ -129,11 +129,12 @@ buildNpmPackage (finalAttrs: {
       -o -name "config.gypi" \
       -o -path '*/build/*.mk' -o -path '*/build/Makefile' \
       | xargs rm -f
-    # keytar/build: keep only the runtime addon. Object files and .deps/*.d
-    # embed paths to nodejs-source and -dev outputs, bloating the closure.
-    find $out/share/gemini-cli/node_modules/keytar/build \
+    # @github/keytar/build: keep only the runtime addon. Object files and
+    # .deps/*.d embed paths to nodejs-source and -dev outputs, bloating the
+    # closure.
+    find $out/share/gemini-cli/node_modules/@github/keytar/build \
       -type f -not -name 'keytar.node' -delete
-    find $out/share/gemini-cli/node_modules/keytar/build \
+    find $out/share/gemini-cli/node_modules/@github/keytar/build \
       -type d -empty -delete
   '';
 
