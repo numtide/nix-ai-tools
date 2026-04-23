@@ -3,6 +3,9 @@
   flake,
   fetchFromGitHub,
   rustPlatform,
+  pkg-config,
+  openssl,
+  stdenv,
   versionCheckHook,
 }:
 
@@ -24,6 +27,13 @@ rustPlatform.buildRustPackage rec {
     "openfang-cli"
   ];
   cargoTestFlags = cargoBuildFlags;
+
+  # native-tls needs openssl on Linux only; link nixpkgs openssl instead of
+  # upstream's vendored build (avoids perl/clang, inherits security updates).
+  env.OPENSSL_NO_VENDOR = "1";
+
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ openssl ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
