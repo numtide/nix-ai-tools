@@ -3,10 +3,6 @@
   flake,
   fetchFromGitHub,
   rustPlatform,
-  pkg-config,
-  perl,
-  clang,
-  openssl,
   versionCheckHook,
 }:
 
@@ -28,16 +24,6 @@ rustPlatform.buildRustPackage rec {
     "openfang-cli"
   ];
   cargoTestFlags = cargoBuildFlags;
-
-  nativeBuildInputs = [
-    clang
-    perl
-    pkg-config
-  ];
-
-  buildInputs = [
-    openssl
-  ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
