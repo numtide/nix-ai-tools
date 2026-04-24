@@ -45,6 +45,7 @@ buildGoModule {
   env.CGO_ENABLED = "1";
 
   preBuild = ''
+    rm -rf internal/web/dist
     cp -r ${frontend} internal/web/dist
   '';
 
