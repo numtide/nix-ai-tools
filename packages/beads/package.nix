@@ -12,16 +12,16 @@
 
 buildGoModule.override { go = go-bin; } rec {
   pname = "beads";
-  version = "1.0.2";
+  version = "1.0.3";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-    hash = "sha256-aRgm2gWO08FZA2HaVxSitmjDk0Fp51oFZ8lmBCKDrzU=";
+    hash = "sha256-K3X67XgUl55mZS4r4V/KTbXPNqCV7fPHi8HnrDime+E=";
   };
 
-  vendorHash = "sha256-stY1JxMAeINT73KCvwZyh/TUktkLirEcGa0sW1u7W1s=";
+  vendorHash = "sha256-Rn1MnasYUOBbIgjFx0E6R2Zak6la1VajDkHqoiFpHtw=";
 
   nativeBuildInputs = [
     makeWrapper
