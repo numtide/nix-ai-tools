@@ -1,7 +1,7 @@
 {
-  "version": "0.124.0",
-  "hash": "sha256-YFnzzwCm9/b30qLDMbkf/rEizuTjeqdCgoBZeS0wNBo=",
-  "cargoHash": "sha256-tuUY+Mg7DwYnYLt1zfqo0rrz5ip0fukxj947yBJAyks=",
+  "version": "0.125.0",
+  "hash": "sha256-q175gmBw+edb5+w8TM36yUeFsyIdB1/IwWzbxBbBmoA=",
+  "cargoHash": "sha256-fDVlj7zAZnwP9YBaYaSQZXYYWrBm5IEyLT9zoorvzFg=",
   "librusty_v8": {
     "version": "146.4.0",
     "hashes": {
