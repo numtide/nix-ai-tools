@@ -6,5 +6,5 @@
 }:
 pkgs.callPackage ./package.nix {
   inherit flake;
-  codex = perSystem.self.codex;
+  inherit (perSystem.self) buildNpmPackage codex;
 }

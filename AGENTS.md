@@ -232,6 +232,8 @@ fi
 
 ### Common Issues and Solutions
 
+1. **npm packages**: Use `perSystem.self.buildNpmPackage` (not `pkgs.buildNpmPackage`) in `default.nix`. It is the same builder plus an eval-time guard that fails fast with a helpful message when the consumer's nixpkgs predates `fetcherVersion = 2`, instead of a cryptic FOD hash mismatch (#4320).
+
 1. **Rust packages with git dependencies**: May fail during cargo vendoring if dependencies have workspace inheritance issues. Consider using pre-built binaries as a workaround.
 
 1. **Binary packages**: When packaging pre-built binaries:
