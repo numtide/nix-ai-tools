@@ -90,9 +90,15 @@ rustPlatform.buildRustPackage {
   };
 
   preBuild = ''
-    # Remove LTO to speed up builds
+    # Upstream sets fat LTO + codegen-units=1 in [profile.release] purely to
+    # shrink the shipped binary (openai/codex#1411). With ~1.2k crates and 80
+    # workspace members, codegen-units=1 makes each late-stage rustc hold the
+    # whole crate's IR in one module (~2–2.5 GiB RSS for codex-core/-tui), so
+    # `cargo -j$NIX_BUILD_CORES` peaks at ~12 GiB and OOMs our 16 GiB aarch64
+    # builder. Relax both; LTO off also keeps the link step cheap.
     substituteInPlace Cargo.toml \
-      --replace-fail 'lto = "fat"' 'lto = false'
+      --replace-fail 'lto = "fat"' 'lto = false' \
+      --replace-fail 'codegen-units = 1' 'codegen-units = 16'
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
