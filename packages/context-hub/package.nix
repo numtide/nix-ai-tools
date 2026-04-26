@@ -3,16 +3,14 @@
   buildNpmPackage,
   fetchFromGitHub,
   flake,
-  fetchNpmDepsWithPackuments,
-  npmConfigHook,
   versionCheckHook,
 }:
 
 let
   versionData = lib.importJSON ./hashes.json;
 in
-buildNpmPackage (finalAttrs: {
-  inherit npmConfigHook;
+buildNpmPackage {
+  npmDepsFetcherVersion = 2;
   pname = "context-hub";
   inherit (versionData) version;
 
@@ -23,12 +21,7 @@ buildNpmPackage (finalAttrs: {
     inherit (versionData) rev hash;
   };
 
-  npmDeps = fetchNpmDepsWithPackuments {
-    inherit (finalAttrs) src;
-    name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = versionData.npmDepsHash;
-    fetcherVersion = 2;
-  };
+  inherit (versionData) npmDepsHash;
   makeCacheWritable = true;
 
   dontNpmBuild = true;
@@ -65,4 +58,4 @@ buildNpmPackage (finalAttrs: {
     mainProgram = "chub";
     platforms = lib.platforms.all;
   };
-})
+}

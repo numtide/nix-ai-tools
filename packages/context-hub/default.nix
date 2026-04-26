@@ -1,8 +1,10 @@
-{ pkgs, flake, ... }:
-let
-  npmPackumentSupport = pkgs.callPackage ../../lib/fetch-npm-deps.nix { };
-in
+{
+  pkgs,
+  flake,
+  perSystem,
+  ...
+}:
 pkgs.callPackage ./package.nix {
   inherit flake;
-  inherit (npmPackumentSupport) fetchNpmDepsWithPackuments npmConfigHook;
+  inherit (perSystem.self) buildNpmPackage;
 }
