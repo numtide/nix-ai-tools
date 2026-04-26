@@ -8,16 +8,16 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "gitagent";
-  version = "0.3.2";
+  version = "1.4.3";
 
   src = fetchFromGitHub {
     owner = "open-gitagent";
     repo = "gitagent";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-YFcsUxnhWj3A9itf/eylM4Os5eXSMakO/LmEi+MbKnw=";
+    hash = "sha256-OEhLqEBgcVQLvjrSN6cAagKStLi0VWfciFp17HjkAuU=";
   };
 
-  npmDepsHash = "sha256-j0lhpHaPpSvdPSjrfZr/gxs+2fJPKTy58ICyMuZYINA=";
+  npmDepsHash = "sha256-Hp9xHCNeNbl16qtJkK8LyF4TroIAuUzlT47vo2QLzL0=";
   makeCacheWritable = true;
 
   passthru.category = "Utilities";
