@@ -5,6 +5,7 @@
   buildNpmPackage,
   fetchFromGitHub,
   versionCheckHook,
+  unpinGoModVersionHook,
 }:
 
 let
@@ -39,6 +40,8 @@ in
 buildGoModule {
   pname = "agentsview";
   inherit version src vendorHash;
+
+  nativeBuildInputs = [ unpinGoModVersionHook ];
 
   subPackages = [ "cmd/agentsview" ];
   tags = [ "fts5" ];
