@@ -4,7 +4,21 @@
   fetchFromGitHub,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+let
+  python = python3.override {
+    self = python;
+    packageOverrides = _final: prev: {
+      # Transitive dep via fastmcp -> py-key-value-aio. Its dynamodb tests
+      # break against the moto/aiobotocore-3.x combo in current
+      # nixpkgs-unstable ("Duplicate 'Server' header"). Fixed upstream in
+      # NixOS/nixpkgs#513680; drop this override once that lands in our pin
+      # (tracking: numtide/llm-agents.nix#4343).
+      aioboto3 = prev.aioboto3.overridePythonAttrs { doCheck = false; };
+    };
+  };
+
+in
+python.pkgs.buildPythonApplication rec {
   pname = "code-review-graph";
   version = "2.3.2";
   pyproject = true;
@@ -16,7 +30,7 @@ python3.pkgs.buildPythonApplication rec {
     hash = "sha256-2U+NfPOb2A/gmqzRUQ/80C5EhOHPM4YpGilZmVSTY/g=";
   };
 
-  build-system = with python3.pkgs; [
+  build-system = with python.pkgs; [
     hatchling
   ];
 
@@ -24,7 +38,7 @@ python3.pkgs.buildPythonApplication rec {
   # has advanced to 1.x and 6.x. The runtime deps check is overly strict.
   pypaBuildFlags = [ "--skip-dependency-check" ];
 
-  dependencies = with python3.pkgs; [
+  dependencies = with python.pkgs; [
     mcp
     fastmcp
     tree-sitter

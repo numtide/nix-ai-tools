@@ -9,7 +9,6 @@ pkgs.mkShellNoCC {
     pkgs.gnugrep
     pkgs.gnused
     pkgs.jq
-    pkgs.nix-prefetch-scripts
     pkgs.nix-update
     pkgs.nodejs
 
