@@ -8,23 +8,25 @@
   versionCheckHook,
 }:
 
+let
+  versionData = lib.importJSON ./hashes.json;
+in
 buildNpmPackage (finalAttrs: {
   inherit npmConfigHook;
   pname = "context-hub";
-  version = "0.1.3";
+  inherit (versionData) version;
 
   src = fetchFromGitHub {
     owner = "andrewyng";
     repo = "context-hub";
-    # upstream does not tag releases; rev corresponds to cli/package.json v${version}
-    rev = "596506ebb4d53cfbc6ae458b731e0b1a18790f9e";
-    hash = "sha256-ozn5yrdtoPqcw/PiHJLHXT4Ayyed1AS1zak5a83pIQA=";
+    # upstream does not tag releases; rev/version maintained by update.py
+    inherit (versionData) rev hash;
   };
 
   npmDeps = fetchNpmDepsWithPackuments {
     inherit (finalAttrs) src;
     name = "${finalAttrs.pname}-${finalAttrs.version}-npm-deps";
-    hash = "sha256-6aejmBVNztS8kAX9eq9HwfPJK6DwOCD3X6rQ5ZMQAmM=";
+    hash = versionData.npmDepsHash;
     fetcherVersion = 2;
   };
   makeCacheWritable = true;
