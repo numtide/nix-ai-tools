@@ -17,7 +17,6 @@ from updater import (
     fetch_text,
     load_hashes,
     save_hashes,
-    should_update,
 )
 from updater.hash import hex_to_sri
 
@@ -56,7 +55,11 @@ def main() -> None:
 
     print(f"Current: {current}, Latest: {latest}")
 
-    if not should_update(current, latest):
+    # Follow the upstream `latest` pointer exactly, including downgrades:
+    # Anthropic rolls bad releases back by repointing it (e.g. 2.1.120 was
+    # yanked back to 2.1.119), and should_update() would leave us pinned to
+    # the broken build.
+    if current == latest:
         print("Already up to date")
         return
 
