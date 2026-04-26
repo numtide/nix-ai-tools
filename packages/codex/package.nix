@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchCargoVendor,
   fetchurl,
   fetchzip,
   installShellFiles,
@@ -61,11 +60,7 @@ rustPlatform.buildRustPackage {
   pname = "codex";
   inherit version src;
 
-  cargoDeps = fetchCargoVendor {
-    inherit src;
-    sourceRoot = "source/codex-rs";
-    hash = cargoHash;
-  };
+  inherit cargoHash;
 
   sourceRoot = "source/codex-rs";
 
