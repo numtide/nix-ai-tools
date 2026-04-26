@@ -6,12 +6,12 @@
 
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
-  pname = "claude-code-acp";
+  pname = "claude-agent-acp";
   version = "0.31.0";
 
   src = fetchFromGitHub {
-    owner = "zed-industries";
-    repo = "claude-code-acp";
+    owner = "agentclientprotocol";
+    repo = "claude-agent-acp";
     rev = "v${version}";
     hash = "sha256-lWAuf8EO5Y1x1HhcNrbNQUgOsdGG5SXYTiXevWBEhSQ=";
   };
@@ -26,8 +26,8 @@ buildNpmPackage rec {
 
   meta = with lib; {
     description = "An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)";
-    homepage = "https://github.com/zed-industries/claude-code-acp";
-    changelog = "https://github.com/zed-industries/claude-code-acp/releases/tag/v${version}";
+    homepage = "https://github.com/agentclientprotocol/claude-agent-acp";
+    changelog = "https://github.com/agentclientprotocol/claude-agent-acp/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ ];

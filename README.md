@@ -490,13 +490,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### ACP Ecosystem
 
 <details>
-<summary><strong>claude-code-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
+<summary><strong>claude-agent-acp</strong> - An ACP-compatible coding agent powered by the Claude Code SDK (TypeScript)</summary>
 
 - **Source**: source
 - **License**: Apache-2.0
-- **Homepage**: https://github.com/zed-industries/claude-code-acp
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-acp -- --help`
-- **Nix**: [packages/claude-code-acp/package.nix](packages/claude-code-acp/package.nix)
+- **Homepage**: https://github.com/agentclientprotocol/claude-agent-acp
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-agent-acp -- --help`
+- **Nix**: [packages/claude-agent-acp/package.nix](packages/claude-agent-acp/package.nix)
 
 </details>
 <details>
