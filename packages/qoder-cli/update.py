@@ -63,8 +63,9 @@ def main() -> None:
 
     print(f"Updating qoder-cli from {current} to {latest}")
 
-    # Extract hashes from manifest
-    hashes: dict[str, str] = {}
+    # Extract URLs and hashes from manifest. Upstream has changed file naming
+    # before, so we record the exact URL rather than reconstructing it.
+    platforms: dict[str, dict[str, str]] = {}
     for file_entry in manifest["files"]:
         os_name = file_entry["os"]
         arch = file_entry["arch"]
@@ -72,16 +73,19 @@ def main() -> None:
 
         if key in PLATFORM_MAP:
             nix_platform = PLATFORM_MAP[key]
-            hashes[nix_platform] = hex_to_sri(file_entry["sha256"])
+            platforms[nix_platform] = {
+                "url": file_entry["url"],
+                "hash": hex_to_sri(file_entry["sha256"]),
+            }
 
     # Verify we got all expected platforms
     expected = set(PLATFORM_MAP.values())
-    got = set(hashes.keys())
+    got = set(platforms.keys())
     missing = expected - got
     if missing:
         print(f"Warning: Missing platforms in manifest: {missing}")
 
-    save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})
+    save_hashes(HASHES_FILE, {"version": latest, "platforms": platforms})
     print(f"Updated to {latest}")
 
 

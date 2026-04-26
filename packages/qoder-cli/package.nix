@@ -2,43 +2,31 @@
   lib,
   stdenv,
   fetchurl,
-  unzip,
   wrapBuddy,
-  gcc-unwrapped,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux_amd64.tar.gz";
-    aarch64-linux = "linux_arm64.tar.gz";
-    x86_64-darwin = "darwin_amd64.zip";
-    aarch64-darwin = "darwin_arm64.zip";
-  };
+  inherit (versionData) version platforms;
 
   platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
+  src = platforms.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "qoder-cli";
   inherit version;
 
   src = fetchurl {
-    url = "https://download.qoder.com/qodercli/releases/${version}/qodercli_${version}_${platformSuffix}";
-    hash = hashes.${platform};
+    inherit (src) url hash;
   };
 
-  nativeBuildInputs =
-    lib.optionals stdenv.hostPlatform.isDarwin [ unzip ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ gcc-unwrapped.lib ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
   sourceRoot = ".";
+
+  dontStrip = true; # do not mess with the bun runtime
 
   installPhase = ''
     runHook preInstall
