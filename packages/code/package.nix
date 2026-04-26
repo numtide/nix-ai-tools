@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchCargoVendor,
   installShellFiles,
   rustPlatform,
   pkg-config,
@@ -25,11 +24,7 @@ rustPlatform.buildRustPackage {
   pname = "code";
   inherit version src;
 
-  cargoDeps = fetchCargoVendor {
-    inherit src;
-    sourceRoot = "source/code-rs";
-    hash = "sha256-ig90sWozfLZQJ/F6BuhRbLbR4GiyygqAaumO6WOItpw=";
-  };
+  cargoHash = "sha256-ig90sWozfLZQJ/F6BuhRbLbR4GiyygqAaumO6WOItpw=";
 
   sourceRoot = "source/code-rs";
 
