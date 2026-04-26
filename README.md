@@ -803,6 +803,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>context-hub</strong> - CLI for Context Hub - search and retrieve LLM-optimized docs and skills</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/andrewyng/context-hub
+- **Usage**: `nix run github:numtide/llm-agents.nix#context-hub -- --help`
+- **Nix**: [packages/context-hub/package.nix](packages/context-hub/package.nix)
+
+</details>
+<details>
 <summary><strong>copilot-language-server</strong> - GitHub Copilot Language Server - AI pair programmer LSP</summary>
 
 - **Source**: bytecode
