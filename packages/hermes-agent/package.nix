@@ -163,10 +163,13 @@ python3.pkgs.buildPythonApplication rec {
       fal-client
       # Text-to-speech
       edge-tts
-      faster-whisper
       # Skills Hub
       pyjwt
     ]
+    # faster-whisper -> av currently SIGKILLs during pythonImportsCheck on
+    # darwin in nixpkgs-unstable; the voice pipeline is optional, so only
+    # ship it where it builds.
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ faster-whisper ]
     ++ optional-dependencies.gateway
     ++ optional-dependencies.misc;
 
