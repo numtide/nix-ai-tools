@@ -5,6 +5,8 @@
   python3,
   fetchFromGitHub,
   fetchPypi,
+  buildNpmPackage,
+  nodejs,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -96,9 +98,8 @@ let
       hatch-fancy-pypi-readme
     ];
 
-    # Upstream pins hatchling==1.26.3 in build-system.requires; any recent
-    # hatchling works. pythonRelaxDeps only rewrites runtime metadata, so
-    # skip the pypa-build dependency check instead of patching pyproject.toml.
+    # Upstream pins hatchling==1.26.3 in build-system.requires; pythonRelaxDeps
+    # only touches runtime metadata, so skip the build-time pin check.
     pypaBuildFlags = [ "--skip-dependency-check" ];
 
     dependencies = with python3.pkgs; [
@@ -120,11 +121,8 @@ let
       platforms = platforms.all;
     };
   };
-in
-python3.pkgs.buildPythonApplication rec {
-  pname = "hermes-agent";
+
   version = "2026.4.23";
-  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "NousResearch";
@@ -133,11 +131,27 @@ python3.pkgs.buildPythonApplication rec {
     hash = "sha256-cJEYjf8xV4vDw9xRBh9SHMhamj5wNjEhmMO5O3s5lag=";
   };
 
-  build-system = with python3.pkgs; [
-    setuptools
-  ];
+  # `hermes --tui` runs a compiled Ink/React app from ui-tui/ that the wheel
+  # does not ship. Prebuild it and expose via HERMES_TUI_DIR so the CLI takes
+  # the fast-path in hermes_cli/main.py:_make_tui_argv (#4364).
+  hermes-tui = buildNpmPackage {
+    pname = "hermes-tui";
+    inherit version;
+    src = "${src}/ui-tui";
+    npmDepsHash = "sha256-RU4qSHgJPMyfRSEJDzkG4+MReDZDc6QbTD2wisa5QE0=";
 
-  dependencies =
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/lib/hermes-tui
+      cp -r dist node_modules package.json $out/lib/hermes-tui/
+      # @hermes/ink is a file: dep — replace dangling symlink with the source.
+      rm -f $out/lib/hermes-tui/node_modules/@hermes/ink
+      cp -r packages/hermes-ink $out/lib/hermes-tui/node_modules/@hermes/ink
+      runHook postInstall
+    '';
+  };
+
+  hermesDeps =
     with python3.pkgs;
     [
       # Core
@@ -166,28 +180,22 @@ python3.pkgs.buildPythonApplication rec {
       # Skills Hub
       pyjwt
     ]
-    # faster-whisper -> av currently SIGKILLs during pythonImportsCheck on
-    # darwin in nixpkgs-unstable; the voice pipeline is optional, so only
-    # ship it where it builds.
+    # faster-whisper -> av SIGKILLs during import on darwin; voice is optional.
     ++ lib.optionals stdenv.hostPlatform.isLinux [ faster-whisper ]
-    ++ optional-dependencies.gateway
-    ++ optional-dependencies.misc;
+    ++ optionalDeps.gateway
+    ++ optionalDeps.misc;
 
-  # Upstream ships most integrations as setuptools extras and degrades
-  # "gracefully" at runtime by logging a warning and refusing to start the
-  # adapter (see #4175 for the slack-bolt case). In a Nix closure the user
-  # cannot `pip install hermes-agent[slack]`, so pull in every extra that is
-  # already packaged in nixpkgs. Extras whose deps are not yet in nixpkgs
-  # (honcho, daytona, dingtalk, feishu) are intentionally omitted.
-  optional-dependencies = with python3.pkgs; {
-    # Everything the `hermes gateway` command can use.
+  # Upstream extras only warn-and-disable at runtime when missing (#4175), so
+  # ship every extra nixpkgs has. Not yet packaged: honcho, daytona, dingtalk,
+  # feishu.
+  optionalDeps = with python3.pkgs; {
     gateway = [
       # [messaging] / [slack]
       slack-bolt
       slack-sdk
       python-telegram-bot
       discordpy
-      aiohttp # also covers [homeassistant] and [sms]
+      aiohttp
       # [cron]
       croniter
       # [web]
@@ -195,15 +203,12 @@ python3.pkgs.buildPythonApplication rec {
       uvicorn
     ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
-      # [matrix] — upstream gates this on linux because python-olm is
-      # broken on modern macOS toolchains.
+      # [matrix] — python-olm broken on macOS upstream.
       mautrix
       markdown
       aiosqlite
       asyncpg
     ];
-    # Non-gateway extras kept separate so the test closure can stay slim if
-    # someone later wants `hermes-agent.override { withExtras = false; }`.
     misc = [
       # [cli]
       simple-term-menu
@@ -211,7 +216,7 @@ python3.pkgs.buildPythonApplication rec {
       ptyprocess
       # [acp]
       agent-client-protocol
-      # [voice] (faster-whisper already in core deps above)
+      # [voice]
       sounddevice
       numpy
       # [tts-premium]
@@ -225,6 +230,40 @@ python3.pkgs.buildPythonApplication rec {
     ];
   };
 
+  # The TUI spawns `$HERMES_PYTHON -m tui_gateway.entry`; sys.executable is the
+  # bare interpreter, so give it an env with the runtime deps. tui_gateway
+  # itself is found via PYTHONPATH=$out/site-packages (HERMES_PYTHON_SRC_ROOT).
+  pythonEnv = python3.withPackages (_: hermesDeps);
+in
+python3.pkgs.buildPythonApplication {
+  pname = "hermes-agent";
+  inherit version src;
+  pyproject = true;
+
+  build-system = with python3.pkgs; [
+    setuptools
+  ];
+
+  dependencies = hermesDeps;
+  optional-dependencies = optionalDeps;
+
+  makeWrapperArgs = [
+    "--set"
+    "HERMES_TUI_DIR"
+    "${hermes-tui}/lib/hermes-tui"
+    "--set"
+    "HERMES_PYTHON"
+    "${pythonEnv}/bin/python3"
+    "--set"
+    "HERMES_NODE"
+    "${nodejs}/bin/node"
+    # node+npm on PATH short-circuits _ensure_tui_node()'s download bootstrap.
+    "--prefix"
+    "PATH"
+    ":"
+    "${nodejs}/bin"
+  ];
+
   pythonRelaxDeps = [
     "tenacity"
     "requests"
@@ -235,8 +274,7 @@ python3.pkgs.buildPythonApplication rec {
 
   pythonImportsCheck = [
     "hermes_cli"
-    # Regression guard for #4175: these adapters swallow ImportError and only
-    # warn at runtime, so assert the underlying libraries import cleanly.
+    # #4175: adapters swallow ImportError, so assert these import.
     "slack_bolt"
     "discord"
     "telegram.ext"
@@ -250,7 +288,18 @@ python3.pkgs.buildPythonApplication rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
-  passthru.category = "AI Assistants";
+  # #4364: wrapper must wire up the TUI and a deps-capable gateway python.
+  postInstallCheck = ''
+    grep -q HERMES_TUI_DIR $out/bin/hermes
+    grep -q HERMES_PYTHON $out/bin/hermes
+    test -f ${hermes-tui}/lib/hermes-tui/dist/entry.js
+    ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
+  '';
+
+  passthru = {
+    category = "AI Assistants";
+    inherit hermes-tui;
+  };
 
   meta = with lib; {
     description = "Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere";
@@ -258,9 +307,7 @@ python3.pkgs.buildPythonApplication rec {
     changelog = "https://github.com/NousResearch/hermes-agent/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    # x86_64-darwin dropped: arrow-cpp (via litellm -> tokenizers -> datasets
-    # -> pyarrow) is marked broken there, and nixpkgs 26.05 is the last
-    # release supporting the platform anyway.
+    # x86_64-darwin: pyarrow (via faster-whisper chain) broken there.
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
