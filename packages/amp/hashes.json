@@ -1,9 +1,9 @@
 {
-  "version": "0.0.1777234127-g973bfa",
+  "version": "0.0.1777248626-ga45149",
   "binaryHashes": {
-    "x86_64-linux": "sha256-SvDLHw4nfqWtDKtXqQOt6iFt+W4p0RsrXPCArBYIyDI=",
-    "aarch64-linux": "sha256-f5oFRG9C7JI16EwsfSQN7zNfB38BldtZWEeuB64BsG0=",
-    "x86_64-darwin": "sha256-1aW6PMZL46so0En7qj1gt8/bqOk9li8WPNsOCQ5tifo=",
-    "aarch64-darwin": "sha256-94ZOXZLPZDDg3+uI0iuyncjdj0m5DmdYQsDGdjuM60U="
+    "x86_64-linux": "sha256-WdJdiunc26ZNVxJnnTf8p+QkB753XNtdVsAyUFaR/TY=",
+    "aarch64-linux": "sha256-/08wsPTnD99DG7UpLuAAXTyNYuddwN8XAntUzryTEZM=",
+    "x86_64-darwin": "sha256-40D0+lUDiWIzUXmZJfSIOkAgaVewnB7KgMQavQs1/SI=",
+    "aarch64-darwin": "sha256-xYGEkgGLFctans8Fl4NXRSAAPZdi5BoCdj5cz2tt6Ow="
   }
 }
