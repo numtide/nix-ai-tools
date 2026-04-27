@@ -1,2 +1,4 @@
 --version-regex
 ^v(\d+\.\d+\.\d+)$
+--subpackage
+hermes-tui
