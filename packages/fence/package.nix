@@ -16,16 +16,16 @@
 
 buildGoModule rec {
   pname = "fence";
-  version = "0.1.51";
+  version = "0.1.52";
 
   src = fetchFromGitHub {
     owner = "Use-Tusk";
     repo = "fence";
     rev = "v${version}";
-    hash = "sha256-SQexuuD7VyHp3lCOEBY/qYfb6kYzEp5FXSRSH+tvNew=";
+    hash = "sha256-yj1eXdnvBDT+GGVzntVZqzKQhjDZ7n9bHumydoE2EOU=";
   };
 
-  vendorHash = "sha256-JIkEe+wscowc1IT8gtm5C4ZnChsOhy5wTy7R//DLFTU=";
+  vendorHash = "sha256-Ondq2/11Loa/g04dNkPUBkrYCWs8y/NdvLo/XPneaaY=";
 
   nativeBuildInputs = [
     installShellFiles
