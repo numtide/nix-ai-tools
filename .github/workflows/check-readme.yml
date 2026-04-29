@@ -1,0 +1,22 @@
+name: Check README is up to date
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'scripts/generate-package-docs.py'
+      - 'scripts/generate-package-docs.nix'
+      - 'README.md'
+      - '.github/workflows/check-readme.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+      - name: Verify README matches generator output
+        run: |
+          ./scripts/generate-package-docs.py
+          git diff --exit-code README.md
