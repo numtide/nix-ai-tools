@@ -717,6 +717,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>td</strong> - A minimalist CLI for tracking tasks across AI coding sessions.</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/marcus/td
+- **Usage**: `nix run github:numtide/llm-agents.nix#td -- --help`
+- **Nix**: [packages/td/package.nix](packages/td/package.nix)
+
+</details>
+<details>
 <summary><strong>vibe-kanban</strong> - Kanban board to orchestrate AI coding agents like Claude Code, Codex, and Gemini CLI</summary>
 
 - **Source**: source
