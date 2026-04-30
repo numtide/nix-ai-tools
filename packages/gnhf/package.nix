@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   buildNpmPackage,
   fetchFromGitHub,
   versionCheckHook,
@@ -33,7 +34,7 @@ buildNpmPackage rec {
     changelog = "https://github.com/kunchenguid/gnhf/releases/tag/gnhf-v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = [ ];
+    maintainers = with flake.lib.maintainers; [ pikdum ];
     mainProgram = "gnhf";
     platforms = platforms.all;
   };
