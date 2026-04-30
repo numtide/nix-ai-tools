@@ -73,6 +73,10 @@ rustPlatform.buildRustPackage {
     installShellFiles
     makeWrapper
     pkg-config
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # Unable to find libclang: "couldn't find any valid shared libraries matching: ['libclang.dylib']
+    rustPlatform.bindgenHook
   ];
 
   buildInputs = [ openssl ] ++ lib.optionals stdenv.hostPlatform.isLinux [ libcap ];
