@@ -161,6 +161,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>gnhf</strong> - Ralph/autoresearch-style orchestrator that keeps coding agents running while you sleep</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/kunchenguid/gnhf
+- **Usage**: `nix run github:numtide/llm-agents.nix#gnhf -- --help`
+- **Nix**: [packages/gnhf/package.nix](packages/gnhf/package.nix)
+
+</details>
+<details>
 <summary><strong>goose-cli</strong> - CLI for Goose - a local, extensible, open source AI agent that automates engineering tasks</summary>
 
 - **Source**: source
