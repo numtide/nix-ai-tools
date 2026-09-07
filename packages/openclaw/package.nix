@@ -25,19 +25,19 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.8.2";
+  version = "2026.9.2";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-lSYGSyD3rt1YDyZ7d99V1080rMcLSu67skP54XuW1Cw=";
+    hash = "sha256-VRY5aJDmctoblL9hPb//Y3H1+1zWoKa0sbApdHu4saY=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
-    hash = "sha256-XbU5w/X/qsOFZtk0lnB+XJZwhk0f6Ihawk0VEnDqNAk=";
+    hash = "sha256-NUEfkKFibAY3jgM5/e7HtV23nM5UB9iKhy/w8xIIQ+0=";
     fetcherVersion = 3;
     prePnpmInstall = stripPatchedDeps;
   };
@@ -60,32 +60,16 @@ stdenv.mkDerivation (finalAttrs: {
   # node-side ui:build/tsc lets V8 grow its heap toward the host total. Bound
   # both so peak RSS stays within the builder's limit.
   env = {
-    NODE_OPTIONS = "--max-old-space-size=4096";
-    # the sandbox hides the cgroup limit tsdown-build wants to derive this from
-    OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB = "4096";
+    NODE_OPTIONS = "--max-old-space-size=4608";
+    # the sandbox hides the cgroup limit tsdown-build wants to derive this from;
+    # upstream measures a 4352MB minimum for the declaration build
+    OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB = "4608";
     # fs-safe's native openat2 path returns ENOSYS on some builders
     FS_SAFE_NATIVE_MODE = "off";
     RAYON_NUM_THREADS = "4";
   };
 
   postPatch = stripPatchedDeps;
-
-  preBuild = ''
-    # rolldown is a transitive dependency (via tsdown), not a direct root
-    # dependency, so pnpm does not link its binary into node_modules/.bin.
-    # scripts/bundle-a2ui.mjs probes two hard-coded paths under
-    # node_modules/.pnpm/ (the layout produced by pnpm's default isolated
-    # node-linker) and falls back to 'pnpm dlx rolldown' (network) when neither
-    # exists. Upstream however sets `node-linker=hoisted` in .npmrc, so the
-    # package ends up at node_modules/rolldown instead and the probes miss it.
-    # Link it where the script expects so the pre-fetched binary is used.
-    if [ ! -e node_modules/rolldown/bin/cli.mjs ]; then
-      echo "error: rolldown cli.mjs not found in node_modules" >&2
-      exit 1
-    fi
-    mkdir -p node_modules/.pnpm/node_modules
-    ln -sfT ../../rolldown node_modules/.pnpm/node_modules/rolldown
-  '';
 
   buildPhase = ''
     runHook preBuild
