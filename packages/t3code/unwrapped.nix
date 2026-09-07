@@ -9,6 +9,8 @@
   pnpmBuildHook,
   nodejs_24,
   node-gyp,
+  pkg-config,
+  libsecret,
   python3,
   cacert,
   electron_43,
@@ -115,12 +117,16 @@ stdenv.mkDerivation {
     pnpmConfigHook
     python3
   ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     cctools.libtool
     libicns
     writeDarwinBundle
     xcbuild
   ];
+
+  # build:desktop compiles native/browser-secret against libsecret on linux
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libsecret ];
 
   preBuild = ''
     export pnpm_config_verify_deps_before_run=false
