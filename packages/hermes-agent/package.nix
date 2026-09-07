@@ -295,6 +295,8 @@ let
 
   # pyramid dropped its pkg_resources shim on python 3.14, so slack-bolt's
   # pyramid adapter tests fail at collection with ModuleNotFoundError.
+  # The async assistant scenario tests wait on real timers and time out on
+  # loaded builders.
   # pkg-resources-backport tests need jaraco-path, broken on darwin
   slack-bolt' =
     (python3.pkgs.slack-bolt.override {
@@ -305,6 +307,7 @@ let
       (old: {
         disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
           "tests/adapter_tests/pyramid/"
+          "tests/scenario_tests_async/test_events_assistant.py"
         ];
       });
 
