@@ -8,20 +8,21 @@
   versionCheckHomeHook,
   git,
   lsof,
+  tmux,
 }:
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "1.15.0";
+  version = "1.16.3";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     tag = "v${version}";
-    hash = "sha256-LdpTOnru4r46BYwHdKknlzqnOMutH6zseQZxd/BFAOY=";
+    hash = "sha256-TuqmuXDH6UxHmMd7Otu0rFtZFgHwg5yeAN4JpTagtIw=";
   };
 
-  vendorHash = "sha256-a5wcWeauSsDmRZ9j7AG+QUOVkCRy0UnAOexPfl8mezo=";
+  vendorHash = "sha256-jYCRbLdZxeR6gh9jyc7HTipbinj9QLoafFg8nujo9eI=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -82,8 +83,13 @@ buildGoModule rec {
     export PATH="${git}/bin:$PATH"
   '';
 
-  # worktree cleanup safety tests probe live processes via lsof on darwin
-  nativeCheckInputs = [ lsof ];
+  # worktree cleanup safety tests probe live processes via lsof on darwin;
+  # the cross-profile review tests run the real CLI, which refuses to start
+  # without tmux on PATH
+  nativeCheckInputs = [
+    lsof
+    tmux
+  ];
 
   doInstallCheck = true;
 
