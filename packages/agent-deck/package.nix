@@ -8,6 +8,7 @@
   versionCheckHomeHook,
   git,
   lsof,
+  tmux,
 }:
 
 buildGoModule rec {
@@ -82,8 +83,13 @@ buildGoModule rec {
     export PATH="${git}/bin:$PATH"
   '';
 
-  # worktree cleanup safety tests probe live processes via lsof on darwin
-  nativeCheckInputs = [ lsof ];
+  # worktree cleanup safety tests probe live processes via lsof on darwin;
+  # the cross-profile review tests run the real CLI, which refuses to start
+  # without tmux on PATH
+  nativeCheckInputs = [
+    lsof
+    tmux
+  ];
 
   doInstallCheck = true;
 
