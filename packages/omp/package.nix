@@ -127,6 +127,11 @@ stdenv.mkDerivation {
   env = {
     # smallvec's `specialization` feature needs nightly features on stable rustc
     RUSTC_BOOTSTRAP = 1;
+    # upstream's release profile is fat LTO with one codegen unit; that final
+    # link runs silently for 10+ minutes and CI builders kill it. Use the
+    # settings of upstream's own `ci` profile instead.
+    CARGO_PROFILE_RELEASE_LTO = "thin";
+    CARGO_PROFILE_RELEASE_CODEGEN_UNITS = 16;
   };
 
   bunDeps = bun2nixLib.fetchBunDeps {
