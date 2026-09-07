@@ -67,20 +67,18 @@ stdenv.mkDerivation {
   dontStrip = true;
   dontWrapGApps = true;
 
-  nativeBuildInputs =
-    lib.optionals isLinux [
-      formatelf
-      dpkg
-      makeWrapper
-      wrapGAppsHook3
-    ]
-    ++ [
-      # patch-asar.py runs on both platforms.
-      python3
-    ]
-    ++ lib.optionals isDarwin [
-      unzip
-    ];
+  nativeBuildInputs = [
+    python3
+  ]
+  ++ lib.optionals isLinux [
+    formatelf
+    dpkg
+    makeWrapper
+    wrapGAppsHook3
+  ]
+  ++ lib.optionals isDarwin [
+    unzip
+  ];
 
   buildInputs = lib.optionals isLinux [
     alsa-lib
@@ -159,7 +157,6 @@ stdenv.mkDerivation {
     else
       ''
         runHook preUnpack
-        # The darwin distribution is a zip of the ChatGPT.app bundle.
         unzip -q "$src"
         runHook postUnpack
       '';
@@ -196,7 +193,6 @@ stdenv.mkDerivation {
         mv ChatGPT.app "$out/Applications/"
         ln -s ../Applications/ChatGPT.app/Contents/MacOS/ChatGPT "$out/bin/chatgpt"
 
-        # See patch-asar.py for the darwin store-mode patches.
         python3 ${./patch-asar.py} "$out/Applications/ChatGPT.app/Contents/Resources/app.asar" darwin
 
         runHook postInstall
