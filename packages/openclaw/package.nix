@@ -60,9 +60,10 @@ stdenv.mkDerivation (finalAttrs: {
   # node-side ui:build/tsc lets V8 grow its heap toward the host total. Bound
   # both so peak RSS stays within the builder's limit.
   env = {
-    NODE_OPTIONS = "--max-old-space-size=4096";
-    # the sandbox hides the cgroup limit tsdown-build wants to derive this from
-    OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB = "4096";
+    NODE_OPTIONS = "--max-old-space-size=4608";
+    # the sandbox hides the cgroup limit tsdown-build wants to derive this from;
+    # upstream measures a 4352MB minimum for the declaration build
+    OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB = "4608";
     # fs-safe's native openat2 path returns ENOSYS on some builders
     FS_SAFE_NATIVE_MODE = "off";
     RAYON_NUM_THREADS = "4";
