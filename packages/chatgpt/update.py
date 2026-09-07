@@ -8,7 +8,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.request
-import xml.etree.ElementTree as ET  # conventional stdlib alias
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
@@ -204,9 +204,8 @@ def darwin_source(current: dict[str, str] | None) -> dict[str, str]:
     zip is downloaded and hashed. The existing entry is reused unchanged to
     avoid re-downloading the ~600MB archive on every run.
     """
-    # The appcast is served over HTTPS from the pinned static host and only
-    # version/url pairings are extracted; the artifact's authenticity is
-    # enforced by the pinned hash in review (see S314).
+    # S314: the appcast only yields a version/url pair; the pinned hash on the
+    # downloaded artifact is what carries trust
     root = ET.fromstring(fetch_url(APPCAST_URL))  # noqa: S314
     for item in root.iter("item"):
         version = (item.findtext("title") or "").strip()

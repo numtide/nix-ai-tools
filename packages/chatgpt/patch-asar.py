@@ -6,12 +6,12 @@ spaces to the original's exact byte length instead of re-packing the archive.
 Minified identifiers change between releases, so patterns are regexes that
 capture the identifiers they need instead of hard-coding them.
 
-The second argument selects the platform patch set ("linux" by default,
-"darwin" otherwise): the NixOS-only process.report guard is absent from the
+Patch sets are per platform: the process.report guard is absent from the
 macOS build, and the writable plugin copy fix lands in whichever branch of
-the copy helper actually runs on that platform.
+the copy helper runs on that platform.
 """
 
+import argparse
 import re
 import sys
 from collections.abc import Callable
@@ -41,9 +41,7 @@ COPY_PLUGINS_WRITABLE = re.compile(
 )
 
 
-def _copy_writable_linux(match: re.Match[bytes]) -> bytes:
-    """Linux: rewrite the non-darwin branch (the one that runs on Linux)."""
-    m = match
+def _copy_writable_linux(m: re.Match[bytes]) -> bytes:
     return (
         m["fn"]
         + b"let r="
@@ -58,15 +56,9 @@ def _copy_writable_linux(match: re.Match[bytes]) -> bytes:
     )
 
 
-def _copy_writable_darwin(match: re.Match[bytes]) -> bytes:
-    """Darwin: the ``ditto`` branch is the one that runs on macOS.
-
-    ``ditto --noqtn`` preserves the source's read-only mode bits, so 444
-    store files would land read-only in ~/.codex and block the manifest
-    rewrite. Bytes are stolen from the dead branches, which can never run on
-    macOS (``ditto`` always returns first).
-    """
-    m = match
+def _copy_writable_darwin(m: re.Match[bytes]) -> bytes:
+    # the chmod bytes are stolen from the non-darwin branch, which is dead on
+    # macOS because the ditto branch always returns first
     return (
         m["fn"]
         + b"let r="
@@ -94,23 +86,17 @@ PATCHES: dict[
     ],
 }
 
-# argv index of the optional platform argument.
-PLATFORM_ARGV_INDEX = 2
-
 
 def main() -> None:
-    """Patch the asar archive (argv[1]) for the given platform (argv[2])."""
-    asar = Path(sys.argv[1])
-    platform = (
-        sys.argv[PLATFORM_ARGV_INDEX]
-        if len(sys.argv) > PLATFORM_ARGV_INDEX
-        else "linux"
-    )
-    if platform not in PATCHES:
-        sys.exit(f"unknown platform {platform!r} (known: {', '.join(PATCHES)})")
+    """Patch the asar archive in place."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("asar", type=Path)
+    parser.add_argument("platform", nargs="?", default="linux", choices=PATCHES)
+    args = parser.parse_args()
+    asar: Path = args.asar
 
     data = asar.read_bytes()
-    for pattern, build in PATCHES[platform]:
+    for pattern, build in PATCHES[args.platform]:
         matches = list(pattern.finditer(data))
         if len(matches) != 1:
             sys.exit(
