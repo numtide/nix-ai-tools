@@ -9,6 +9,8 @@
   pnpmBuildHook,
   nodejs_24,
   node-gyp,
+  pkg-config,
+  libsecret,
   python3,
   cacert,
   electron_43,
@@ -26,14 +28,14 @@
 
 let
   pname = "t3code";
-  version = "0.0.38";
+  version = "0.0.39";
   pnpm = pnpm_11;
 
   src = fetchFromGitHub {
     owner = "pingdotgg";
     repo = "t3code";
     tag = "v${version}";
-    hash = "sha256-lbAOIlNwVxrjXA5jJGzmOm7Fe2ZcsnFuDzaSEt6R7G4=";
+    hash = "sha256-nlVv29HKEXXU8+1bkJFWZllDdCV0teiaix+lqmOwoA0=";
   };
 
   resourceMonitor = rustPlatform.buildRustPackage {
@@ -101,7 +103,7 @@ stdenv.mkDerivation {
       pnpmWorkspaces
       ;
     fetcherVersion = 4;
-    hash = "sha256-t/hmpXdYPnBFx18A6NrSL4zSvVnUDIjIPtLjGOzoaDk=";
+    hash = "sha256-hYyiJ6FyNuG4594xObhMFIFBp5FZqK7o6sNnmryR/Jc=";
   };
 
   nativeBuildInputs = [
@@ -115,12 +117,16 @@ stdenv.mkDerivation {
     pnpmConfigHook
     python3
   ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     cctools.libtool
     libicns
     writeDarwinBundle
     xcbuild
   ];
+
+  # build:desktop compiles native/browser-secret against libsecret on linux
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libsecret ];
 
   preBuild = ''
     export pnpm_config_verify_deps_before_run=false
