@@ -70,23 +70,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   postPatch = stripPatchedDeps;
 
-  preBuild = ''
-    # rolldown is a transitive dependency (via tsdown), not a direct root
-    # dependency, so pnpm does not link its binary into node_modules/.bin.
-    # scripts/bundle-a2ui.mjs probes two hard-coded paths under
-    # node_modules/.pnpm/ (the layout produced by pnpm's default isolated
-    # node-linker) and falls back to 'pnpm dlx rolldown' (network) when neither
-    # exists. Upstream however sets `node-linker=hoisted` in .npmrc, so the
-    # package ends up at node_modules/rolldown instead and the probes miss it.
-    # Link it where the script expects so the pre-fetched binary is used.
-    if [ ! -e node_modules/rolldown/bin/cli.mjs ]; then
-      echo "error: rolldown cli.mjs not found in node_modules" >&2
-      exit 1
-    fi
-    mkdir -p node_modules/.pnpm/node_modules
-    ln -sfT ../../rolldown node_modules/.pnpm/node_modules/rolldown
-  '';
-
   buildPhase = ''
     runHook preBuild
 
