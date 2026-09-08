@@ -13,16 +13,16 @@
 # crit requires a go >= 1.26 toolchain.
 (buildGoModule.override { go = go_1_26; }) rec {
   pname = "crit";
-  version = "0.20.0";
+  version = "0.20.1";
 
   src = fetchFromGitHub {
     owner = "tomasz-tomczyk";
     repo = "crit";
     tag = "v${version}";
-    hash = "sha256-L7vqf7c0YMyDVEKQqzelFZVM5CZ6jSs7OZUfw5S6aQ8=";
+    hash = "sha256-PLNoj2mgLj5iUKElGXOIHW7bahXoxrb33kIqPTaz1+I=";
   };
 
-  vendorHash = "sha256-1RUnAxY0WAvOxYQUGivQFvxOeXLewivjHdgnSw6Goh8=";
+  vendorHash = "sha256-iEeHP8r32ipnAV54dflLKg/XPJXjO1M3KqslRcQnhZ0=";
 
   subPackages = [ "cmd/crit" ];
 
