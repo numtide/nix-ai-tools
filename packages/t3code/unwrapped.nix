@@ -28,14 +28,14 @@
 
 let
   pname = "t3code";
-  version = "0.0.39";
+  version = "0.0.40";
   pnpm = pnpm_11;
 
   src = fetchFromGitHub {
     owner = "pingdotgg";
     repo = "t3code";
     tag = "v${version}";
-    hash = "sha256-nlVv29HKEXXU8+1bkJFWZllDdCV0teiaix+lqmOwoA0=";
+    hash = "sha256-J8kXpfMfm03/DDAiWXJuANwUNDshhiUn7Lf9tV42Xfw=";
   };
 
   resourceMonitor = rustPlatform.buildRustPackage {
@@ -103,7 +103,7 @@ stdenv.mkDerivation {
       pnpmWorkspaces
       ;
     fetcherVersion = 4;
-    hash = "sha256-hYyiJ6FyNuG4594xObhMFIFBp5FZqK7o6sNnmryR/Jc=";
+    hash = "sha256-+UsoURSM4VP+CgF1fWROBEB85EuH+iJJM/xDPFigCKk=";
   };
 
   nativeBuildInputs = [
