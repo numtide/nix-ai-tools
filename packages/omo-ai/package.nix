@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   buildNpmPackage,
   fetchurl,
   fd,
@@ -135,7 +136,7 @@ buildNpmPackage {
       fromSource
       binaryNativeCode
     ];
-    maintainers = with lib.maintainers; [ ];
+    maintainers = with flake.lib.maintainers; [ ankarhem ];
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
