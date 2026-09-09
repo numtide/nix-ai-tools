@@ -15,14 +15,14 @@ let
   };
 in
 base.overrideAttrs (old: rec {
-  version = "2.3.2";
+  version = "2.3.3";
   src = fetchFromGitHub {
     owner = "dolthub";
     repo = "dolt";
     tag = "v${version}";
-    hash = "sha256-+mGvRm0YaDFuXuJfBocfJEqH36UllEm8rhx73RoihyM=";
+    hash = "sha256-9t4bpv35gQ+vAHf5M7XwDlY7vzeVb5k36DOERWT4l6g=";
   };
-  vendorHash = "sha256-j9HnfUZ1w6l/ytnYgvd3xiUNmTXd4BePOtSX1eJKaAc=";
+  vendorHash = "sha256-dS3OM2ghudvCldFkTQyVsdyaYFU8lkUcZ99y5xD3oc0=";
   passthru = (old.passthru or { }) // {
     hideFromDocs = true;
     updateEvenIfHidden = true;
