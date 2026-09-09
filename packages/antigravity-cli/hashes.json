@@ -1,13 +1,13 @@
 {
-  "version": "1.1.27",
+  "version": "1.1.28",
   "urls": {
-    "x86_64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.1.27-5211191891591168/linux-x64/cli_linux_x64.tar.gz",
-    "aarch64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.1.27-5211191891591168/linux-arm/cli_linux_arm64.tar.gz",
-    "aarch64-darwin": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.1.27-5211191891591168/darwin-arm/cli_mac_arm64.tar.gz"
+    "x86_64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.1.28-5576113066475520/linux-x64/cli_linux_x64.tar.gz",
+    "aarch64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.1.28-5576113066475520/linux-arm/cli_linux_arm64.tar.gz",
+    "aarch64-darwin": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.1.28-5576113066475520/darwin-arm/cli_mac_arm64.tar.gz"
   },
   "hashes": {
-    "x86_64-linux": "sha512-eT1LnqLAjZp+ULr6As/IwZQkvWDW6D+RQI1F+cbUznml1Xb+3lvvFk2COr+E+BNZoUtMpmWVLEewp8/XQ7tpwA==",
-    "aarch64-linux": "sha512-7UX2kweFqktC8U4HrOHJ2RqU+3bnYPVKy9fT05UeH5V/1Fag2uKjEk3Zo7aJv3r7fJMDo+S6lQN/wQBjQk2b+Q==",
-    "aarch64-darwin": "sha512-zWJ/eY4Fn4Soi/4h295UzFJi4tk9GUPxIOtLOGgj9KH3xKV9TQ+HZVdwm2BhpMAvH8ExV/AEfF328wCvpHHkEQ=="
+    "x86_64-linux": "sha512-qFXGI0Jv6QEIi/4rTVWbAfW0eafF7A5BrP4SnU/n3u6fvZBXByzI6MGe1lR0yvpPHRD83BT7uF+C8gw+yUKV1A==",
+    "aarch64-linux": "sha512-LMF8Ki3+XH0vgIisFsz+8nCTPHhEw8cXs+T0+Uhz+GXr3cWUNQjL5UtJdsD53EeMpxuMJrjAjWdY2VCHiCNVMA==",
+    "aarch64-darwin": "sha512-hKO7mAsNlnZJ5mkysENlpXilVgneqVcjSaB7EUBnIWRHwfwvD/VZQPtmVzCdpmW9OvT+iqFq94huExJDtoQIfw=="
   }
 }
