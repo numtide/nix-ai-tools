@@ -26,6 +26,11 @@ let
     nss
     nspr
   ];
+  executable =
+    if stdenv.hostPlatform.isDarwin then
+      "${chatgpt-unwrapped}/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+    else
+      "${chatgpt-unwrapped}/bin/chatgpt";
   patchRuntime = replaceVars ./patch-runtime.sh {
     autoFormatelf = "${formatelf.bin}/bin/auto-formatelf";
     inotifywait = "${inotify-tools}/bin/inotifywait";
@@ -46,12 +51,17 @@ stdenvNoCC.mkDerivation {
     runHook preInstall
 
     mkdir -p "$out/bin"
-    makeShellWrapper ${chatgpt-unwrapped}/bin/chatgpt "$out/bin/chatgpt" \
+    makeShellWrapper ${executable} "$out/bin/chatgpt" \
       ${lib.optionalString stdenv.hostPlatform.isLinux "--run '. ${patchRuntime}' --set-default DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 1"} \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland}}" \
       --add-flags ${lib.escapeShellArg commandLineArgs}
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
       ln -s ${chatgpt-unwrapped}/share "$out/share"
+    ''}
+    ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+      mkdir -p "$out/Applications"
+      ln -s ${chatgpt-unwrapped}/Applications/ChatGPT.app \
+        "$out/Applications/ChatGPT.app"
     ''}
 
     runHook postInstall
