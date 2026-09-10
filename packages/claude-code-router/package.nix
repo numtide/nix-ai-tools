@@ -10,7 +10,7 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "claude-code-router";
-  version = "3.0.22";
+  version = "3.1.0";
 
   # The GitHub repo carries package-lock.json (needed for npmDepsHash) but
   # not the built dist/ tree; the npm registry tarball is the other way
@@ -21,15 +21,15 @@ buildNpmPackage (finalAttrs: {
     owner = "musistudio";
     repo = "claude-code-router";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-dVjWNqlstf27HL5xGZooAX5hNVAc+PC9/ILya5jfZq0=";
+    hash = "sha256-maeo9rYiI8w9u3NM6OmebWkhxVUOwVfFLKtz93sIRcQ=";
   };
 
   dist = fetchzip {
     url = "https://registry.npmjs.org/@musistudio/claude-code-router/-/claude-code-router-${finalAttrs.version}.tgz";
-    hash = "sha256-rfB2f1r7u/Q8jGCC3jkUHa09PpB134ul+b8W0nqOW1o=";
+    hash = "sha256-5YsF3tyTwD1U+/JyvpEHVlGx7riZdMuSrBLMWquRuWA=";
   };
 
-  npmDepsHash = "sha256-+jieoHoftUAuMyvmoIUPkHzqIqvMjs5VAfwYCWdAiIk=";
+  npmDepsHash = "sha256-jWzTekZDPzWOpTivq4mMp/qDcs4rByUy4qMUjAsRJaQ=";
 
   # Upstream is an npm workspace monorepo; the published CLI lives in
   # packages/cli.
