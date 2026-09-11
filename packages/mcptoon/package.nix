@@ -6,14 +6,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "mcptoon";
-  version = "0.7.8";
+  version = "0.7.9";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "activeing123";
     repo = "mcptoon";
     tag = "v${version}";
-    hash = "sha256-3OL6cqcSRGiwatKb9ljobqff/DpQR7hWsEY7V4U3MAk=";
+    hash = "sha256-yimfT0V6pEPLYsqaA2bVXO80GS3OeFzZB5cDPO5S/Ww=";
   };
 
   # Upstream tags releases without bumping __version__ (v0.2.2 still
