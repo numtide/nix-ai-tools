@@ -123,6 +123,7 @@ stdenv.mkDerivation {
   runtimeDependencies = lib.optionals isLinux [
     libGL
     libgbm
+    libnotify
     libsecret
     libpulseaudio
     pipewire
