@@ -189,21 +189,29 @@ stdenv.mkDerivation {
       ''
         runHook preInstall
 
-        mkdir -p "$out/Applications" "$out/bin"
+        mkdir -p "$out/Applications"
         mv ChatGPT.app "$out/Applications/"
-        ln -s ../Applications/ChatGPT.app/Contents/MacOS/ChatGPT "$out/bin/chatgpt"
 
         python3 ${./patch-asar.py} "$out/Applications/ChatGPT.app/Contents/Resources/app.asar" darwin
 
         runHook postInstall
       '';
 
-  postFixup = lib.optionalString isLinux ''
-    patchelf --add-rpath ${lib.makeLibraryPath [ qt5.qtbase ]} \
-      "$out/lib/chatgpt/libqt5_shim.so"
-    patchelf --add-rpath ${lib.makeLibraryPath [ qt6.qtbase ]} \
-      "$out/lib/chatgpt/libqt6_shim.so"
-  '';
+  postFixup =
+    lib.optionalString isLinux ''
+      patchelf --add-rpath ${lib.makeLibraryPath [ qt5.qtbase ]} \
+        "$out/lib/chatgpt/libqt5_shim.so"
+      patchelf --add-rpath ${lib.makeLibraryPath [ qt6.qtbase ]} \
+        "$out/lib/chatgpt/libqt6_shim.so"
+    ''
+    + lib.optionalString isDarwin ''
+      # Patching app.asar and script shebangs invalidates OpenAI's signature.
+      # An invalid signature makes macOS refuse to launch the application.
+      /usr/bin/codesign --force --deep --sign - \
+        "$out/Applications/ChatGPT.app"
+      /usr/bin/codesign --verify --deep --strict \
+        "$out/Applications/ChatGPT.app"
+    '';
 
   meta = with lib; {
     description = "Desktop application for ChatGPT and Codex";
